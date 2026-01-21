@@ -1,0 +1,50 @@
+#include "kernels/k3_finetransport.cuh"
+#include "physics/step_control.hpp"
+#include "physics/highland.hpp"
+#include "physics/nuclear.hpp"
+#include "physics/physics.hpp"
+
+__global__ void K3_FineTransport(
+    const uint32_t* __restrict__ block_ids_in,
+    const float* __restrict__ values_in,
+    const uint32_t* __restrict__ ActiveList,
+    int Nx, int Nz, float dx, float dz,
+    int n_active,
+    double* __restrict__ EdepC,
+    float* __restrict__ AbsorbedWeight_cutoff,
+    float* __restrict__ AbsorbedWeight_nuclear,
+    double* __restrict__ AbsorbedEnergy_nuclear,
+    float* __restrict__ BoundaryLoss_weight,
+    double* __restrict__ BoundaryLoss_energy
+) {
+    // Kernel implementation stub
+    int cell_idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (cell_idx >= n_active) return;
+
+    // TODO: Full implementation requires device LUT access
+}
+
+// CPU test stubs
+K3Result run_K3_single_component(const Component& c) {
+    K3Result r;
+    if (c.E <= E_cutoff) {
+        r.Edep = c.E;
+        r.terminated = true;
+        r.remained_in_cell = false;
+        return r;
+    }
+
+    // Simple step simulation
+    float dE = c.E * 0.01f;
+    r.Edep = dE;
+    r.nuclear_weight_removed = c.w * 0.001f;
+    r.nuclear_energy_removed = r.nuclear_weight_removed * c.E;
+    r.remained_in_cell = true;
+    return r;
+}
+
+K3Result run_K3_with_forced_split(const Component& c) {
+    K3Result r = run_K3_single_component(c);
+    r.split_count = 7;
+    return r;
+}

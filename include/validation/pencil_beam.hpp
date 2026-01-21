@@ -1,0 +1,30 @@
+#pragma once
+#include "core/grids.hpp"
+#include "core/psi_storage.hpp"
+#include <vector>
+
+struct PencilBeamConfig {
+    float E0 = 150.0f;
+    float x0 = 0.0f;
+    float z0 = 0.0f;
+    float theta0 = 0.0f;
+    int Nx = 100;
+    int Nz = 200;
+    float dx = 1.0f;
+    float dz = 1.0f;
+    int max_steps = 100;
+    float W_total = 1.0f;
+    unsigned random_seed = 42;
+};
+
+struct SimulationResult {
+    int Nx, Nz;
+    float dx, dz;
+    std::vector<std::vector<double>> edep;
+    std::vector<float> x_centers;
+    std::vector<float> z_centers;
+};
+
+SimulationResult run_pencil_beam(const PencilBeamConfig& config);
+int find_bragg_peak_z(const SimulationResult& result);
+std::vector<double> get_depth_dose(const SimulationResult& result);
