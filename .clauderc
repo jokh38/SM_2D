@@ -1,0 +1,19 @@
+# SM_2D Project Configuration
+# This file is automatically loaded by Claude Code for this project
+
+## Task Completion Rule
+CRITICAL: When any task is completed, update todo.md with:
+- [x] Task description (file:line reference)
+- Add any new pending tasks as [ ] items
+
+## Project Context
+- Hierarchical Deterministic Transport Solver for proton therapy
+- Target hardware: RTX 2080 (8GB VRAM)
+- Main language: CUDA C++
+- Spec version: v0.8
+
+## Key Physics Constraints
+- R-based step control (NO S(E) usage - IC-1)
+- Variance-based MCS accumulation (IC-2)
+- Bin-edge energy discretization (IC-3)
+- Energy conservation <1e-5, weight conservation <1e-6
