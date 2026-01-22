@@ -272,8 +272,8 @@ tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/source/pencil_source.hpp \
- /workspaces/SM_2D/include/core/grids.hpp /usr/include/c++/12/cmath \
+ /workspaces/SM_2D/src/include/source/pencil_source.hpp \
+ /workspaces/SM_2D/src/include/core/grids.hpp /usr/include/c++/12/cmath \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
@@ -295,6 +295,6 @@ tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: \
  /usr/include/c++/12/tr1/poly_hermite.tcc \
  /usr/include/c++/12/tr1/poly_laguerre.tcc \
  /usr/include/c++/12/tr1/riemann_zeta.tcc \
- /workspaces/SM_2D/include/core/psi_storage.hpp \
- /workspaces/SM_2D/include/core/local_bins.hpp \
- /workspaces/SM_2D/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+ /workspaces/SM_2D/src/include/core/local_bins.hpp \
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp

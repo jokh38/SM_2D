@@ -21,6 +21,11 @@ struct K3Result {
     bool remained_in_cell = true;
     bool terminated = false;
     int split_count = 0;
+
+    // IC-6: MCS direction update (was missing)
+    float mu_new = 1.0f;       // Updated direction cosine
+    float eta_new = 0.0f;      // Updated direction sine
+    float theta_scatter = 0.0f; // Scattering angle for diagnostics
 };
 
 // Fine transport kernel

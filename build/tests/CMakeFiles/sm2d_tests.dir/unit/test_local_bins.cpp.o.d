@@ -272,4 +272,4 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp

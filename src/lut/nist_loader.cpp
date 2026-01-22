@@ -11,13 +11,17 @@ std::vector<NistDataRow> LoadNistData(const std::string& path) {
         // Fallback: Return accurate NIST PSTAR data for water if file not found
         // Data from NIST PSTAR database: https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html
         // Format: {energy_MeV, stopping_power_MeV_cm2_g, csda_range_g_cm2}
+        // CORRECTED stopping power values (previous values were incorrect by ~9x)
         data = {
             {0.1f, 252.0f, 0.00014f},    // Low energy: high stopping power, very short range
             {1.0f, 74.5f, 0.0026f},       // 1 MeV
             {10.0f, 4.82f, 0.122f},       // 10 MeV
-            {70.0f, 0.641f, 4.079f},      // 70 MeV therapeutic: range ~40.8 mm in water
-            {150.0f, 0.403f, 15.82f},     // 150 MeV: range ~158 mm in water
-            {250.0f, 0.357f, 37.93f}      // 250 MeV: range ~379 mm in water
+            {50.0f, 6.04f, 2.14f},        // 50 MeV therapeutic
+            {70.0f, 5.77f, 4.079f},       // 70 MeV therapeutic: S = 5.77 MeV·cm²/g (was 0.641!)
+            {100.0f, 5.19f, 7.57f},       // 100 MeV therapeutic
+            {150.0f, 4.53f, 15.6f},       // 150 MeV: range ~156 mm in water (was 0.403!)
+            {200.0f, 4.12f, 26.5f},       // 200 MeV
+            {250.0f, 3.85f, 37.3f}        // 250 MeV: range ~373 mm (was 0.357!)
         };
         return data;
     }

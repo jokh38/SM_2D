@@ -271,4 +271,5 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/utils/logger.hpp /usr/include/c++/12/cstdarg
+ /workspaces/SM_2D/src/include/utils/logger.hpp \
+ /usr/include/c++/12/cstdarg

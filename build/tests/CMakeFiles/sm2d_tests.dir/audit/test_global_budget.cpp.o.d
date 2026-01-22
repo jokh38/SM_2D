@@ -272,5 +272,5 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/audit/global_budget.hpp \
- /workspaces/SM_2D/include/audit/conservation.hpp
+ /workspaces/SM_2D/src/include/audit/global_budget.hpp \
+ /workspaces/SM_2D/src/include/audit/conservation.hpp

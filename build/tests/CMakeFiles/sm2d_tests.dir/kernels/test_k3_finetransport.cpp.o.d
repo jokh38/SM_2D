@@ -425,11 +425,11 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o : /workspace
     /usr/include/gtest/gtest-typed-test.h \
     /usr/include/gtest/gtest_pred_impl.h \
     /usr/include/gtest/gtest_prod.h \
-    /workspaces/SM_2D/cuda/kernels/k3_finetransport.cuh \
-    /workspaces/SM_2D/include/physics/physics.hpp \
-    /workspaces/SM_2D/include/physics/step_control.hpp \
-    /workspaces/SM_2D/include/lut/r_lut.hpp \
-    /workspaces/SM_2D/include/core/grids.hpp \
-    /workspaces/SM_2D/include/physics/highland.hpp \
-    /workspaces/SM_2D/include/physics/nuclear.hpp \
-    /workspaces/SM_2D/include/physics/energy_straggling.hpp
+    /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cuh \
+    /workspaces/SM_2D/src/include/physics/physics.hpp \
+    /workspaces/SM_2D/src/include/physics/step_control.hpp \
+    /workspaces/SM_2D/src/include/lut/r_lut.hpp \
+    /workspaces/SM_2D/src/include/core/grids.hpp \
+    /workspaces/SM_2D/src/include/physics/highland.hpp \
+    /workspaces/SM_2D/src/include/physics/nuclear.hpp \
+    /workspaces/SM_2D/src/include/physics/energy_straggling.hpp

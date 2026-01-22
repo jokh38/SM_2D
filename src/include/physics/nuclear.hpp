@@ -22,7 +22,9 @@ inline float Sigma_total(float E_MeV) {
     }
 
     // Reference values at 100 MeV (ICRU 63)
-    constexpr float sigma_100 = 0.0050f;  // mm⁻¹ at 100 MeV
+    // CORRECTED: ICRU 63 reports ~0.0012 mm⁻¹ for water at 100 MeV
+    // Previous value 0.005 was ~4x too high
+    constexpr float sigma_100 = 0.0012f;  // mm⁻¹ at 100 MeV (ICRU 63)
     constexpr float E_ref = 100.0f;       // Reference energy [MeV]
 
     if (E_MeV >= 20.0f) {
@@ -35,7 +37,8 @@ inline float Sigma_total(float E_MeV) {
     } else {
         // Low energy (5-20 MeV): rapid increase due to reduced Coulomb barrier
         // Linear ramp from 0 at 5 MeV to sigma_20 at 20 MeV
-        constexpr float sigma_20 = 0.0065f;  // mm⁻¹ at 20 MeV
+        // CORRECTED: Scaled proportionally with sigma_100
+        constexpr float sigma_20 = 0.0016f;  // mm⁻¹ at 20 MeV (was 0.0065)
         float frac = (E_MeV - 5.0f) / 15.0f;  // 0 to 1
         return sigma_20 * frac;
     }

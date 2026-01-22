@@ -272,4 +272,4 @@ tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/perf/memory_profiler.hpp
+ /workspaces/SM_2D/src/include/perf/memory_profiler.hpp

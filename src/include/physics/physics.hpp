@@ -6,7 +6,7 @@
 
 // Physics constants
 constexpr float m_p = 938.272f;          // Proton mass [MeV/c²]
-constexpr float X0_water = 360.8f;       // Radiation length [mm]
+// X0_water is defined in highland.hpp (360.8f) to avoid circular dependency
 constexpr float E_cutoff = 0.1f;         // Energy cutoff [MeV]
 constexpr float weight_epsilon = 1e-12f; // Weight underflow threshold
 

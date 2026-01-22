@@ -72,24 +72,20 @@ K3Result run_K3_single_component(const Component& c) {
 
     const auto& lut = get_global_rlut();
 
-    // Step size [mm]
-    constexpr float step_size = 1.0f;
     constexpr float rho_water = 1.0f;  // Water density [g/cm³]
 
-    // Get stopping power from LUT [MeV cm²/g]
-    float S = lut.lookup_S(c.E);
+    // IC-7: Use adaptive step size control (was fixed 1.0 mm)
+    float step_size = compute_max_step_physics(lut, c.E);
 
-    // Convert to dE/dx [MeV/mm]
-    float dEdx = stopping_power_to_dEdx(S, rho_water);
+    // IC-1: Use Range-Energy inverse lookup for energy update
+    // This is more accurate than Euler integration near Bragg peak
+    float mean_dE = compute_energy_deposition(lut, c.E, step_size);
 
-    // Mean energy loss [MeV]
-    float mean_dE = dEdx * step_size;
-
-    // Energy straggling (Bohr theory)
-    float sigma_E = bohr_energy_straggling_sigma(c.E, step_size, rho_water);
+    // IC-4: Use full Vavilov straggling model (was only Bohr)
+    // energy_straggling_sigma automatically selects Bohr/Landau/Vavilov based on κ
+    float sigma_E = energy_straggling_sigma(c.E, step_size, rho_water);
 
     // IC-3: Use per-particle seed for proper straggling
-    // Simple hash from component state
     unsigned seed = static_cast<unsigned>(
         (unsigned)(c.x * 10000) ^ (unsigned)(c.z * 1000) ^ (unsigned)(c.E * 100)
     );
@@ -99,11 +95,16 @@ K3Result run_K3_single_component(const Component& c) {
     dE = fminf(dE, c.E);
 
     r.Edep = dE;
-    r.E_new = c.E - dE;  // IC-2: Return updated energy for caller to use
 
-    // Nuclear interactions (~0.1% probability)
-    r.nuclear_weight_removed = c.w * 0.001f;
-    r.nuclear_energy_removed = r.nuclear_weight_removed * c.E;
+    // IC-2: Use R-based inverse lookup for energy (more accurate than E_new = E - dE)
+    r.E_new = compute_energy_after_step(lut, c.E, step_size);
+
+    // Nuclear interactions with corrected cross-section
+    float w_removed, E_removed;
+    float w_new = apply_nuclear_attenuation(c.w, c.E, step_size, w_removed, E_removed);
+    r.nuclear_weight_removed = w_removed;
+    r.nuclear_energy_removed = E_removed;
+
     r.remained_in_cell = true;
 
     // Terminate if energy depleted
@@ -111,6 +112,21 @@ K3Result run_K3_single_component(const Component& c) {
         r.terminated = true;
         r.E_new = 0.0f;  // All remaining energy deposited
     }
+
+    // IC-6: Apply MCS direction update (was completely missing)
+    // This is critical for lateral spread calculation
+    float mu_temp = c.mu;
+    float eta_temp = c.eta;
+
+    // Sample MCS scattering angle
+    float sigma_mcs = highland_sigma(c.E, step_size, X0_water);
+    r.theta_scatter = sample_mcs_angle(sigma_mcs, seed);
+
+    // Update direction cosines
+    update_direction_after_mcs(c.theta, r.theta_scatter, mu_temp, eta_temp);
+
+    r.mu_new = mu_temp;
+    r.eta_new = eta_temp;
 
     return r;
 }

@@ -272,6 +272,6 @@ tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/perf/kernel_profiler.hpp \
+ /workspaces/SM_2D/src/include/perf/kernel_profiler.hpp \
  /usr/include/c++/12/thread /usr/include/c++/12/bits/std_thread.h \
  /usr/include/c++/12/bits/this_thread_sleep.h /usr/include/c++/12/chrono

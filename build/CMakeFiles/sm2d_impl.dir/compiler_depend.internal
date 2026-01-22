@@ -103,7 +103,7 @@ CMakeFiles/sm2d_impl.dir/src/audit/conservation.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/audit/conservation.hpp
+ /workspaces/SM_2D/src/include/audit/conservation.hpp
 
 CMakeFiles/sm2d_impl.dir/src/audit/global_budget.cpp.o
  /workspaces/SM_2D/src/audit/global_budget.cpp
@@ -229,8 +229,8 @@ CMakeFiles/sm2d_impl.dir/src/audit/global_budget.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/audit/conservation.hpp
- /workspaces/SM_2D/include/audit/global_budget.hpp
+ /workspaces/SM_2D/src/include/audit/conservation.hpp
+ /workspaces/SM_2D/src/include/audit/global_budget.hpp
 
 CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.o
  /workspaces/SM_2D/src/audit/reporting.cpp
@@ -436,9 +436,9 @@ CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/audit/conservation.hpp
- /workspaces/SM_2D/include/audit/global_budget.hpp
- /workspaces/SM_2D/include/audit/reporting.hpp
+ /workspaces/SM_2D/src/include/audit/conservation.hpp
+ /workspaces/SM_2D/src/include/audit/global_budget.hpp
+ /workspaces/SM_2D/src/include/audit/reporting.hpp
 
 CMakeFiles/sm2d_impl.dir/src/boundary/boundaries.cpp.o
  /workspaces/SM_2D/src/boundary/boundaries.cpp
@@ -465,7 +465,7 @@ CMakeFiles/sm2d_impl.dir/src/boundary/boundaries.cpp.o
  /usr/include/x86_64-linux-gnu/gnu/stubs.h
  /usr/include/x86_64-linux-gnu/sys/cdefs.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/boundary/boundaries.hpp
+ /workspaces/SM_2D/src/include/boundary/boundaries.hpp
 
 CMakeFiles/sm2d_impl.dir/src/boundary/loss_tracking.cpp.o
  /workspaces/SM_2D/src/boundary/loss_tracking.cpp
@@ -504,7 +504,7 @@ CMakeFiles/sm2d_impl.dir/src/boundary/loss_tracking.cpp.o
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h
  /usr/include/x86_64-linux-gnu/gnu/stubs.h
  /usr/include/x86_64-linux-gnu/sys/cdefs.h
- /workspaces/SM_2D/include/boundary/loss_tracking.hpp
+ /workspaces/SM_2D/src/include/boundary/loss_tracking.hpp
 
 CMakeFiles/sm2d_impl.dir/src/core/buckets.cpp.o
  /workspaces/SM_2D/src/core/buckets.cpp
@@ -553,9 +553,9 @@ CMakeFiles/sm2d_impl.dir/src/core/buckets.cpp.o
  /usr/include/x86_64-linux-gnu/gnu/stubs.h
  /usr/include/x86_64-linux-gnu/sys/cdefs.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/buckets.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/buckets.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
 
 CMakeFiles/sm2d_impl.dir/src/core/grids.cpp.o
  /workspaces/SM_2D/src/core/grids.cpp
@@ -685,7 +685,7 @@ CMakeFiles/sm2d_impl.dir/src/core/grids.cpp.o
  /usr/include/x86_64-linux-gnu/sys/select.h
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
- /workspaces/SM_2D/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
 
 CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.o
  /workspaces/SM_2D/src/core/psi_storage.cpp
@@ -760,9 +760,9 @@ CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.o
  /usr/include/x86_64-linux-gnu/sys/cdefs.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
 
 CMakeFiles/sm2d_impl.dir/src/lut/nist_loader.cpp.o
  /workspaces/SM_2D/src/lut/nist_loader.cpp
@@ -969,7 +969,7 @@ CMakeFiles/sm2d_impl.dir/src/lut/nist_loader.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/lut/nist_loader.hpp
+ /workspaces/SM_2D/src/include/lut/nist_loader.hpp
 
 CMakeFiles/sm2d_impl.dir/src/lut/r_lut.cpp.o
  /workspaces/SM_2D/src/lut/r_lut.cpp
@@ -1148,9 +1148,9 @@ CMakeFiles/sm2d_impl.dir/src/lut/r_lut.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/lut/nist_loader.hpp
- /workspaces/SM_2D/include/lut/r_lut.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/lut/nist_loader.hpp
+ /workspaces/SM_2D/src/include/lut/r_lut.hpp
 
 CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.o
  /workspaces/SM_2D/src/perf/kernel_profiler.cpp
@@ -1366,7 +1366,7 @@ CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/perf/kernel_profiler.hpp
+ /workspaces/SM_2D/src/include/perf/kernel_profiler.hpp
 
 CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.o
  /workspaces/SM_2D/src/perf/memory_profiler.cpp
@@ -1562,7 +1562,7 @@ CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/perf/memory_profiler.hpp
+ /workspaces/SM_2D/src/include/perf/memory_profiler.hpp
 
 CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.o
  /workspaces/SM_2D/src/perf/occupancy_analyzer.cpp
@@ -1703,7 +1703,7 @@ CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/perf/occupancy_analyzer.hpp
+ /workspaces/SM_2D/src/include/perf/occupancy_analyzer.hpp
 
 CMakeFiles/sm2d_impl.dir/src/source/gaussian_source.cpp.o
  /workspaces/SM_2D/src/source/gaussian_source.cpp
@@ -1886,11 +1886,11 @@ CMakeFiles/sm2d_impl.dir/src/source/gaussian_source.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/source/gaussian_source.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/source/gaussian_source.hpp
 
 CMakeFiles/sm2d_impl.dir/src/source/pencil_source.cpp.o
  /workspaces/SM_2D/src/source/pencil_source.cpp
@@ -2018,11 +2018,11 @@ CMakeFiles/sm2d_impl.dir/src/source/pencil_source.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/source/pencil_source.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/source/pencil_source.hpp
 
 CMakeFiles/sm2d_impl.dir/src/utils/cuda_pool.cpp.o
  /workspaces/SM_2D/src/utils/cuda_pool.cpp
@@ -2248,7 +2248,7 @@ CMakeFiles/sm2d_impl.dir/src/utils/cuda_pool.cpp.o
  /usr/local/cuda-12.4/include/vector_functions.h
  /usr/local/cuda-12.4/include/vector_functions.hpp
  /usr/local/cuda-12.4/include/vector_types.h
- /workspaces/SM_2D/include/utils/cuda_pool.hpp
+ /workspaces/SM_2D/src/include/utils/cuda_pool.hpp
 
 CMakeFiles/sm2d_impl.dir/src/utils/logger.cpp.o
  /workspaces/SM_2D/src/utils/logger.cpp
@@ -2463,7 +2463,7 @@ CMakeFiles/sm2d_impl.dir/src/utils/logger.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/utils/logger.hpp
+ /workspaces/SM_2D/src/include/utils/logger.hpp
 
 CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.o
  /workspaces/SM_2D/src/utils/memory_tracker.cpp
@@ -2679,7 +2679,7 @@ CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.o
  /usr/local/cuda-12.4/include/vector_functions.h
  /usr/local/cuda-12.4/include/vector_functions.hpp
  /usr/local/cuda-12.4/include/vector_types.h
- /workspaces/SM_2D/include/utils/memory_tracker.hpp
+ /workspaces/SM_2D/src/include/utils/memory_tracker.hpp
 
 CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o
  /workspaces/SM_2D/src/validation/bragg_peak.cpp
@@ -2816,12 +2816,12 @@ CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/validation/bragg_peak.hpp
- /workspaces/SM_2D/include/validation/pencil_beam.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/validation/bragg_peak.hpp
+ /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 CMakeFiles/sm2d_impl.dir/src/validation/determinism.cpp.o
  /workspaces/SM_2D/src/validation/determinism.cpp
@@ -2952,12 +2952,12 @@ CMakeFiles/sm2d_impl.dir/src/validation/determinism.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/validation/determinism.hpp
- /workspaces/SM_2D/include/validation/pencil_beam.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/validation/determinism.hpp
+ /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 CMakeFiles/sm2d_impl.dir/src/validation/lateral_spread.cpp.o
  /workspaces/SM_2D/src/validation/lateral_spread.cpp
@@ -3094,12 +3094,12 @@ CMakeFiles/sm2d_impl.dir/src/validation/lateral_spread.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/validation/lateral_spread.hpp
- /workspaces/SM_2D/include/validation/pencil_beam.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/validation/lateral_spread.hpp
+ /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o
  /workspaces/SM_2D/src/validation/pencil_beam.cpp
@@ -3284,18 +3284,18 @@ CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/lut/nist_loader.hpp
- /workspaces/SM_2D/include/lut/r_lut.hpp
- /workspaces/SM_2D/include/physics/energy_straggling.hpp
- /workspaces/SM_2D/include/physics/highland.hpp
- /workspaces/SM_2D/include/physics/nuclear.hpp
- /workspaces/SM_2D/include/physics/physics.hpp
- /workspaces/SM_2D/include/physics/step_control.hpp
- /workspaces/SM_2D/include/validation/pencil_beam.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/lut/nist_loader.hpp
+ /workspaces/SM_2D/src/include/lut/r_lut.hpp
+ /workspaces/SM_2D/src/include/physics/energy_straggling.hpp
+ /workspaces/SM_2D/src/include/physics/highland.hpp
+ /workspaces/SM_2D/src/include/physics/nuclear.hpp
+ /workspaces/SM_2D/src/include/physics/physics.hpp
+ /workspaces/SM_2D/src/include/physics/step_control.hpp
+ /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o
  /workspaces/SM_2D/src/validation/validation_report.cpp
@@ -3528,14 +3528,14 @@ CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h
- /workspaces/SM_2D/include/core/block_encoding.hpp
- /workspaces/SM_2D/include/core/grids.hpp
- /workspaces/SM_2D/include/core/local_bins.hpp
- /workspaces/SM_2D/include/core/psi_storage.hpp
- /workspaces/SM_2D/include/lut/nist_loader.hpp
- /workspaces/SM_2D/include/validation/bragg_peak.hpp
- /workspaces/SM_2D/include/validation/determinism.hpp
- /workspaces/SM_2D/include/validation/lateral_spread.hpp
- /workspaces/SM_2D/include/validation/pencil_beam.hpp
- /workspaces/SM_2D/include/validation/validation_report.hpp
+ /workspaces/SM_2D/src/include/core/block_encoding.hpp
+ /workspaces/SM_2D/src/include/core/grids.hpp
+ /workspaces/SM_2D/src/include/core/local_bins.hpp
+ /workspaces/SM_2D/src/include/core/psi_storage.hpp
+ /workspaces/SM_2D/src/include/lut/nist_loader.hpp
+ /workspaces/SM_2D/src/include/validation/bragg_peak.hpp
+ /workspaces/SM_2D/src/include/validation/determinism.hpp
+ /workspaces/SM_2D/src/include/validation/lateral_spread.hpp
+ /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
+ /workspaces/SM_2D/src/include/validation/validation_report.hpp
 

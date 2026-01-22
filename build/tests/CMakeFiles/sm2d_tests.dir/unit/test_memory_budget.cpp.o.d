@@ -272,7 +272,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o: \
  /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
  /usr/include/gtest/gtest_pred_impl.h /usr/include/gtest/gtest_prod.h \
- /workspaces/SM_2D/include/utils/memory_tracker.hpp \
+ /workspaces/SM_2D/src/include/utils/memory_tracker.hpp \
  /usr/local/cuda-12.4/include/cuda_runtime.h \
  /usr/local/cuda-12.4/include/crt/host_config.h \
  /usr/local/cuda-12.4/include/builtin_types.h \
