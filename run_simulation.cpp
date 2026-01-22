@@ -141,9 +141,21 @@ int main(int argc, char* argv[]) {
         config.validate();
         print_config_summary(std::cout, config);
 
-        if (!create_output_directory(config.output.output_dir)) {
+        // Resolve output directory relative to config file location
+        // If config_file is a path, get its directory
+        std::string output_dir = config.output.output_dir;
+        if (output_dir[0] != '/') {
+            // Relative path - resolve from config file directory
+            size_t last_slash = config_file.find_last_of("/\\");
+            if (last_slash != std::string::npos) {
+                std::string config_dir = config_file.substr(0, last_slash);
+                output_dir = config_dir + "/" + output_dir;
+            }
+        }
+
+        if (!create_output_directory(output_dir)) {
             std::cerr << "Warning: Could not create output directory: "
-                      << config.output.output_dir << std::endl;
+                      << output_dir << std::endl;
         }
 
         std::cout << "\n--- Running Simulation ---" << std::endl;
@@ -158,8 +170,8 @@ int main(int argc, char* argv[]) {
         std::cout << "Simulation complete." << std::endl;
         std::cout << "  Bragg Peak: " << peak_depth << " mm depth, " << peak_dose << " Gy" << std::endl;
 
-        std::string dose_2d_path = config.output.output_dir + "/" + config.output.dose_2d_file;
-        std::string pdd_path = config.output.output_dir + "/" + config.output.pdd_file;
+        std::string dose_2d_path = output_dir + "/" + config.output.dose_2d_file;
+        std::string pdd_path = output_dir + "/" + config.output.pdd_file;
 
         std::cout << "\n--- Saving Results ---" << std::endl;
 

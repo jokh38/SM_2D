@@ -343,7 +343,7 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o: /workspaces/
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/audit/conservation.hpp
+  /workspaces/SM_2D/src/include/audit/conservation.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o: /workspaces/SM_2D/tests/audit/test_cell_weight_audit.cpp \
   /usr/include/alloca.h \
@@ -687,7 +687,7 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o: /workspaces/
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/audit/conservation.hpp
+  /workspaces/SM_2D/src/include/audit/conservation.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o: /workspaces/SM_2D/tests/audit/test_global_budget.cpp \
   /usr/include/alloca.h \
@@ -1031,8 +1031,8 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o: /workspaces/SM_2
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/audit/conservation.hpp \
-  /workspaces/SM_2D/include/audit/global_budget.hpp
+  /workspaces/SM_2D/src/include/audit/conservation.hpp \
+  /workspaces/SM_2D/src/include/audit/global_budget.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o: /workspaces/SM_2D/tests/audit/test_reporting.cpp \
   /usr/include/alloca.h \
@@ -1376,9 +1376,9 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o: /workspaces/SM_2D/te
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/audit/conservation.hpp \
-  /workspaces/SM_2D/include/audit/global_budget.hpp \
-  /workspaces/SM_2D/include/audit/reporting.hpp
+  /workspaces/SM_2D/src/include/audit/conservation.hpp \
+  /workspaces/SM_2D/src/include/audit/global_budget.hpp \
+  /workspaces/SM_2D/src/include/audit/reporting.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o: /workspaces/SM_2D/tests/boundary/test_boundaries.cpp \
   /usr/include/alloca.h \
@@ -1722,7 +1722,7 @@ tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o: /workspaces/SM_2
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/boundary/boundaries.hpp
+  /workspaces/SM_2D/src/include/boundary/boundaries.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o: /workspaces/SM_2D/tests/boundary/test_loss_tracking.cpp \
   /usr/include/alloca.h \
@@ -2066,7 +2066,7 @@ tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o: /workspaces/S
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/boundary/loss_tracking.hpp
+  /workspaces/SM_2D/src/include/boundary/loss_tracking.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp \
   /usr/include/alloca.h \
@@ -2495,10 +2495,10 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: /workspaces/SM
   /usr/local/cuda-12.4/include/vector_functions.h \
   /usr/local/cuda-12.4/include/vector_functions.hpp \
   /usr/local/cuda-12.4/include/vector_types.h \
-  /workspaces/SM_2D/cuda/kernels/k1_activemask.cuh \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp
+  /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh \
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp \
   /usr/include/alloca.h \
@@ -2927,14 +2927,14 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: /workspaces
   /usr/local/cuda-12.4/include/vector_functions.h \
   /usr/local/cuda-12.4/include/vector_functions.hpp \
   /usr/local/cuda-12.4/include/vector_types.h \
-  /workspaces/SM_2D/cuda/kernels/k3_finetransport.cuh \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/lut/r_lut.hpp \
-  /workspaces/SM_2D/include/physics/energy_straggling.hpp \
-  /workspaces/SM_2D/include/physics/highland.hpp \
-  /workspaces/SM_2D/include/physics/nuclear.hpp \
-  /workspaces/SM_2D/include/physics/physics.hpp \
-  /workspaces/SM_2D/include/physics/step_control.hpp
+  /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cuh \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/lut/r_lut.hpp \
+  /workspaces/SM_2D/src/include/physics/energy_straggling.hpp \
+  /workspaces/SM_2D/src/include/physics/highland.hpp \
+  /workspaces/SM_2D/src/include/physics/nuclear.hpp \
+  /workspaces/SM_2D/src/include/physics/physics.hpp \
+  /workspaces/SM_2D/src/include/physics/step_control.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o: /workspaces/SM_2D/tests/perf/test_kernel_profiling.cpp \
   /usr/include/alloca.h \
@@ -3282,7 +3282,7 @@ tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o: /workspaces/SM
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/perf/kernel_profiler.hpp
+  /workspaces/SM_2D/src/include/perf/kernel_profiler.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o: /workspaces/SM_2D/tests/perf/test_memory_profiling.cpp \
   /usr/include/alloca.h \
@@ -3626,7 +3626,7 @@ tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o: /workspaces/SM
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/perf/memory_profiler.hpp
+  /workspaces/SM_2D/src/include/perf/memory_profiler.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o: /workspaces/SM_2D/tests/perf/test_occupancy.cpp \
   /usr/include/alloca.h \
@@ -3970,7 +3970,7 @@ tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o: /workspaces/SM_2D/tes
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/perf/occupancy_analyzer.hpp
+  /workspaces/SM_2D/src/include/perf/occupancy_analyzer.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o: /workspaces/SM_2D/tests/source/test_gaussian.cpp \
   /usr/include/alloca.h \
@@ -4345,11 +4345,11 @@ tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o: /workspaces/SM_2D/te
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp \
-  /workspaces/SM_2D/include/source/gaussian_source.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+  /workspaces/SM_2D/src/include/source/gaussian_source.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: /workspaces/SM_2D/tests/source/test_pencil.cpp \
   /usr/include/alloca.h \
@@ -4717,11 +4717,11 @@ tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: /workspaces/SM_2D/test
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp \
-  /workspaces/SM_2D/include/source/pencil_source.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+  /workspaces/SM_2D/src/include/source/pencil_source.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o: /workspaces/SM_2D/tests/unit/test_block_encoding.cpp \
   /usr/include/alloca.h \
@@ -5065,7 +5065,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o: /workspaces/SM_2
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o: /workspaces/SM_2D/tests/unit/test_buckets.cpp \
   /usr/include/alloca.h \
@@ -5409,9 +5409,9 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o: /workspaces/SM_2D/tests
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/buckets.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/buckets.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o: /workspaces/SM_2D/tests/unit/test_build_system.cpp \
   /usr/include/alloca.h \
@@ -6550,7 +6550,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o: /workspaces/SM_2D/tests/u
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/grids.hpp
+  /workspaces/SM_2D/src/include/core/grids.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o: /workspaces/SM_2D/tests/unit/test_highland.cpp \
   /usr/include/alloca.h \
@@ -6918,7 +6918,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o: /workspaces/SM_2D/test
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/physics/highland.hpp
+  /workspaces/SM_2D/src/include/physics/highland.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o: /workspaces/SM_2D/tests/unit/test_local_bins.cpp \
   /usr/include/alloca.h \
@@ -7262,7 +7262,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o: /workspaces/SM_2D/te
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/local_bins.hpp
+  /workspaces/SM_2D/src/include/core/local_bins.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o: /workspaces/SM_2D/tests/unit/test_logging.cpp \
   /usr/include/alloca.h \
@@ -7607,7 +7607,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o: /workspaces/SM_2D/tests
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/utils/logger.hpp
+  /workspaces/SM_2D/src/include/utils/logger.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o: /workspaces/SM_2D/tests/unit/test_memory_budget.cpp \
   /usr/include/alloca.h \
@@ -7976,7 +7976,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o: /workspaces/SM_2D
   /usr/local/cuda-12.4/include/vector_functions.h \
   /usr/local/cuda-12.4/include/vector_functions.hpp \
   /usr/local/cuda-12.4/include/vector_types.h \
-  /workspaces/SM_2D/include/utils/memory_tracker.hpp
+  /workspaces/SM_2D/src/include/utils/memory_tracker.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o: /workspaces/SM_2D/tests/unit/test_memory_pool.cpp \
   /usr/include/alloca.h \
@@ -8350,7 +8350,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o: /workspaces/SM_2D/t
   /usr/local/cuda-12.4/include/vector_functions.h \
   /usr/local/cuda-12.4/include/vector_functions.hpp \
   /usr/local/cuda-12.4/include/vector_types.h \
-  /workspaces/SM_2D/include/utils/cuda_pool.hpp
+  /workspaces/SM_2D/src/include/utils/cuda_pool.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o: /workspaces/SM_2D/tests/unit/test_nuclear.cpp \
   /usr/include/alloca.h \
@@ -8718,7 +8718,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o: /workspaces/SM_2D/tests
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/physics/nuclear.hpp
+  /workspaces/SM_2D/src/include/physics/nuclear.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o: /workspaces/SM_2D/tests/unit/test_psi_storage.cpp \
   /usr/include/alloca.h \
@@ -9062,9 +9062,9 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o: /workspaces/SM_2D/t
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o: /workspaces/SM_2D/tests/unit/test_r_lut.cpp \
   /usr/include/alloca.h \
@@ -9432,8 +9432,8 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o: /workspaces/SM_2D/tests/u
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/lut/r_lut.hpp
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/lut/r_lut.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o: /workspaces/SM_2D/tests/unit/test_step_control.cpp \
   /usr/include/alloca.h \
@@ -9801,9 +9801,9 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o: /workspaces/SM_2D/
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/lut/r_lut.hpp \
-  /workspaces/SM_2D/include/physics/step_control.hpp
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/lut/r_lut.hpp \
+  /workspaces/SM_2D/src/include/physics/step_control.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o: /workspaces/SM_2D/tests/validation/test_bragg_peak.cpp \
   /usr/include/alloca.h \
@@ -10171,12 +10171,12 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o: /workspaces/SM
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp \
-  /workspaces/SM_2D/include/validation/bragg_peak.hpp \
-  /workspaces/SM_2D/include/validation/pencil_beam.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+  /workspaces/SM_2D/src/include/validation/bragg_peak.hpp \
+  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o: /workspaces/SM_2D/tests/validation/test_determinism.cpp \
   /usr/include/alloca.h \
@@ -10544,12 +10544,12 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o: /workspaces/S
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp \
-  /workspaces/SM_2D/include/validation/determinism.hpp \
-  /workspaces/SM_2D/include/validation/pencil_beam.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+  /workspaces/SM_2D/src/include/validation/determinism.hpp \
+  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o: /workspaces/SM_2D/tests/validation/test_lateral_spread.cpp \
   /usr/include/alloca.h \
@@ -10917,12 +10917,12 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o: /workspace
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp \
-  /workspaces/SM_2D/include/validation/lateral_spread.hpp \
-  /workspaces/SM_2D/include/validation/pencil_beam.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+  /workspaces/SM_2D/src/include/validation/lateral_spread.hpp \
+  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o: /workspaces/SM_2D/tests/validation/test_pencil_beam.cpp \
   /usr/include/alloca.h \
@@ -11290,11 +11290,11 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o: /workspaces/S
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/core/block_encoding.hpp \
-  /workspaces/SM_2D/include/core/grids.hpp \
-  /workspaces/SM_2D/include/core/local_bins.hpp \
-  /workspaces/SM_2D/include/core/psi_storage.hpp \
-  /workspaces/SM_2D/include/validation/pencil_beam.hpp
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
+  /workspaces/SM_2D/src/include/core/psi_storage.hpp \
+  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /workspaces/SM_2D/tests/validation/test_validation_report.cpp \
   /usr/include/alloca.h \
@@ -11638,14 +11638,20 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
-  /workspaces/SM_2D/include/validation/validation_report.hpp
+  /workspaces/SM_2D/src/include/validation/validation_report.hpp
 
+
+/workspaces/SM_2D/src/include/validation/validation_report.hpp:
 
 /workspaces/SM_2D/tests/validation/test_validation_report.cpp:
 
-/workspaces/SM_2D/include/validation/lateral_spread.hpp:
+/workspaces/SM_2D/tests/validation/test_pencil_beam.cpp:
 
 /workspaces/SM_2D/tests/validation/test_lateral_spread.cpp:
+
+/workspaces/SM_2D/src/include/validation/pencil_beam.hpp:
+
+/workspaces/SM_2D/src/include/validation/bragg_peak.hpp:
 
 /workspaces/SM_2D/tests/validation/test_bragg_peak.cpp:
 
@@ -11659,7 +11665,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /workspaces/SM_2D/tests/unit/test_memory_budget.cpp:
 
-/workspaces/SM_2D/include/utils/logger.hpp:
+/workspaces/SM_2D/src/include/utils/logger.hpp:
 
 /workspaces/SM_2D/tests/unit/test_local_bins.cpp:
 
@@ -11667,39 +11673,39 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /workspaces/SM_2D/tests/unit/test_block_encoding.cpp:
 
-/workspaces/SM_2D/include/source/pencil_source.hpp:
+/workspaces/SM_2D/src/include/source/gaussian_source.hpp:
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/opt_random.h:
-
-/workspaces/SM_2D/include/core/buckets.hpp:
 
 /usr/include/c++/12/random:
 
 /usr/include/c++/12/bits/random.tcc:
 
-/workspaces/SM_2D/include/perf/memory_profiler.hpp:
+/workspaces/SM_2D/src/include/perf/occupancy_analyzer.hpp:
 
 /workspaces/SM_2D/tests/perf/test_memory_profiling.cpp:
-
-/workspaces/SM_2D/include/perf/kernel_profiler.hpp:
 
 /usr/include/c++/12/chrono:
 
 /usr/include/c++/12/bits/std_thread.h:
 
-/workspaces/SM_2D/include/physics/step_control.hpp:
+/workspaces/SM_2D/src/include/physics/step_control.hpp:
 
-/workspaces/SM_2D/include/physics/physics.hpp:
+/workspaces/SM_2D/src/include/physics/physics.hpp:
 
-/workspaces/SM_2D/include/physics/nuclear.hpp:
+/workspaces/SM_2D/src/include/physics/nuclear.hpp:
 
-/workspaces/SM_2D/include/physics/energy_straggling.hpp:
+/workspaces/SM_2D/src/include/physics/highland.hpp:
+
+/workspaces/SM_2D/src/include/lut/r_lut.hpp:
 
 /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp:
 
-/workspaces/SM_2D/include/core/psi_storage.hpp:
+/workspaces/SM_2D/src/include/core/psi_storage.hpp:
 
-/workspaces/SM_2D/include/core/block_encoding.hpp:
+/workspaces/SM_2D/src/include/core/local_bins.hpp:
+
+/workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh:
 
 /usr/local/cuda-12.4/include/vector_functions.hpp:
 
@@ -11716,8 +11722,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/local/cuda-12.4/include/sm_32_intrinsics.h:
 
 /usr/local/cuda-12.4/include/sm_32_atomic_functions.hpp:
-
-/usr/local/cuda-12.4/include/sm_32_atomic_functions.h:
 
 /usr/local/cuda-12.4/include/sm_30_intrinsics.hpp:
 
@@ -11775,6 +11779,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
 
+/workspaces/SM_2D/src/include/perf/kernel_profiler.hpp:
+
 /usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
@@ -11799,6 +11805,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/limits.h:
 
+/workspaces/SM_2D/src/include/core/block_encoding.hpp:
+
 /usr/include/c++/12/tr1/special_function_util.h:
 
 /usr/include/c++/12/tr1/riemann_zeta.tcc:
@@ -11817,17 +11825,19 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp:
 
-/workspaces/SM_2D/include/boundary/loss_tracking.hpp:
+/workspaces/SM_2D/src/include/boundary/loss_tracking.hpp:
 
 /workspaces/SM_2D/tests/boundary/test_loss_tracking.cpp:
 
-/workspaces/SM_2D/include/audit/reporting.hpp:
+/usr/local/cuda-12.4/include/sm_32_atomic_functions.h:
+
+/workspaces/SM_2D/src/include/audit/reporting.hpp:
 
 /workspaces/SM_2D/tests/audit/test_reporting.cpp:
 
-/workspaces/SM_2D/tests/validation/test_pencil_beam.cpp:
+/workspaces/SM_2D/src/include/audit/global_budget.hpp:
 
-/workspaces/SM_2D/include/audit/global_budget.hpp:
+/workspaces/SM_2D/src/include/audit/conservation.hpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h:
 
@@ -11845,11 +11855,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/c++/12/system_error:
 
-/workspaces/SM_2D/include/utils/cuda_pool.hpp:
-
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
-
-/workspaces/SM_2D/include/perf/occupancy_analyzer.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/signum-arch.h:
 
@@ -11879,9 +11885,9 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/c++/12/ext/aligned_buffer.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+/workspaces/SM_2D/src/include/core/grids.hpp:
 
-/workspaces/SM_2D/include/boundary/boundaries.hpp:
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
 
 /usr/include/c++/12/cstdlib:
 
@@ -11895,7 +11901,11 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
+/workspaces/SM_2D/src/include/perf/memory_profiler.hpp:
+
 /usr/include/c++/12/bits/utility.h:
+
+/workspaces/SM_2D/src/include/physics/energy_straggling.hpp:
 
 /usr/include/c++/12/bits/node_handle.h:
 
@@ -11937,8 +11947,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/c++/12/bits/stl_uninitialized.h:
 
-/workspaces/SM_2D/include/validation/determinism.hpp:
-
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
 /usr/include/c++/12/tr1/modified_bessel_func.tcc:
@@ -11978,8 +11986,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
 
 /usr/include/c++/12/bits/stl_construct.h:
-
-/workspaces/SM_2D/include/validation/bragg_peak.hpp:
 
 /usr/include/c++/12/iosfwd:
 
@@ -12021,8 +12027,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/c++/12/bits/align.h:
 
-/workspaces/SM_2D/cuda/kernels/k1_activemask.cuh:
-
 /usr/include/c++/12/limits:
 
 /usr/include/c++/12/numeric:
@@ -12032,6 +12036,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/include/c++/12/iostream:
 
 /usr/include/c++/12/bits/enable_special_members.h:
+
+/workspaces/SM_2D/src/include/source/pencil_source.hpp:
 
 /usr/include/c++/12/bits/localefwd.h:
 
@@ -12044,6 +12050,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/include/c++/12/bits/cpp_type_traits.h:
 
 /usr/include/c++/12/bits/functexcept.h:
+
+/workspaces/SM_2D/src/include/utils/cuda_pool.hpp:
 
 /usr/include/c++/12/sstream:
 
@@ -12101,7 +12109,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
 
-/workspaces/SM_2D/include/validation/validation_report.hpp:
+/workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cuh:
 
 /usr/include/c++/12/bits/invoke.h:
 
@@ -12157,8 +12165,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/c++/12/bits/predefined_ops.h:
 
-/workspaces/SM_2D/include/audit/conservation.hpp:
-
 /usr/include/c++/12/bits/string_view.tcc:
 
 /usr/include/c++/12/math.h:
@@ -12211,11 +12217,11 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/ctype.h:
 
-/workspaces/SM_2D/include/physics/highland.hpp:
-
 /usr/include/asm-generic/int-ll64.h:
 
 /usr/include/linux/errno.h:
+
+/workspaces/SM_2D/src/include/validation/lateral_spread.hpp:
 
 /usr/include/x86_64-linux-gnu/asm/posix_types.h:
 
@@ -12267,6 +12273,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/c++/12/bits/shared_ptr_base.h:
 
+/workspaces/SM_2D/src/include/core/buckets.hpp:
+
 /usr/local/cuda-12.4/include/crt/device_functions.h:
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/c++locale.h:
@@ -12317,6 +12325,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
 
+/workspaces/SM_2D/src/include/boundary/boundaries.hpp:
+
 /usr/include/gtest/gtest-printers.h:
 
 /usr/local/cuda-12.4/include/crt/math_functions.hpp:
@@ -12331,7 +12341,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/gtest/gtest.h:
 
-/workspaces/SM_2D/include/core/grids.hpp:
+/workspaces/SM_2D/src/include/validation/determinism.hpp:
 
 /usr/include/gtest/gtest_prod.h:
 
@@ -12348,8 +12358,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/include/gtest/internal/gtest-port-arch.h:
 
 /usr/include/gtest/internal/gtest-port.h:
-
-/workspaces/SM_2D/include/lut/r_lut.hpp:
 
 /usr/include/gtest/internal/gtest-type-util.h:
 
@@ -12401,8 +12409,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/wchar.h:
 
-/workspaces/SM_2D/include/source/gaussian_source.hpp:
-
 /workspaces/SM_2D/tests/boundary/test_boundaries.cpp:
 
 /usr/include/c++/12/bits/stl_tempbuf.h:
@@ -12432,8 +12438,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/include/gtest/internal/custom/gtest-port.h:
 
 /usr/include/x86_64-linux-gnu/bits/confname.h:
-
-/workspaces/SM_2D/include/utils/memory_tracker.hpp:
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/gthr-default.h:
 
@@ -12508,10 +12512,6 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /usr/include/c++/12/bits/basic_string.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
-
-/workspaces/SM_2D/include/validation/pencil_beam.hpp:
-
-/workspaces/SM_2D/include/core/local_bins.hpp:
 
 /usr/include/c++/12/bits/stream_iterator.h:
 
@@ -12641,9 +12641,9 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/cxxabi_tweaks.h:
 
-/usr/include/x86_64-linux-gnu/c++/12/bits/gthr.h:
+/workspaces/SM_2D/src/include/utils/memory_tracker.hpp:
 
-/workspaces/SM_2D/cuda/kernels/k3_finetransport.cuh:
+/usr/include/x86_64-linux-gnu/c++/12/bits/gthr.h:
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/time_members.h:
 

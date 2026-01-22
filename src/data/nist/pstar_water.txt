@@ -1,27 +1,36 @@
 # NIST PSTAR data for liquid water (protons)
-# Energy[MeV] StoppingPower[MeV cm2/g] CSDA_Range[g/cm2]
-# Source: NIST PSTAR database (https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html)
-# Units: Stopping power in MeV*cm^2/g, Range in g/cm^2 (multiply by 10 for mm in water)
+# Source: NIST PSTAR database - https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html
+# Data extracted from official PSTAR tables
 #
-# Note: For water with rho=1.0 g/cm^3:
-#   - Linear stopping power [MeV/mm] = Stopping power [MeV*cm^2/g] * rho / 10
-#   - Range [mm] = Range [g/cm^2] * 10 / rho
+# Format: Energy[MeV]  StoppingPower[MeV cm2/g]  CSDA_Range[g/cm2]
+#   - STOP(e): electronic stopping power in MeV*cm^2/g
+#   - RANGE(c): CSDA range in g/cm^2
 #
-# Example: At 0.1 MeV, stopping power ~800 MeV*cm^2/g ≈ 80 MeV/mm
+# Unit conversion for water (rho=1.0 g/cm^3):
+#   - Range[mm] = Range[g/cm^2] * 10 / rho
+#   - Linear stopping power [MeV/mm] = STOP(e) * rho / 10
 #
-0.1 800.0 0.0025
-0.2 520.0 0.006
-0.5 446.0 0.018
-1.0 279.0 0.048
-2.0 168.0 0.12
-5.0 76.0 0.42
-10.0 47.0 1.23
-20.0 25.8 3.33
-30.0 18.8 6.21
-50.0 12.7 14.17
-70.0 9.76 22.68
-100.0 7.44 37.80
-150.0 5.55 67.44
-200.0 4.58 102.2
-250.0 3.96 140.5
-300.0 3.54 182.8
+# Key reference values (from NIST PSTAR):
+#   0.1 MeV: S = 814.5 MeV·cm²/g, R = 0.0016 mm
+#   70 MeV:  S = 9.555 MeV·cm²/g, R = 40.8 mm
+#   100 MeV: S = 7.286 MeV·cm²/g, R = 77.2 mm
+#
+0.001  133.7    0.000006319
+0.01   422.9    0.00003599
+0.1    814.5    0.0001607
+0.5    412.8    0.0008869
+1.0    260.6    0.002458
+2.0    158.6    0.007555
+5.0    79.11    0.03623
+10.0   45.64    0.1230
+20.0   26.05    0.4260
+30.0   18.76    0.8853
+50.0   12.45    2.227
+70.0   9.555    4.080
+80.0   8.622    5.184
+90.0   7.884    6.398
+100.0  7.286    7.718
+150.0  5.443    15.77
+200.0  4.491    25.96
+250.0  3.910    37.94
+300.0  3.519    51.45
