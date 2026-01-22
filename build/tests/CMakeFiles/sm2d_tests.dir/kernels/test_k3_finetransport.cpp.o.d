@@ -429,4 +429,5 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o : /workspace
     /workspaces/SM_2D/include/lut/r_lut.hpp \
     /workspaces/SM_2D/include/core/grids.hpp \
     /workspaces/SM_2D/include/physics/highland.hpp \
-    /workspaces/SM_2D/include/physics/nuclear.hpp
+    /workspaces/SM_2D/include/physics/nuclear.hpp \
+    /workspaces/SM_2D/include/physics/energy_straggling.hpp

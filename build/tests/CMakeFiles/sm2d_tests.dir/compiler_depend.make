@@ -2914,6 +2914,7 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: /workspaces
   /workspaces/SM_2D/cuda/kernels/k3_finetransport.cuh \
   /workspaces/SM_2D/include/core/grids.hpp \
   /workspaces/SM_2D/include/lut/r_lut.hpp \
+  /workspaces/SM_2D/include/physics/energy_straggling.hpp \
   /workspaces/SM_2D/include/physics/highland.hpp \
   /workspaces/SM_2D/include/physics/nuclear.hpp \
   /workspaces/SM_2D/include/physics/physics.hpp \
@@ -11627,6 +11628,8 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /worksp
 /workspaces/SM_2D/include/physics/physics.hpp:
 
 /workspaces/SM_2D/include/physics/nuclear.hpp:
+
+/workspaces/SM_2D/include/physics/energy_straggling.hpp:
 
 /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp:
 

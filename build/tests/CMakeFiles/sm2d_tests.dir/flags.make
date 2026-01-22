@@ -7,11 +7,11 @@ CUDA_DEFINES =
 
 CUDA_INCLUDES = --options-file CMakeFiles/sm2d_tests.dir/includes_CUDA.rsp
 
-CUDA_FLAGS =  --expt-relaxed-constexpr "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -DGTEST_HAS_PTHREAD=1
+CUDA_FLAGS =  --expt-relaxed-constexpr -g "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -DGTEST_HAS_PTHREAD=1
 
 CXX_DEFINES = 
 
 CXX_INCLUDES = -I/usr/local/cuda-12.4/include -I/workspaces/SM_2D/include -I/workspaces/SM_2D/cuda
 
-CXX_FLAGS = -DGTEST_HAS_PTHREAD=1
+CXX_FLAGS = -g -DGTEST_HAS_PTHREAD=1
 

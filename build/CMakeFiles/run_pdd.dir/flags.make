@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/usr/local/cuda-12.4/include -I/workspaces/SM_2D/include
 
-CXX_FLAGS = 
+CXX_FLAGS = -g
 

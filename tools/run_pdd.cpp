@@ -7,19 +7,19 @@
 #include <iomanip>
 
 int main() {
-    // Configure 70 MeV pencil beam simulation
+    // Configure 120 MeV pencil beam simulation
     PencilBeamConfig config;
-    config.E0 = 70.0f;      // 70 MeV protons
-    config.Nx = 50;         // Transverse bins
-    config.Nz = 100;        // Depth bins (increased for better resolution)
+    config.E0 = 120.0f;     // 120 MeV protons
+    config.Nx = 60;         // Transverse bins
+    config.Nz = 150;        // Depth bins (150mm for 120 MeV range ~130mm)
     config.dx = 1.0f;       // 1 mm transverse spacing
-    config.dz = 1.0f;       // 1 mm depth spacing (100 mm total depth)
+    config.dz = 1.0f;       // 1 mm depth spacing (150 mm total depth)
     config.W_total = 1.0f;  // 1 Gy normalized dose
-    config.x0 = 25.0f;      // Center of transverse grid
+    config.x0 = 30.0f;      // Center of transverse grid
     config.z0 = 0.0f;       // Start at surface
     config.random_seed = 42;
 
-    std::cout << "Running 70 MeV proton pencil beam simulation..." << std::endl;
+    std::cout << "Running 120 MeV proton pencil beam simulation..." << std::endl;
     std::cout << "  Grid: " << config.Nx << " x " << config.Nz << std::endl;
     std::cout << "  Spacing: " << config.dx << " mm x " << config.dz << " mm" << std::endl;
 
@@ -37,8 +37,8 @@ int main() {
     std::cout << "  Bragg Peak: " << peak_depth << " mm depth, " << peak_dose << " Gy" << std::endl;
 
     // Save PDD to file
-    std::ofstream out("pdd_70MeV.txt");
-    out << "# 70 MeV Proton Pencil Beam Depth-Dose Distribution\n";
+    std::ofstream out("pdd_120MeV.txt");
+    out << "# 120 MeV Proton Pencil Beam Depth-Dose Distribution\n";
     out << "# Depth(mm)    Dose(Gy)    Normalized\n";
     out << "# Bragg Peak at: " << peak_depth << " mm, " << peak_dose << " Gy\n";
 
@@ -51,11 +51,11 @@ int main() {
     }
     out.close();
 
-    std::cout << "PDD saved to: pdd_70MeV.txt" << std::endl;
+    std::cout << "PDD saved to: pdd_120MeV.txt" << std::endl;
 
     // Also save full 2D dose distribution
-    std::ofstream out2d("dose_70MeV_2D.txt");
-    out2d << "# 70 MeV Proton Pencil Beam 2D Dose Distribution\n";
+    std::ofstream out2d("dose_120MeV_2D.txt");
+    out2d << "# 120 MeV Proton Pencil Beam 2D Dose Distribution\n";
     out2d << "# x(mm) z(mm) dose(Gy)\n";
     for (int iz = 0; iz < result.Nz; ++iz) {
         for (int ix = 0; ix < result.Nx; ++ix) {
@@ -68,7 +68,7 @@ int main() {
     }
     out2d.close();
 
-    std::cout << "2D dose distribution saved to: dose_70MeV_2D.txt" << std::endl;
+    std::cout << "2D dose distribution saved to: dose_120MeV_2D.txt" << std::endl;
 
     return 0;
 }

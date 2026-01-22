@@ -46,47 +46,47 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
     // Get reference stopping power for normalization
     float S_plateau = lut.lookup_S(config.E0);
 
+    // Range straggling sigma (energy-dependent)
+    // Clinical distal falloff (80%-20%) is ~3-5mm for 150 MeV protons
+    // Gaussian convolution with sigma_R ~ 1.5% of range
+    float sigma_R = std::max(3.0f, R_bragg * 0.015f);
+
+    // First pass: compute unconvolved depth-dose from stopping power
+    std::vector<float> unconvolved_dose(config.Nz);
     for (int j = 0; j < config.Nz; ++j) {
         float z = result.z_centers[j];
 
-        // Compute relative depth (0 = surface, 1 = Bragg peak)
-        float normalized_depth = z / R_bragg;
-
-        // Depth-dose model based on proton physics
-        // This is a parameterized Bragg curve that captures:
-        // 1. Low dose at surface (build-up)
-        // 2. Plateau region with gradual increase
-        // 3. Bragg peak (not a singularity)
-        // 4. Distal falloff
-        float depth_dose = 0.0f;
-
-        if (normalized_depth < 1.0f) {
-            // Before Bragg peak: use power law with smooth peak
-            // D(z) ∝ (1 - z/R)^(-p) where p < 1 to avoid singularity
-            float remaining_fraction = 1.0f - normalized_depth;
-
-            // Use tanh for smooth saturation at peak
-            // This creates a smooth transition without singularity
-            float peak_sharpness = 3.0f;  // Higher = sharper peak
-            float saturation = std::tanh(peak_sharpness * (1.0f - remaining_fraction));
-
-            // Stopping power contribution (1/β² dependence)
+        if (z < R_bragg) {
+            // Before Bragg peak: D(z) = S(E(z)) / S(E0)
             float R_residual = R_bragg - z;
             float E_z = lut.lookup_E_inverse(std::max(0.1f, R_residual));
             float S_z = lut.lookup_S(E_z);
-
-            // Combine stopping power and peak enhancement
-            float base_dose = (S_z / S_plateau) * 0.8f;  // Plateau baseline
-            float peak_dose = 4.0f;  // Peak relative to baseline
-            depth_dose = base_dose + (peak_dose - base_dose) * saturation;
-
+            unconvolved_dose[j] = S_z / S_plateau;
         } else {
-            // After Bragg peak: exponential distal falloff
-            // Clinical distal falloff ~3-5mm for 150 MeV
-            float distal_mm = z - R_bragg;
-            float falloff_width = 4.0f;  // mm
-            depth_dose = std::exp(-distal_mm / falloff_width) * 4.0f;
+            // Beyond Bragg peak: no primary particles
+            unconvolved_dose[j] = 0.0f;
         }
+    }
+
+    // Second pass: convolve with Gaussian range straggling
+    // This smooths the sharp Bragg peak into a realistic distribution
+    int kernel_radius = static_cast<int>(4 * sigma_R / config.dz);  // 4-sigma kernel
+    for (int j = 0; j < config.Nz; ++j) {
+        float z = result.z_centers[j];
+        float convolved_dose = 0.0f;
+        float norm = 0.0f;
+
+        for (int k = -kernel_radius; k <= kernel_radius; ++k) {
+            int jk = j + k;
+            if (jk >= 0 && jk < config.Nz) {
+                float dz_k = k * config.dz;
+                float gaussian = std::exp(-(dz_k * dz_k) / (2.0f * sigma_R * sigma_R));
+                convolved_dose += unconvolved_dose[jk] * gaussian;
+                norm += gaussian;
+            }
+        }
+
+        float depth_dose = convolved_dose / norm;
 
         // Depth-dependent lateral spread (MCS theory)
         float sigma_z = sigma_0 * z / std::sqrt(3.0f);

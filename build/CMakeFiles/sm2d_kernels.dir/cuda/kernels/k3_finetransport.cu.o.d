@@ -207,8 +207,70 @@ CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.o : /workspaces/SM_
     /usr/include/c++/12/bits/vector.tcc \
     /workspaces/SM_2D/include/physics/highland.hpp \
     /workspaces/SM_2D/include/physics/nuclear.hpp \
+    /workspaces/SM_2D/include/physics/energy_straggling.hpp \
     /usr/include/c++/12/cstdint \
     /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
     /usr/include/stdint.h \
     /usr/include/x86_64-linux-gnu/bits/wchar.h \
-    /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h
+    /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+    /usr/include/c++/12/mutex \
+    /usr/include/c++/12/tuple \
+    /usr/include/c++/12/bits/uses_allocator.h \
+    /usr/include/c++/12/exception \
+    /usr/include/c++/12/bits/exception_ptr.h \
+    /usr/include/c++/12/bits/cxxabi_init_exception.h \
+    /usr/include/c++/12/typeinfo \
+    /usr/include/c++/12/bits/nested_exception.h \
+    /usr/include/c++/12/system_error \
+    /usr/include/x86_64-linux-gnu/c++/12/bits/error_constants.h \
+    /usr/include/c++/12/cerrno \
+    /usr/include/errno.h \
+    /usr/include/x86_64-linux-gnu/bits/errno.h \
+    /usr/include/linux/errno.h \
+    /usr/include/x86_64-linux-gnu/asm/errno.h \
+    /usr/include/asm-generic/errno.h \
+    /usr/include/asm-generic/errno-base.h \
+    /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
+    /usr/include/c++/12/iosfwd \
+    /usr/include/c++/12/bits/stringfwd.h \
+    /usr/include/c++/12/bits/postypes.h \
+    /usr/include/c++/12/cwchar \
+    /usr/include/wchar.h \
+    /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
+    /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+    /usr/include/c++/12/stdexcept \
+    /usr/include/c++/12/string \
+    /usr/include/c++/12/bits/char_traits.h \
+    /usr/include/c++/12/bits/localefwd.h \
+    /usr/include/x86_64-linux-gnu/c++/12/bits/c++locale.h \
+    /usr/include/c++/12/clocale \
+    /usr/include/locale.h \
+    /usr/include/x86_64-linux-gnu/bits/locale.h \
+    /usr/include/c++/12/cctype \
+    /usr/include/c++/12/bits/ostream_insert.h \
+    /usr/include/c++/12/bits/cxxabi_forced.h \
+    /usr/include/c++/12/bits/basic_string.h \
+    /usr/include/c++/12/string_view \
+    /usr/include/c++/12/bits/string_view.tcc \
+    /usr/include/c++/12/ext/string_conversions.h \
+    /usr/include/c++/12/cstdio \
+    /usr/include/c++/12/bits/charconv.h \
+    /usr/include/c++/12/bits/basic_string.tcc \
+    /usr/include/c++/12/bits/chrono.h \
+    /usr/include/c++/12/ratio \
+    /usr/include/c++/12/ctime \
+    /usr/include/c++/12/bits/parse_numbers.h \
+    /usr/include/c++/12/bits/std_mutex.h \
+    /usr/include/x86_64-linux-gnu/c++/12/bits/gthr.h \
+    /usr/include/x86_64-linux-gnu/c++/12/bits/gthr-default.h \
+    /usr/include/pthread.h \
+    /usr/include/sched.h \
+    /usr/include/x86_64-linux-gnu/bits/sched.h \
+    /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
+    /usr/include/x86_64-linux-gnu/bits/cpu-set.h \
+    /usr/include/x86_64-linux-gnu/bits/setjmp.h \
+    /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+    /usr/include/c++/12/bits/unique_lock.h \
+    /usr/include/c++/12/ext/atomicity.h \
+    /usr/include/x86_64-linux-gnu/c++/12/bits/atomic_word.h \
+    /usr/include/x86_64-linux-gnu/sys/single_threaded.h

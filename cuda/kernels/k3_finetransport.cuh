@@ -14,6 +14,7 @@ struct Component {
 // Result from single component transport
 struct K3Result {
     float Edep = 0;
+    float E_new = 0;           // Updated energy after transport (IC-2 fix)
     float nuclear_weight_removed = 0;
     float nuclear_energy_removed = 0;
     int bucket_emissions = 0;

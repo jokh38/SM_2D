@@ -64,6 +64,7 @@ K3Result run_K3_single_component(const Component& c) {
     K3Result r;
     if (c.E <= E_cutoff) {
         r.Edep = c.E;
+        r.E_new = 0.0f;  // All energy deposited
         r.terminated = true;
         r.remained_in_cell = false;
         return r;
@@ -87,21 +88,28 @@ K3Result run_K3_single_component(const Component& c) {
     // Energy straggling (Bohr theory)
     float sigma_E = bohr_energy_straggling_sigma(c.E, step_size, rho_water);
 
-    // Sample actual energy loss with straggling
-    unsigned seed = 12345;  // TODO: use proper RNG from component state
+    // IC-3: Use per-particle seed for proper straggling
+    // Simple hash from component state
+    unsigned seed = static_cast<unsigned>(
+        (unsigned)(c.x * 10000) ^ (unsigned)(c.z * 1000) ^ (unsigned)(c.E * 100)
+    );
     float dE = sample_energy_loss_with_straggling(mean_dE, sigma_E, seed);
 
     // Ensure we don't deposit more energy than available
     dE = fminf(dE, c.E);
 
     r.Edep = dE;
-    r.nuclear_weight_removed = c.w * 0.001f;  // Nuclear interactions (~0.1% probability)
+    r.E_new = c.E - dE;  // IC-2: Return updated energy for caller to use
+
+    // Nuclear interactions (~0.1% probability)
+    r.nuclear_weight_removed = c.w * 0.001f;
     r.nuclear_energy_removed = r.nuclear_weight_removed * c.E;
     r.remained_in_cell = true;
 
     // Terminate if energy depleted
-    if (c.E - dE <= E_cutoff) {
+    if (r.E_new <= E_cutoff) {
         r.terminated = true;
+        r.E_new = 0.0f;  // All remaining energy deposited
     }
 
     return r;

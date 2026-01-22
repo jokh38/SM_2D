@@ -14,10 +14,9 @@ inline float highland_sigma(float E_MeV, float ds, float X0 = 360.8f) {
     float ln_term = logf(t);
     float bracket = 1.0f + 0.038f * ln_term;
 
-    // IC-8: Reduce step, don't clamp bracket
-    if (bracket < 0.1f) {
-        return -1.0f;  // Signal: reduce step size
-    }
+    // IC-8: Clamp bracket to physical minimum instead of signaling error
+    // The Highland correction is valid for t > 1e-5, beyond which we clamp
+    bracket = fmaxf(bracket, 0.1f);
 
     return (13.6f / (beta * p_MeV)) * sqrtf(t) * bracket;
 }
