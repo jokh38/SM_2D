@@ -27,7 +27,21 @@ LogLevel Logger::get_level() const {
     return level_;
 }
 
-void Logger::log(LogLevel level, const char* fmt, ...) {
+void Logger::info(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    log(LogLevel::INFO, fmt, args);
+    va_end(args);
+}
+
+void Logger::error(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    log(LogLevel::ERROR, fmt, args);
+    va_end(args);
+}
+
+void Logger::log(LogLevel level, const char* fmt, va_list args) {
     if (level_ > level) return;
 
     auto now = std::chrono::system_clock::now();
@@ -45,10 +59,7 @@ void Logger::log(LogLevel level, const char* fmt, ...) {
         std::printf("%s: ", level_strings[static_cast<int>(level)]);
     }
 
-    va_list args;
-    va_start(args, fmt);
     std::vprintf(fmt, args);
-    va_end(args);
     std::printf("\n");
 }
 

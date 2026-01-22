@@ -1,0 +1,10 @@
+/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir
+/workspaces/SM_2D/build/CMakeFiles/sm2d_impl.dir
+/workspaces/SM_2D/build/CMakeFiles/run_pdd.dir
+/workspaces/SM_2D/build/CMakeFiles/test.dir
+/workspaces/SM_2D/build/CMakeFiles/edit_cache.dir
+/workspaces/SM_2D/build/CMakeFiles/rebuild_cache.dir
+/workspaces/SM_2D/build/tests/CMakeFiles/sm2d_tests.dir
+/workspaces/SM_2D/build/tests/CMakeFiles/test.dir
+/workspaces/SM_2D/build/tests/CMakeFiles/edit_cache.dir
+/workspaces/SM_2D/build/tests/CMakeFiles/rebuild_cache.dir

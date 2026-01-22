@@ -1,5 +1,6 @@
 #include "kernels/k5_audit.cuh"
 #include <cmath>
+#include <cstdint>
 
 __global__ void K5_WeightAudit(
     const uint32_t* __restrict__ block_ids_in,

@@ -1,4 +1,5 @@
 #include "kernels/k4_transfer.cuh"
+#include "core/psi_storage.hpp"
 
 __device__ int get_neighbor(int cell, int face, int Nx, int Nz) {
     int ix = cell % Nx;

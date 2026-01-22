@@ -6,6 +6,7 @@ set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_ARCHITECTURES 75)  # RTX 2080
 
 set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
 
 # Find dependencies
 find_package(GTest REQUIRED)
@@ -67,6 +68,14 @@ add_library(sm2d_impl STATIC
 )
 
 target_link_libraries(sm2d_impl sm2d_core)
+
+# Add CUDA include directories for C++ files that include CUDA headers
+target_include_directories(sm2d_impl PRIVATE /usr/local/cuda-12.4/include)
+
+# PDD tool executable
+add_executable(run_pdd tools/run_pdd.cpp)
+target_link_libraries(run_pdd sm2d_core sm2d_impl)
+target_include_directories(run_pdd PRIVATE /usr/local/cuda-12.4/include)
 
 # Test executable
 enable_testing()

@@ -1,0 +1,307 @@
+Running main() from ./googletest/src/gtest_main.cc
+[==========] Running 88 tests from 33 test suites.
+[----------] Global test environment set-up.
+[----------] 2 tests from BuildSystemTest
+[ RUN      ] BuildSystemTest.ProjectStructure
+[       OK ] BuildSystemTest.ProjectStructure (0 ms)
+[ RUN      ] BuildSystemTest.CMakeLists
+[       OK ] BuildSystemTest.CMakeLists (0 ms)
+[----------] 2 tests from BuildSystemTest (0 ms total)
+
+[----------] 3 tests from CudaSmokeTest
+[ RUN      ] CudaSmokeTest.DeviceAvailable
+[       OK ] CudaSmokeTest.DeviceAvailable (122 ms)
+[ RUN      ] CudaSmokeTest.CanAllocate
+[       OK ] CudaSmokeTest.CanAllocate (166 ms)
+[ RUN      ] CudaSmokeTest.SimpleKernel
+[       OK ] CudaSmokeTest.SimpleKernel (0 ms)
+[----------] 3 tests from CudaSmokeTest (289 ms total)
+
+[----------] 2 tests from MemoryBudgetTest
+[ RUN      ] MemoryBudgetTest.InitialUsageLow
+[       OK ] MemoryBudgetTest.InitialUsageLow (0 ms)
+[ RUN      ] MemoryBudgetTest.AllocationTracked
+[       OK ] MemoryBudgetTest.AllocationTracked (0 ms)
+[----------] 2 tests from MemoryBudgetTest (0 ms total)
+
+[----------] 1 test from LoggerTest
+[ RUN      ] LoggerTest.InfoLevelWorks
+[01:14:30] [0;32mINFO[0m: Test info message: {}
+[       OK ] LoggerTest.InfoLevelWorks (0 ms)
+[----------] 1 test from LoggerTest (0 ms total)
+
+[----------] 2 tests from CudaPoolTest
+[ RUN      ] CudaPoolTest.AllocateDeallocate
+[       OK ] CudaPoolTest.AllocateDeallocate (1 ms)
+[ RUN      ] CudaPoolTest.MultipleAllocations
+[       OK ] CudaPoolTest.MultipleAllocations (1 ms)
+[----------] 2 tests from CudaPoolTest (2 ms total)
+
+[----------] 2 tests from EnergyGridTest
+[ RUN      ] EnergyGridTest.BinEdgesCorrect
+[       OK ] EnergyGridTest.BinEdgesCorrect (0 ms)
+[ RUN      ] EnergyGridTest.FindEnergyBin
+[       OK ] EnergyGridTest.FindEnergyBin (0 ms)
+[----------] 2 tests from EnergyGridTest (0 ms total)
+
+[----------] 1 test from AngularGridTest
+[ RUN      ] AngularGridTest.BinEdgesCorrect
+[       OK ] AngularGridTest.BinEdgesCorrect (0 ms)
+[----------] 1 test from AngularGridTest (0 ms total)
+
+[----------] 3 tests from RLUTTest
+[ RUN      ] RLUTTest.R_150MeV_WithinTolerance
+[       OK ] RLUTTest.R_150MeV_WithinTolerance (0 ms)
+[ RUN      ] RLUTTest.R_70MeV_WithinTolerance
+[       OK ] RLUTTest.R_70MeV_WithinTolerance (0 ms)
+[ RUN      ] RLUTTest.InverseConsistency
+[       OK ] RLUTTest.InverseConsistency (0 ms)
+[----------] 3 tests from RLUTTest (0 ms total)
+
+[----------] 2 tests from LocalBinsTest
+[ RUN      ] LocalBinsTest.LocalBinsEquals32
+[       OK ] LocalBinsTest.LocalBinsEquals32 (0 ms)
+[ RUN      ] LocalBinsTest.EncodeDecodeRoundTrip
+[       OK ] LocalBinsTest.EncodeDecodeRoundTrip (0 ms)
+[----------] 2 tests from LocalBinsTest (0 ms total)
+
+[----------] 1 test from BlockEncodingTest
+[ RUN      ] BlockEncodingTest.EncodeDecodeRoundTrip
+[       OK ] BlockEncodingTest.EncodeDecodeRoundTrip (0 ms)
+[----------] 1 test from BlockEncodingTest (0 ms total)
+
+[----------] 2 tests from PsiStorageTest
+[ RUN      ] PsiStorageTest.InitializeEmpty
+[       OK ] PsiStorageTest.InitializeEmpty (10 ms)
+[ RUN      ] PsiStorageTest.AllocateAndAccess
+[       OK ] PsiStorageTest.AllocateAndAccess (7 ms)
+[----------] 2 tests from PsiStorageTest (17 ms total)
+
+[----------] 2 tests from BucketTest
+[ RUN      ] BucketTest.InitializeEmpty
+[       OK ] BucketTest.InitializeEmpty (0 ms)
+[ RUN      ] BucketTest.EmitToBucket
+[       OK ] BucketTest.EmitToBucket (0 ms)
+[----------] 2 tests from BucketTest (0 ms total)
+
+[----------] 3 tests from StepControlTest
+[ RUN      ] StepControlTest.StepSizePositive
+[       OK ] StepControlTest.StepSizePositive (0 ms)
+[ RUN      ] StepControlTest.StepSizeSmallerNearBragg
+[       OK ] StepControlTest.StepSizeSmallerNearBragg (0 ms)
+[ RUN      ] StepControlTest.EnergyDecreases
+[       OK ] StepControlTest.EnergyDecreases (0 ms)
+[----------] 3 tests from StepControlTest (0 ms total)
+
+[----------] 3 tests from HighlandTest
+[ RUN      ] HighlandTest.SigmaPositive
+[       OK ] HighlandTest.SigmaPositive (0 ms)
+[ RUN      ] HighlandTest.SigmaIncreasesWithStep
+[       OK ] HighlandTest.SigmaIncreasesWithStep (0 ms)
+[ RUN      ] HighlandTest.SigmaDecreasesWithEnergy
+[       OK ] HighlandTest.SigmaDecreasesWithEnergy (0 ms)
+[----------] 3 tests from HighlandTest (0 ms total)
+
+[----------] 3 tests from NuclearTest
+[ RUN      ] NuclearTest.CrossSectionPositive
+[       OK ] NuclearTest.CrossSectionPositive (0 ms)
+[ RUN      ] NuclearTest.AttenuationReducesWeight
+[       OK ] NuclearTest.AttenuationReducesWeight (0 ms)
+[ RUN      ] NuclearTest.EnergyTracked
+[       OK ] NuclearTest.EnergyTracked (0 ms)
+[----------] 3 tests from NuclearTest (0 ms total)
+
+[----------] 4 tests from K1Test
+[ RUN      ] K1Test.HighEnergyTriggered
+[       OK ] K1Test.HighEnergyTriggered (0 ms)
+[ RUN      ] K1Test.LowEnergyNotTriggered
+[       OK ] K1Test.LowEnergyNotTriggered (0 ms)
+[ RUN      ] K1Test.WeightThreshold
+[       OK ] K1Test.WeightThreshold (0 ms)
+[ RUN      ] K1Test.MultipleCells
+[       OK ] K1Test.MultipleCells (0 ms)
+[----------] 4 tests from K1Test (0 ms total)
+
+[----------] 4 tests from K3Test
+[ RUN      ] K3Test.EnergyCutoff
+[       OK ] K3Test.EnergyCutoff (0 ms)
+[ RUN      ] K3Test.SingleStepTransport
+[       OK ] K3Test.SingleStepTransport (0 ms)
+[ RUN      ] K3Test.NuclearAttenuation
+[       OK ] K3Test.NuclearAttenuation (0 ms)
+[ RUN      ] K3Test.AngularSplit
+[       OK ] K3Test.AngularSplit (0 ms)
+[----------] 4 tests from K3Test (0 ms total)
+
+[----------] 2 tests from PencilSourceTest
+[ RUN      ] PencilSourceTest.DefaultValues
+[       OK ] PencilSourceTest.DefaultValues (0 ms)
+[ RUN      ] PencilSourceTest.InjectionCorrectCell
+[       OK ] PencilSourceTest.InjectionCorrectCell (0 ms)
+[----------] 2 tests from PencilSourceTest (0 ms total)
+
+[----------] 2 tests from GaussianSourceTest
+[ RUN      ] GaussianSourceTest.DefaultValues
+[       OK ] GaussianSourceTest.DefaultValues (0 ms)
+[ RUN      ] GaussianSourceTest.WeightSumConserved
+/workspaces/SM_2D/tests/source/test_gaussian.cpp:29: Failure
+The difference between total and src.W_total is 0.26799994707107544, which exceeds 1e-3f, where
+total evaluates to 0.73200005292892456,
+src.W_total evaluates to 1, and
+1e-3f evaluates to 0.0010000000474974513.
+[  FAILED  ] GaussianSourceTest.WeightSumConserved (1 ms)
+[----------] 2 tests from GaussianSourceTest (1 ms total)
+
+[----------] 2 tests from BoundaryTest
+[ RUN      ] BoundaryTest.AbsorbAtZmax
+/workspaces/SM_2D/tests/boundary/test_boundaries.cpp:12: Failure
+Expected equality of these values:
+  neighbor
+    Which is: 39
+  -1
+[  FAILED  ] BoundaryTest.AbsorbAtZmax (0 ms)
+[ RUN      ] BoundaryTest.NormalNeighbor
+[       OK ] BoundaryTest.NormalNeighbor (0 ms)
+[----------] 2 tests from BoundaryTest (0 ms total)
+
+[----------] 3 tests from BoundaryLossTest
+[ RUN      ] BoundaryLossTest.InitializeZero
+[       OK ] BoundaryLossTest.InitializeZero (0 ms)
+[ RUN      ] BoundaryLossTest.RecordLoss
+[       OK ] BoundaryLossTest.RecordLoss (0 ms)
+[ RUN      ] BoundaryLossTest.TotalLoss
+[       OK ] BoundaryLossTest.TotalLoss (0 ms)
+[----------] 3 tests from BoundaryLossTest (0 ms total)
+
+[----------] 2 tests from CellWeightAudit
+[ RUN      ] CellWeightAudit.SingleComponentTransport
+[       OK ] CellWeightAudit.SingleComponentTransport (0 ms)
+[ RUN      ] CellWeightAudit.WeightConservationFail
+[       OK ] CellWeightAudit.WeightConservationFail (0 ms)
+[----------] 2 tests from CellWeightAudit (0 ms total)
+
+[----------] 2 tests from CellEnergyAudit
+[ RUN      ] CellEnergyAudit.SingleComponentTransport
+[       OK ] CellEnergyAudit.SingleComponentTransport (0 ms)
+[ RUN      ] CellEnergyAudit.EnergyDriftDetection
+[       OK ] CellEnergyAudit.EnergyDriftDetection (0 ms)
+[----------] 2 tests from CellEnergyAudit (0 ms total)
+
+[----------] 2 tests from GlobalBudget
+[ RUN      ] GlobalBudget.WeightCloses
+[       OK ] GlobalBudget.WeightCloses (0 ms)
+[ RUN      ] GlobalBudget.EnergyCloses
+[       OK ] GlobalBudget.EnergyCloses (0 ms)
+[----------] 2 tests from GlobalBudget (0 ms total)
+
+[----------] 1 test from AuditReport
+[ RUN      ] AuditReport.PrintWeightReport
+[       OK ] AuditReport.PrintWeightReport (0 ms)
+[----------] 1 test from AuditReport (0 ms total)
+
+[----------] 3 tests from PencilBeam
+[ RUN      ] PencilBeam.RunSimulation
+[       OK ] PencilBeam.RunSimulation (0 ms)
+[ RUN      ] PencilBeam.FindBraggPeak
+[       OK ] PencilBeam.FindBraggPeak (0 ms)
+[ RUN      ] PencilBeam.GetDepthDose
+[       OK ] PencilBeam.GetDepthDose (0 ms)
+[----------] 3 tests from PencilBeam (0 ms total)
+
+[----------] 5 tests from BraggPeak
+[ RUN      ] BraggPeak.FindPosition
+[       OK ] BraggPeak.FindPosition (0 ms)
+[ RUN      ] BraggPeak.ComputeFWHM
+[       OK ] BraggPeak.ComputeFWHM (0 ms)
+[ RUN      ] BraggPeak.FindR80
+[       OK ] BraggPeak.FindR80 (0 ms)
+[ RUN      ] BraggPeak.FindR20
+[       OK ] BraggPeak.FindR20 (1 ms)
+[ RUN      ] BraggPeak.DistalFalloff
+[       OK ] BraggPeak.DistalFalloff (1 ms)
+[----------] 5 tests from BraggPeak (4 ms total)
+
+[----------] 4 tests from LateralSpread
+[ RUN      ] LateralSpread.GetSigmaAtZ
+[       OK ] LateralSpread.GetSigmaAtZ (0 ms)
+[ RUN      ] LateralSpread.GetLateralProfile
+[       OK ] LateralSpread.GetLateralProfile (0 ms)
+[ RUN      ] LateralSpread.FermiEygesSigma
+[       OK ] LateralSpread.FermiEygesSigma (0 ms)
+[ RUN      ] LateralSpread.FitGaussianSigma
+[       OK ] LateralSpread.FitGaussianSigma (0 ms)
+[----------] 4 tests from LateralSpread (1 ms total)
+
+[----------] 3 tests from Determinism
+[ RUN      ] Determinism.ComputeChecksum
+[       OK ] Determinism.ComputeChecksum (0 ms)
+[ RUN      ] Determinism.SameConfigSameChecksum
+[       OK ] Determinism.SameConfigSameChecksum (0 ms)
+[ RUN      ] Determinism.VerifyDeterminism
+[       OK ] Determinism.VerifyDeterminism (0 ms)
+[----------] 3 tests from Determinism (1 ms total)
+
+[----------] 2 tests from ValidationReport
+[ RUN      ] ValidationReport.GenerateReport
+[       OK ] ValidationReport.GenerateReport (0 ms)
+[ RUN      ] ValidationReport.RunFullValidation
+[       OK ] ValidationReport.RunFullValidation (2 ms)
+[----------] 2 tests from ValidationReport (2 ms total)
+
+[----------] 5 tests from MemoryProfilerTest
+[ RUN      ] MemoryProfilerTest.InitialState
+[       OK ] MemoryProfilerTest.InitialState (0 ms)
+[ RUN      ] MemoryProfilerTest.BudgetSetting
+[       OK ] MemoryProfilerTest.BudgetSetting (0 ms)
+[ RUN      ] MemoryProfilerTest.StartStopTracking
+[       OK ] MemoryProfilerTest.StartStopTracking (0 ms)
+[ RUN      ] MemoryProfilerTest.BudgetCheck
+[       OK ] MemoryProfilerTest.BudgetCheck (0 ms)
+[ RUN      ] MemoryProfilerTest.ReportGeneration
+Memory Report:
+  Budget: 7 GB
+  Peak: 0.146484 GB
+  Status: OK
+  Headroom: 6.85352 GB
+[       OK ] MemoryProfilerTest.ReportGeneration (0 ms)
+[----------] 5 tests from MemoryProfilerTest (0 ms total)
+
+[----------] 6 tests from KernelProfilerTest
+[ RUN      ] KernelProfilerTest.InitialState
+[       OK ] KernelProfilerTest.InitialState (0 ms)
+[ RUN      ] KernelProfilerTest.SingleKernelTiming
+[       OK ] KernelProfilerTest.SingleKernelTiming (10 ms)
+[ RUN      ] KernelProfilerTest.MultipleKernelTimings
+[       OK ] KernelProfilerTest.MultipleKernelTimings (15 ms)
+[ RUN      ] KernelProfilerTest.AccumulatedTiming
+[       OK ] KernelProfilerTest.AccumulatedTiming (10 ms)
+[ RUN      ] KernelProfilerTest.ReportGeneration
+
+=== Kernel Performance Report ===
+             kernel1: 5.14 ms (100.00%)
+-----------------------------------
+Total: 5.14 ms
+[       OK ] KernelProfilerTest.ReportGeneration (5 ms)
+[ RUN      ] KernelProfilerTest.StopWithoutStart
+[       OK ] KernelProfilerTest.StopWithoutStart (0 ms)
+[----------] 6 tests from KernelProfilerTest (41 ms total)
+
+[----------] 4 tests from OccupancyAnalyzerTest
+[ RUN      ] OccupancyAnalyzerTest.InitialState
+[       OK ] OccupancyAnalyzerTest.InitialState (0 ms)
+[ RUN      ] OccupancyAnalyzerTest.AnalyzeKernel
+[       OK ] OccupancyAnalyzerTest.AnalyzeKernel (0 ms)
+[ RUN      ] OccupancyAnalyzerTest.MultipleKernels
+[       OK ] OccupancyAnalyzerTest.MultipleKernels (0 ms)
+[ RUN      ] OccupancyAnalyzerTest.LimitingFactorRetrieval
+[       OK ] OccupancyAnalyzerTest.LimitingFactorRetrieval (0 ms)
+[----------] 4 tests from OccupancyAnalyzerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 88 tests from 33 test suites ran. (365 ms total)
+[  PASSED  ] 86 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] GaussianSourceTest.WeightSumConserved
+[  FAILED  ] BoundaryTest.AbsorbAtZmax
+
+ 2 FAILED TESTS

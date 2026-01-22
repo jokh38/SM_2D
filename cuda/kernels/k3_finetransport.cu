@@ -3,6 +3,7 @@
 #include "physics/highland.hpp"
 #include "physics/nuclear.hpp"
 #include "physics/physics.hpp"
+#include <cstdint>
 
 __global__ void K3_FineTransport(
     const uint32_t* __restrict__ block_ids_in,

@@ -1,5 +1,7 @@
 #pragma once
 #include "core/buckets.hpp"
+#include "core/psi_storage.hpp"
+#include <cstdint>
 
 __global__ void K4_BucketTransfer(
     const OutflowBucket* __restrict__ OutflowBuckets,

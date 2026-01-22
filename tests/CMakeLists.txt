@@ -1,3 +1,4 @@
+# Create test executable with CUDA enabled
 add_executable(sm2d_tests
     unit/test_build_system.cpp
     unit/test_cuda_smoke.cpp
@@ -33,6 +34,14 @@ add_executable(sm2d_tests
     perf/test_occupancy.cpp
 )
 
+# Set test property to treat .cpp files with CUDA kernel calls as CUDA
+set_source_files_properties(
+    unit/test_cuda_smoke.cpp
+    kernels/test_k1_activemask.cpp
+    kernels/test_k3_finetransport.cpp
+    PROPERTIES LANGUAGE CUDA
+)
+
 target_link_libraries(sm2d_tests
     sm2d_core
     sm2d_cuda
@@ -41,6 +50,9 @@ target_link_libraries(sm2d_tests
     GTest::gtest_main
     GTest::gtest
 )
+
+# Add CUDA include directories for tests
+target_include_directories(sm2d_tests PRIVATE /usr/local/cuda-12.4/include)
 
 include(GoogleTest)
 gtest_discover_tests(sm2d_tests)

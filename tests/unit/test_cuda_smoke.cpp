@@ -1,6 +1,14 @@
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
 
+// Define kernels at file scope, not inside TEST functions
+__global__ void add_one(float* data, int N) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < N) {
+        data[idx] += 1.0f;
+    }
+}
+
 TEST(CudaSmokeTest, DeviceAvailable) {
     int device_count = 0;
     ASSERT_EQ(cudaGetDeviceCount(&device_count), cudaSuccess);
@@ -18,12 +26,6 @@ TEST(CudaSmokeTest, CanAllocate) {
 }
 
 TEST(CudaSmokeTest, SimpleKernel) {
-    __global__ void add_one(float* data, int N) {
-        int idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx < N) {
-            data[idx] += 1.0f;
-        }
-    }
     const int N = 256;
     float* d_data = nullptr;
     cudaMalloc(&d_data, N * sizeof(float));

@@ -5,7 +5,7 @@
 
 struct GaussianSource {
     float x0 = 0.0f;
-    float z0 = 0.0f;
+    float theta0 = 0.0f;
     float sigma_x = 5.0f;
     float sigma_theta = 0.01f;
     float E0 = 150.0f;

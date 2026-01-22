@@ -21,7 +21,7 @@ void MemoryProfiler::start() {
 }
 
 void MemoryProfiler::stop() {
-    peak_ = std::max(peak_, baseline_ + 50ULL * 1024 * 1024);  // Add 50MB
+    peak_ = std::max(peak_, static_cast<uint64_t>(baseline_ + 50ULL * 1024 * 1024));  // Add 50MB
     running_ = false;
 }
 

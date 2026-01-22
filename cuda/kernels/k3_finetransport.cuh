@@ -1,5 +1,6 @@
 #pragma once
 #include "physics/physics.hpp"
+#include <cstdint>
 
 // Component state
 struct Component {

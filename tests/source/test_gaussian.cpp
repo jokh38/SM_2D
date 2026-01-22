@@ -13,7 +13,7 @@ TEST(GaussianSourceTest, WeightSumConserved) {
     GaussianSource src;
     src.W_total = 1.0f;
     src.x0 = 5.0f;
-    src.z0 = 5.0f;
+    src.theta0 = 0.05f;
 
     EnergyGrid e_grid(0.1f, 250.0f, 256);
     AngularGrid a_grid(-M_PI/2, M_PI/2, 512);
