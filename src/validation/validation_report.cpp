@@ -79,7 +79,7 @@ ValidationResults run_full_validation() {
     ValidationResults results;
 
     // Load NIST data
-    auto nist_data = LoadNistData("data/pstar_water.txt");
+    auto nist_data = LoadNistData("src/data/pstar_water.txt");
 
     // Helper to find NIST range for energy
     auto find_nist_range = [&nist_data](float E) -> float {

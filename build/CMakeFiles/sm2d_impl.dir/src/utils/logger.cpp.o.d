@@ -1,6 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/utils/logger.cpp.o: \
  /workspaces/SM_2D/src/utils/logger.cpp /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/utils/logger.hpp /usr/include/c++/12/string \
+ /workspaces/SM_2D/src/include/utils/logger.hpp \
+ /usr/include/c++/12/string \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \

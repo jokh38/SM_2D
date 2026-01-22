@@ -1,7 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.o: \
  /workspaces/SM_2D/src/perf/kernel_profiler.cpp \
  /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/perf/kernel_profiler.hpp \
+ /workspaces/SM_2D/src/include/perf/kernel_profiler.hpp \
  /usr/include/c++/12/string \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \

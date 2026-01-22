@@ -1,7 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.o: \
  /workspaces/SM_2D/src/audit/reporting.cpp /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/audit/reporting.hpp \
- /workspaces/SM_2D/include/audit/conservation.hpp \
+ /workspaces/SM_2D/src/include/audit/reporting.hpp \
+ /workspaces/SM_2D/src/include/audit/conservation.hpp \
  /usr/include/c++/12/cstdint \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \
@@ -22,7 +22,7 @@ CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
- /workspaces/SM_2D/include/audit/global_budget.hpp \
+ /workspaces/SM_2D/src/include/audit/global_budget.hpp \
  /usr/include/c++/12/vector /usr/include/c++/12/bits/stl_algobase.h \
  /usr/include/c++/12/bits/functexcept.h \
  /usr/include/c++/12/bits/exception_defines.h \

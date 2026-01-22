@@ -9,11 +9,11 @@ echo ""
 # Check kernel headers
 echo "1. Checking kernel headers (.cuh)..."
 KERNEL_HEADERS=(
-    "cuda/kernels/k1_activemask.cuh"
-    "cuda/kernels/k3_finetransport.cuh"
-    "cuda/kernels/k4_transfer.cuh"
-    "cuda/kernels/k5_audit.cuh"
-    "cuda/kernels/k6_swap.cuh"
+    "src/cuda/kernels/k1_activemask.cuh"
+    "src/cuda/kernels/k3_finetransport.cuh"
+    "src/cuda/kernels/k4_transfer.cuh"
+    "src/cuda/kernels/k5_audit.cuh"
+    "src/cuda/kernels/k6_swap.cuh"
 )
 
 for header in "${KERNEL_HEADERS[@]}"; do
@@ -28,11 +28,11 @@ echo ""
 # Check kernel implementations
 echo "2. Checking kernel implementations (.cu)..."
 KERNEL_IMPLS=(
-    "cuda/kernels/k1_activemask.cu"
-    "cuda/kernels/k3_finetransport.cu"
-    "cuda/kernels/k4_transfer.cu"
-    "cuda/kernels/k5_audit.cu"
-    "cuda/kernels/k6_swap.cu"
+    "src/cuda/kernels/k1_activemask.cu"
+    "src/cuda/kernels/k3_finetransport.cu"
+    "src/cuda/kernels/k4_transfer.cu"
+    "src/cuda/kernels/k5_audit.cu"
+    "src/cuda/kernels/k6_swap.cu"
 )
 
 for impl in "${KERNEL_IMPLS[@]}"; do

@@ -557,11 +557,11 @@ sm2d_tests_OBJECTS = \
 
 # External object files for target sm2d_tests
 sm2d_tests_EXTERNAL_OBJECTS = \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.o"
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o"
 
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
@@ -595,11 +595,11 @@ tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.o
+tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
+tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
+tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
+tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
+tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/build.make
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: libsm2d_impl.a
 tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: /usr/lib/x86_64-linux-gnu/libgtest_main.a
@@ -651,11 +651,11 @@ sm2d_tests_OBJECTS = \
 
 # External object files for target sm2d_tests
 sm2d_tests_EXTERNAL_OBJECTS = \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.o"
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o" \
+"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o"
 
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
@@ -689,11 +689,11 @@ tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_rep
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.o
+tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
+tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
+tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
+tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
+tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/build.make
 tests/sm2d_tests: libsm2d_impl.a
 tests/sm2d_tests: /usr/lib/x86_64-linux-gnu/libgtest_main.a

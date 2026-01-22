@@ -1,7 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/audit/global_budget.cpp.o: \
  /workspaces/SM_2D/src/audit/global_budget.cpp /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/audit/global_budget.hpp \
- /workspaces/SM_2D/include/audit/conservation.hpp \
+ /workspaces/SM_2D/src/include/audit/global_budget.hpp \
+ /workspaces/SM_2D/src/include/audit/conservation.hpp \
  /usr/include/c++/12/cstdint \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \

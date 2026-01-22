@@ -178,126 +178,6 @@ sm2d_tests/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/build
 .PHONY : sm2d_tests/fast
 
-cuda/kernels/k1_activemask.o: cuda/kernels/k1_activemask.cu.o
-.PHONY : cuda/kernels/k1_activemask.o
-
-# target to build an object file
-cuda/kernels/k1_activemask.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.o
-.PHONY : cuda/kernels/k1_activemask.cu.o
-
-cuda/kernels/k1_activemask.i: cuda/kernels/k1_activemask.cu.i
-.PHONY : cuda/kernels/k1_activemask.i
-
-# target to preprocess a source file
-cuda/kernels/k1_activemask.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.i
-.PHONY : cuda/kernels/k1_activemask.cu.i
-
-cuda/kernels/k1_activemask.s: cuda/kernels/k1_activemask.cu.s
-.PHONY : cuda/kernels/k1_activemask.s
-
-# target to generate assembly for a file
-cuda/kernels/k1_activemask.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k1_activemask.cu.s
-.PHONY : cuda/kernels/k1_activemask.cu.s
-
-cuda/kernels/k3_finetransport.o: cuda/kernels/k3_finetransport.cu.o
-.PHONY : cuda/kernels/k3_finetransport.o
-
-# target to build an object file
-cuda/kernels/k3_finetransport.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.o
-.PHONY : cuda/kernels/k3_finetransport.cu.o
-
-cuda/kernels/k3_finetransport.i: cuda/kernels/k3_finetransport.cu.i
-.PHONY : cuda/kernels/k3_finetransport.i
-
-# target to preprocess a source file
-cuda/kernels/k3_finetransport.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.i
-.PHONY : cuda/kernels/k3_finetransport.cu.i
-
-cuda/kernels/k3_finetransport.s: cuda/kernels/k3_finetransport.cu.s
-.PHONY : cuda/kernels/k3_finetransport.s
-
-# target to generate assembly for a file
-cuda/kernels/k3_finetransport.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k3_finetransport.cu.s
-.PHONY : cuda/kernels/k3_finetransport.cu.s
-
-cuda/kernels/k4_transfer.o: cuda/kernels/k4_transfer.cu.o
-.PHONY : cuda/kernels/k4_transfer.o
-
-# target to build an object file
-cuda/kernels/k4_transfer.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.o
-.PHONY : cuda/kernels/k4_transfer.cu.o
-
-cuda/kernels/k4_transfer.i: cuda/kernels/k4_transfer.cu.i
-.PHONY : cuda/kernels/k4_transfer.i
-
-# target to preprocess a source file
-cuda/kernels/k4_transfer.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.i
-.PHONY : cuda/kernels/k4_transfer.cu.i
-
-cuda/kernels/k4_transfer.s: cuda/kernels/k4_transfer.cu.s
-.PHONY : cuda/kernels/k4_transfer.s
-
-# target to generate assembly for a file
-cuda/kernels/k4_transfer.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k4_transfer.cu.s
-.PHONY : cuda/kernels/k4_transfer.cu.s
-
-cuda/kernels/k5_audit.o: cuda/kernels/k5_audit.cu.o
-.PHONY : cuda/kernels/k5_audit.o
-
-# target to build an object file
-cuda/kernels/k5_audit.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.o
-.PHONY : cuda/kernels/k5_audit.cu.o
-
-cuda/kernels/k5_audit.i: cuda/kernels/k5_audit.cu.i
-.PHONY : cuda/kernels/k5_audit.i
-
-# target to preprocess a source file
-cuda/kernels/k5_audit.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.i
-.PHONY : cuda/kernels/k5_audit.cu.i
-
-cuda/kernels/k5_audit.s: cuda/kernels/k5_audit.cu.s
-.PHONY : cuda/kernels/k5_audit.s
-
-# target to generate assembly for a file
-cuda/kernels/k5_audit.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k5_audit.cu.s
-.PHONY : cuda/kernels/k5_audit.cu.s
-
-cuda/kernels/k6_swap.o: cuda/kernels/k6_swap.cu.o
-.PHONY : cuda/kernels/k6_swap.o
-
-# target to build an object file
-cuda/kernels/k6_swap.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.o
-.PHONY : cuda/kernels/k6_swap.cu.o
-
-cuda/kernels/k6_swap.i: cuda/kernels/k6_swap.cu.i
-.PHONY : cuda/kernels/k6_swap.i
-
-# target to preprocess a source file
-cuda/kernels/k6_swap.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.i
-.PHONY : cuda/kernels/k6_swap.cu.i
-
-cuda/kernels/k6_swap.s: cuda/kernels/k6_swap.cu.s
-.PHONY : cuda/kernels/k6_swap.s
-
-# target to generate assembly for a file
-cuda/kernels/k6_swap.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.s
-.PHONY : cuda/kernels/k6_swap.cu.s
-
 run_simulation.o: run_simulation.cpp.o
 .PHONY : run_simulation.o
 
@@ -513,6 +393,126 @@ src/core/psi_storage.s: src/core/psi_storage.cpp.s
 src/core/psi_storage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.s
 .PHONY : src/core/psi_storage.cpp.s
+
+src/cuda/kernels/k1_activemask.o: src/cuda/kernels/k1_activemask.cu.o
+.PHONY : src/cuda/kernels/k1_activemask.o
+
+# target to build an object file
+src/cuda/kernels/k1_activemask.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
+.PHONY : src/cuda/kernels/k1_activemask.cu.o
+
+src/cuda/kernels/k1_activemask.i: src/cuda/kernels/k1_activemask.cu.i
+.PHONY : src/cuda/kernels/k1_activemask.i
+
+# target to preprocess a source file
+src/cuda/kernels/k1_activemask.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.i
+.PHONY : src/cuda/kernels/k1_activemask.cu.i
+
+src/cuda/kernels/k1_activemask.s: src/cuda/kernels/k1_activemask.cu.s
+.PHONY : src/cuda/kernels/k1_activemask.s
+
+# target to generate assembly for a file
+src/cuda/kernels/k1_activemask.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.s
+.PHONY : src/cuda/kernels/k1_activemask.cu.s
+
+src/cuda/kernels/k3_finetransport.o: src/cuda/kernels/k3_finetransport.cu.o
+.PHONY : src/cuda/kernels/k3_finetransport.o
+
+# target to build an object file
+src/cuda/kernels/k3_finetransport.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
+.PHONY : src/cuda/kernels/k3_finetransport.cu.o
+
+src/cuda/kernels/k3_finetransport.i: src/cuda/kernels/k3_finetransport.cu.i
+.PHONY : src/cuda/kernels/k3_finetransport.i
+
+# target to preprocess a source file
+src/cuda/kernels/k3_finetransport.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.i
+.PHONY : src/cuda/kernels/k3_finetransport.cu.i
+
+src/cuda/kernels/k3_finetransport.s: src/cuda/kernels/k3_finetransport.cu.s
+.PHONY : src/cuda/kernels/k3_finetransport.s
+
+# target to generate assembly for a file
+src/cuda/kernels/k3_finetransport.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.s
+.PHONY : src/cuda/kernels/k3_finetransport.cu.s
+
+src/cuda/kernels/k4_transfer.o: src/cuda/kernels/k4_transfer.cu.o
+.PHONY : src/cuda/kernels/k4_transfer.o
+
+# target to build an object file
+src/cuda/kernels/k4_transfer.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
+.PHONY : src/cuda/kernels/k4_transfer.cu.o
+
+src/cuda/kernels/k4_transfer.i: src/cuda/kernels/k4_transfer.cu.i
+.PHONY : src/cuda/kernels/k4_transfer.i
+
+# target to preprocess a source file
+src/cuda/kernels/k4_transfer.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.i
+.PHONY : src/cuda/kernels/k4_transfer.cu.i
+
+src/cuda/kernels/k4_transfer.s: src/cuda/kernels/k4_transfer.cu.s
+.PHONY : src/cuda/kernels/k4_transfer.s
+
+# target to generate assembly for a file
+src/cuda/kernels/k4_transfer.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.s
+.PHONY : src/cuda/kernels/k4_transfer.cu.s
+
+src/cuda/kernels/k5_audit.o: src/cuda/kernels/k5_audit.cu.o
+.PHONY : src/cuda/kernels/k5_audit.o
+
+# target to build an object file
+src/cuda/kernels/k5_audit.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
+.PHONY : src/cuda/kernels/k5_audit.cu.o
+
+src/cuda/kernels/k5_audit.i: src/cuda/kernels/k5_audit.cu.i
+.PHONY : src/cuda/kernels/k5_audit.i
+
+# target to preprocess a source file
+src/cuda/kernels/k5_audit.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.i
+.PHONY : src/cuda/kernels/k5_audit.cu.i
+
+src/cuda/kernels/k5_audit.s: src/cuda/kernels/k5_audit.cu.s
+.PHONY : src/cuda/kernels/k5_audit.s
+
+# target to generate assembly for a file
+src/cuda/kernels/k5_audit.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.s
+.PHONY : src/cuda/kernels/k5_audit.cu.s
+
+src/cuda/kernels/k6_swap.o: src/cuda/kernels/k6_swap.cu.o
+.PHONY : src/cuda/kernels/k6_swap.o
+
+# target to build an object file
+src/cuda/kernels/k6_swap.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
+.PHONY : src/cuda/kernels/k6_swap.cu.o
+
+src/cuda/kernels/k6_swap.i: src/cuda/kernels/k6_swap.cu.i
+.PHONY : src/cuda/kernels/k6_swap.i
+
+# target to preprocess a source file
+src/cuda/kernels/k6_swap.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.i
+.PHONY : src/cuda/kernels/k6_swap.cu.i
+
+src/cuda/kernels/k6_swap.s: src/cuda/kernels/k6_swap.cu.s
+.PHONY : src/cuda/kernels/k6_swap.s
+
+# target to generate assembly for a file
+src/cuda/kernels/k6_swap.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.s
+.PHONY : src/cuda/kernels/k6_swap.cu.s
 
 src/lut/nist_loader.o: src/lut/nist_loader.cpp.o
 .PHONY : src/lut/nist_loader.o
@@ -887,21 +887,6 @@ help:
 	@echo "... sm2d_impl"
 	@echo "... sm2d_kernels"
 	@echo "... sm2d_tests"
-	@echo "... cuda/kernels/k1_activemask.o"
-	@echo "... cuda/kernels/k1_activemask.i"
-	@echo "... cuda/kernels/k1_activemask.s"
-	@echo "... cuda/kernels/k3_finetransport.o"
-	@echo "... cuda/kernels/k3_finetransport.i"
-	@echo "... cuda/kernels/k3_finetransport.s"
-	@echo "... cuda/kernels/k4_transfer.o"
-	@echo "... cuda/kernels/k4_transfer.i"
-	@echo "... cuda/kernels/k4_transfer.s"
-	@echo "... cuda/kernels/k5_audit.o"
-	@echo "... cuda/kernels/k5_audit.i"
-	@echo "... cuda/kernels/k5_audit.s"
-	@echo "... cuda/kernels/k6_swap.o"
-	@echo "... cuda/kernels/k6_swap.i"
-	@echo "... cuda/kernels/k6_swap.s"
 	@echo "... run_simulation.o"
 	@echo "... run_simulation.i"
 	@echo "... run_simulation.s"
@@ -929,6 +914,21 @@ help:
 	@echo "... src/core/psi_storage.o"
 	@echo "... src/core/psi_storage.i"
 	@echo "... src/core/psi_storage.s"
+	@echo "... src/cuda/kernels/k1_activemask.o"
+	@echo "... src/cuda/kernels/k1_activemask.i"
+	@echo "... src/cuda/kernels/k1_activemask.s"
+	@echo "... src/cuda/kernels/k3_finetransport.o"
+	@echo "... src/cuda/kernels/k3_finetransport.i"
+	@echo "... src/cuda/kernels/k3_finetransport.s"
+	@echo "... src/cuda/kernels/k4_transfer.o"
+	@echo "... src/cuda/kernels/k4_transfer.i"
+	@echo "... src/cuda/kernels/k4_transfer.s"
+	@echo "... src/cuda/kernels/k5_audit.o"
+	@echo "... src/cuda/kernels/k5_audit.i"
+	@echo "... src/cuda/kernels/k5_audit.s"
+	@echo "... src/cuda/kernels/k6_swap.o"
+	@echo "... src/cuda/kernels/k6_swap.i"
+	@echo "... src/cuda/kernels/k6_swap.s"
 	@echo "... src/lut/nist_loader.o"
 	@echo "... src/lut/nist_loader.i"
 	@echo "... src/lut/nist_loader.s"

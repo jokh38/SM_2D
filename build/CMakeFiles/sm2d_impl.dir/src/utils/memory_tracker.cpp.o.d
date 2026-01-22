@@ -1,7 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.o: \
  /workspaces/SM_2D/src/utils/memory_tracker.cpp \
  /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/utils/memory_tracker.hpp \
+ /workspaces/SM_2D/src/include/utils/memory_tracker.hpp \
  /usr/local/cuda-12.4/include/cuda_runtime.h \
  /usr/local/cuda-12.4/include/crt/host_config.h \
  /usr/local/cuda-12.4/include/builtin_types.h \

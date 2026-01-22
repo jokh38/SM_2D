@@ -12,7 +12,7 @@ RLUT GenerateRLUT(float E_min, float E_max, int N_E) {
     lut.log_S.resize(N_E);
 
     // Load NIST data
-    auto nist_data = LoadNistData("data/nist/pstar_water.txt");
+    auto nist_data = LoadNistData("src/data/nist/pstar_water.txt");
 
     // Convert NIST range from g/cm² to mm (water density = 1.0 g/cm³)
     const float rho = 1.0f;

@@ -1,6 +1,6 @@
 CMakeFiles/sm2d_impl.dir/src/boundary/boundaries.cpp.o: \
  /workspaces/SM_2D/src/boundary/boundaries.cpp /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/boundary/boundaries.hpp \
+ /workspaces/SM_2D/src/include/boundary/boundaries.hpp \
  /usr/include/c++/12/cstdint \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \

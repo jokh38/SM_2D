@@ -1,7 +1,7 @@
-#include "include/core/config_loader.hpp"
-#include "include/validation/pencil_beam.hpp"
-#include "include/validation/bragg_peak.hpp"
-#include "include/source/source_adapter.hpp"
+#include "core/config_loader.hpp"
+#include "validation/pencil_beam.hpp"
+#include "validation/bragg_peak.hpp"
+#include "source/source_adapter.hpp"
 #include <iostream>
 #include <fstream>
 #include <iomanip>

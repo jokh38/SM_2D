@@ -1,6 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/lut/nist_loader.cpp.o: \
  /workspaces/SM_2D/src/lut/nist_loader.cpp /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/lut/nist_loader.hpp /usr/include/c++/12/string \
+ /workspaces/SM_2D/src/include/lut/nist_loader.hpp \
+ /usr/include/c++/12/string \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \

@@ -1,7 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.o: \
  /workspaces/SM_2D/src/perf/memory_profiler.cpp \
  /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/perf/memory_profiler.hpp \
+ /workspaces/SM_2D/src/include/perf/memory_profiler.hpp \
  /usr/include/c++/12/cstdint \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \

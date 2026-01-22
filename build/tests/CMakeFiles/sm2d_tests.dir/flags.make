@@ -11,7 +11,7 @@ CUDA_FLAGS =  --expt-relaxed-constexpr -O3 -DNDEBUG "--generate-code=arch=comput
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/local/cuda-12.4/include -I/workspaces/SM_2D/include -I/workspaces/SM_2D/cuda
+CXX_INCLUDES = -I/usr/local/cuda-12.4/include -I/workspaces/SM_2D/src/include -I/workspaces/SM_2D/src/cuda
 
 CXX_FLAGS = -O3 -DNDEBUG -DGTEST_HAS_PTHREAD=1
 

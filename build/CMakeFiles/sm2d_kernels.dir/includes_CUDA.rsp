@@ -1,1 +1,1 @@
--I/workspaces/SM_2D/include -I/workspaces/SM_2D/cuda
+-I/workspaces/SM_2D/src/include -I/workspaces/SM_2D/src/cuda

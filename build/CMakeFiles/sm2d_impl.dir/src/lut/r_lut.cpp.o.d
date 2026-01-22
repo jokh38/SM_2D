@@ -1,7 +1,7 @@
 CMakeFiles/sm2d_impl.dir/src/lut/r_lut.cpp.o: \
  /workspaces/SM_2D/src/lut/r_lut.cpp /usr/include/stdc-predef.h \
- /workspaces/SM_2D/include/lut/r_lut.hpp \
- /workspaces/SM_2D/include/core/grids.hpp /usr/include/c++/12/vector \
+ /workspaces/SM_2D/src/include/lut/r_lut.hpp \
+ /workspaces/SM_2D/src/include/core/grids.hpp /usr/include/c++/12/vector \
  /usr/include/c++/12/bits/stl_algobase.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \
@@ -106,8 +106,8 @@ CMakeFiles/sm2d_impl.dir/src/lut/r_lut.cpp.o: \
  /usr/include/c++/12/tr1/poly_hermite.tcc \
  /usr/include/c++/12/tr1/poly_laguerre.tcc \
  /usr/include/c++/12/tr1/riemann_zeta.tcc \
- /workspaces/SM_2D/include/lut/nist_loader.hpp /usr/include/c++/12/string \
- /usr/include/c++/12/bits/stringfwd.h \
+ /workspaces/SM_2D/src/include/lut/nist_loader.hpp \
+ /usr/include/c++/12/string /usr/include/c++/12/bits/stringfwd.h \
  /usr/include/c++/12/bits/char_traits.h \
  /usr/include/c++/12/bits/postypes.h /usr/include/c++/12/cwchar \
  /usr/include/wchar.h /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \

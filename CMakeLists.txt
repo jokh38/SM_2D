@@ -14,29 +14,29 @@ find_package(GTest REQUIRED)
 # Core library
 add_library(sm2d_core INTERFACE)
 target_include_directories(sm2d_core INTERFACE
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src/include
 )
 
 # CUDA kernels
 add_library(sm2d_cuda INTERFACE)
 target_include_directories(sm2d_cuda INTERFACE
-    ${CMAKE_SOURCE_DIR}/cuda
+    ${CMAKE_SOURCE_DIR}/src/cuda
 )
 
 # CUDA kernel sources (separable compilation)
 set(CUDA_KERNEL_SOURCES
-    cuda/kernels/k1_activemask.cu
-    cuda/kernels/k3_finetransport.cu
-    cuda/kernels/k4_transfer.cu
-    cuda/kernels/k5_audit.cu
-    cuda/kernels/k6_swap.cu
+    src/cuda/kernels/k1_activemask.cu
+    src/cuda/kernels/k3_finetransport.cu
+    src/cuda/kernels/k4_transfer.cu
+    src/cuda/kernels/k5_audit.cu
+    src/cuda/kernels/k6_swap.cu
 )
 
 # Create CUDA object library for kernel files
 add_library(sm2d_kernels OBJECT ${CUDA_KERNEL_SOURCES})
 target_include_directories(sm2d_kernels PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/cuda
+    ${CMAKE_SOURCE_DIR}/src/include
+    ${CMAKE_SOURCE_DIR}/src/cuda
 )
 set_property(TARGET sm2d_kernels PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
