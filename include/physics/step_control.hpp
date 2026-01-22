@@ -2,21 +2,56 @@
 #include "lut/r_lut.hpp"
 #include <cmath>
 
-// R-based step size control (IC-1: NO S(E) USAGE)
+// ============================================================================
+// R-based step size control with adaptive refinement near Bragg peak
+// ============================================================================
+// IC-1: Uses R(E) LUT, not S(E) directly
+//
+// Step size is limited by:
+// 1. Fraction of remaining range (2% default)
+// 2. Energy-dependent refinement near Bragg peak
+// 3. Maximum absolute step size (1 mm)
+//
+// Near Bragg peak (E < 20 MeV), stopping power varies rapidly,
+// requiring smaller steps for accuracy.
 inline float compute_max_step_physics(const RLUT& lut, float E) {
     float R = lut.lookup_R(E);
 
-    // Option A: Fixed fraction of remaining range
-    float delta_R_max = 0.02f * R;  // Max 2% range loss per substep
+    // Base: 2% of remaining range
+    float delta_R_max = 0.02f * R;
 
-    // Energy-dependent refinement near Bragg
-    if (E < 10.0f) {
-        delta_R_max = fminf(delta_R_max, 0.2f);
+    // Energy-dependent refinement factor
+    // dS/dE increases near Bragg peak, requiring smaller steps
+    float dS_factor = 1.0f;
+
+    if (E < 5.0f) {
+        // Very near end of range: extreme refinement
+        dS_factor = 0.2f;
+        delta_R_max = fminf(delta_R_max, 0.1f);  // Max 0.1 mm
+    } else if (E < 10.0f) {
+        // Near Bragg peak: high refinement
+        dS_factor = 0.3f;
+        delta_R_max = fminf(delta_R_max, 0.2f);  // Max 0.2 mm
+    } else if (E < 20.0f) {
+        // Bragg peak region: moderate refinement
+        dS_factor = 0.5f;
+        delta_R_max = fminf(delta_R_max, 0.5f);  // Max 0.5 mm
     } else if (E < 50.0f) {
-        delta_R_max = fminf(delta_R_max, 0.5f);
+        // Pre-Bragg: light refinement
+        dS_factor = 0.7f;
+        delta_R_max = fminf(delta_R_max, 0.7f);  // Max 0.7 mm
     }
 
-    return delta_R_max;  // This IS the step size (dR/ds ≈ 1 in CSDA)
+    // Apply refinement factor
+    delta_R_max = delta_R_max * dS_factor;
+
+    // Hard upper limit (prevents overly large steps at high energy)
+    delta_R_max = fminf(delta_R_max, 1.0f);  // Max 1 mm
+
+    // Hard lower limit (prevents excessive subdivision)
+    delta_R_max = fmaxf(delta_R_max, 0.05f);  // Min 0.05 mm
+
+    return delta_R_max;  // dR/ds ≈ 1 in CSDA approximation
 }
 
 // Energy update using R-based control

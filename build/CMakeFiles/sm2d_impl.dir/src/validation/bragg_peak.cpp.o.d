@@ -93,6 +93,7 @@ CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/12/bits/specfun.h /usr/include/c++/12/limits \
  /usr/include/c++/12/tr1/gamma.tcc \

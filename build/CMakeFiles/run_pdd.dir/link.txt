@@ -1,1 +1,1 @@
-/usr/bin/c++ -g CMakeFiles/run_pdd.dir/tools/run_pdd.cpp.o -o run_pdd  libsm2d_impl.a
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/run_pdd.dir/tools/run_pdd.cpp.o -o run_pdd  libsm2d_impl.a

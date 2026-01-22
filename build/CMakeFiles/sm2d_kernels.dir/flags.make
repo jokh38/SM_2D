@@ -6,5 +6,5 @@ CUDA_DEFINES =
 
 CUDA_INCLUDES = --options-file CMakeFiles/sm2d_kernels.dir/includes_CUDA.rsp
 
-CUDA_FLAGS =  --expt-relaxed-constexpr -g "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
+CUDA_FLAGS =  --expt-relaxed-constexpr -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
 

@@ -93,15 +93,37 @@ float RLUT::lookup_S(float E) const {
 }
 
 float RLUT::lookup_E_inverse(float R_input) const {
+    // Handle boundary cases explicitly
+    if (R_input <= 0.0f) {
+        return grid.E_min;  // Zero range → minimum energy
+    }
+    if (R_input >= R.back()) {
+        return grid.E_max;  // Beyond LUT range → maximum energy
+    }
+    if (R_input <= R.front()) {
+        return grid.E_min;  // Below minimum LUT range
+    }
+
+    // Binary search for interpolation bin
+    // R is monotonically increasing with energy by construction
     auto it = std::lower_bound(R.begin(), R.end(), R_input);
+
+    // Clamp to valid bin range [0, N_E - 2] for interpolation
     int bin = std::max(0, std::min(static_cast<int>(it - R.begin()), grid.N_E - 2));
 
+    // Log-log interpolation (same as R->E direction)
     float log_R_val = logf(R_input);
     float log_R0 = log_R[bin];
     float log_R1 = log_R[bin + 1];
     float log_E0 = log_E[bin];
     float log_E1 = log_E[bin + 1];
 
-    float log_E_val = log_E0 + (log_E1 - log_E0) * (log_R_val - log_R0) / (log_R1 - log_R0);
+    // Avoid division by zero (should not happen with valid LUT)
+    float d_log_R = log_R1 - log_R0;
+    if (fabsf(d_log_R) < 1e-10f) {
+        return expf(log_E0);  // Fallback to bin value
+    }
+
+    float log_E_val = log_E0 + (log_E1 - log_E0) * (log_R_val - log_R0) / d_log_R;
     return expf(log_E_val);
 }

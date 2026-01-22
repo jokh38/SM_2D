@@ -1,24 +1,39 @@
 #pragma once
 #include <cmath>
 
-// Highland formula for multiple Coulomb scattering
+// Proton rest mass [MeV/c²]
+namespace { const float m_p_MeV = 938.272f; }
+
+// Highland formula for multiple Coulomb scattering (PDG 2024)
 // Returns sigma_theta [radians]
+//
+// σ_θ = (13.6 MeV / βcp) * z * sqrt(x/X_0) * [1 + 0.038 * ln(x/X_0)]
+//
+// where:
+//   βcp = momentum * velocity [MeV/c]
+//   z = projectile charge (1 for protons)
+//   x = step length [mm]
+//   X_0 = radiation length [mm] (360.8 mm for water)
+//
+// Valid for: 1e-5 < t < 100 where t = x/X_0
 inline float highland_sigma(float E_MeV, float ds, float X0 = 360.8f) {
-    // X0 = 360.8 mm for water
-    float beta = sqrtf(1.0f - powf(938.272f / (E_MeV + 938.272f), 2));
-    float p_MeV = sqrtf(powf(E_MeV + 938.272f, 2) - 938.272f * 938.272f);
+    constexpr float z = 1.0f;  // Proton charge
+
+    // Relativistic kinematics
+    float gamma = (E_MeV + m_p_MeV) / m_p_MeV;
+    float beta = sqrtf(fmaxf(1.0f - 1.0f / (gamma * gamma), 0.0f));
+    float p_MeV = sqrtf(fmaxf((E_MeV + m_p_MeV) * (E_MeV + m_p_MeV) - m_p_MeV * m_p_MeV, 0.0f));
+
     float t = ds / X0;
+    if (t < 1e-6f) return 0.0f;
 
-    if (t < 1e-10f) return 0.0f;
+    // Highland correction factor
+    // Valid for 1e-5 < t < 100; clamp to physical minimum
+    float ln_t = logf(t);
+    float bracket = 1.0f + 0.038f * ln_t;
+    bracket = fmaxf(bracket, 0.5f);  // Physical minimum (PDG recommendation)
 
-    float ln_term = logf(t);
-    float bracket = 1.0f + 0.038f * ln_term;
-
-    // IC-8: Clamp bracket to physical minimum instead of signaling error
-    // The Highland correction is valid for t > 1e-5, beyond which we clamp
-    bracket = fmaxf(bracket, 0.1f);
-
-    return (13.6f / (beta * p_MeV)) * sqrtf(t) * bracket;
+    return (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
 }
 
 // 7-point Gaussian quadrature weights for angular splitting
