@@ -153,17 +153,17 @@ sm2d_impl/fast:
 .PHONY : sm2d_impl/fast
 
 #=============================================================================
-# Target rules for targets named run_pdd
+# Target rules for targets named run_simulation
 
 # Build rule for target.
-run_pdd: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_pdd
-.PHONY : run_pdd
+run_simulation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_simulation
+.PHONY : run_simulation
 
 # fast build rule for target.
-run_pdd/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/build
-.PHONY : run_pdd/fast
+run_simulation/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/build
+.PHONY : run_simulation/fast
 
 #=============================================================================
 # Target rules for targets named sm2d_tests
@@ -297,6 +297,30 @@ cuda/kernels/k6_swap.s: cuda/kernels/k6_swap.cu.s
 cuda/kernels/k6_swap.cu.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/cuda/kernels/k6_swap.cu.s
 .PHONY : cuda/kernels/k6_swap.cu.s
+
+run_simulation.o: run_simulation.cpp.o
+.PHONY : run_simulation.o
+
+# target to build an object file
+run_simulation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/run_simulation.cpp.o
+.PHONY : run_simulation.cpp.o
+
+run_simulation.i: run_simulation.cpp.i
+.PHONY : run_simulation.i
+
+# target to preprocess a source file
+run_simulation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/run_simulation.cpp.i
+.PHONY : run_simulation.cpp.i
+
+run_simulation.s: run_simulation.cpp.s
+.PHONY : run_simulation.s
+
+# target to generate assembly for a file
+run_simulation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/run_simulation.cpp.s
+.PHONY : run_simulation.cpp.s
 
 src/audit/conservation.o: src/audit/conservation.cpp.o
 .PHONY : src/audit/conservation.o
@@ -850,30 +874,6 @@ src/validation/validation_report.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.s
 .PHONY : src/validation/validation_report.cpp.s
 
-tools/run_pdd.o: tools/run_pdd.cpp.o
-.PHONY : tools/run_pdd.o
-
-# target to build an object file
-tools/run_pdd.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/tools/run_pdd.cpp.o
-.PHONY : tools/run_pdd.cpp.o
-
-tools/run_pdd.i: tools/run_pdd.cpp.i
-.PHONY : tools/run_pdd.i
-
-# target to preprocess a source file
-tools/run_pdd.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/tools/run_pdd.cpp.i
-.PHONY : tools/run_pdd.cpp.i
-
-tools/run_pdd.s: tools/run_pdd.cpp.s
-.PHONY : tools/run_pdd.s
-
-# target to generate assembly for a file
-tools/run_pdd.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/tools/run_pdd.cpp.s
-.PHONY : tools/run_pdd.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -883,7 +883,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... test"
-	@echo "... run_pdd"
+	@echo "... run_simulation"
 	@echo "... sm2d_impl"
 	@echo "... sm2d_kernels"
 	@echo "... sm2d_tests"
@@ -902,6 +902,9 @@ help:
 	@echo "... cuda/kernels/k6_swap.o"
 	@echo "... cuda/kernels/k6_swap.i"
 	@echo "... cuda/kernels/k6_swap.s"
+	@echo "... run_simulation.o"
+	@echo "... run_simulation.i"
+	@echo "... run_simulation.s"
 	@echo "... src/audit/conservation.o"
 	@echo "... src/audit/conservation.i"
 	@echo "... src/audit/conservation.s"
@@ -971,9 +974,6 @@ help:
 	@echo "... src/validation/validation_report.o"
 	@echo "... src/validation/validation_report.i"
 	@echo "... src/validation/validation_report.s"
-	@echo "... tools/run_pdd.o"
-	@echo "... tools/run_pdd.i"
-	@echo "... tools/run_pdd.s"
 .PHONY : help
 
 

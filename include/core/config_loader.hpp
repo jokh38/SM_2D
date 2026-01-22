@@ -265,6 +265,26 @@ inline IncidentParticleConfig load_incident_particle_config(const std::string& f
         sampling_sec.get_int("random_seed", config.sampling.random_seed));
     config.sampling.use_stratified = sampling_sec.get_bool("use_stratified", config.sampling.use_stratified);
 
+    // [grid] section
+    ConfigSection grid_sec = loader.get_section("grid");
+    config.grid.Nx = grid_sec.get_int("Nx", config.grid.Nx);
+    config.grid.Nz = grid_sec.get_int("Nz", config.grid.Nz);
+    config.grid.dx = grid_sec.get_float("dx_mm", config.grid.dx);
+    config.grid.dz = grid_sec.get_float("dz_mm", config.grid.dz);
+    config.grid.max_steps = grid_sec.get_int("max_steps", config.grid.max_steps);
+
+    // [output] section
+    ConfigSection output_sec = loader.get_section("output");
+    config.output.output_dir = output_sec.get("output_dir", config.output.output_dir);
+    config.output.dose_2d_file = output_sec.get("dose_2d_file", config.output.dose_2d_file);
+    config.output.pdd_file = output_sec.get("pdd_file", config.output.pdd_file);
+    config.output.let_file = output_sec.get("let_file", config.output.let_file);
+    config.output.format = output_sec.get("format", config.output.format);
+    config.output.normalize_dose = output_sec.get_bool("normalize_dose", config.output.normalize_dose);
+    config.output.save_2d = output_sec.get_bool("save_2d", config.output.save_2d);
+    config.output.save_pdd = output_sec.get_bool("save_pdd", config.output.save_pdd);
+    config.output.save_lat_profiles = output_sec.get_bool("save_lat_profiles", config.output.save_lat_profiles);
+
     return config;
 }
 
@@ -322,7 +342,27 @@ inline bool save_incident_particle_config(
     file << "[sampling]\n";
     file << "n_samples = " << config.sampling.n_samples << "\n";
     file << "random_seed = " << config.sampling.random_seed << "\n";
-    file << "use_stratified = " << (config.sampling.use_stratified ? "true" : "false") << "\n";
+    file << "use_stratified = " << (config.sampling.use_stratified ? "true" : "false") << "\n\n";
+
+    // [grid] section
+    file << "[grid]\n";
+    file << "Nx = " << config.grid.Nx << "\n";
+    file << "Nz = " << config.grid.Nz << "\n";
+    file << "dx_mm = " << config.grid.dx << "\n";
+    file << "dz_mm = " << config.grid.dz << "\n";
+    file << "max_steps = " << config.grid.max_steps << "\n\n";
+
+    // [output] section
+    file << "[output]\n";
+    file << "output_dir = " << config.output.output_dir << "\n";
+    file << "dose_2d_file = " << config.output.dose_2d_file << "\n";
+    file << "pdd_file = " << config.output.pdd_file << "\n";
+    file << "let_file = " << config.output.let_file << "\n";
+    file << "format = " << config.output.format << "\n";
+    file << "normalize_dose = " << (config.output.normalize_dose ? "true" : "false") << "\n";
+    file << "save_2d = " << (config.output.save_2d ? "true" : "false") << "\n";
+    file << "save_pdd = " << (config.output.save_pdd ? "true" : "false") << "\n";
+    file << "save_lat_profiles = " << (config.output.save_lat_profiles ? "true" : "false") << "\n";
 
     return true;
 }
@@ -349,6 +389,10 @@ inline void print_config_summary(std::ostream& os, const IncidentParticleConfig&
     if (config.beam_profile == BeamProfileType::GAUSSIAN) {
         os << "Samples: " << config.sampling.n_samples << "\n";
     }
+    os << "\n";
+    os << "Grid: " << config.grid.Nx << " x " << config.grid.Nz;
+    os << " (dx=" << config.grid.dx << "mm, dz=" << config.grid.dz << "mm)\n";
+    os << "Output Dir: " << config.output.output_dir << "\n";
     os << "======================================\n";
 }
 

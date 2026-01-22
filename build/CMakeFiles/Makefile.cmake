@@ -63,6 +63,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/sm2d_kernels.dir/DependInfo.cmake"
   "CMakeFiles/sm2d_impl.dir/DependInfo.cmake"
-  "CMakeFiles/run_pdd.dir/DependInfo.cmake"
+  "CMakeFiles/run_simulation.dir/DependInfo.cmake"
   "tests/CMakeFiles/sm2d_tests.dir/DependInfo.cmake"
   )

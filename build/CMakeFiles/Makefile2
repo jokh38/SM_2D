@@ -65,7 +65,7 @@ CMAKE_BINARY_DIR = /workspaces/SM_2D/build
 # The main recursive "all" target.
 all: CMakeFiles/sm2d_kernels.dir/all
 all: CMakeFiles/sm2d_impl.dir/all
-all: CMakeFiles/run_pdd.dir/all
+all: CMakeFiles/run_simulation.dir/all
 all: tests/all
 .PHONY : all
 
@@ -76,7 +76,7 @@ preinstall: tests/preinstall
 # The main recursive "clean" target.
 clean: CMakeFiles/sm2d_kernels.dir/clean
 clean: CMakeFiles/sm2d_impl.dir/clean
-clean: CMakeFiles/run_pdd.dir/clean
+clean: CMakeFiles/run_simulation.dir/clean
 clean: tests/clean
 .PHONY : clean
 
@@ -148,30 +148,30 @@ CMakeFiles/sm2d_impl.dir/clean:
 .PHONY : CMakeFiles/sm2d_impl.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/run_pdd.dir
+# Target rules for target CMakeFiles/run_simulation.dir
 
 # All Build rule for target.
-CMakeFiles/run_pdd.dir/all: CMakeFiles/sm2d_impl.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=1,2 "Built target run_pdd"
-.PHONY : CMakeFiles/run_pdd.dir/all
+CMakeFiles/run_simulation.dir/all: CMakeFiles/sm2d_impl.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=1,2 "Built target run_simulation"
+.PHONY : CMakeFiles/run_simulation.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/run_pdd.dir/rule: cmake_check_build_system
+CMakeFiles/run_simulation.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 26
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/run_pdd.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/run_simulation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 0
-.PHONY : CMakeFiles/run_pdd.dir/rule
+.PHONY : CMakeFiles/run_simulation.dir/rule
 
 # Convenience name for target.
-run_pdd: CMakeFiles/run_pdd.dir/rule
-.PHONY : run_pdd
+run_simulation: CMakeFiles/run_simulation.dir/rule
+.PHONY : run_simulation
 
 # clean rule for target.
-CMakeFiles/run_pdd.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_pdd.dir/build.make CMakeFiles/run_pdd.dir/clean
-.PHONY : CMakeFiles/run_pdd.dir/clean
+CMakeFiles/run_simulation.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/clean
+.PHONY : CMakeFiles/run_simulation.dir/clean
 
 #=============================================================================
 # Target rules for target tests/CMakeFiles/sm2d_tests.dir

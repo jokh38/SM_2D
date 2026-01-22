@@ -140,6 +140,38 @@ struct SamplingConfig {
 };
 
 /**
+ * @brief Grid configuration for simulation
+ */
+struct GridConfig {
+    int Nx = 100;                  // Number of transverse bins
+    int Nz = 200;                  // Number of depth bins
+    float dx = 1.0f;               // Transverse spacing (mm)
+    float dz = 1.0f;               // Depth spacing (mm)
+    int max_steps = 100;           // Maximum simulation steps
+};
+
+/**
+ * @brief Output file configuration
+ */
+struct OutputConfig {
+    // File paths
+    std::string output_dir = "results";
+    std::string dose_2d_file = "dose_2d.txt";
+    std::string pdd_file = "pdd.txt";
+    std::string let_file = "";     // Empty = don't output LET
+
+    // Output format
+    std::string format = "txt";    // txt, csv, or hdf5
+
+    // Output options
+    bool normalize_dose = true;    // Normalize to max dose
+    bool save_2d = true;           // Save 2D dose distribution
+    bool save_pdd = true;          // Save depth-dose
+    bool save_lat_profiles = false;// Save lateral profiles at specified depths
+    std::vector<float> lat_depths_mm;  // Depths for lateral profiles
+};
+
+/**
  * @brief Unified incident particle configuration
  *
  * This structure centralizes all parameters for incident particle specification.
@@ -161,6 +193,12 @@ struct IncidentParticleConfig {
 
     // Monte Carlo sampling
     SamplingConfig sampling;
+
+    // Grid configuration
+    GridConfig grid;
+
+    // Output configuration
+    OutputConfig output;
 
     // Beam weight/intensity
     float W_total = 1.0f;              // Total weight (normalized dose)
@@ -220,6 +258,23 @@ inline void IncidentParticleConfig::validate() const {
     if (W_total <= 0.0f) {
         throw std::invalid_argument("IncidentParticleConfig: W_total must be positive");
     }
+
+    // Grid validation
+    if (grid.Nx <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: Nx must be positive");
+    }
+    if (grid.Nz <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: Nz must be positive");
+    }
+    if (grid.dx <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: dx must be positive");
+    }
+    if (grid.dz <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: dz must be positive");
+    }
+    if (grid.max_steps <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: max_steps must be positive");
+    }
 }
 
 /**
@@ -246,6 +301,17 @@ inline void IncidentParticleConfig::set_defaults_for_proton() {
 
     sampling.n_samples = 1000;
     sampling.random_seed = 42;
+
+    grid.Nx = 100;
+    grid.Nz = 200;
+    grid.dx = 1.0f;
+    grid.dz = 1.0f;
+    grid.max_steps = 100;
+
+    output.output_dir = "results";
+    output.format = "txt";
+    output.save_2d = true;
+    output.save_pdd = true;
 
     W_total = 1.0f;
 }
