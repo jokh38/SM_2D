@@ -1,6 +1,10 @@
 #pragma once
 #include "physics/physics.hpp"
+#include "lut/r_lut.hpp"
 #include <cstdint>
+
+// Forward declaration for device LUT access
+struct DeviceRLUT;
 
 // Component state
 struct Component {
