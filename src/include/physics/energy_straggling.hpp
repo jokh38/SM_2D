@@ -18,10 +18,18 @@ constexpr float m_ec2_MeV = 0.511f;
 // Returns standard deviation of energy loss [MeV]
 // Valid for thick absorbers (κ >> 1, Gaussian regime)
 inline float bohr_energy_straggling_sigma(float E_MeV, float ds_mm, float rho = 1.0f) {
-    // Simplified for protons in water:
-    // σ_E ≈ κ * sqrt(ρ * ds) where κ ≈ 0.156 MeV/√mm for water
-    constexpr float kappa = 0.156f;  // Bohr constant for water [MeV/√mm]
-    return kappa * sqrtf(rho * ds_mm);
+    // Bohr straggling: σ²_E = 4π N_e r_e² (m_e c²)² z² L ρ ds
+    // The energy dependence enters through the β factor in the log term L
+    // Simplified for protons in water with β correction:
+    // σ_E ≈ κ * sqrt(ρ * ds) / β
+
+    // Relativistic kinematics for β correction
+    float gamma = (E_MeV + 938.272f) / 938.272f;
+    float beta2 = 1.0f - 1.0f / (gamma * gamma);
+    float beta = sqrtf(fmaxf(beta2, 0.01f));  // Avoid division by zero
+
+    constexpr float kappa_0 = 0.156f;  // Bohr constant for water [MeV/√mm] at β≈1
+    return kappa_0 * sqrtf(rho * ds_mm) / beta;
 }
 
 // ============================================================================

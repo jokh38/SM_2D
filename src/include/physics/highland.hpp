@@ -109,15 +109,9 @@ inline void update_direction_after_mcs(
     float theta_new = theta_old + theta_scatter;
 
     // Update direction cosines
+    // Note: cos²θ + sin²θ = 1 exactly, no normalization needed
     mu_out = cosf(theta_new);
     eta_out = sinf(theta_new);
-
-    // Normalize to ensure mu² + eta² = 1
-    float norm = sqrtf(mu_out * mu_out + eta_out * eta_out);
-    if (norm > 1e-6f) {
-        mu_out /= norm;
-        eta_out /= norm;
-    }
 }
 
 // Complete MCS step: sample and update direction

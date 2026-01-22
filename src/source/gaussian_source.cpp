@@ -17,6 +17,7 @@ void inject_source(
 
     float w_per_sample = src.W_total / src.n_samples;
     float dx = 1.0f;
+    float dz = 1.0f;
 
     for (int i = 0; i < src.n_samples; ++i) {
         float x = x_dist(rng);
@@ -27,9 +28,14 @@ void inject_source(
         theta = fmaxf(a_grid.theta_min, fminf(theta, a_grid.theta_max));
 
         int ix = static_cast<int>(x / dx);
-        if (ix < 0 || ix >= psi.Nx) continue;
+        int iz = 0;  // Injection at incident plane z=0
 
-        int cell = ix;
+        if (ix < 0 || ix >= psi.Nx) continue;
+        if (iz < 0 || iz >= psi.Nz) continue;
+
+        // P8 FIX: Use 2D cell indexing (ix + iz * Nx)
+        int cell = ix + iz * psi.Nx;
+
         int theta_bin = a_grid.FindBin(theta);
         int E_bin = e_grid.FindBin(E);
 

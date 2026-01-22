@@ -5,8 +5,10 @@ TEST(BoundaryTest, AbsorbAtZmax) {
     BoundaryConfig config;
     config.z_max = BoundaryType::ABSORB;
 
-    int cell = 31;
-    int face = 0;
+    // For 8x8 grid, z_max boundary has iz = 7
+    // Use ix = 3, iz = 7 → cell = 3 + 7 * 8 = 59
+    int cell = 59;
+    int face = 0;  // +z direction
 
     int neighbor = get_neighbor(cell, face, config, 8, 8);
     EXPECT_EQ(neighbor, -1);

@@ -78,11 +78,17 @@ TEST(K1Test, ComputeBETriggerFromEnergy) {
     int b_E_trigger = compute_b_E_trigger(10.0f, e_grid, N_E_local);
 
     // With log-spaced grid from 0.1 to 300 MeV:
-    // 10 MeV falls in bin ~54, which maps to block ~13 (54 / 4)
-    EXPECT_GT(b_E_trigger, 10);
-    EXPECT_LT(b_E_trigger, 20);
+    // log(0.1) = -2.303, log(300) = 5.704, delta_log = 8.007/256 = 0.0313
+    // 10 MeV → log(10) = 2.303 → bin = (2.303 - (-2.303)) / 0.0313 ≈ 147
+    // b_E_trigger = 147 / 4 = 36
+    EXPECT_GT(b_E_trigger, 30);
+    EXPECT_LT(b_E_trigger, 45);
 
     // Higher E_trigger should give higher b_E_trigger
     int b_E_trigger_50 = compute_b_E_trigger(50.0f, e_grid, N_E_local);
     EXPECT_GT(b_E_trigger_50, b_E_trigger);
+
+    // 50 MeV → log(50) = 3.912 → bin ≈ 198 → block ≈ 49
+    EXPECT_GT(b_E_trigger_50, 45);
+    EXPECT_LT(b_E_trigger_50, 55);
 }
