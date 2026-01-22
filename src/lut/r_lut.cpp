@@ -4,10 +4,12 @@
 #include <algorithm>
 
 RLUT GenerateRLUT(float E_min, float E_max, int N_E) {
-    RLUT lut{EnergyGrid(E_min, E_max, N_E), {}, {}, {}};
+    RLUT lut{EnergyGrid(E_min, E_max, N_E), {}, {}, {}, {}, {}};
     lut.R.resize(N_E);
+    lut.S.resize(N_E);
     lut.log_E.resize(N_E);
     lut.log_R.resize(N_E);
+    lut.log_S.resize(N_E);
 
     // Load NIST data
     auto nist_data = LoadNistData("data/nist/pstar_water.txt");
@@ -31,22 +33,32 @@ RLUT GenerateRLUT(float E_min, float E_max, int N_E) {
 
         if (it == nist_data.begin()) {
             lut.R[i] = nist_data[0].csda_range_g_cm2 * g_cm2_to_mm;
+            lut.S[i] = nist_data[0].stopping_power;
         } else if (it == nist_data.end()) {
             lut.R[i] = nist_data.back().csda_range_g_cm2 * g_cm2_to_mm;
+            lut.S[i] = nist_data.back().stopping_power;
         } else {
-            // Linear interpolation in log-log space
+            // Linear interpolation in log-log space for Range
             float E0 = (it - 1)->energy_MeV;
             float E1 = it->energy_MeV;
             float R0 = (it - 1)->csda_range_g_cm2 * g_cm2_to_mm;
             float R1 = it->csda_range_g_cm2 * g_cm2_to_mm;
+            float S0 = (it - 1)->stopping_power;
+            float S1 = it->stopping_power;
 
             float log_R = logf(R0) + (logf(R1) - logf(R0)) *
                          (logf(E) - logf(E0)) / (logf(E1) - logf(E0));
             lut.R[i] = expf(log_R);
+
+            // Log-log interpolation for Stopping Power
+            float log_S = logf(S0) + (logf(S1) - logf(S0)) *
+                         (logf(E) - logf(E0)) / (logf(E1) - logf(E0));
+            lut.S[i] = expf(log_S);
         }
 
         lut.log_E[i] = logf(lut.grid.rep[i]);
         lut.log_R[i] = logf(lut.R[i]);
+        lut.log_S[i] = logf(lut.S[i]);
     }
 
     return lut;
@@ -64,6 +76,20 @@ float RLUT::lookup_R(float E) const {
 
     float log_R_val = log_R0 + (log_R1 - log_R0) * (log_E_val - log_E0) / (log_E1 - log_E0);
     return expf(log_R_val);
+}
+
+float RLUT::lookup_S(float E) const {
+    float E_clamped = fmaxf(grid.E_min, fminf(E, grid.E_max));
+    int bin = grid.FindBin(E_clamped);
+
+    float log_E_val = logf(E_clamped);
+    float log_E0 = log_E[bin];
+    float log_E1 = log_E[std::min(bin + 1, grid.N_E - 1)];
+    float log_S0 = log_S[bin];
+    float log_S1 = log_S[std::min(bin + 1, grid.N_E - 1)];
+
+    float log_S_val = log_S0 + (log_S1 - log_S0) * (log_E_val - log_E0) / (log_E1 - log_E0);
+    return expf(log_S_val);
 }
 
 float RLUT::lookup_E_inverse(float R_input) const {

@@ -2,6 +2,7 @@
 #include "physics/step_control.hpp"
 #include "physics/highland.hpp"
 #include "physics/nuclear.hpp"
+#include "physics/energy_straggling.hpp"
 
 // Physics constants
 constexpr float m_p = 938.272f;          // Proton mass [MeV/c²]

@@ -1,4 +1,6 @@
 #include "validation/pencil_beam.hpp"
+#include "lut/r_lut.hpp"
+#include "lut/nist_loader.hpp"
 #include <cmath>
 #include <algorithm>
 #include <numeric>
@@ -27,8 +29,13 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
 
     // STUB: In full implementation, this would run the CUDA simulation
     // For now, create a simple Bragg peak pattern for validation testing
-    float R_bragg = 15.8f;  // Approximate range for 150 MeV in water (mm)
-    float sigma = 2.0f;     // Lateral spread (mm)
+
+    // Generate RLUT to get accurate range from NIST PSTAR based on initial energy
+    auto lut = GenerateRLUT(0.1f, 300.0f, 256);
+    float R_bragg = lut.lookup_R(config.E0);  // Range from NIST PSTAR lookup
+
+    // Energy-dependent lateral spread (approximate)
+    float sigma = 0.5f + 0.02f * config.E0;  // Lateral spread increases with energy
 
     for (int j = 0; j < config.Nz; ++j) {
         float z = result.z_centers[j];

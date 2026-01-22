@@ -36,3 +36,11 @@ inline float compute_energy_deposition(const RLUT& lut, float E, float step_leng
     float E_new = compute_energy_after_step(lut, E, step_length);
     return E - E_new;
 }
+
+// Energy deposition using stopping power (more physically accurate)
+// dE = S(E) * ds * rho, where S is in [MeV cm²/g], ds in [mm], rho in [g/cm³]
+inline float compute_energy_deposition_stopping_power(const RLUT& lut, float E, float step_length, float rho = 1.0f) {
+    float S = lut.lookup_S(E);  // Stopping power [MeV cm²/g]
+    // Convert: S [MeV cm²/g] * rho [g/cm³] * ds [mm] / 10 [mm/cm] = [MeV]
+    return S * rho * step_length / 10.0f;
+}
