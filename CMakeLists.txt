@@ -77,6 +77,11 @@ add_executable(run_pdd tools/run_pdd.cpp)
 target_link_libraries(run_pdd sm2d_core sm2d_impl)
 target_include_directories(run_pdd PRIVATE /usr/local/cuda-12.4/include)
 
+# Config test executable
+add_executable(test_config tools/test_config.cpp)
+target_link_libraries(test_config sm2d_core)
+target_include_directories(test_config PRIVATE /usr/local/cuda-12.4/include)
+
 # Test executable
 enable_testing()
 add_subdirectory(tests)
