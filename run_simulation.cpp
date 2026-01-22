@@ -39,6 +39,7 @@ PencilBeamConfig make_pencil_beam_config(const IncidentParticleConfig& config) {
     pbc.dx = config.grid.dx;
     pbc.dz = config.grid.dz;
     pbc.max_steps = config.grid.max_steps;
+    pbc.sigma_x0 = config.spatial.sigma_x;  // Initial Gaussian beam width
     pbc.W_total = config.W_total;
     pbc.random_seed = config.sampling.random_seed;
     return pbc;

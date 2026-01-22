@@ -13,6 +13,7 @@ struct PencilBeamConfig {
     float dx = 1.0f;
     float dz = 1.0f;
     int max_steps = 100;
+    float sigma_x0 = 0.0f;  // Initial Gaussian beam width (sigma at z=0) [mm]
     float W_total = 1.0f;
     unsigned random_seed = 42;
 };

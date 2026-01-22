@@ -88,8 +88,10 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
 
         float depth_dose = convolved_dose / norm;
 
-        // Depth-dependent lateral spread (MCS theory)
-        float sigma_z = sigma_0 * z / std::sqrt(3.0f);
+        // Depth-dependent lateral spread (MCS theory + initial beam size)
+        // Total sigma = sqrt(sigma_MCS^2 + sigma_initial^2)
+        float sigma_mcs = sigma_0 * z / std::sqrt(3.0f);
+        float sigma_z = std::sqrt(std::pow(sigma_mcs, 2) + std::pow(config.sigma_x0, 2));
         sigma_z = std::max(sigma_z, 0.5f);  // Minimum spread [mm]
 
         for (int i = 0; i < config.Nx; ++i) {
