@@ -14,7 +14,7 @@
 // ============================================================================
 
 // ============================================================================
-// P6: 2D MCS Projection Documentation
+// P2 FIX: 2D MCS Projection Correction Applied
 // ============================================================================
 // This simulation uses a 2D geometry (x-z plane).
 // The Highland formula gives the 3D scattering angle sigma_3D.
@@ -24,19 +24,15 @@
 //   - The 2D scattering angle is: θ_2D = θ_3D * cos(φ)
 //   - The expected value is: E[|cos(φ)|] = 2/π ≈ 0.637
 //
-// This implementation directly uses the Highland formula as the 2D scattering
-// angle sigma, which is equivalent to assuming sigma_2D = sigma_3D.
-// For accurate 2D simulation, multiply by 2/π if needed.
-//
-// Current choice (no correction factor) is acceptable for validation because:
-//   1. The overall scattering magnitude is preserved
-//   2. Lateral profiles remain qualitatively correct
-//   3. The effect is a ~37% overestimate in 2D scattering angle
+// FIXED: 2D projection correction factor (2/π) is now applied to convert
+// sigma_3D to sigma_2D for accurate 2D simulation.
 // ============================================================================
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
+constexpr float DEVICE_MCS_2D_CORRECTION = 2.0f / (float)M_PI;  // ≈ 0.637
 
 // Physics constants
 constexpr float DEVICE_m_p_MeV = 938.272f;      // Proton rest mass [MeV/c²]
@@ -50,6 +46,7 @@ constexpr float DEVICE_Z_A_water = 0.555f;      // Z/A for water
 // ============================================================================
 
 // Highland formula for MCS scattering angle sigma [radians]
+// P2 FIX: Now applies 2D projection correction (2/π)
 __device__ inline float device_highland_sigma(float E_MeV, float ds, float X0 = DEVICE_X0_water) {
     constexpr float z = 1.0f;  // Proton charge
 
@@ -68,7 +65,9 @@ __device__ inline float device_highland_sigma(float E_MeV, float ds, float X0 = 
     float bracket = 1.0f + 0.038f * ln_t;
     bracket = fmaxf(bracket, 0.25f);
 
-    return (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    // P2 FIX: Apply 2D projection correction
+    float sigma_3d = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    return sigma_3d * DEVICE_MCS_2D_CORRECTION;
 }
 
 // Sample Gaussian scattering angle using Box-Muller transform

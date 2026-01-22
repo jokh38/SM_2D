@@ -93,10 +93,6 @@ __global__ void K3_FineTransport(
     float cell_boundary_weight = 0.0f;
     double cell_boundary_energy = 0.0;
 
-    // Cell position (origin at cell corner)
-    float x_cell = 0.0f;
-    float z_cell = 0.0f;
-
     // Process all slots in this cell
     for (int slot = 0; slot < 32; ++slot) {
         uint32_t bid = block_ids_in[cell * 32 + slot];
@@ -144,51 +140,72 @@ __global__ void K3_FineTransport(
                 (cell * 7 + slot * 13 + lidx * 17) ^ 0x5DEECE66DL
             );
 
-            // Initial direction
-            float mu = cosf(theta);
-            float eta = sinf(theta);
+            // P8 FIX: Each component starts at cell center
+            // In a more complete implementation, each component would track
+            // its own position through multiple steps
+            float x_cell = dx * 0.5f;
+            float z_cell = dz * 0.5f;
 
-            // Perform transport step
-            float step = device_compute_max_step(dlut, E);
+            // Initial direction (before MCS)
+            float mu_init = cosf(theta);
+            float eta_init = sinf(theta);
 
-            // Energy loss with straggling
-            float mean_dE = device_compute_energy_deposition(dlut, E, step);
-            float sigma_dE = device_energy_straggling_sigma(E, step, 1.0f);
+            // P9 FIX: First estimate step to boundary for initial direction
+            float step_to_z_plus = (mu_init > 0) ? (dz - z_cell) / mu_init : 1e30f;
+            float step_to_z_minus = (mu_init < 0) ? (-z_cell) / mu_init : 1e30f;
+            float step_to_x_plus = (eta_init > 0) ? (dx - x_cell) / eta_init : 1e30f;
+            float step_to_x_minus = (eta_init < 0) ? (-x_cell) / eta_init : 1e30f;
+            float step_to_boundary = fminf(fminf(step_to_z_plus, step_to_z_minus),
+                                           fminf(step_to_x_plus, step_to_x_minus));
+            step_to_boundary = fmaxf(step_to_boundary, 0.0f);
+
+            // Compute physics-limited step size
+            float step_phys = device_compute_max_step(dlut, E, dx, dz);
+
+            // P9 FIX: Use minimum of physics step and distance to boundary
+            float actual_step = fminf(step_phys, step_to_boundary);
+
+            // Energy loss with straggling for actual step
+            float mean_dE = device_compute_energy_deposition(dlut, E, actual_step);
+            float sigma_dE = device_energy_straggling_sigma(E, actual_step, 1.0f);
             float dE = device_sample_energy_loss(mean_dE, sigma_dE, seed);
             dE = fminf(dE, E);
 
             float E_new = E - dE;
             float edep = dE * weight;
 
-            // Nuclear attenuation
+            // Nuclear attenuation for actual step
             float w_rem, E_rem;
-            float w_new = device_apply_nuclear_attenuation(weight, E, step, w_rem, E_rem);
+            float w_new = device_apply_nuclear_attenuation(weight, E, actual_step, w_rem, E_rem);
             edep += E_rem;
 
-            // MCS
-            float sigma_mcs = device_highland_sigma(E, step);
+            // MCS for actual step
+            float sigma_mcs = device_highland_sigma(E, actual_step);
             float theta_scatter = device_sample_mcs_angle(sigma_mcs, seed);
             float theta_new = theta + theta_scatter;
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
 
-            // Normalize
+            // Normalize direction
             float norm = sqrtf(mu_new * mu_new + eta_new * eta_new);
             if (norm > 1e-6f) {
                 mu_new /= norm;
                 eta_new /= norm;
             }
 
-            // Position update
-            float x_new = x_cell + eta_new * step;
-            float z_new = z_cell + mu_new * step;
+            // P8 FIX: Position update with actual step
+            float x_new = x_cell + eta_new * actual_step;
+            float z_new = z_cell + mu_new * actual_step;
+
+            // Clamp position to cell bounds
+            x_new = fmaxf(0.0f, fminf(x_new, dx));
+            z_new = fmaxf(0.0f, fminf(z_new, dz));
 
             // Check boundary crossing
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
 
             if (exit_face >= 0) {
                 // Particle exits cell - emit to bucket
-                // Note: we emit at the NEW energy/angle after transport
                 DeviceOutflowBucket& bucket = shared_buckets[exit_face];
                 device_emit_component_to_bucket(
                     bucket, theta_new, E_new, w_new,
@@ -198,13 +215,19 @@ __global__ void K3_FineTransport(
 
                 cell_boundary_weight += w_new;
                 cell_boundary_energy += E_new * w_new;
+                // P6 FIX: Add nuclear energy to boundary energy accounting
+                cell_boundary_energy += E_rem;
             } else {
                 // Particle remains in cell - deposit energy locally
                 cell_edep += edep;
                 cell_w_nuclear += w_rem;
                 cell_E_nuclear += E_rem;
 
-                // Update remaining in-cell values (simplified: just track deposited energy)
+                // Update position for next iteration (P8 FIX)
+                x_cell = x_new;
+                z_cell = z_new;
+
+                // Cutoff check
                 if (E_new <= 0.1f) {
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;

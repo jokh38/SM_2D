@@ -134,8 +134,8 @@ __device__ inline float device_compute_energy_deposition(const DeviceRLUT& lut, 
 // Device Functions for Step Size Control
 // ============================================================================
 
-// Compute maximum step size based on physics (device version)
-__device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E) {
+// P5 FIX: Compute maximum step size based on physics AND cell geometry
+__device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, float dx = 1.0f, float dz = 1.0f) {
     float R = device_lookup_R(lut, E);
 
     // Base: 2% of remaining range
@@ -161,6 +161,10 @@ __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E) 
     delta_R_max = delta_R_max * dS_factor;
     delta_R_max = fminf(delta_R_max, 1.0f);
     delta_R_max = fmaxf(delta_R_max, 0.05f);
+
+    // P5 FIX: Limit by cell size to prevent skipping cells
+    float cell_limit = 0.25f * fminf(dx, dz);
+    delta_R_max = fminf(delta_R_max, cell_limit);
 
     return delta_R_max;
 }

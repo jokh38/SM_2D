@@ -15,7 +15,7 @@ constexpr float X0_water = 360.8f;  // Radiation length of water [mm]
 namespace { const float m_p_MeV = 938.272f; }
 
 // ============================================================================
-// P6: 2D MCS Projection Documentation
+// P2 FIX: 2D MCS Projection Correction Applied
 // ============================================================================
 // This simulation uses a 2D geometry (x-z plane).
 // The Highland formula gives the 3D scattering angle sigma_3D.
@@ -25,15 +25,11 @@ namespace { const float m_p_MeV = 938.272f; }
 //   - The 2D scattering angle is: θ_2D = θ_3D * cos(φ)
 //   - The expected value is: E[|cos(φ)|] = 2/π ≈ 0.637
 //
-// This implementation directly uses the Highland formula as the 2D scattering
-// angle sigma, which is equivalent to assuming sigma_2D = sigma_3D.
-// For accurate 2D simulation, multiply by 2/π if needed.
-//
-// Current choice (no correction factor) is acceptable for validation because:
-//   1. The overall scattering magnitude is preserved
-//   2. Lateral profiles remain qualitatively correct
-//   3. The effect is a ~37% overestimate in 2D scattering angle
+// FIXED: 2D projection correction factor (2/π) is now applied to convert
+// sigma_3D to sigma_2D for accurate 2D simulation.
 // ============================================================================
+
+constexpr float MCS_2D_CORRECTION = 2.0f / (float)M_PI;  // ≈ 0.637
 
 // Highland formula for multiple Coulomb scattering (PDG 2024)
 // Returns sigma_theta [radians] for 2D simulation (x-z plane)
@@ -62,11 +58,12 @@ inline float highland_sigma(float E_MeV, float ds, float X0 = 360.8f) {
     // Valid for 1e-5 < t < 100; clamp to physical minimum
     float ln_t = logf(t);
     float bracket = 1.0f + 0.038f * ln_t;
-    // CORRECTED: PDG 2024 recommends bracket ≥ 0.25 (was 0.5)
-    // This reduces overestimation for thin absorbers
+    // PDG 2024 recommends bracket ≥ 0.25 (was 0.5)
     bracket = fmaxf(bracket, 0.25f);  // PDG 2024 recommendation
 
-    return (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    // P2 FIX: Apply 2D projection correction
+    float sigma_3d = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    return sigma_3d * MCS_2D_CORRECTION;
 }
 
 // 7-point Gaussian quadrature weights for angular splitting

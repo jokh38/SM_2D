@@ -11,10 +11,11 @@
 // 1. Fraction of remaining range (2% default)
 // 2. Energy-dependent refinement near Bragg peak
 // 3. Maximum absolute step size (1 mm)
+// 4. P5 FIX: Cell size (dx, dz) to prevent skipping cells
 //
 // Near Bragg peak (E < 20 MeV), stopping power varies rapidly,
 // requiring smaller steps for accuracy.
-inline float compute_max_step_physics(const RLUT& lut, float E) {
+inline float compute_max_step_physics(const RLUT& lut, float E, float dx = 1.0f, float dz = 1.0f) {
     float R = lut.lookup_R(E);
 
     // Base: 2% of remaining range
@@ -50,6 +51,11 @@ inline float compute_max_step_physics(const RLUT& lut, float E) {
 
     // Hard lower limit (prevents excessive subdivision)
     delta_R_max = fmaxf(delta_R_max, 0.05f);  // Min 0.05 mm
+
+    // P5 FIX: Limit by cell size to prevent skipping cells
+    // Use 0.25 * min(dx, dz) as geometric limit (spec requirement)
+    float cell_limit = 0.25f * fminf(dx, dz);
+    delta_R_max = fminf(delta_R_max, cell_limit);
 
     return delta_R_max;  // dR/ds ≈ 1 in CSDA approximation
 }
