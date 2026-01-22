@@ -432,4 +432,8 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o : /workspace
     /workspaces/SM_2D/src/include/core/grids.hpp \
     /workspaces/SM_2D/src/include/physics/highland.hpp \
     /workspaces/SM_2D/src/include/physics/nuclear.hpp \
-    /workspaces/SM_2D/src/include/physics/energy_straggling.hpp
+    /workspaces/SM_2D/src/include/physics/energy_straggling.hpp \
+    /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
+    /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
+    /workspaces/SM_2D/src/include/core/local_bins.hpp \
+    /workspaces/SM_2D/src/include/core/block_encoding.hpp

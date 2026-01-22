@@ -214,6 +214,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o: /workspaces/SM_
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh \
   /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+  /workspaces/SM_2D/src/include/core/grids.hpp \
   /workspaces/SM_2D/src/include/core/local_bins.hpp \
   /workspaces/SM_2D/src/include/core/psi_storage.hpp
 
@@ -487,8 +488,13 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o: /workspaces/
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
+  /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
+  /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
+  /workspaces/SM_2D/src/cuda/device/device_physics.cuh \
   /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cuh \
+  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
   /workspaces/SM_2D/src/include/core/grids.hpp \
+  /workspaces/SM_2D/src/include/core/local_bins.hpp \
   /workspaces/SM_2D/src/include/lut/r_lut.hpp \
   /workspaces/SM_2D/src/include/physics/energy_straggling.hpp \
   /workspaces/SM_2D/src/include/physics/highland.hpp \
@@ -707,6 +713,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o: /workspaces/SM_2D
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
   /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
+  /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
   /workspaces/SM_2D/src/cuda/kernels/k4_transfer.cuh \
   /workspaces/SM_2D/src/include/core/block_encoding.hpp \
   /workspaces/SM_2D/src/include/core/buckets.hpp \
@@ -1130,13 +1137,13 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /workspaces/SM_2D/src/include/physics/nuclear.hpp:
 
-/workspaces/SM_2D/src/include/physics/highland.hpp:
-
 /workspaces/SM_2D/src/include/physics/energy_straggling.hpp:
 
 /workspaces/SM_2D/src/include/lut/r_lut.hpp:
 
-/workspaces/SM_2D/src/include/core/grids.hpp:
+/workspaces/SM_2D/src/include/physics/highland.hpp:
+
+/workspaces/SM_2D/src/cuda/device/device_bucket.cuh:
 
 /usr/include/x86_64-linux-gnu/sys/single_threaded.h:
 
@@ -1196,6 +1203,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/nested_exception.h:
 
+/workspaces/SM_2D/src/cuda/device/device_physics.cuh:
+
 /usr/include/c++/12/bits/localefwd.h:
 
 /usr/include/c++/12/bits/cxxabi_init_exception.h:
@@ -1203,6 +1212,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/c++/12/bits/chrono.h:
 
 /usr/include/asm-generic/errno.h:
+
+/workspaces/SM_2D/src/include/core/grids.hpp:
 
 /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h:
 
@@ -1483,6 +1494,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/c++/12/tr1/modified_bessel_func.tcc:
 
 /workspaces/SM_2D/src/cuda/kernels/k5_audit.cu:
+
+/workspaces/SM_2D/src/cuda/device/device_lut.cuh:
 
 /usr/include/c++/12/iosfwd:
 

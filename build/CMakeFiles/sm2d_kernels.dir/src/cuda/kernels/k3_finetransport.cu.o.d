@@ -210,11 +210,16 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o : /workspaces
     /workspaces/SM_2D/src/include/physics/highland.hpp \
     /workspaces/SM_2D/src/include/physics/nuclear.hpp \
     /workspaces/SM_2D/src/include/physics/energy_straggling.hpp \
+    /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
+    /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
     /usr/include/c++/12/cstdint \
     /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
     /usr/include/stdint.h \
     /usr/include/x86_64-linux-gnu/bits/wchar.h \
     /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+    /workspaces/SM_2D/src/include/core/local_bins.hpp \
+    /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+    /workspaces/SM_2D/src/cuda/device/device_physics.cuh \
     /usr/include/c++/12/mutex \
     /usr/include/c++/12/tuple \
     /usr/include/c++/12/bits/uses_allocator.h \

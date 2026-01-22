@@ -6,7 +6,7 @@ __global__ void K1_ActiveMask(
     const float* __restrict__ values,
     uint8_t* __restrict__ ActiveMask,
     int Nx, int Nz,
-    float E_trigger,
+    int b_E_trigger,  // P4 FIX: Now uses block index directly (pre-computed from E_trigger)
     float weight_active_min
 ) {
     int cell = blockIdx.x * blockDim.x + threadIdx.x;
@@ -23,10 +23,10 @@ __global__ void K1_ActiveMask(
         if (bid == 0xFFFFFFFF) continue;
 
         uint32_t b_E = (bid >> 12) & 0xFFF;
-        // FIXED: Changed from >= (HIGH energy) to < (LOW energy)
-        // b_E is energy bin index; lower values = lower energy
+        // P4 FIX: Now uses the b_E_trigger parameter instead of hardcoded 20
+        // b_E is coarse energy block index; lower values = lower energy
         // Activate fine transport when energy is below threshold (LOW energy region)
-        if (b_E < 20) needs_fine_transport = true;
+        if (b_E < static_cast<uint32_t>(b_E_trigger)) needs_fine_transport = true;
 
         for (int lidx = 0; lidx < 32; ++lidx) {
             W_cell += values[(cell * 32 + slot) * 32 + lidx];
@@ -41,7 +41,7 @@ void run_K1_ActiveMask(
     const PsiC& psi,
     uint8_t* ActiveMask,
     int Nx, int Nz,
-    float E_trigger,
+    int b_E_trigger,  // P4 FIX: Now uses block index directly (pre-computed from E_trigger)
     float weight_active_min
 ) {
     for (int cell = 0; cell < Nx * Nz; ++cell) {
@@ -53,8 +53,8 @@ void run_K1_ActiveMask(
             if (bid == 0xFFFFFFFF) continue;
 
             uint32_t b_E = (bid >> 12) & 0xFFF;
-            // FIXED: Activate fine transport at LOW energy, not HIGH energy
-            if (b_E < 20) needs_fine_transport = true;
+            // P4 FIX: Now uses the b_E_trigger parameter instead of hardcoded 20
+            if (b_E < static_cast<uint32_t>(b_E_trigger)) needs_fine_transport = true;
 
             for (int lidx = 0; lidx < 32; ++lidx) {
                 W_cell += psi.value[cell][slot][lidx];

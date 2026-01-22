@@ -1,10 +1,9 @@
 #pragma once
 #include "physics/physics.hpp"
 #include "lut/r_lut.hpp"
+#include "device/device_lut.cuh"
+#include "device/device_bucket.cuh"
 #include <cstdint>
-
-// Forward declaration for device LUT access
-struct DeviceRLUT;
 
 // Component state
 struct Component {
@@ -28,7 +27,8 @@ struct K3Result {
     float theta_scatter = 0.0f; // Scattering angle for diagnostics
 };
 
-// Fine transport kernel
+// P1 FIX: Updated GPU kernel signature with device LUT and bucket support
+// This replaces the stub implementation with full physics transport
 __global__ void K3_FineTransport(
     // Inputs
     const uint32_t* __restrict__ block_ids_in,
@@ -37,15 +37,88 @@ __global__ void K3_FineTransport(
     // Grid
     int Nx, int Nz, float dx, float dz,
     int n_active,
+    // Device LUT (P2 FIX)
+    const DeviceRLUT dlut,
+    // Grid edges for bin finding
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local,
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
     float* __restrict__ AbsorbedWeight_nuclear,
     double* __restrict__ AbsorbedEnergy_nuclear,
     float* __restrict__ BoundaryLoss_weight,
-    double* __restrict__ BoundaryLoss_energy
+    double* __restrict__ BoundaryLoss_energy,
+    // Outflow buckets for boundary crossing (P3 FIX)
+    DeviceOutflowBucket* __restrict__ OutflowBuckets
 );
 
-// CPU test stubs
+// CPU test stubs (unchanged)
 K3Result run_K3_single_component(const Component& c);
 K3Result run_K3_with_forced_split(const Component& c);
+
+// ============================================================================
+// Helper: Create DeviceRLUT from CPU RLUT
+// ============================================================================
+// This function copies CPU LUT data to GPU memory for kernel use
+// P2 FIX: Enables device LUT access in K3 kernel
+struct DeviceLUTWrapper {
+    DeviceRLUT dlut;
+    float* d_R;
+    float* d_S;
+    float* d_log_E;
+    float* d_log_R;
+    float* d_log_S;
+
+    DeviceLUTWrapper() : d_R(nullptr), d_S(nullptr), d_log_E(nullptr),
+                         d_log_R(nullptr), d_log_S(nullptr) {}
+
+    // Initialize from CPU RLUT (allocates and copies to GPU)
+    bool init(const RLUT& cpu_lut) {
+        int N_E = cpu_lut.grid.N_E;
+
+        // Allocate device memory
+        size_t data_size = N_E * sizeof(float);
+
+        cudaMalloc(&d_R, data_size);
+        cudaMalloc(&d_S, data_size);
+        cudaMalloc(&d_log_E, data_size);
+        cudaMalloc(&d_log_R, data_size);
+        cudaMalloc(&d_log_S, data_size);
+
+        // Copy data to device
+        cudaMemcpy(d_R, cpu_lut.R.data(), data_size, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_S, cpu_lut.S.data(), data_size, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_log_E, cpu_lut.log_E.data(), data_size, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_log_R, cpu_lut.log_R.data(), data_size, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_log_S, cpu_lut.log_S.data(), data_size, cudaMemcpyHostToDevice);
+
+        // Fill device LUT structure
+        dlut.N_E = N_E;
+        dlut.E_min = cpu_lut.grid.E_min;
+        dlut.E_max = cpu_lut.grid.E_max;
+        dlut.R = d_R;
+        dlut.S = d_S;
+        dlut.log_E = d_log_E;
+        dlut.log_R = d_log_R;
+        dlut.log_S = d_log_S;
+
+        return true;
+    }
+
+    // Free GPU memory
+    void cleanup() {
+        if (d_R) cudaFree(d_R);
+        if (d_S) cudaFree(d_S);
+        if (d_log_E) cudaFree(d_log_E);
+        if (d_log_R) cudaFree(d_log_R);
+        if (d_log_S) cudaFree(d_log_S);
+        d_R = d_S = d_log_E = d_log_R = d_log_S = nullptr;
+    }
+
+    ~DeviceLUTWrapper() {
+        cleanup();
+    }
+};

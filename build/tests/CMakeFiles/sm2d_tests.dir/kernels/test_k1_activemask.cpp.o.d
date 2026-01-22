@@ -428,4 +428,5 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o : /workspaces/S
     /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh \
     /workspaces/SM_2D/src/include/core/psi_storage.hpp \
     /workspaces/SM_2D/src/include/core/local_bins.hpp \
-    /workspaces/SM_2D/src/include/core/block_encoding.hpp
+    /workspaces/SM_2D/src/include/core/block_encoding.hpp \
+    /workspaces/SM_2D/src/include/core/grids.hpp
