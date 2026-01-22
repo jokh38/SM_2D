@@ -57,7 +57,11 @@ inline float compute_max_step_physics(const RLUT& lut, float E, float dx = 1.0f,
     float cell_limit = 0.25f * fminf(dx, dz);
     delta_R_max = fminf(delta_R_max, cell_limit);
 
-    return delta_R_max;  // dR/ds ≈ 1 in CSDA approximation
+    // PHYSICS NOTE: dR/ds = -1 in CSDA approximation
+    // From R(E) = ∫_0^E dE'/(S(E')·ρ) and dE/ds = -S(E)·ρ:
+    //   dR/ds = (dR/dE)·(dE/ds) = (1/(S·ρ))·(-S·ρ) = -1
+    // So R decreases by exactly the step length: R_new = R_old - Δs
+    return delta_R_max;
 }
 
 // Energy update using R-based control

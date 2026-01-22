@@ -14,25 +14,29 @@
 // ============================================================================
 
 // ============================================================================
-// P2 FIX: 2D MCS Projection Correction Applied
+// MCS 2D Projection Correction (Physical Analysis Applied)
 // ============================================================================
 // This simulation uses a 2D geometry (x-z plane).
 // The Highland formula gives the 3D scattering angle sigma_3D.
 //
-// When projecting 3D scattering onto 2D (x-z plane):
+// PHYSICS CORRECTION (2026-01):
+// For 3D isotropic scattering projected onto a 2D plane:
 //   - The azimuthal angle φ is uniformly distributed in [0, 2π]
-//   - The 2D scattering angle is: θ_2D = θ_3D * cos(φ)
-//   - The expected value is: E[|cos(φ)|] = 2/π ≈ 0.637
+//   - Projected variance: σ_2D² = σ_3D² / 2 (variance splits equally)
+//   - Therefore: σ_2D = σ_3D / √2 ≈ 0.707 × σ_3D
 //
-// FIXED: 2D projection correction factor (2/π) is now applied to convert
-// sigma_3D to sigma_2D for accurate 2D simulation.
+// PREVIOUS ERROR: Used 2/π ≈ 0.637 based on E[|cos(φ)|], but this applies
+// to displacement not angle. For variance-based lateral spread, 1/√2 is correct.
+//
+// FIXED: Now uses 1/√2 for proper 2D projection variance
 // ============================================================================
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-constexpr float DEVICE_MCS_2D_CORRECTION = 2.0f / (float)M_PI;  // ≈ 0.637
+// 1/√2 ≈ 0.70710678 (precomputed for constexpr compatibility)
+constexpr float DEVICE_MCS_2D_CORRECTION = 0.70710678f;
 
 // Physics constants
 constexpr float DEVICE_m_p_MeV = 938.272f;      // Proton rest mass [MeV/c²]
@@ -159,6 +163,8 @@ __device__ inline float device_energy_straggling_sigma(float E_MeV, float ds_mm,
         return device_bohr_straggling_sigma(ds_mm, rho);
     } else if (kappa < 0.01f) {
         // Landau regime - use effective width
+        // PHYSICS NOTE: Landau is asymmetric, FWHM/2.355 approximation used.
+        // Therapeutic protons typically in Vavilov regime (0.01 < κ < 10).
         float gamma = (E_MeV + DEVICE_m_p_MeV) / DEVICE_m_p_MeV;
         float beta = sqrtf(fmaxf(1.0f - 1.0f / (gamma * gamma), 0.0f));
         float ds_cm = ds_mm / 10.0f;
@@ -190,8 +196,9 @@ __device__ inline float device_sample_energy_loss(float mean_E_loss, float sigma
 // ============================================================================
 // Nuclear Interactions (ICRU 63)
 // ============================================================================
-
-// Nuclear cross-section [mm⁻¹]
+// PHYSICS NOTE: This simplified model treats all nuclear-removed energy as
+// locally deposited. In reality, secondary particles transport ~70-80% of
+// this energy away from the primary track, causing ~1-2% local dose overestimate.
 __device__ inline float device_nuclear_cross_section(float E_MeV) {
     if (E_MeV < 5.0f) return 0.0f;
 

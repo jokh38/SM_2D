@@ -84,7 +84,13 @@ inline float energy_straggling_sigma(float E_MeV, float ds_mm, float rho = 1.0f)
         return bohr_energy_straggling_sigma(E_MeV, ds_mm, rho);
     } else if (kappa < 0.01f) {
         // Landau regime - thin absorber (therapeutic protons typically here)
-        // For Landau: effective width ≈ 4 * ξ (FWHM ~ 4ξ)
+        //
+        // PHYSICS NOTE: Landau distribution is asymmetric with no well-defined sigma.
+        // The approximation FWHM ≈ 4ξ and sigma_eff = FWHM/2.355 is commonly used
+        // but introduces quantitative error. For therapeutic protons (50-250 MeV),
+        // kappa is typically in the Vavilov regime (0.01 < κ < 10), so this
+        // approximation has limited impact.
+        //
         // Use effective sigma = FWHM / 2.355 for comparison with Gaussian
         constexpr float Z_A = 0.555f;
         float gamma = (E_MeV + 938.272f) / 938.272f;

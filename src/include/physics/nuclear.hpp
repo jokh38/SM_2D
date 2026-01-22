@@ -47,11 +47,12 @@ inline float Sigma_total(float E_MeV) {
 // ============================================================================
 // Nuclear attenuation with energy budget tracking (IC-5)
 // ============================================================================
-// Note: Simplified model that conserves total energy
-// In reality, nuclear interactions produce secondary particles that
-// transport energy away from the primary track. This simplified model
-// treats all removed energy as locally absorbed, which overestimates
-// dose locally by ~0.1% (acceptable for validation).
+// PHYSICS NOTE: Simplified model that conserves total energy
+// In reality, nuclear interactions produce secondary particles (neutrons,
+// protons, alpha) that transport energy away from the primary track.
+// This simplified model treats all removed energy as locally absorbed,
+// which overestimates local dose by ~1-2%. For validation purposes,
+// this approximation is acceptable but may affect penumbra accuracy.
 inline float apply_nuclear_attenuation(
     float w_old,
     float E,
