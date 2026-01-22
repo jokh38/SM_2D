@@ -13,22 +13,27 @@ __global__ void K1_ActiveMask(
     if (cell >= Nx * Nz) return;
 
     float W_cell = 0;
-    bool has_high_E = false;
+    bool needs_fine_transport = false;
 
     // Check all slots in cell
+    // IC-1: Fine transport activates at LOW energy (Bragg peak region)
+    // where stopping power is LARGE, not at high energy
     for (int slot = 0; slot < 32; ++slot) {
         uint32_t bid = block_ids[cell * 32 + slot];
         if (bid == 0xFFFFFFFF) continue;
 
         uint32_t b_E = (bid >> 12) & 0xFFF;
-        if (b_E >= 5) has_high_E = true;
+        // FIXED: Changed from >= (HIGH energy) to < (LOW energy)
+        // b_E is energy bin index; lower values = lower energy
+        // Activate fine transport when energy is below threshold (LOW energy region)
+        if (b_E < 20) needs_fine_transport = true;
 
         for (int lidx = 0; lidx < 32; ++lidx) {
             W_cell += values[(cell * 32 + slot) * 32 + lidx];
         }
     }
 
-    ActiveMask[cell] = (has_high_E && W_cell > weight_active_min) ? 1 : 0;
+    ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;
 }
 
 // CPU wrapper implementation
@@ -41,20 +46,21 @@ void run_K1_ActiveMask(
 ) {
     for (int cell = 0; cell < Nx * Nz; ++cell) {
         float W_cell = 0;
-        bool has_high_E = false;
+        bool needs_fine_transport = false;
 
         for (int slot = 0; slot < 32; ++slot) {
             uint32_t bid = psi.block_id[cell][slot];
             if (bid == 0xFFFFFFFF) continue;
 
             uint32_t b_E = (bid >> 12) & 0xFFF;
-            if (b_E >= 5) has_high_E = true;
+            // FIXED: Activate fine transport at LOW energy, not HIGH energy
+            if (b_E < 20) needs_fine_transport = true;
 
             for (int lidx = 0; lidx < 32; ++lidx) {
                 W_cell += psi.value[cell][slot][lidx];
             }
         }
 
-        ActiveMask[cell] = (has_high_E && W_cell > weight_active_min) ? 1 : 0;
+        ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;
     }
 }

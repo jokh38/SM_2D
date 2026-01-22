@@ -11,17 +11,22 @@ std::vector<NistDataRow> LoadNistData(const std::string& path) {
         // Fallback: Return accurate NIST PSTAR data for water if file not found
         // Data from NIST PSTAR database: https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html
         // Format: {energy_MeV, stopping_power_MeV_cm2_g, csda_range_g_cm2}
-        // CORRECTED stopping power values (previous values were incorrect by ~9x)
+        // CORRECTED: 0.1 MeV ~800 MeV·cm²/g ≈ 80 MeV/mm (unit: MeV·cm²/g for ρ=1 g/cm³)
         data = {
-            {0.1f, 252.0f, 0.00014f},    // Low energy: high stopping power, very short range
-            {1.0f, 74.5f, 0.0026f},       // 1 MeV
-            {10.0f, 4.82f, 0.122f},       // 10 MeV
-            {50.0f, 6.04f, 2.14f},        // 50 MeV therapeutic
-            {70.0f, 5.77f, 4.079f},       // 70 MeV therapeutic: S = 5.77 MeV·cm²/g (was 0.641!)
-            {100.0f, 5.19f, 7.57f},       // 100 MeV therapeutic
-            {150.0f, 4.53f, 15.6f},       // 150 MeV: range ~156 mm in water (was 0.403!)
-            {200.0f, 4.12f, 26.5f},       // 200 MeV
-            {250.0f, 3.85f, 37.3f}        // 250 MeV: range ~373 mm (was 0.357!)
+            {0.1f, 800.0f, 0.0025f},     // 0.1 MeV: S ≈ 800 MeV·cm²/g ≈ 80 MeV/mm
+            {0.5f, 446.0f, 0.018f},      // 0.5 MeV
+            {1.0f, 279.0f, 0.048f},      // 1 MeV
+            {2.0f, 168.0f, 0.12f},       // 2 MeV
+            {5.0f, 76.0f, 0.42f},        // 5 MeV
+            {10.0f, 47.0f, 1.23f},       // 10 MeV
+            {20.0f, 25.8f, 3.33f},       // 20 MeV
+            {50.0f, 12.7f, 14.17f},      // 50 MeV therapeutic
+            {70.0f, 9.76f, 22.68f},      // 70 MeV therapeutic
+            {100.0f, 7.44f, 37.80f},     // 100 MeV therapeutic
+            {150.0f, 5.55f, 67.44f},     // 150 MeV: range ~674 mm in water (CSDA)
+            {200.0f, 4.58f, 102.2f},     // 200 MeV
+            {250.0f, 3.96f, 140.5f},     // 250 MeV
+            {300.0f, 3.54f, 182.8f}      // 300 MeV
         };
         return data;
     }

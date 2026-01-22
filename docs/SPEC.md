@@ -831,29 +831,41 @@ assert(abs(lookup_R(70.0) - 40.8) / 40.8 < 0.01);
 
 ```cpp
 bool is_cell_active(int cell) {
-    // Criterion 1: Contains high-energy components
+    // Criterion 1: Contains LOW-energy components (Bragg peak region)
+    // CRITICAL: Fine transport activates at LOW energy where stopping power is LARGE
+    // This is the opposite of the original (incorrect) implementation
     for (int slot = 0; slot < Kb; ++slot) {
         if (block_id[cell][slot] == EMPTY) continue;
-        
+
         int b_E = (block_id[cell][slot] >> 12) & 0xFFF;
-        float E_block_min = E_edges[b_E * N_E_local];
-        
-        if (E_block_min > E_trigger) return true;
+        float E_block_max = E_edges[(b_E + 1) * N_E_local];
+
+        // FIXED: Changed from > (HIGH energy) to < (LOW energy)
+        // Activate fine transport when energy is BELOW threshold
+        if (E_block_max < E_trigger) return true;
     }
-    
+
     // Criterion 2: Total weight above threshold
     float W_cell = sum_weights(PsiC[cell]);
     if (W_cell > weight_active_min) return true;
-    
+
     return false;
 }
 ```
 
 ### 13.2 Parameters
 ```cpp
-const float E_trigger = 10.0f;        // MeV
+const float E_trigger = 20.0f;        // MeV (threshold for fine transport)
 const float weight_active_min = 1e-10f;
 ```
+
+### 13.3 Physics Justification
+
+Fine transport is activated at **LOW energy** (below E_trigger) because:
+- Stopping power S(E) is **larger** at low energy (Bragg peak region)
+- Rapid energy deposition requires smaller step sizes for accuracy
+- At high energy, S(E) is small and coarse transport is sufficient
+- This is the **opposite** of the original incorrect implementation
 
 ---
 
