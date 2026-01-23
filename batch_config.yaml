@@ -1,0 +1,39 @@
+# SM_2D Batch Simulation Configuration
+# 배치 시뮬레이션을 위한 파라미터 설정 파일
+
+# 기본 설정 파일 (템플릿)
+template: "sim.ini"
+
+# 결과 저장 경로
+output_base: "results/batch"
+
+# 스윕할 파라미터 설정
+# 각 그룹 내의 파라미터들은 Cartesian product로 모든 조합 생성
+sweep:
+  # 에너지 스윕
+  energy:
+    section: "[energy]"
+    mean_MeV: [70, 110, 150, 190, 230]
+
+  # 위치 스윕
+  position:
+    section: "[spatial]"
+    x0_mm: [-10, -5, 0, 5, 10]
+
+# 실행 설정
+execution:
+  # 병렬 프로세스 수 (0 = 사용 가능한 모든 코어 사용)
+  parallel: 0
+  # 각 시뮬레이션 타임아웃 (초)
+  timeout: 300
+
+# 시각화 설정
+plot:
+  # 배치 완료 후 자동 플로팅
+  auto_plot: true
+  # PDD 곡선 비교 플롯
+  plot_pdd: true
+  # 2D dose map 플롯
+  plot_2d: true
+  # 요약 플롯 저장 경로
+  summary_plot: "results/batch_summary.png"
