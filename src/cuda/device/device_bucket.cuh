@@ -17,7 +17,16 @@
 
 constexpr uint32_t DEVICE_EMPTY_BLOCK_ID = 0xFFFFFFFF;
 constexpr int DEVICE_Kb_out = 64;
-constexpr int DEVICE_LOCAL_BINS = 32;
+constexpr int DEVICE_LOCAL_BINS = LOCAL_BINS;  // Now 128 for 3D (theta, E, x_sub)
+
+// Face definitions (must match K4 get_neighbor)
+// Moved to top so these can be used by other functions
+enum DeviceFace {
+    FACE_Z_PLUS = 0,   // +z direction
+    FACE_Z_MINUS = 1,  // -z direction
+    FACE_X_PLUS = 2,   // +x direction
+    FACE_X_MINUS = 3   // -x direction
+};
 
 // Device-accessible OutflowBucket structure
 // Matches CPU OutflowBucket layout for direct memory transfer
@@ -76,7 +85,7 @@ __device__ inline void device_emit_to_bucket(
     // Note: If bucket is full, weight is lost (should be rare with Kb_out=64)
 }
 
-// Emit a component to a bucket with full phase-space encoding
+// Emit a component to a bucket with full phase-space encoding (2D version for compatibility)
 // This is the main emission function called by K3 FineTransport
 __device__ inline void device_emit_component_to_bucket(
     DeviceOutflowBucket& bucket,
@@ -127,6 +136,96 @@ __device__ inline void device_emit_component_to_bucket(
     device_emit_to_bucket(bucket, bid, lidx, weight);
 }
 
+// ============================================================================
+// 3D Phase-Space Emission (theta, E, x_sub)
+// ============================================================================
+
+// Emit a component to a bucket with 3D phase-space encoding (theta, E, x_sub)
+__device__ inline void device_emit_component_to_bucket_3d(
+    DeviceOutflowBucket& bucket,
+    float theta,            // Polar angle [rad]
+    float E,                // Energy [MeV]
+    float weight,           // Statistical weight
+    int x_sub,              // Sub-cell x bin (0-3)
+    const float* __restrict__ theta_edges,  // Angular grid edges
+    const float* __restrict__ E_edges,      // Energy grid edges
+    int N_theta,            // Number of angular bins
+    int N_E,                // Number of energy bins
+    int N_theta_local,      // Local angular bins per block (8)
+    int N_E_local           // Local energy bins per block (4)
+) {
+    if (weight <= 0.0f) return;
+
+    // Find global bins
+    int theta_bin = 0;
+    int E_bin = 0;
+
+    // For uniform theta grid
+    float theta_min = theta_edges[0];
+    float theta_max = theta_edges[N_theta];
+    float dtheta = (theta_max - theta_min) / N_theta;
+    theta_bin = (int)((theta - theta_min) / dtheta);
+    theta_bin = max(0, min(theta_bin, N_theta - 1));
+
+    // For log-spaced E grid
+    float E_min = E_edges[0];
+    float E_max = E_edges[N_E];
+    float log_E = logf(E);
+    float log_E_min = logf(E_min);
+    float log_E_max = logf(E_max);
+    float dlog = (log_E_max - log_E_min) / N_E;
+    E_bin = (int)((log_E - log_E_min) / dlog);
+    E_bin = max(0, min(E_bin, N_E - 1));
+
+    // Encode to coarse block and local index
+    uint32_t b_theta = theta_bin / N_theta_local;
+    uint32_t b_E = E_bin / N_E_local;
+    uint32_t bid = encode_block(b_theta, b_E);
+
+    int theta_local = theta_bin % N_theta_local;
+    int E_local = E_bin % N_E_local;
+
+    // 3D local index encoding with x_sub
+    uint16_t lidx = encode_local_idx_3d(theta_local, E_local, x_sub);
+
+    // Emit to bucket
+    device_emit_to_bucket(bucket, bid, lidx, weight);
+}
+
+// Transform x_sub when crossing to neighbor cell
+// Face mapping:
+//   +z (0): x_offset unchanged
+//   -z (1): x_offset unchanged
+//   +x (2): source cell right edge -> neighbor left edge (x_sub -> 0)
+//   -x (3): source cell left edge -> neighbor right edge (x_sub -> N_x_sub-1)
+__device__ inline int device_transform_x_sub_for_neighbor(int x_sub, int face) {
+    switch (face) {
+        case FACE_X_PLUS:   // Moving to +x neighbor, reset to leftmost bin
+            return 0;
+        case FACE_X_MINUS:  // Moving to -x neighbor, reset to rightmost bin
+            return N_x_sub - 1;
+        default:            // Z direction: preserve x_sub
+            return x_sub;
+    }
+}
+
+// Calculate x offset in neighbor cell after crossing face
+// Returns the offset from neighbor cell center
+__device__ inline float device_get_neighbor_x_offset(
+    float x_exit,       // Exit position in current cell coordinates
+    int face,           // Exit face
+    float dx            // Cell size
+) {
+    switch (face) {
+        case FACE_X_PLUS:   // Exiting +x face, entering neighbor from left
+            return -dx * 0.5f;  // Neighbor cell's left edge (relative to center)
+        case FACE_X_MINUS:  // Exiting -x face, entering neighbor from right
+            return dx * 0.5f;   // Neighbor cell's right edge (relative to center)
+        default:            // Z direction: preserve x offset
+            return x_exit - dx * 0.5f;
+    }
+}
+
 // Clear a bucket (set all values to empty/zero)
 __device__ inline void device_bucket_clear(DeviceOutflowBucket& bucket) {
     int idx = threadIdx.x + blockDim.x * threadIdx.y + blockDim.x * blockDim.y * threadIdx.z;
@@ -150,14 +249,6 @@ __device__ inline void device_bucket_clear(DeviceOutflowBucket& bucket) {
 __device__ inline int device_bucket_index(int cell, int face, int Nx, int Nz) {
     return cell * 4 + face;
 }
-
-// Face definitions (must match K4 get_neighbor)
-enum DeviceFace {
-    FACE_Z_PLUS = 0,   // +z direction
-    FACE_Z_MINUS = 1,  // -z direction
-    FACE_X_PLUS = 2,   // +x direction
-    FACE_X_MINUS = 3   // -x direction
-};
 
 // Determine which face a particle will exit through
 // Returns -1 if particle remains in cell

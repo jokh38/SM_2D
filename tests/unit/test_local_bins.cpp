@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 #include "core/local_bins.hpp"
 
-TEST(LocalBinsTest, LocalBinsEquals32) {
-    EXPECT_EQ(LOCAL_BINS, 32);
+TEST(LocalBinsTest, LocalBinsEquals128) {
+    EXPECT_EQ(LOCAL_BINS, 128);  // Updated: 8 * 4 * 4 = 128
     EXPECT_EQ(N_theta_local, 8);
     EXPECT_EQ(N_E_local, 4);
+    EXPECT_EQ(N_x_sub, 4);
 }
 
 TEST(LocalBinsTest, EncodeDecodeRoundTrip) {
@@ -17,4 +18,40 @@ TEST(LocalBinsTest, EncodeDecodeRoundTrip) {
             EXPECT_EQ(e_decoded, e);
         }
     }
+}
+
+TEST(LocalBinsTest, EncodeDecode3DRoundTrip) {
+    for (int t = 0; t < N_theta_local; ++t) {
+        for (int e = 0; e < N_E_local; ++e) {
+            for (int x = 0; x < N_x_sub; ++x) {
+                uint16_t encoded = encode_local_idx_3d(t, e, x);
+                int t_decoded, e_decoded, x_decoded;
+                decode_local_idx_3d(encoded, t_decoded, e_decoded, x_decoded);
+                EXPECT_EQ(t_decoded, t);
+                EXPECT_EQ(e_decoded, e);
+                EXPECT_EQ(x_decoded, x);
+            }
+        }
+    }
+}
+
+TEST(LocalBinsTest, XOffsetToBinRoundTrip) {
+    float dx = 1.0f;  // 1 mm cell size
+
+    // Test each sub-cell bin
+    for (int x = 0; x < N_x_sub; ++x) {
+        float offset = get_x_offset_from_bin(x, dx);
+        int bin = get_x_sub_bin(offset, dx);
+        EXPECT_EQ(bin, x);
+    }
+
+    // Test boundary values
+    EXPECT_EQ(get_x_sub_bin(-0.5f * dx, dx), 0);  // Left edge
+    EXPECT_EQ(get_x_sub_bin(0.0f, dx), 2);        // Center
+    EXPECT_EQ(get_x_sub_bin(0.49f * dx, dx), 3);  // Near right edge
+}
+
+TEST(LocalBinsTest, LocalBinsCapacity) {
+    // Ensure LOCAL_BINS fits in uint16_t
+    EXPECT_LE(LOCAL_BINS, 65536);
 }

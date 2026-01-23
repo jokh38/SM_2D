@@ -1,4 +1,5 @@
 #include "validation/lateral_spread.hpp"
+#include "core/local_bins.hpp"
 #include <cmath>
 #include <algorithm>
 
@@ -70,4 +71,42 @@ float fit_gaussian_sigma(const std::vector<double>& profile, float dx) {
     double variance = mean_x2 - mean * mean;
 
     return static_cast<float>(std::sqrt(std::max(0.0, variance)));
+}
+
+// ============================================================================
+// Sub-cell resolution profile extraction (for 3D phase-space analysis)
+// ============================================================================
+
+std::vector<double> get_lateral_profile_subcell(const SimulationResult& result, float z_mm, const PsiC& psi) {
+    // Find closest z index
+    int z_idx = static_cast<int>(std::round(z_mm / result.dz));
+    z_idx = std::max(0, std::min(result.Nz - 1, z_idx));
+
+    // High-resolution profile with sub-cell bins
+    int total_x_bins = result.Nx * N_x_sub;
+    std::vector<double> profile(total_x_bins, 0.0);
+
+    for (int ix = 0; ix < result.Nx; ++ix) {
+        for (int x_sub = 0; x_sub < N_x_sub; ++x_sub) {
+            int profile_idx = ix * N_x_sub + x_sub;
+            int cell = ix + z_idx * result.Nx;
+
+            // Sum over all (theta, E) bins for this sub-cell
+            double cell_sum = 0.0;
+            for (int slot = 0; slot < psi.Kb; ++slot) {
+                for (int theta_local = 0; theta_local < N_theta_local; ++theta_local) {
+                    for (int E_local = 0; E_local < N_E_local; ++E_local) {
+                        uint16_t lidx = encode_local_idx_3d(theta_local, E_local, x_sub);
+                        if (cell < static_cast<int>(psi.value.size()) &&
+                            slot < static_cast<int>(psi.value[cell].size())) {
+                            cell_sum += psi.value[cell][slot][lidx];
+                        }
+                    }
+                }
+            }
+            profile[profile_idx] = cell_sum;
+        }
+    }
+
+    return profile;
 }

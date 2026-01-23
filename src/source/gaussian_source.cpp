@@ -36,6 +36,11 @@ void inject_source(
         // P8 FIX: Use 2D cell indexing (ix + iz * Nx)
         int cell = ix + iz * psi.Nx;
 
+        // Calculate sub-cell x position
+        float x_in_cell = x - ix * dx;  // Position within cell [0, dx)
+        float x_offset = x_in_cell - dx * 0.5f;  // Offset from cell center [-dx/2, +dx/2)
+        int x_sub = get_x_sub_bin(x_offset, dx);  // Sub-cell bin [0, 3]
+
         int theta_bin = a_grid.FindBin(theta);
         int E_bin = e_grid.FindBin(E);
 
@@ -46,7 +51,9 @@ void inject_source(
 
         int theta_local = theta_bin % N_theta_local;
         int E_local = E_bin % N_E_local;
-        uint16_t lidx = encode_local_idx(theta_local, E_local);
+
+        // Use 3D encoding with x_sub
+        uint16_t lidx = encode_local_idx_3d(theta_local, E_local, x_sub);
 
         int slot = psi.find_or_allocate_slot(cell, bid);
         if (slot < 0) continue;

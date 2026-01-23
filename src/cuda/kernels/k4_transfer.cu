@@ -194,7 +194,7 @@ void run_K4_BucketTransfer(
         if (neighbor >= 0) {
             int out_slot = psi_out.find_or_allocate_slot(neighbor, bid);
             if (out_slot >= 0) {
-                for (int lidx = 0; lidx < 32; ++lidx) {
+                for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
                     float w = bucket.value[slot][lidx];
                     if (w > 0) {
                         psi_out.value[neighbor][out_slot][lidx] += w;

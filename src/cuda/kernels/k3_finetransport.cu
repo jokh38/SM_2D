@@ -69,21 +69,8 @@ __global__ void K3_FineTransport(
 
     int cell = ActiveList[active_idx];
 
-    // Shared memory for coalesced bucket access
-    __shared__ DeviceOutflowBucket shared_buckets[4];
-
-    // Initialize local buckets
-    int local_tid = threadIdx.x;
-    if (local_tid < 4) {
-        for (int i = 0; i < DEVICE_Kb_out; ++i) {
-            shared_buckets[local_tid].block_id[i] = DEVICE_EMPTY_BLOCK_ID;
-            shared_buckets[local_tid].local_count[i] = 0;
-            for (int j = 0; j < DEVICE_LOCAL_BINS; ++j) {
-                shared_buckets[local_tid].value[i][j] = 0.0f;
-            }
-        }
-    }
-    __syncthreads();
+    // Note: With LOCAL_BINS=128, shared buckets would exceed 48KB limit
+    // Write directly to global memory instead of using shared memory
 
     // Accumulators for this cell
     double cell_edep = 0.0;
@@ -108,9 +95,9 @@ __global__ void K3_FineTransport(
             float weight = values_in[global_idx];
             if (weight < 1e-12f) continue;
 
-            // Decode local index
-            int theta_local = lidx / N_E_local;
-            int E_local = lidx % N_E_local;
+            // Decode 3D local index (theta_local, E_local, x_sub)
+            int theta_local, E_local, x_sub;
+            decode_local_idx_3d(lidx, theta_local, E_local, x_sub);
 
             // Get representative phase space values
             int theta_bin = b_theta * N_theta_local + theta_local;
@@ -140,10 +127,10 @@ __global__ void K3_FineTransport(
                 (cell * 7 + slot * 13 + lidx * 17) ^ 0x5DEECE66DL
             );
 
-            // P8 FIX: Each component starts at cell center
-            // In a more complete implementation, each component would track
-            // its own position through multiple steps
-            float x_cell = dx * 0.5f;
+            // P8 FIX: Each component starts at cell center + sub-cell offset
+            // Sub-cell partitioning tracks lateral position within cell
+            float x_offset = get_x_offset_from_bin(x_sub, dx);  // Get offset from cell center
+            float x_cell = dx * 0.5f + x_offset;  // Cell center + sub-cell offset
             float z_cell = dz * 0.5f;
 
             // Initial direction (before MCS)
@@ -206,9 +193,15 @@ __global__ void K3_FineTransport(
 
             if (exit_face >= 0) {
                 // Particle exits cell - emit to bucket
-                DeviceOutflowBucket& bucket = shared_buckets[exit_face];
-                device_emit_component_to_bucket(
-                    bucket, theta_new, E_new, w_new,
+                // Calculate x_sub for neighbor cell based on exit position
+                float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+
+                // Write directly to global memory (LOCAL_BINS=128 too large for shared memory)
+                int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                device_emit_component_to_bucket_3d(
+                    bucket, theta_new, E_new, w_new, x_sub_neighbor,
                     theta_edges, E_edges, N_theta, N_E,
                     N_theta_local, N_E_local
                 );
@@ -232,20 +225,6 @@ __global__ void K3_FineTransport(
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 }
-            }
-        }
-    }
-
-    __syncthreads();
-
-    // Write bucket data to global memory
-    if (local_tid < 4) {
-        int bucket_idx = device_bucket_index(cell, local_tid, Nx, Nz);
-        for (int i = 0; i < DEVICE_Kb_out; ++i) {
-            OutflowBuckets[bucket_idx].block_id[i] = shared_buckets[local_tid].block_id[i];
-            OutflowBuckets[bucket_idx].local_count[i] = shared_buckets[local_tid].local_count[i];
-            for (int j = 0; j < DEVICE_LOCAL_BINS; ++j) {
-                OutflowBuckets[bucket_idx].value[i][j] = shared_buckets[local_tid].value[i][j];
             }
         }
     }
