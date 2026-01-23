@@ -122,6 +122,9 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
         float A0 = 0.0f, A1 = 0.0f, A2 = 0.0f;
         int n_steps = static_cast<int>(std::ceil(z / config.dz));
 
+        // DEBUG: Sample a few steps
+        int debug_steps[] = {0, 50, 100, 154, 200, 250, 309};
+
         for (int step = 0; step < n_steps; ++step) {
             float step_start = step * config.dz;
             if (step_start >= z) {
@@ -141,6 +144,14 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
             // This is the rate of angular variance increase per unit path length
             float T_step = (sigma_theta * sigma_theta) / step_length;
 
+            // DEBUG: Print sample steps
+            for (int ds : debug_steps) {
+                if (step == ds && (j == 155)) {
+                    printf("  step %d: z_step=%.2f, R_res=%.2f, E_z=%.2f MeV, sigma=%.4f mrad, T=%.6f\n",
+                           step, z_step, R_residual, E_z, sigma_theta*1000, T_step);
+                }
+            }
+
             // Fermi-Eyges moment integrals (trapezoidal rule)
             A0 += T_step * step_length;
             A1 += T_step * z_step * step_length;
@@ -151,6 +162,12 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
         float sigma_diffusion_sq = A0 * z * z - 2.0f * A1 * z + A2;
         sigma_diffusion_sq = std::max(0.0f, sigma_diffusion_sq);  // Numerical stability
         float sigma_diffusion = std::sqrt(sigma_diffusion_sq);
+
+        // DEBUG: Print moments
+        if (j == 40 || j == 100 || j == 155 || j == 310) {
+            printf("DEBUG MOMENTS: z=%.1f, A0=%.6f, A1=%.2f, A2=%.2f\n", z, A0, A1, A2);
+            printf("  sigma_diff_sq = %.2f, sigma_diff = %.3f\n", sigma_diffusion_sq, sigma_diffusion);
+        }
 
         // Geometric spread from initial angular divergence (small-angle approximation)
         float sigma_geometric = std::abs(config.sigma_theta0) * z;
@@ -167,6 +184,12 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
 
         // Ensure minimum spread for numerical stability
         sigma_z = std::max(sigma_z, config.dx);
+
+        // DEBUG: Print sigma_z at key depths
+        if (j == 40 || j == 100 || j == 155 || j == 310) {
+            printf("DEBUG: z=%.1f, sigma_z=%.3f, sigma_diff=%.3f, sigma_geom=%.3f, sigma_x0=%.3f\n",
+                   z, sigma_z, sigma_diffusion, sigma_geometric, config.sigma_x0);
+        }
 
         // Apply lateral Gaussian profile
         for (int i = 0; i < config.Nx; ++i) {

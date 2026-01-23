@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspaces/SM_2D/src/cuda/kernels/k1_activemask.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o.d"
+  "/workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o.d"
   "/workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o.d"
   "/workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o.d"
   "/workspaces/SM_2D/src/cuda/kernels/k5_audit.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o.d"

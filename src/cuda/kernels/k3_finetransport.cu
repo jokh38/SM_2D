@@ -95,9 +95,9 @@ __global__ void K3_FineTransport(
             float weight = values_in[global_idx];
             if (weight < 1e-12f) continue;
 
-            // Decode 3D local index (theta_local, E_local, x_sub)
-            int theta_local, E_local, x_sub;
-            decode_local_idx_3d(lidx, theta_local, E_local, x_sub);
+            // FIX Problem 1: Decode 4D local index (theta_local, E_local, x_sub, z_sub)
+            int theta_local, E_local, x_sub, z_sub;
+            decode_local_idx_4d(lidx, theta_local, E_local, x_sub, z_sub);
 
             // Get representative phase space values
             int theta_bin = b_theta * N_theta_local + theta_local;
@@ -106,7 +106,15 @@ __global__ void K3_FineTransport(
             float theta_min = theta_edges[0];
             float theta_max = theta_edges[N_theta];
             float dtheta = (theta_max - theta_min) / N_theta;
-            float theta = theta_min + (theta_bin + 0.5f) * dtheta;
+
+            // FIX Problem 3: Intra-bin sampling for angle distribution
+            // Instead of using bin center, sample uniformly within bin
+            // This preserves the variance that would otherwise be lost
+            unsigned seed = static_cast<unsigned>(
+                (cell * 7 + slot * 13 + lidx * 17) ^ 0x5DEECE66DL
+            );
+            float theta_frac = (seed & 0xFFFF) / 65536.0f;  // [0, 1)
+            float theta = theta_edges[theta_bin] + theta_frac * dtheta;
 
             float E_min = E_edges[0];
             float E_max = E_edges[N_E];
@@ -122,16 +130,12 @@ __global__ void K3_FineTransport(
                 continue;
             }
 
-            // Generate seed for this component
-            unsigned seed = static_cast<unsigned>(
-                (cell * 7 + slot * 13 + lidx * 17) ^ 0x5DEECE66DL
-            );
-
-            // P8 FIX: Each component starts at cell center + sub-cell offset
-            // Sub-cell partitioning tracks lateral position within cell
-            float x_offset = get_x_offset_from_bin(x_sub, dx);  // Get offset from cell center
-            float x_cell = dx * 0.5f + x_offset;  // Cell center + sub-cell offset
-            float z_cell = dz * 0.5f;
+            // FIX Problem 1: Each component starts at cell center + sub-cell offsets
+            // Sub-cell partitioning tracks BOTH x and z position within cell
+            float x_offset = get_x_offset_from_bin(x_sub, dx);
+            float z_offset = get_z_offset_from_bin(z_sub, dz);
+            float x_cell = x_offset;  // Position relative to cell origin (0,0)
+            float z_cell = z_offset;
 
             // Initial direction (before MCS)
             float mu_init = cosf(theta);
@@ -152,6 +156,13 @@ __global__ void K3_FineTransport(
             // P9 FIX: Use minimum of physics step and distance to boundary
             float actual_step = fminf(step_phys, step_to_boundary);
 
+            // FIX Problem 2: Mid-point MCS method for better physical accuracy
+            // The scattering should occur at the midpoint of the step, not at the start
+            // First half: move with initial direction
+            float half_step = actual_step * 0.5f;
+            float x_mid = x_cell + eta_init * half_step;
+            float z_mid = z_cell + mu_init * half_step;
+
             // Energy loss with straggling for actual step
             float mean_dE = device_compute_energy_deposition(dlut, E, actual_step);
             float sigma_dE = device_energy_straggling_sigma(E, actual_step, 1.0f);
@@ -166,10 +177,12 @@ __global__ void K3_FineTransport(
             float w_new = device_apply_nuclear_attenuation(weight, E, actual_step, w_rem, E_rem);
             edep += E_rem;
 
-            // MCS for actual step
+            // MCS at midpoint (using energy at start of step for simplicity)
             float sigma_mcs = device_highland_sigma(E, actual_step);
             float theta_scatter = device_sample_mcs_angle(sigma_mcs, seed);
             float theta_new = theta + theta_scatter;
+
+            // Second half: move with new scattered direction
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
 
@@ -180,9 +193,9 @@ __global__ void K3_FineTransport(
                 eta_new /= norm;
             }
 
-            // P8 FIX: Position update with actual step
-            float x_new = x_cell + eta_new * actual_step;
-            float z_new = z_cell + mu_new * actual_step;
+            // Complete position update: from midpoint with new direction
+            float x_new = x_mid + eta_new * half_step;
+            float z_new = z_mid + mu_new * half_step;
 
             // Clamp position to cell bounds
             x_new = fmaxf(0.0f, fminf(x_new, dx));
@@ -192,16 +205,28 @@ __global__ void K3_FineTransport(
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
 
             if (exit_face >= 0) {
-                // Particle exits cell - emit to bucket
-                // Calculate x_sub for neighbor cell based on exit position
+                // FIX Problem 1: Calculate x_sub and z_sub for neighbor cell
                 float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
                 int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
 
-                // Write directly to global memory (LOCAL_BINS=128 too large for shared memory)
+                // For z_offset in neighbor, we need to determine where we entered
+                float z_offset_neighbor;
+                if (exit_face == 0) {  // +z face: entering from bottom
+                    z_offset_neighbor = -dz * 0.5f + dz * 0.125f;  // bin 0 center
+                } else if (exit_face == 1) {  // -z face: entering from top
+                    z_offset_neighbor = dz * 0.5f - dz * 0.125f;  // bin 3 center
+                } else {
+                    // x face: preserve relative z position
+                    z_offset_neighbor = z_new - dz * 0.5f;
+                }
+                int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
+                z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+
+                // Write directly to global memory
                 int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
                 DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                device_emit_component_to_bucket_3d(
-                    bucket, theta_new, E_new, w_new, x_sub_neighbor,
+                device_emit_component_to_bucket_4d(
+                    bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
                     theta_edges, E_edges, N_theta, N_E,
                     N_theta_local, N_E_local
                 );
@@ -216,9 +241,12 @@ __global__ void K3_FineTransport(
                 cell_w_nuclear += w_rem;
                 cell_E_nuclear += E_rem;
 
-                // Update position for next iteration (P8 FIX)
-                x_cell = x_new;
-                z_cell = z_new;
+                // FIX Problem 1: Update sub-cell bins for next iteration
+                // Recalculate x_sub and z_sub based on new position
+                float x_offset_new = x_new - dx * 0.5f;
+                float z_offset_new = z_new - dz * 0.5f;
+                x_sub = get_x_sub_bin(x_offset_new, dx);
+                z_sub = get_z_sub_bin(z_offset_new, dz);
 
                 // Cutoff check
                 if (E_new <= 0.1f) {

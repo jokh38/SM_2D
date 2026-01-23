@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o"
   "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o.d"
+  "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o"
+  "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o.d"
   "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o"
   "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o.d"
   "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o"

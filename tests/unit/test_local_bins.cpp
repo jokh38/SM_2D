@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
 #include "core/local_bins.hpp"
 
-TEST(LocalBinsTest, LocalBinsEquals128) {
-    EXPECT_EQ(LOCAL_BINS, 128);  // Updated: 8 * 4 * 4 = 128
+TEST(LocalBinsTest, LocalBinsEquals512) {
+    // FIX Problem 1: Added z_sub bin (4D encoding)
+    // LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub
+    //            = 8 * 4 * 4 * 4 = 512
+    EXPECT_EQ(LOCAL_BINS, 512);
     EXPECT_EQ(N_theta_local, 8);
     EXPECT_EQ(N_E_local, 4);
     EXPECT_EQ(N_x_sub, 4);
+    EXPECT_EQ(N_z_sub, 4);  // New: z_sub bins
 }
 
 TEST(LocalBinsTest, EncodeDecodeRoundTrip) {
@@ -49,6 +53,41 @@ TEST(LocalBinsTest, XOffsetToBinRoundTrip) {
     EXPECT_EQ(get_x_sub_bin(-0.5f * dx, dx), 0);  // Left edge
     EXPECT_EQ(get_x_sub_bin(0.0f, dx), 2);        // Center
     EXPECT_EQ(get_x_sub_bin(0.49f * dx, dx), 3);  // Near right edge
+}
+
+TEST(LocalBinsTest, ZOffsetToBinRoundTrip) {
+    float dz = 1.0f;  // 1 mm cell size
+
+    // FIX Problem 1: Test z_sub bins
+    for (int z = 0; z < N_z_sub; ++z) {
+        float offset = get_z_offset_from_bin(z, dz);
+        int bin = get_z_sub_bin(offset, dz);
+        EXPECT_EQ(bin, z);
+    }
+
+    // Test boundary values
+    EXPECT_EQ(get_z_sub_bin(-0.5f * dz, dz), 0);  // Bottom edge
+    EXPECT_EQ(get_z_sub_bin(0.0f, dz), 2);        // Center
+    EXPECT_EQ(get_z_sub_bin(0.49f * dz, dz), 3);  // Near top edge
+}
+
+TEST(LocalBinsTest, EncodeDecode4DRoundTrip) {
+    // FIX Problem 1: Test 4D encoding
+    for (int t = 0; t < N_theta_local; ++t) {
+        for (int e = 0; e < N_E_local; ++e) {
+            for (int x = 0; x < N_x_sub; ++x) {
+                for (int z = 0; z < N_z_sub; ++z) {
+                    uint16_t encoded = encode_local_idx_4d(t, e, x, z);
+                    int t_decoded, e_decoded, x_decoded, z_decoded;
+                    decode_local_idx_4d(encoded, t_decoded, e_decoded, x_decoded, z_decoded);
+                    EXPECT_EQ(t_decoded, t);
+                    EXPECT_EQ(e_decoded, e);
+                    EXPECT_EQ(x_decoded, x);
+                    EXPECT_EQ(z_decoded, z);
+                }
+            }
+        }
+    }
 }
 
 TEST(LocalBinsTest, LocalBinsCapacity) {

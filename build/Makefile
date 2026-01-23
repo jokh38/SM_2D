@@ -418,6 +418,30 @@ src/cuda/kernels/k1_activemask.cu.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.s
 .PHONY : src/cuda/kernels/k1_activemask.cu.s
 
+src/cuda/kernels/k2_coarsetransport.o: src/cuda/kernels/k2_coarsetransport.cu.o
+.PHONY : src/cuda/kernels/k2_coarsetransport.o
+
+# target to build an object file
+src/cuda/kernels/k2_coarsetransport.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o
+.PHONY : src/cuda/kernels/k2_coarsetransport.cu.o
+
+src/cuda/kernels/k2_coarsetransport.i: src/cuda/kernels/k2_coarsetransport.cu.i
+.PHONY : src/cuda/kernels/k2_coarsetransport.i
+
+# target to preprocess a source file
+src/cuda/kernels/k2_coarsetransport.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.i
+.PHONY : src/cuda/kernels/k2_coarsetransport.cu.i
+
+src/cuda/kernels/k2_coarsetransport.s: src/cuda/kernels/k2_coarsetransport.cu.s
+.PHONY : src/cuda/kernels/k2_coarsetransport.s
+
+# target to generate assembly for a file
+src/cuda/kernels/k2_coarsetransport.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.s
+.PHONY : src/cuda/kernels/k2_coarsetransport.cu.s
+
 src/cuda/kernels/k3_finetransport.o: src/cuda/kernels/k3_finetransport.cu.o
 .PHONY : src/cuda/kernels/k3_finetransport.o
 
@@ -917,6 +941,9 @@ help:
 	@echo "... src/cuda/kernels/k1_activemask.o"
 	@echo "... src/cuda/kernels/k1_activemask.i"
 	@echo "... src/cuda/kernels/k1_activemask.s"
+	@echo "... src/cuda/kernels/k2_coarsetransport.o"
+	@echo "... src/cuda/kernels/k2_coarsetransport.i"
+	@echo "... src/cuda/kernels/k2_coarsetransport.s"
 	@echo "... src/cuda/kernels/k3_finetransport.o"
 	@echo "... src/cuda/kernels/k3_finetransport.i"
 	@echo "... src/cuda/kernels/k3_finetransport.s"

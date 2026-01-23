@@ -26,6 +26,7 @@ target_include_directories(sm2d_cuda INTERFACE
 # CUDA kernel sources (separable compilation)
 set(CUDA_KERNEL_SOURCES
     src/cuda/kernels/k1_activemask.cu
+    src/cuda/kernels/k2_coarsetransport.cu
     src/cuda/kernels/k3_finetransport.cu
     src/cuda/kernels/k4_transfer.cu
     src/cuda/kernels/k5_audit.cu
