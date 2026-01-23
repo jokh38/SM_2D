@@ -52,6 +52,29 @@ def load_dose_2d(filepath):
 
     return x_vals, z_vals, dose_grid
 
+def get_roi_limits(x_data, y_data, threshold_fraction=0.01):
+    """Calculate axis limits focusing on region of interest (excluding near-zero values)"""
+    y_max = np.max(y_data)
+    threshold = threshold_fraction * y_max
+
+    # For x-axis: find range where y is above threshold
+    above_threshold = y_data > threshold
+    if np.any(above_threshold):
+        x_min = np.min(x_data[above_threshold])
+        x_max = np.max(x_data[above_threshold])
+        # Add small margin
+        x_margin = 0.05 * (x_max - x_min)
+        x_min = max(0, x_min - x_margin)
+        x_max = x_max + x_margin
+    else:
+        x_min, x_max = np.min(x_data), np.max(x_data)
+
+    # For y-axis: start from small non-zero value
+    y_min = threshold
+    y_max = y_max * 1.05  # Add 5% margin on top
+
+    return (x_min, x_max), (y_min, y_max)
+
 def plot_pdd(depths, doses, output_path='results/pdd_plot.png'):
     """Plot depth-dose curve"""
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -65,6 +88,11 @@ def plot_pdd(depths, doses, output_path='results/pdd_plot.png'):
     ax.axvline(peak_depth, color='r', linestyle='--', alpha=0.7,
                label=f'Bragg Peak: {peak_depth:.1f} mm')
     ax.axhline(peak_dose, color='r', linestyle='--', alpha=0.7)
+
+    # Set ROI limits to exclude near-zero values
+    (x_min, x_max), (y_min, y_max) = get_roi_limits(depths, doses)
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
 
     ax.set_xlabel('Depth (mm)', fontsize=12)
     ax.set_ylabel('Dose (Gy)', fontsize=12)
@@ -205,6 +233,10 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     ax3.axvline(20, color='g', linestyle='--', alpha=0.7, label='Shallow (20mm)')
     ax3.axvline(peak_depth / 2, color='orange', linestyle='--', alpha=0.7, label=f'Middle ({peak_depth/2:.1f}mm)')
     ax3.axvline(peak_depth, color='r', linestyle='--', alpha=0.7, label=f'Bragg Peak ({peak_depth:.1f}mm)')
+    # Set ROI limits to exclude near-zero values
+    (x_min, x_max), (y_min, y_max) = get_roi_limits(depths, doses)
+    ax3.set_xlim(x_min, x_max)
+    ax3.set_ylim(y_min, y_max)
     ax3.set_xlabel('Depth (mm)', fontsize=10)
     ax3.set_ylabel('Dose (Gy)', fontsize=10)
     ax3.set_title('PDD (Central Axis)', fontsize=11, fontweight='bold')
@@ -217,6 +249,10 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
         ax4.plot(x_prof, dose_prof, 'g-', linewidth=2)
+        # Set ROI limits to exclude near-zero values
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof)
+        ax4.set_xlim(x_min, x_max)
+        ax4.set_ylim(y_min, y_max)
         sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
         ax4.text(0.05, 0.95, sigma_text, transform=ax4.transAxes,
                 fontsize=10, verticalalignment='top',
@@ -234,6 +270,10 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
         ax5.plot(x_prof, dose_prof, 'orange', linewidth=2)
+        # Set ROI limits to exclude near-zero values
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof)
+        ax5.set_xlim(x_min, x_max)
+        ax5.set_ylim(y_min, y_max)
         sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
         ax5.text(0.05, 0.95, sigma_text, transform=ax5.transAxes,
                 fontsize=10, verticalalignment='top',
@@ -249,6 +289,10 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
         ax6.plot(x_prof, dose_prof, 'r-', linewidth=2)
+        # Set ROI limits to exclude near-zero values
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof)
+        ax6.set_xlim(x_min, x_max)
+        ax6.set_ylim(y_min, y_max)
         sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
         ax6.text(0.05, 0.95, sigma_text, transform=ax6.transAxes,
                 fontsize=10, verticalalignment='top',
