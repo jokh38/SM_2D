@@ -185,13 +185,7 @@ __global__ void K3_FineTransport(
             // Second half: move with new scattered direction
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
-
-            // Normalize direction
-            float norm = sqrtf(mu_new * mu_new + eta_new * eta_new);
-            if (norm > 1e-6f) {
-                mu_new /= norm;
-                eta_new /= norm;
-            }
+            // Note: cos²θ + sin²θ = 1, so normalization is unnecessary
 
             // Complete position update: from midpoint with new direction
             float x_new = x_mid + eta_new * half_step;

@@ -107,13 +107,7 @@ __device__ inline void device_update_direction_mcs(
 
     mu_out = cosf(theta_new);
     eta_out = sinf(theta_new);
-
-    // Normalize
-    float norm = sqrtf(mu_out * mu_out + eta_out * eta_out);
-    if (norm > 1e-6f) {
-        mu_out /= norm;
-        eta_out /= norm;
-    }
+    // Note: cos²θ + sin²θ = 1, so normalization is unnecessary
 }
 
 // ============================================================================
@@ -149,9 +143,18 @@ __device__ inline float device_vavilov_kappa(float E_MeV, float ds_mm, float rho
 }
 
 // Bohr straggling (Gaussian regime, κ >> 1)
-__device__ inline float device_bohr_straggling_sigma(float ds_mm, float rho = 1.0f) {
-    constexpr float kappa_water = 0.156f;  // MeV/√mm for water
-    return kappa_water * sqrtf(rho * ds_mm);
+// FIX: Added 1/β energy dependence to match CPU implementation
+// Bohr straggling: σ²_E = 4π N_e r_e² (m_e c²)² z² L ρ ds ∝ 1/β²
+// Therefore: σ_E ∝ 1/β
+__device__ inline float device_bohr_straggling_sigma(float E_MeV, float ds_mm, float rho = 1.0f) {
+    constexpr float kappa_water = 0.156f;  // MeV/√mm for water at β≈1
+
+    // Relativistic β calculation for energy dependence
+    float gamma = (E_MeV + DEVICE_m_p_MeV) / DEVICE_m_p_MeV;
+    float beta2 = 1.0f - 1.0f / (gamma * gamma);
+    float beta = sqrtf(fmaxf(beta2, 0.01f));  // Avoid division by zero
+
+    return kappa_water * sqrtf(rho * ds_mm) / beta;  // 1/β correction added
 }
 
 // Energy straggling sigma with full Vavilov regime handling
@@ -160,7 +163,7 @@ __device__ inline float device_energy_straggling_sigma(float E_MeV, float ds_mm,
 
     if (kappa > 10.0f) {
         // Bohr (Gaussian) regime
-        return device_bohr_straggling_sigma(ds_mm, rho);
+        return device_bohr_straggling_sigma(E_MeV, ds_mm, rho);
     } else if (kappa < 0.01f) {
         // Landau regime - use effective width
         // PHYSICS NOTE: Landau is asymmetric, FWHM/2.355 approximation used.
@@ -172,7 +175,7 @@ __device__ inline float device_energy_straggling_sigma(float E_MeV, float ds_mm,
         return 4.0f * xi / 2.355f;  // FWHM / 2.355
     } else {
         // Vavilov regime - interpolate
-        float sigma_bohr = device_bohr_straggling_sigma(ds_mm, rho);
+        float sigma_bohr = device_bohr_straggling_sigma(E_MeV, ds_mm, rho);
         float gamma = (E_MeV + DEVICE_m_p_MeV) / DEVICE_m_p_MeV;
         float beta = sqrtf(fmaxf(1.0f - 1.0f / (gamma * gamma), 0.0f));
         float ds_cm = ds_mm / 10.0f;
