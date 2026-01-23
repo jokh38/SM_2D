@@ -52,9 +52,25 @@ def load_dose_2d(filepath):
 
     return x_vals, z_vals, dose_grid
 
-def get_roi_limits(x_data, y_data, threshold_fraction=0.01):
-    """Calculate axis limits focusing on region of interest (excluding near-zero values)"""
+def get_roi_limits(x_data, y_data, threshold_fraction=0.01, x_margin_fraction=0.15, y_max_fraction=1.05):
+    """Calculate axis limits focusing on region of interest (excluding near-zero values)
+
+    Args:
+        x_data: x-axis values
+        y_data: y-axis values
+        threshold_fraction: Fraction of max to consider as non-zero threshold (default: 0.01 = 1%)
+        x_margin_fraction: Margin fraction to add on each side of x range (default: 0.15 = 15%)
+        y_max_fraction: Factor to multiply y_max for upper y limit (default: 1.05 = 105%)
+
+    Returns:
+        ((x_min, x_max), (y_min, y_max)): Axis limits
+    """
     y_max = np.max(y_data)
+
+    if y_max < 1e-15:
+        # All zeros - return full range
+        return (np.min(x_data), np.max(x_data)), (0, 1)
+
     threshold = threshold_fraction * y_max
 
     # For x-axis: find range where y is above threshold
@@ -62,18 +78,18 @@ def get_roi_limits(x_data, y_data, threshold_fraction=0.01):
     if np.any(above_threshold):
         x_min = np.min(x_data[above_threshold])
         x_max = np.max(x_data[above_threshold])
-        # Add small margin
-        x_margin = 0.05 * (x_max - x_min)
-        x_min = max(0, x_min - x_margin)
+        # Add proportional margin
+        x_margin = x_margin_fraction * (x_max - x_min)
+        x_min = x_min - x_margin
         x_max = x_max + x_margin
     else:
         x_min, x_max = np.min(x_data), np.max(x_data)
 
-    # For y-axis: start from small non-zero value
+    # For y-axis: start from threshold (not zero) and add margin on top
     y_min = threshold
-    y_max = y_max * 1.05  # Add 5% margin on top
+    y_max_lim = y_max * y_max_fraction
 
-    return (x_min, x_max), (y_min, y_max)
+    return (x_min, x_max), (y_min, y_max_lim)
 
 def plot_pdd(depths, doses, output_path='results/pdd_plot.png'):
     """Plot depth-dose curve"""
@@ -243,63 +259,69 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     ax3.grid(True, alpha=0.3)
     ax3.legend(fontsize=8)
 
-    # Middle-right: x profile at shallow depth (20 mm)
+    # Middle-right: x profile at shallow depth (20 mm) - NORMALIZED
     ax4 = axes[1, 0]
     x_prof, dose_prof, actual_depth = get_x_profile(x_vals, z_vals, dose_grid, 20.0)
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
-        ax4.plot(x_prof, dose_prof, 'g-', linewidth=2)
+        # Normalize profile to maximum
+        dose_prof_norm = dose_prof / (np.max(dose_prof) + 1e-10)
+        ax4.plot(x_prof, dose_prof_norm, 'g-', linewidth=2)
         # Set ROI limits to exclude near-zero values
-        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof)
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof_norm)
         ax4.set_xlim(x_min, x_max)
-        ax4.set_ylim(y_min, y_max)
+        ax4.set_ylim(0, 1.05)  # Normalized y-axis
         sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
         ax4.text(0.05, 0.95, sigma_text, transform=ax4.transAxes,
                 fontsize=10, verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        ax4.set_title(f'X Profile @ {actual_depth:.1f}mm', fontsize=11, fontweight='bold')
+        ax4.set_title(f'X Profile @ {actual_depth:.1f}mm (Normalized)', fontsize=11, fontweight='bold')
     ax4.set_xlabel('x (mm)', fontsize=10)
-    ax4.set_ylabel('Dose (Gy)', fontsize=10)
+    ax4.set_ylabel('Normalized Dose', fontsize=10)
     ax4.grid(True, alpha=0.3)
 
     # ===== Third row: x-profiles at middle and Bragg peak =====
-    # Bottom-middle: x profile at middle depth (bragg peak / 2)
+    # Bottom-middle: x profile at middle depth (bragg peak / 2) - NORMALIZED
     ax5 = axes[1, 1]
     middle_depth = peak_depth / 2
     x_prof, dose_prof, actual_depth = get_x_profile(x_vals, z_vals, dose_grid, middle_depth)
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
-        ax5.plot(x_prof, dose_prof, 'orange', linewidth=2)
+        # Normalize profile to maximum
+        dose_prof_norm = dose_prof / (np.max(dose_prof) + 1e-10)
+        ax5.plot(x_prof, dose_prof_norm, 'orange', linewidth=2)
         # Set ROI limits to exclude near-zero values
-        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof)
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof_norm)
         ax5.set_xlim(x_min, x_max)
-        ax5.set_ylim(y_min, y_max)
+        ax5.set_ylim(0, 1.05)  # Normalized y-axis
         sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
         ax5.text(0.05, 0.95, sigma_text, transform=ax5.transAxes,
                 fontsize=10, verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        ax5.set_title(f'X Profile @ {actual_depth:.1f}mm', fontsize=11, fontweight='bold')
+        ax5.set_title(f'X Profile @ {actual_depth:.1f}mm (Normalized)', fontsize=11, fontweight='bold')
     ax5.set_xlabel('x (mm)', fontsize=10)
-    ax5.set_ylabel('Dose (Gy)', fontsize=10)
+    ax5.set_ylabel('Normalized Dose', fontsize=10)
     ax5.grid(True, alpha=0.3)
 
-    # Bottom-right: x profile at bragg peak depth
+    # Bottom-right: x profile at bragg peak depth - NORMALIZED
     ax6 = axes[1, 2]
     x_prof, dose_prof, actual_depth = get_x_profile(x_vals, z_vals, dose_grid, peak_depth)
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
-        ax6.plot(x_prof, dose_prof, 'r-', linewidth=2)
+        # Normalize profile to maximum
+        dose_prof_norm = dose_prof / (np.max(dose_prof) + 1e-10)
+        ax6.plot(x_prof, dose_prof_norm, 'r-', linewidth=2)
         # Set ROI limits to exclude near-zero values
-        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof)
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof_norm)
         ax6.set_xlim(x_min, x_max)
-        ax6.set_ylim(y_min, y_max)
+        ax6.set_ylim(0, 1.05)  # Normalized y-axis
         sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
         ax6.text(0.05, 0.95, sigma_text, transform=ax6.transAxes,
                 fontsize=10, verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        ax6.set_title(f'X Profile @ {actual_depth:.1f}mm (Bragg Peak)', fontsize=11, fontweight='bold')
+        ax6.set_title(f'X Profile @ {actual_depth:.1f}mm (Bragg Peak, Normalized)', fontsize=11, fontweight='bold')
     ax6.set_xlabel('x (mm)', fontsize=10)
-    ax6.set_ylabel('Dose (Gy)', fontsize=10)
+    ax6.set_ylabel('Normalized Dose', fontsize=10)
     ax6.grid(True, alpha=0.3)
 
     plt.tight_layout()

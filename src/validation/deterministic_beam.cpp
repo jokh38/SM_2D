@@ -101,31 +101,34 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
         float depth_dose = convolved_dose / norm;
 
         /**
-         * FIXED: Proper lateral spread calculation using Highland theory
+         * FIXED: Proper lateral spread calculation using Fermi-Eyges theory
          *
          * The lateral spread σ(z) at depth z has three components:
          * 1. σ_initial: Initial beam width (config.sigma_x0)
          * 2. σ_geometric: Geometric spread from initial angular divergence
          * 3. σ_diffusion: Highland angular diffusion accumulated along path
          *
-         * The diffusion term is computed by integrating Highland scattering
-         * along the path, with each scattering event contributing to lateral
-         * displacement according to the lever arm (z - z').
+         * Fermi-Eyges moments for lateral variance:
+         *   T(z) = dσ_θ²/dz : Angular scattering power [rad²/mm]
+         *   A₀(z) = ∫₀ᶻ T(z') dz'        : Total angular variance
+         *   A₁(z) = ∫₀ᶻ z' × T(z') dz'    : First moment
+         *   A₂(z) = ∫₀ᶻ z'² × T(z') dz'   : Second moment
+         *
+         * Lateral variance at depth z:
+         *   σ_x²(z) = A₀×z² - 2×A₁×z + A₂
+         *
+         * Reference: Fermi, Eyges; "On the Multiple Scattering of Charged Particles"
          */
-        float sigma_diffusion_sq = 0.0f;
-
-        // Integrate scattering contribution along path using Fermi-Eyges:
-        // σ_x^2(z) = ∫ (z - z')^2 * T(z') dz', where T = d<θ^2>/dz.
-        // We approximate T dz by the Highland σ_θ^2 over each dz step.
+        float A0 = 0.0f, A1 = 0.0f, A2 = 0.0f;
         int n_steps = static_cast<int>(std::ceil(z / config.dz));
+
         for (int step = 0; step < n_steps; ++step) {
             float step_start = step * config.dz;
             if (step_start >= z) {
                 break;
             }
             float step_length = std::min(config.dz, z - step_start);
-            float z_step = step_start + 0.5f * step_length;
-            float z_remaining = z - z_step;
+            float z_step = step_start + 0.5f * step_length;  // Step center position
 
             // Energy at this depth (residual range method)
             float R_residual = R_bragg - z_step;
@@ -134,10 +137,19 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
             // Highland scattering angle for this step (2D projection included)
             float sigma_theta = highland_sigma(E_z, step_length, X0_water);
 
-            // Accumulate diffusion contribution with lever arm to depth z
-            sigma_diffusion_sq += sigma_theta * sigma_theta * z_remaining * z_remaining;
+            // Scattering power: T = dσ_θ²/dz ≈ σ_θ²/ds [rad²/mm]
+            // This is the rate of angular variance increase per unit path length
+            float T_step = (sigma_theta * sigma_theta) / step_length;
+
+            // Fermi-Eyges moment integrals (trapezoidal rule)
+            A0 += T_step * step_length;
+            A1 += T_step * z_step * step_length;
+            A2 += T_step * z_step * z_step * step_length;
         }
 
+        // Fermi-Eyges lateral variance formula
+        float sigma_diffusion_sq = A0 * z * z - 2.0f * A1 * z + A2;
+        sigma_diffusion_sq = std::max(0.0f, sigma_diffusion_sq);  // Numerical stability
         float sigma_diffusion = std::sqrt(sigma_diffusion_sq);
 
         // Geometric spread from initial angular divergence (small-angle approximation)
