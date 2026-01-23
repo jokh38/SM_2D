@@ -34,6 +34,7 @@ PencilBeamConfig make_pencil_beam_config(const IncidentParticleConfig& config) {
     pbc.x0 = config.spatial.x0;
     pbc.z0 = config.spatial.z0;
     pbc.theta0 = config.angular.theta0;
+    pbc.sigma_theta0 = config.angular.sigma_theta;
     pbc.Nx = config.grid.Nx;
     pbc.Nz = config.grid.Nz;
     pbc.dx = config.grid.dx;

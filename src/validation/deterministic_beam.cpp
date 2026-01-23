@@ -105,7 +105,7 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
          *
          * The lateral spread σ(z) at depth z has three components:
          * 1. σ_initial: Initial beam width (config.sigma_x0)
-         * 2. σ_geometric: Direct geometric spread from initial angle
+         * 2. σ_geometric: Geometric spread from initial angular divergence
          * 3. σ_diffusion: Highland angular diffusion accumulated along path
          *
          * The diffusion term is computed by integrating Highland scattering
@@ -114,11 +114,17 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
          */
         float sigma_diffusion_sq = 0.0f;
 
-        // Integrate scattering contribution along path
-        // Use discrete steps matching the grid resolution
-        int n_steps = static_cast<int>(z / config.dz);
-        for (int step = 0; step <= n_steps; ++step) {
-            float z_step = step * config.dz;
+        // Integrate scattering contribution along path using Fermi-Eyges:
+        // σ_x^2(z) = ∫ (z - z')^2 * T(z') dz', where T = d<θ^2>/dz.
+        // We approximate T dz by the Highland σ_θ^2 over each dz step.
+        int n_steps = static_cast<int>(std::ceil(z / config.dz));
+        for (int step = 0; step < n_steps; ++step) {
+            float step_start = step * config.dz;
+            if (step_start >= z) {
+                break;
+            }
+            float step_length = std::min(config.dz, z - step_start);
+            float z_step = step_start + 0.5f * step_length;
             float z_remaining = z - z_step;
 
             // Energy at this depth (residual range method)
@@ -126,19 +132,19 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
             float E_z = R_residual > 0 ? lut.lookup_E_inverse(std::max(0.1f, R_residual)) : 0.1f;
 
             // Highland scattering angle for this step (2D projection included)
-            float sigma_theta = highland_sigma(E_z, config.dz, X0_water);
+            float sigma_theta = highland_sigma(E_z, step_length, X0_water);
 
-            // Accumulate diffusion contribution
-            // Variance from scattering at z_step contributes with (z-z_step) lever arm
-            // The factor 1/3 comes from the Molière theory for lateral displacement
-            float lever_arm = z_remaining / std::sqrt(3.0f);
-            sigma_diffusion_sq += sigma_theta * sigma_theta * lever_arm * lever_arm;
+            // Accumulate diffusion contribution with lever arm to depth z
+            sigma_diffusion_sq += sigma_theta * sigma_theta * z_remaining * z_remaining;
         }
 
         float sigma_diffusion = std::sqrt(sigma_diffusion_sq);
 
-        // Geometric spread from initial angular divergence
-        float sigma_geometric = std::abs(std::tan(config.theta0)) * z;
+        // Geometric spread from initial angular divergence (small-angle approximation)
+        float sigma_geometric = std::abs(config.sigma_theta0) * z;
+
+        // Beam center shifts with mean angle (tilt)
+        float x_mean = std::tan(config.theta0) * z;
 
         // Total lateral spread (quadrature sum of all components)
         float sigma_z = std::sqrt(
@@ -153,7 +159,8 @@ SimulationResult run_pencil_beam(const PencilBeamConfig& config) {
         // Apply lateral Gaussian profile
         for (int i = 0; i < config.Nx; ++i) {
             float x = result.x_centers[i];
-            float lateral_factor = std::exp(-(x * x) / (2.0f * sigma_z * sigma_z));
+            float x_shift = x - x_mean;
+            float lateral_factor = std::exp(-(x_shift * x_shift) / (2.0f * sigma_z * sigma_z));
             float lateral_norm = config.dx / (std::sqrt(2.0f * M_PI) * sigma_z);
             result.edep[j][i] = config.W_total * depth_dose * lateral_factor * lateral_norm;
         }

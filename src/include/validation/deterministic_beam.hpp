@@ -17,6 +17,7 @@ struct PencilBeamConfig {
     float x0 = 0.0f;
     float z0 = 0.0f;
     float theta0 = 0.0f;
+    float sigma_theta0 = 0.0f;  // Initial angular divergence (1D RMS) [rad]
     int Nx = 100;
     int Nz = 200;
     float dx = 1.0f;
