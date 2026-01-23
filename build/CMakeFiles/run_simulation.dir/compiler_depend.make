@@ -330,10 +330,13 @@ CMakeFiles/run_simulation.dir/run_simulation.cpp.o: /workspaces/SM_2D/run_simula
   /workspaces/SM_2D/src/include/source/pencil_source.hpp \
   /workspaces/SM_2D/src/include/source/source_adapter.hpp \
   /workspaces/SM_2D/src/include/validation/bragg_peak.hpp \
+  /workspaces/SM_2D/src/include/validation/deterministic_beam.hpp \
   /workspaces/SM_2D/src/include/validation/pencil_beam.hpp
 
 
 /workspaces/SM_2D/src/include/validation/pencil_beam.hpp:
+
+/workspaces/SM_2D/src/include/validation/deterministic_beam.hpp:
 
 /workspaces/SM_2D/src/include/validation/bragg_peak.hpp:
 

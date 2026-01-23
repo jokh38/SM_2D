@@ -1,0 +1,36 @@
+# Claude Code
+.claude/
+
+# Build outputs
+build/
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+a.out
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.Python
+*.egg-info/
+dist/
+build/
+
+# Temporary files
+*.log
+*.tmp
+.DS_Store
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Results (optional - uncomment if you don't want to track results)
+# results/

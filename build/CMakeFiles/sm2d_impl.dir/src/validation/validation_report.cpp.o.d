@@ -31,6 +31,7 @@ CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp \
+ /workspaces/SM_2D/src/include/validation/deterministic_beam.hpp \
  /workspaces/SM_2D/src/include/core/grids.hpp /usr/include/c++/12/vector \
  /usr/include/c++/12/bits/stl_algobase.h \
  /usr/include/c++/12/bits/functexcept.h \

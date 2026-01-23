@@ -802,6 +802,30 @@ src/validation/determinism.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/determinism.cpp.s
 .PHONY : src/validation/determinism.cpp.s
 
+src/validation/deterministic_beam.o: src/validation/deterministic_beam.cpp.o
+.PHONY : src/validation/deterministic_beam.o
+
+# target to build an object file
+src/validation/deterministic_beam.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o
+.PHONY : src/validation/deterministic_beam.cpp.o
+
+src/validation/deterministic_beam.i: src/validation/deterministic_beam.cpp.i
+.PHONY : src/validation/deterministic_beam.i
+
+# target to preprocess a source file
+src/validation/deterministic_beam.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.i
+.PHONY : src/validation/deterministic_beam.cpp.i
+
+src/validation/deterministic_beam.s: src/validation/deterministic_beam.cpp.s
+.PHONY : src/validation/deterministic_beam.s
+
+# target to generate assembly for a file
+src/validation/deterministic_beam.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.s
+.PHONY : src/validation/deterministic_beam.cpp.s
+
 src/validation/lateral_spread.o: src/validation/lateral_spread.cpp.o
 .PHONY : src/validation/lateral_spread.o
 
@@ -825,30 +849,6 @@ src/validation/lateral_spread.s: src/validation/lateral_spread.cpp.s
 src/validation/lateral_spread.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/lateral_spread.cpp.s
 .PHONY : src/validation/lateral_spread.cpp.s
-
-src/validation/pencil_beam.o: src/validation/pencil_beam.cpp.o
-.PHONY : src/validation/pencil_beam.o
-
-# target to build an object file
-src/validation/pencil_beam.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o
-.PHONY : src/validation/pencil_beam.cpp.o
-
-src/validation/pencil_beam.i: src/validation/pencil_beam.cpp.i
-.PHONY : src/validation/pencil_beam.i
-
-# target to preprocess a source file
-src/validation/pencil_beam.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.i
-.PHONY : src/validation/pencil_beam.cpp.i
-
-src/validation/pencil_beam.s: src/validation/pencil_beam.cpp.s
-.PHONY : src/validation/pencil_beam.s
-
-# target to generate assembly for a file
-src/validation/pencil_beam.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.s
-.PHONY : src/validation/pencil_beam.cpp.s
 
 src/validation/validation_report.o: src/validation/validation_report.cpp.o
 .PHONY : src/validation/validation_report.o
@@ -965,12 +965,12 @@ help:
 	@echo "... src/validation/determinism.o"
 	@echo "... src/validation/determinism.i"
 	@echo "... src/validation/determinism.s"
+	@echo "... src/validation/deterministic_beam.o"
+	@echo "... src/validation/deterministic_beam.i"
+	@echo "... src/validation/deterministic_beam.s"
 	@echo "... src/validation/lateral_spread.o"
 	@echo "... src/validation/lateral_spread.i"
 	@echo "... src/validation/lateral_spread.s"
-	@echo "... src/validation/pencil_beam.o"
-	@echo "... src/validation/pencil_beam.i"
-	@echo "... src/validation/pencil_beam.s"
 	@echo "... src/validation/validation_report.o"
 	@echo "... src/validation/validation_report.i"
 	@echo "... src/validation/validation_report.s"

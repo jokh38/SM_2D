@@ -279,19 +279,19 @@ CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/src/audit/reporting.cpp -o CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.s
 
-CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o: CMakeFiles/sm2d_impl.dir/flags.make
-CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o: /workspaces/SM_2D/src/validation/pencil_beam.cpp
-CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o: CMakeFiles/sm2d_impl.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o -MF CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o.d -o CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o -c /workspaces/SM_2D/src/validation/pencil_beam.cpp
+CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o: CMakeFiles/sm2d_impl.dir/flags.make
+CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o: /workspaces/SM_2D/src/validation/deterministic_beam.cpp
+CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o: CMakeFiles/sm2d_impl.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o -MF CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o.d -o CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o -c /workspaces/SM_2D/src/validation/deterministic_beam.cpp
 
-CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/SM_2D/src/validation/pencil_beam.cpp > CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.i
+CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/SM_2D/src/validation/deterministic_beam.cpp > CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.i
 
-CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/src/validation/pencil_beam.cpp -o CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.s
+CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/src/validation/deterministic_beam.cpp -o CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.s
 
 CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o: CMakeFiles/sm2d_impl.dir/flags.make
 CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o: /workspaces/SM_2D/src/validation/bragg_peak.cpp
@@ -408,7 +408,7 @@ sm2d_impl_OBJECTS = \
 "CMakeFiles/sm2d_impl.dir/src/audit/conservation.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/audit/global_budget.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.o" \
-"CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o" \
+"CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/validation/lateral_spread.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/validation/determinism.cpp.o" \
@@ -435,7 +435,7 @@ libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/boundary/loss_tracking.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/audit/conservation.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/audit/global_budget.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/audit/reporting.cpp.o
-libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/validation/pencil_beam.cpp.o
+libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/validation/deterministic_beam.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/validation/lateral_spread.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/validation/determinism.cpp.o

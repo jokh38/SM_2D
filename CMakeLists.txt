@@ -57,7 +57,7 @@ add_library(sm2d_impl STATIC
     src/audit/conservation.cpp
     src/audit/global_budget.cpp
     src/audit/reporting.cpp
-    src/validation/pencil_beam.cpp
+    src/validation/deterministic_beam.cpp
     src/validation/bragg_peak.cpp
     src/validation/lateral_spread.cpp
     src/validation/determinism.cpp
@@ -76,6 +76,12 @@ target_include_directories(sm2d_impl PRIVATE /usr/local/cuda-12.4/include)
 add_executable(run_simulation run_simulation.cpp)
 target_link_libraries(run_simulation sm2d_core sm2d_impl)
 target_include_directories(run_simulation PRIVATE /usr/local/cuda-12.4/include)
+
+# Copy executable to project root after build
+add_custom_command(TARGET run_simulation POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:run_simulation> ${CMAKE_SOURCE_DIR}/run_simulation
+    COMMENT "Copying run_simulation to project root"
+)
 
 # Test executable
 enable_testing()

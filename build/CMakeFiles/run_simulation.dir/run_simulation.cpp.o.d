@@ -189,6 +189,7 @@ CMakeFiles/run_simulation.dir/run_simulation.cpp.o: \
  /usr/include/c++/12/bits/uniform_int_dist.h \
  /usr/include/c++/12/pstl/glue_algorithm_defs.h \
  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp \
+ /workspaces/SM_2D/src/include/validation/deterministic_beam.hpp \
  /workspaces/SM_2D/src/include/core/grids.hpp /usr/include/c++/12/cmath \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \

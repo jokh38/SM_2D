@@ -3,6 +3,7 @@ CMakeFiles/sm2d_impl.dir/src/validation/bragg_peak.cpp.o: \
  /usr/include/stdc-predef.h \
  /workspaces/SM_2D/src/include/validation/bragg_peak.hpp \
  /workspaces/SM_2D/src/include/validation/pencil_beam.hpp \
+ /workspaces/SM_2D/src/include/validation/deterministic_beam.hpp \
  /workspaces/SM_2D/src/include/core/grids.hpp /usr/include/c++/12/vector \
  /usr/include/c++/12/bits/stl_algobase.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
