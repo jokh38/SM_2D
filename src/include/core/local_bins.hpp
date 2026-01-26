@@ -13,11 +13,11 @@
 #define __device__
 #endif
 
-constexpr int N_theta_local = 8;
-constexpr int N_E_local = 4;
+constexpr int N_theta_local = 4;
+constexpr int N_E_local = 2;
 constexpr int N_x_sub = 4;                    // Sub-cell x position bins per cell
 constexpr int N_z_sub = 4;                    // Sub-cell z position bins per cell (FIX: Problem 1)
-constexpr int LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub;  // = 512
+constexpr int LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub;  // = 128 (reduced for memory)
 
 // ============================================================================
 // 4D Local Index Encoding (theta_local, E_local, x_sub, z_sub)

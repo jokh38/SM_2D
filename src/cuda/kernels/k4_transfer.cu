@@ -1,5 +1,6 @@
 #include "kernels/k4_transfer.cuh"
 #include "device/device_bucket.cuh"
+#include "device/device_psic.cuh"  // For DEVICE_Kb
 #include "core/psi_storage.hpp"
 #include "core/local_bins.hpp"
 #include "core/block_encoding.hpp"
@@ -62,7 +63,8 @@ __global__ void K4_BucketTransfer(
     if (cell >= Nx * Nz) return;
 
     // P3 FIX: Define max slots per cell (must match PsiC structure)
-    constexpr int max_slots_per_cell = 32;
+    // FIX: Use DEVICE_Kb instead of hardcoded 32
+    constexpr int max_slots_per_cell = DEVICE_Kb;  // = 8
 
     // Each cell receives buckets from ALL 4 neighbors
     // Process all 4 faces

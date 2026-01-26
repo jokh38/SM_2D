@@ -110,9 +110,9 @@ void run_k1k6_pipeline_transport(
     DevicePsiC psi_in, psi_out;
 
     // Set CUDA device
-    cudaError_t err = cudaSetDevice(0);
-    if (err != cudaSuccess) {
-        std::cerr << "Failed to set CUDA device: " << cudaGetErrorString(err) << std::endl;
+    cudaError_t device_err = cudaSetDevice(0);
+    if (device_err != cudaSuccess) {
+        std::cerr << "Failed to set CUDA device: " << cudaGetErrorString(device_err) << std::endl;
         return;
     }
 
@@ -186,6 +186,25 @@ void run_k1k6_pipeline_transport(
         device_psic_cleanup(psi_out);
         return;
     }
+
+    // Verify source injection by summing weights in source cell
+    size_t source_cell_slots = psi_in.Kb * LOCAL_BINS;
+    std::vector<float> h_source_values(source_cell_slots);
+    size_t source_offset = source_cell * psi_in.Kb * LOCAL_BINS;
+    cudaMemcpy(h_source_values.data(), psi_in.value + source_offset,
+               source_cell_slots * sizeof(float), cudaMemcpyDeviceToHost);
+
+    float total_weight = 0.0f;
+    int nonzero_count = 0;
+    for (size_t i = 0; i < source_cell_slots; ++i) {
+        if (h_source_values[i] > 0.0f) {
+            total_weight += h_source_values[i];
+            nonzero_count++;
+        }
+    }
+    std::cout << "  Source injection verification:" << std::endl;
+    std::cout << "    Total weight in source cell: " << total_weight << " (expected: " << W_total << ")" << std::endl;
+    std::cout << "    Non-zero bins: " << nonzero_count << " / " << source_cell_slots << std::endl;
 
     // ========================================================================
     // STEP 4: Run Main Pipeline

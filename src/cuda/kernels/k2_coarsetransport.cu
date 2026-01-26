@@ -2,6 +2,7 @@
 #include "device/device_lut.cuh"
 #include "device/device_physics.cuh"
 #include "device/device_bucket.cuh"
+#include "device/device_psic.cuh"  // For DEVICE_Kb
 #include "physics/step_control.hpp"
 #include "physics/highland.hpp"
 #include "physics/nuclear.hpp"
@@ -86,9 +87,12 @@ __global__ void K2_CoarseTransport(
     // Coarse step size: use full cell size or configured step
     float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
 
+    // FIX: Use DEVICE_Kb instead of hardcoded 32
+    constexpr int Kb = DEVICE_Kb;  // = 8
+
     // Process all slots in this cell
-    for (int slot = 0; slot < 32; ++slot) {
-        uint32_t bid = block_ids_in[cell * 32 + slot];
+    for (int slot = 0; slot < Kb; ++slot) {
+        uint32_t bid = block_ids_in[cell * Kb + slot];
         if (bid == DEVICE_EMPTY_BLOCK_ID) continue;
 
         // Decode block ID
@@ -97,7 +101,7 @@ __global__ void K2_CoarseTransport(
 
         // Process all local bins
         for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
-            int global_idx = (cell * 32 + slot) * DEVICE_LOCAL_BINS + lidx;
+            int global_idx = (cell * Kb + slot) * DEVICE_LOCAL_BINS + lidx;
             float weight = values_in[global_idx];
             if (weight < 1e-12f) continue;
 

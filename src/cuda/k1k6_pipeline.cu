@@ -159,38 +159,58 @@ __global__ void compute_total_weight(
 
 bool K1K6PipelineState::allocate(int Nx, int Nz) {
     int N_cells = Nx * Nz;
+    cudaError_t e;
+
+    std::cout << "Allocating pipeline state for " << Nx << "x" << Nz << " (" << N_cells << " cells)" << std::endl;
 
     // Allocate ActiveMask
-    if (cudaMalloc(&d_ActiveMask, N_cells * sizeof(uint8_t)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_ActiveMask, N_cells * sizeof(uint8_t));
+    if (e != cudaSuccess) { std::cerr << "Failed d_ActiveMask: " << N_cells << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate ActiveList
-    if (cudaMalloc(&d_ActiveList, N_cells * sizeof(uint32_t)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_ActiveList, N_cells * sizeof(uint32_t));
+    if (e != cudaSuccess) { std::cerr << "Failed d_ActiveList: " << N_cells * 4 << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate CoarseList
-    if (cudaMalloc(&d_CoarseList, N_cells * sizeof(uint32_t)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_CoarseList, N_cells * sizeof(uint32_t));
+    if (e != cudaSuccess) { std::cerr << "Failed d_CoarseList: " << N_cells * 4 << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate device counters
-    if (cudaMalloc(&d_n_active, sizeof(int)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_n_coarse, sizeof(int)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_n_active, sizeof(int));
+    if (e != cudaSuccess) { std::cerr << "Failed d_n_active: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_n_coarse, sizeof(int));
+    if (e != cudaSuccess) { std::cerr << "Failed d_n_coarse: " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate energy deposition array
-    if (cudaMalloc(&d_EdepC, N_cells * sizeof(double)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_EdepC, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_EdepC: " << N_cells * 8 << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate weight tracking arrays
-    if (cudaMalloc(&d_AbsorbedWeight_cutoff, N_cells * sizeof(float)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_AbsorbedWeight_nuclear, N_cells * sizeof(float)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_AbsorbedEnergy_nuclear, N_cells * sizeof(double)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_BoundaryLoss_weight, N_cells * sizeof(float)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_BoundaryLoss_energy, N_cells * sizeof(double)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_AbsorbedWeight_cutoff, N_cells * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_AbsorbedWeight_cutoff: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_AbsorbedWeight_nuclear, N_cells * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_AbsorbedWeight_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_AbsorbedEnergy_nuclear, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_AbsorbedEnergy_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_BoundaryLoss_weight, N_cells * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_BoundaryLoss_weight: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_BoundaryLoss_energy, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_BoundaryLoss_energy: " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate outflow buckets (4 faces per cell)
-    if (cudaMalloc(&d_OutflowBuckets, N_cells * 4 * sizeof(DeviceOutflowBucket)) != cudaSuccess) return false;
+    size_t bucket_bytes = N_cells * 4 * sizeof(DeviceOutflowBucket);
+    e = cudaMalloc(&d_OutflowBuckets, bucket_bytes);
+    if (e != cudaSuccess) { std::cerr << "Failed d_OutflowBuckets: " << bucket_bytes << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate audit structures
-    if (cudaMalloc(&d_audit_report, sizeof(AuditReport)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_weight_in, N_cells * sizeof(double)) != cudaSuccess) return false;
-    if (cudaMalloc(&d_weight_out, N_cells * sizeof(double)) != cudaSuccess) return false;
+    e = cudaMalloc(&d_audit_report, sizeof(AuditReport));
+    if (e != cudaSuccess) { std::cerr << "Failed d_audit_report: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_weight_in, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_weight_in: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_weight_out, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_weight_out: " << cudaGetErrorString(e) << std::endl; return false; }
 
+    std::cout << "Pipeline state allocation successful" << std::endl;
     owns_device_memory = true;
     return true;
 }

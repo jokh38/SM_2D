@@ -16,7 +16,7 @@
 // ============================================================================
 
 constexpr uint32_t DEVICE_EMPTY_BLOCK_ID = 0xFFFFFFFF;
-constexpr int DEVICE_Kb_out = 64;
+constexpr int DEVICE_Kb_out = 8;  // Reduced from 64 to match DEVICE_Kb and save memory
 constexpr int DEVICE_LOCAL_BINS = LOCAL_BINS;  // Now 128 for 3D (theta, E, x_sub)
 
 // Face definitions (must match K4 get_neighbor)

@@ -1,5 +1,7 @@
 #include "kernels/k1_activemask.cuh"
 #include "core/block_encoding.hpp"
+#include "core/local_bins.hpp"  // For LOCAL_BINS
+#include "device/device_psic.cuh"  // For DEVICE_Kb
 
 __global__ void K1_ActiveMask(
     const uint32_t* __restrict__ block_ids,
@@ -18,8 +20,12 @@ __global__ void K1_ActiveMask(
     // Check all slots in cell
     // IC-1: Fine transport activates at LOW energy (Bragg peak region)
     // where stopping power is LARGE, not at high energy
-    for (int slot = 0; slot < 32; ++slot) {
-        uint32_t bid = block_ids[cell * 32 + slot];
+    // FIX: Use actual Kb (device slot count) instead of hardcoded 32
+    constexpr int Kb = DEVICE_Kb;  // Must match DevicePsiC::Kb
+    constexpr int LOCAL_BINS_val = LOCAL_BINS;  // Must match compile-time constant
+
+    for (int slot = 0; slot < Kb; ++slot) {
+        uint32_t bid = block_ids[cell * Kb + slot];
         if (bid == 0xFFFFFFFF) continue;
 
         uint32_t b_E = (bid >> 12) & 0xFFF;
@@ -28,8 +34,8 @@ __global__ void K1_ActiveMask(
         // Activate fine transport when energy is below threshold (LOW energy region)
         if (b_E < static_cast<uint32_t>(b_E_trigger)) needs_fine_transport = true;
 
-        for (int lidx = 0; lidx < 32; ++lidx) {
-            W_cell += values[(cell * 32 + slot) * 32 + lidx];
+        for (int lidx = 0; lidx < LOCAL_BINS_val; ++lidx) {
+            W_cell += values[(cell * Kb + slot) * LOCAL_BINS_val + lidx];
         }
     }
 

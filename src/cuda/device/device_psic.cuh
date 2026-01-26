@@ -1,6 +1,7 @@
 #pragma once
 #include <cuda_runtime.h>
 #include <cstdint>
+#include <iostream>
 #include "core/local_bins.hpp"
 #include "core/block_encoding.hpp"
 
@@ -25,7 +26,7 @@
 // - Total per cell: 32 * 512 = 16,384 values
 // ============================================================================
 
-constexpr int DEVICE_Kb = 32;           // Slots per cell on device
+constexpr int DEVICE_Kb = 8;            // Slots per cell on device (reduced for memory)
 constexpr uint32_t DEVICE_EMPTY_SLOT = 0xFFFFFFFF;  // Empty slot marker
 
 // ============================================================================
@@ -75,18 +76,32 @@ __host__ inline bool device_psic_init(
     size_t total_slots = static_cast<size_t>(psic.N_cells) * Kb;
     size_t total_values = total_slots * LOCAL_BINS;
 
+    size_t block_bytes = total_slots * sizeof(uint32_t);
+    size_t value_bytes = total_values * sizeof(float);
+
+    std::cout << "DevicePsiC allocation:" << std::endl;
+    std::cout << "  Grid: " << Nx << "x" << Nz << " = " << psic.N_cells << " cells" << std::endl;
+    std::cout << "  Kb: " << Kb << ", LOCAL_BINS: " << LOCAL_BINS << std::endl;
+    std::cout << "  block_id: " << block_bytes << " bytes (" << (block_bytes / 1024.0 / 1024.0) << " MB)" << std::endl;
+    std::cout << "  value: " << value_bytes << " bytes (" << (value_bytes / 1024.0 / 1024.0) << " MB)" << std::endl;
+    std::cout << "  total per PsiC: " << ((block_bytes + value_bytes) / 1024.0 / 1024.0) << " MB" << std::endl;
+
     // Allocate block_id array
-    cudaError_t err = cudaMalloc(&psic.block_id, total_slots * sizeof(uint32_t));
+    cudaError_t err = cudaMalloc(&psic.block_id, block_bytes);
     if (err != cudaSuccess) {
+        std::cerr << "Failed to allocate block_id: " << cudaGetErrorString(err) << std::endl;
         return false;
     }
 
     // Allocate value array
-    err = cudaMalloc(&psic.value, total_values * sizeof(float));
+    err = cudaMalloc(&psic.value, value_bytes);
     if (err != cudaSuccess) {
+        std::cerr << "Failed to allocate value: " << cudaGetErrorString(err) << std::endl;
         cudaFree(psic.block_id);
         return false;
     }
+
+    std::cout << "DevicePsiC allocation successful" << std::endl;
 
     // Initialize to empty state
     device_psic_clear(psic);

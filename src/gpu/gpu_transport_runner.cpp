@@ -2,6 +2,7 @@
 
 #ifdef SM2D_HAS_CUDA
 #include "cuda/gpu_transport_wrapper.hpp"
+#include "core/local_bins.hpp"  // For N_theta_local, N_E_local
 #include <cuda_runtime.h>
 #endif
 
@@ -68,8 +69,9 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     // TODO: Make these configurable via IncidentParticleConfig
     const int N_theta = 36;           // Global angular bins
     const int N_E = 32;               // Global energy bins
-    const int N_theta_local = 6;      // Local angular bins per cell
-    const int N_E_local = 6;          // Local energy bins per cell
+    // Local bins must match compile-time constants in local_bins.hpp
+    const int N_theta_local = ::N_theta_local;  // = 4
+    const int N_E_local = ::N_E_local;          // = 2
 
     // Angular grid: [-pi/2, pi/2] for full angular coverage
     AngularGrid theta_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);

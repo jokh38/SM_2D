@@ -1,4 +1,6 @@
 #include "kernels/k5_audit.cuh"
+#include "device/device_psic.cuh"  // For DEVICE_Kb
+#include "core/local_bins.hpp"  // For LOCAL_BINS
 #include <cmath>
 #include <cstdint>
 
@@ -16,18 +18,19 @@ __global__ void K5_WeightAudit(
     if (cell >= N_cells) return;
 
     float W_in = 0, W_out = 0;
-    constexpr int LOCAL_BINS = 32;
-    constexpr int Kb = 32;
+    // FIX: Use actual constants instead of hardcoded 32
+    constexpr int LOCAL_BINS_val = LOCAL_BINS;  // = 128
+    constexpr int Kb = DEVICE_Kb;               // = 8
 
     for (int slot = 0; slot < Kb; ++slot) {
         if (block_ids_in[cell * Kb + slot] != 0xFFFFFFFF) {
-            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
-                W_in += values_in[(cell * Kb + slot) * LOCAL_BINS + lidx];
+            for (int lidx = 0; lidx < LOCAL_BINS_val; ++lidx) {
+                W_in += values_in[(cell * Kb + slot) * LOCAL_BINS_val + lidx];
             }
         }
         if (block_ids_out[cell * Kb + slot] != 0xFFFFFFFF) {
-            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
-                W_out += values_out[(cell * Kb + slot) * LOCAL_BINS + lidx];
+            for (int lidx = 0; lidx < LOCAL_BINS_val; ++lidx) {
+                W_out += values_out[(cell * Kb + slot) * LOCAL_BINS_val + lidx];
             }
         }
     }
