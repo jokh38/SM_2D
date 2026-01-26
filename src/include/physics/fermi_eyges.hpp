@@ -1,6 +1,7 @@
 #pragma once
 #include <cuda_runtime.h>
 #include <cmath>
+#include "physics/highland.hpp"
 
 // ============================================================================
 // FIX Problem 5: Fermi-Eyges Moment Tracking

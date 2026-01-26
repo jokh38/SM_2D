@@ -6,6 +6,8 @@
 #include "core/grids.hpp"
 #include "device/device_lut.cuh"
 #include "device/device_bucket.cuh"
+#include "device/device_psic.cuh"
+#include "kernels/k5_audit.cuh"  // For AuditReport
 
 // ============================================================================
 // K1-K6 Transport Pipeline Header
@@ -24,6 +26,8 @@ struct PsiC;
 struct DevicePsiC;
 struct EnergyGrid;
 struct AngularGrid;
+
+namespace sm_2d {
 
 // ============================================================================
 // Pipeline Configuration
@@ -194,7 +198,7 @@ struct K1K6PipelineState {
 bool run_k1k6_pipeline_transport(
     DevicePsiC* psi_in,
     DevicePsiC* psi_out,
-    const DeviceRLUT& dlut,
+    const ::DeviceRLUT& dlut,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
     const K1K6PipelineConfig& config,
@@ -220,7 +224,7 @@ bool run_k2_coarse_transport(
     const uint8_t* d_ActiveMask,
     const uint32_t* d_CoarseList,
     int n_coarse,
-    const DeviceRLUT& dlut,
+    const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
@@ -232,7 +236,7 @@ bool run_k3_fine_transport(
     const DevicePsiC& psi_in,
     const uint32_t* d_ActiveList,
     int n_active,
-    const DeviceRLUT& dlut,
+    const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
@@ -316,3 +320,5 @@ inline int compute_b_E_trigger(float E_trigger, const EnergyGrid& e_grid, int N_
             exit(1); \
         } \
     } while(0)
+
+} // namespace sm_2d

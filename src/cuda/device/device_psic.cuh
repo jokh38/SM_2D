@@ -52,6 +52,9 @@ struct DevicePsiC {
     // DeviceOutflowBucket* buckets;  // Per-cell outflow buckets
 };
 
+// Forward declaration
+__host__ inline void device_psic_clear(DevicePsiC& psic);
+
 // ============================================================================
 // Memory Management Functions
 // ============================================================================
@@ -105,7 +108,7 @@ __host__ inline void device_psic_cleanup(DevicePsiC& psic) {
 
 // Clear all PsiC data on device (set to empty state)
 // Launch with: clear_psic_kernel<<<grid, block>>>(psic);
-__global__ void clear_psic_kernel(DevicePsiC psic) {
+__inline__ __global__ void clear_psic_kernel(DevicePsiC psic) {
     int cell = blockIdx.x * blockDim.x + threadIdx.x;
     if (cell >= psic.N_cells) return;
 
@@ -407,7 +410,7 @@ __host__ inline bool device_psic_copy_to_host(
 
 // Compute total PsiC (sum of all weights) for a cell
 // Launch with: sum_psic_cell_kernel<<<1, 256>>>(psic, cell, d_result);
-__global__ void sum_psic_cell_kernel(
+__inline__ __global__ void sum_psic_cell_kernel(
     const DevicePsiC psic,
     int cell,
     float* __restrict__ d_result
@@ -448,7 +451,7 @@ __host__ inline float device_psic_sum_cell(const DevicePsiC& psic, int cell) {
     cudaMalloc(&d_result, sizeof(float));
 
     dim3 block(256);
-    sum_psic_cell_kernel<<<1, block, block.x * sizeof(float)>>>(psic, cell, d_result);
+    sum_psic_cell_kernel<<<1, block, static_cast<size_t>(block.x) * sizeof(float)>>>(psic, cell, d_result);
 
     float result;
     cudaMemcpy(&result, d_result, sizeof(float), cudaMemcpyDeviceToHost);
@@ -459,7 +462,7 @@ __host__ inline float device_psic_sum_cell(const DevicePsiC& psic, int cell) {
 
 // Compute global sum of PsiC across all cells
 // Launch with: sum_psic_global_kernel<<<grid, block, shared>>>(psic, d_partial);
-__global__ void sum_psic_global_kernel(
+__inline__ __global__ void sum_psic_global_kernel(
     const DevicePsiC psic,
     float* __restrict__ d_partial  // Partial results per block
 ) {
@@ -502,7 +505,8 @@ __host__ inline float device_psic_sum_global(const DevicePsiC& psic) {
     float* d_partial;
     cudaMalloc(&d_partial, n_blocks * sizeof(float));
 
-    sum_psic_global_kernel<<<grid, block, block.x * sizeof(float)>>(
+    size_t shmem_size = block.x * sizeof(float);
+    sum_psic_global_kernel<<<grid, block, shmem_size>>>(
         psic, d_partial
     );
 
@@ -526,7 +530,7 @@ __host__ inline float device_psic_sum_global(const DevicePsiC& psic) {
 // ============================================================================
 
 // Validate PsiC structure (check for NaN, Inf, negative values)
-__global__ void validate_psic_kernel(
+__inline__ __global__ void validate_psic_kernel(
     const DevicePsiC psic,
     int* __restrict__ d_error_count,
     int* __restrict__ d_first_error_cell

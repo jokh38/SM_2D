@@ -1,4 +1,4 @@
-#include "cuda/k1k6_pipeline.cuh"
+#include "k1k6_pipeline.cuh"
 #include "kernels/k1_activemask.cuh"
 #include "kernels/k2_coarsetransport.cuh"
 #include "kernels/k3_finetransport.cuh"
@@ -302,7 +302,7 @@ bool run_k2_coarse_transport(
     const uint8_t* d_ActiveMask,
     const uint32_t* d_CoarseList,
     int n_coarse,
-    const DeviceRLUT& dlut,
+    const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
@@ -371,7 +371,7 @@ bool run_k3_fine_transport(
     const DevicePsiC& psi_in,
     const uint32_t* d_ActiveList,
     int n_active,
-    const DeviceRLUT& dlut,
+    const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
@@ -502,7 +502,7 @@ void run_k6_swap_buffers(DevicePsiC*& psi_in, DevicePsiC*& psi_out) {
 bool run_k1k6_pipeline_transport(
     DevicePsiC* psi_in,
     DevicePsiC* psi_out,
-    const DeviceRLUT& dlut,
+    const ::DeviceRLUT& dlut,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
     const K1K6PipelineConfig& config,

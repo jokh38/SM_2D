@@ -1,6 +1,16 @@
 #pragma once
 #include <cmath>
 
+// Define CUDA macros for non-CUDA builds
+#ifndef __CUDACC__
+#ifndef __host__
+#define __host__
+#endif
+#ifndef __device__
+#define __device__
+#endif
+#endif
+
 // Forward declare X0_water (defined in physics.hpp which includes this header)
 // Use default value if not yet included
 #ifndef X0_water
@@ -47,7 +57,7 @@ constexpr float MCS_2D_CORRECTION = 0.70710678f;
 //   X_0 = radiation length [mm] (360.8 mm for water)
 //
 // Valid for: 1e-5 < t < 100 where t = x/X_0
-inline float highland_sigma(float E_MeV, float ds, float X0 = 360.8f) {
+__host__ __device__ inline float highland_sigma(float E_MeV, float ds, float X0 = 360.8f) {
     constexpr float z = 1.0f;  // Proton charge
 
     // Relativistic kinematics
@@ -85,7 +95,7 @@ constexpr float QUADRATURE_DELTAS[N_QUADRATURE] = {
 
 // Sample Gaussian scattering angle for MCS
 // Returns theta_scatter [radians] using Box-Muller transform
-inline float sample_mcs_angle(float sigma_theta, unsigned& seed) {
+__host__ __device__ inline float sample_mcs_angle(float sigma_theta, unsigned& seed) {
     if (sigma_theta <= 0.0f) {
         return 0.0f;
     }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.20)
 
 # Check if nvcc exists before trying to use CUDA
 find_program(NVCC_EXECUTABLE nvcc)
@@ -82,13 +82,16 @@ set(IMPL_CUDA_SOURCES
 # Build implementation library
 if(CUDA_ENABLED)
     add_library(sm2d_impl STATIC ${IMPL_CPU_SOURCES} ${IMPL_CUDA_SOURCES})
-    target_include_directories(sm2d_impl PRIVATE ${CMAKE_CUDA_TOOLKIT_ROOT_DIR}/include)
+    target_include_directories(sm2d_impl BEFORE PRIVATE /usr/local/cuda-12.4/include)
     target_include_directories(sm2d_impl PRIVATE ${CMAKE_SOURCE_DIR}/src/cuda)
+    target_compile_definitions(sm2d_impl PRIVATE SM2D_HAS_CUDA)
+    # Add CUDA include to core for headers that need it
+    target_include_directories(sm2d_core INTERFACE /usr/local/cuda-12.4/include)
 else()
     add_library(sm2d_impl STATIC ${IMPL_CPU_SOURCES})
 endif()
 
-target_link_libraries(sm2d_impl sm2d_core)
+target_link_libraries(sm2d_impl sm2d_core sm2d_cuda)
 
 # CUDA kernel sources (only if CUDA is available)
 if(CUDA_ENABLED)

@@ -4,8 +4,7 @@
 #include "physics/fermi_eyges.hpp"
 #include <cmath>
 
-// Physics constants
-constexpr float X0_water = 363.0f;  // Radiation length of water [mm]
+// Physics constants (use highland.hpp's X0_water value)
 constexpr float rho_water = 1.0f;   // Density of water [g/cm³]
 
 // ============================================================================

@@ -1,5 +1,5 @@
 #include "cuda/gpu_transport_wrapper.hpp"
-#include "cuda/k1k6_pipeline.cuh"
+#include "k1k6_pipeline.cuh"
 #include "kernels/simple_gpu_transport.cuh"
 #include "kernels/k3_finetransport.cuh"
 #include "device/device_psic.cuh"
@@ -108,6 +108,13 @@ void run_k1k6_pipeline_transport(
     // ========================================================================
 
     DevicePsiC psi_in, psi_out;
+
+    // Set CUDA device
+    cudaError_t err = cudaSetDevice(0);
+    if (err != cudaSuccess) {
+        std::cerr << "Failed to set CUDA device: " << cudaGetErrorString(err) << std::endl;
+        return;
+    }
 
     if (!device_psic_init(psi_in, Nx, Nz)) {
         std::cerr << "Failed to allocate psi_in" << std::endl;

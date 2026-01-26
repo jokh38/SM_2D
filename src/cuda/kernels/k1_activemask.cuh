@@ -21,10 +21,3 @@ void run_K1_ActiveMask(
     int b_E_trigger,  // Coarse energy block index (not MeV!)
     float weight_active_min
 );
-
-// Helper: Convert E_trigger (MeV) to b_E_trigger (coarse block index)
-// Call this before invoking K1_ActiveMask
-inline int compute_b_E_trigger(float E_trigger, const EnergyGrid& e_grid, int N_E_local) {
-    int E_bin = e_grid.FindBin(E_trigger);
-    return E_bin / N_E_local;  // Convert to coarse block index
-}
