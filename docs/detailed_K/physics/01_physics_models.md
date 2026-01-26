@@ -273,21 +273,43 @@ __device__ void apply_nuclear_attenuation(
 ### 최대 스텝 크기 (Maximum Step Size)
 
 ```cpp
-__host__ __device__ float compute_max_step_physics(float E, const RLUT& lut) {
+__host__ __device__ float compute_max_step_physics(float E, const RLUT& lut, float dx = 1.0f, float dz = 1.0f) {
     float R = lut.lookup_R(E);  // CSDA 범위 [mm]
 
     // 1차 제한: 남은 범위의 분율 [Primary limit: fraction of remaining range]
     float delta_R_max = 0.02f * R;  // 범위의 2%
 
-    // 브래그 피크 근처에서 에너지 의존적 세밀화
-    if (E < 10.0f) {
-        delta_R_max = fminf(delta_R_max, 0.2f);  // 브래그 근처: 최대 0.2mm
+    // 브래그 피크 근처 에너지 의존적 세밀화 계수
+    float dS_factor = 1.0f;
+
+    if (E < 5.0f) {
+        // 사거리 끝 부근: 극도의 세밀화
+        dS_factor = 0.2f;
+        delta_R_max = fminf(delta_R_max, 0.1f);  // 최대 0.1 mm
+    } else if (E < 10.0f) {
+        // 브래그 피크 근처: 높은 세밀화
+        dS_factor = 0.3f;
+        delta_R_max = fminf(delta_R_max, 0.2f);  // 최대 0.2 mm
+    } else if (E < 20.0f) {
+        // 브래그 피크 영역: 중간 세밀화
+        dS_factor = 0.5f;
+        delta_R_max = fminf(delta_R_max, 0.5f);  // 최대 0.5 mm
     } else if (E < 50.0f) {
-        delta_R_max = fminf(delta_R_max, 0.5f);  // 중간 범위: 최대 0.5mm
+        // 브래그 이전: 가벼운 세밀화
+        dS_factor = 0.7f;
+        delta_R_max = fminf(delta_R_max, 0.7f);  // 최대 0.7 mm
     }
 
-    // 절대 최대값 [Absolute maximum]
-    delta_R_max = fminf(delta_R_max, 1.0f);  // 1mm를 초과하지 않음
+    // 세밀화 계수 적용
+    delta_R_max = delta_R_max * dS_factor;
+
+    // 하드 한계
+    delta_R_max = fminf(delta_R_max, 1.0f);  // 최대 1 mm
+    delta_R_max = fmaxf(delta_R_max, 0.05f);  // 최소 0.05 mm
+
+    // 셀 크기 한계(셀 건너뛰기 방지)
+    float cell_limit = 0.25f * fminf(dx, dz);
+    delta_R_max = fminf(delta_R_max, cell_limit);
 
     return delta_R_max;
 }

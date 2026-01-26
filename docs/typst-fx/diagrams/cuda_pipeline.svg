@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e3a5f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d5a87;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="kernelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4a7c59;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6b9b7a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="inputGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a0522d;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="outputGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6b8e23;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9acd32;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="900" fill="#f8f9fa" />
+
+  <!-- Title Bar -->
+  <rect x="0" y="0" width="800" height="70" fill="url(#headerGrad)" />
+  <text x="400" y="45" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">
+    SM_2D CUDA Pipeline Simulation Flow
+  </text>
+
+  <!-- Input Section -->
+  <rect x="250" y="100" width="300" height="60" rx="10" fill="url(#inputGrad)" filter="url(#shadow)" />
+  <text x="400" y="140" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+    INPUT: Protons enter patient body
+  </text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="160" x2="400" y2="190" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+  <!-- K1: ActiveMask -->
+  <rect x="200" y="200" width="400" height="80" rx="10" fill="#3498db" filter="url(#shadow)" />
+  <text x="400" y="230" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">
+    K1: ActiveMask
+  </text>
+  <text x="400" y="255" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">
+    "Which cells need detail?" (E &lt; 10 MeV)
+  </text>
+
+  <!-- Arrow split -->
+  <line x1="400" y1="280" x2="400" y2="300" stroke="#333" stroke-width="3" />
+  <line x1="400" y1="300" x2="250" y2="330" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+  <line x1="400" y1="300" x2="550" y2="330" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+  <!-- K2 & K3 -->
+  <rect x="50" y="340" width="300" height="90" rx="10" fill="#e74c3c" filter="url(#shadow)" />
+  <text x="200" y="370" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    K2: Coarse Transport
+  </text>
+  <text x="200" y="395" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle">
+    High energy particles (E &gt; 10 MeV)
+  </text>
+  <text x="200" y="415" font-family="Arial, sans-serif" font-size="12" fill="#ffe6e6" text-anchor="middle">
+    Fast method | Large steps
+  </text>
+
+  <rect x="450" y="340" width="300" height="90" rx="10" fill="#9b59b6" filter="url(#shadow)" />
+  <text x="600" y="370" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    K3: Fine Transport
+  </text>
+  <text x="600" y="395" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle">
+    Low energy particles (Bragg peak region)
+  </text>
+  <text x="600" y="415" font-family="Arial, sans-serif" font-size="12" fill="#f0e6ff" text-anchor="middle">
+    Full physics | Small steps
+  </text>
+
+  <!-- Merge arrow -->
+  <line x1="200" y1="430" x2="200" y2="450" stroke="#333" stroke-width="3" />
+  <line x1="600" y1="430" x2="600" y2="450" stroke="#333" stroke-width="3" />
+  <line x1="200" y1="450" x2="600" y2="450" stroke="#333" stroke-width="3" />
+  <line x1="400" y1="450" x2="400" y2="470" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+  <!-- K4: Bucket Transfer -->
+  <rect x="200" y="480" width="400" height="70" rx="10" fill="#f39c12" filter="url(#shadow)" />
+  <text x="400" y="510" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    K4: Bucket Transfer
+  </text>
+  <text x="400" y="535" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">
+    Move particles between cells
+  </text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="550" x2="400" y2="580" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+  <!-- K5: Conservation Audit -->
+  <rect x="200" y="590" width="400" height="70" rx="10" fill="#1abc9c" filter="url(#shadow)" />
+  <text x="400" y="620" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    K5: Conservation Audit
+  </text>
+  <text x="400" y="645" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">
+    Verify: Did we lose anything? (Energy &amp; Weight)
+  </text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="660" x2="400" y2="690" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+  <!-- K6: Swap Buffers -->
+  <rect x="200" y="700" width="400" height="70" rx="10" fill="#34495e" filter="url(#shadow)" />
+  <text x="400" y="730" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    K6: Swap Buffers
+  </text>
+  <text x="400" y="755" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">
+    Exchange input/output for next iteration
+  </text>
+
+  <!-- Loop back arrow -->
+  <path d="M 600 735 Q 700 735 700 500 Q 700 140 560 130" fill="none" stroke="#666" stroke-width="2" stroke-dasharray="8,4" marker-end="url(#arrowhead)" />
+  <text x="715" y="420" font-family="Arial, sans-serif" font-size="14" fill="#666" text-anchor="middle">
+    Repeat until
+  </text>
+  <text x="715" y="440" font-family="Arial, sans-serif" font-size="14" fill="#666" text-anchor="middle">
+    all particles stop
+  </text>
+
+  <!-- Output Section -->
+  <rect x="200" y="800" width="400" height="70" rx="10" fill="url(#outputGrad)" filter="url(#shadow)" />
+  <text x="400" y="825" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+    OUTPUT: Dose distribution, Depth-dose curve, Report
+  </text>
+  <text x="400" y="848" font-family="Arial, sans-serif" font-size="13" fill="#f0f8ff" text-anchor="middle">
+    Conservation verified ✓
+  </text>
+
+  <!-- Arrow from K6 to Output -->
+  <line x1="400" y1="770" x2="400" y2="800" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+</svg>

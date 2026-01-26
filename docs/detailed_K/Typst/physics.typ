@@ -1,62 +1,44 @@
-# Physics Models Documentation
+#set text(font: "Linux Libertine", size: 11pt)
+#set page(numbering: "1", margin: (left: 20mm, right: 20mm, top: 20mm, bottom: 20mm))
+#set par(justify: true)
+#set heading(numbering: "1.")
 
-## Overview
+#show math: set text(weight: "regular")
+
+= Physics Models Documentation
+
+== Overview
 
 SM_2D implements comprehensive physics models for proton transport in water, following ICRU, PDG, and NIST standards. All models are implemented as CUDA device functions for GPU acceleration.
 
----
+== 1. Multiple Coulomb Scattering (Highland Formula)
 
-## 1. Multiple Coulomb Scattering (Highland Formula)
+=== Reference
 
-### Reference: PDG 2024 Review of Particle Physics
+PDG 2024 Review of Particle Physics
 
-### The Highland Formula (2D Projection)
+=== The Highland Formula (2D Projection)
 
-```
-σ_θ = (13.6 MeV / βcp) × z × sqrt(x/X_0) × [1 + 0.038 × ln(x/X_0)] / √2
-```
+$ sigma_"theta" = (13.6 " MeV" / (beta c p)) times z times sqrt(x / X_0) times [1 + 0.038 times ln(x / X_0)] / sqrt(2) $
 
 Where:
-- `βcp` = momentum × velocity [MeV/c]
-- `z` = projectile charge (1 for protons)
-- `x` = step length [mm]
-- `X_0` = radiation length (360.8 mm for water)
-- `1/√2` = 3D→2D projection correction
+* $ beta c p $ = momentum times velocity [MeV/c]
+* $ z $ = projectile charge (1 for protons)
+* $ x $ = step length [mm]
+* $ X_0 $ = radiation length (360.8 mm for water)
+* $ 1 / sqrt(2) $ = 3D to 2D projection correction
 
-### Implementation (`highland.hpp`)
+=== Implementation Parameters
 
 ```cpp
 struct HighlandParams {
     float m_p_MeV = 938.272f;      // Proton rest mass
     float X0_water = 360.8f;       // Radiation length [mm]
-    float MCS_2D_CORRECTION = 0.70710678f;  // 1/√2
+    float MCS_2D_CORRECTION = 0.70710678f;  // 1/sqrt(2)
 };
-
-// Calculate scattering angle sigma
-__host__ __device__ float highland_sigma(float E_MeV, float ds, float X0) {
-    // Relativistic kinematics
-    float gamma = 1.0f + E_MeV / m_p_MeV;
-    float beta = sqrt(1.0f - 1.0f / (gamma * gamma));
-    float beta_cp = beta * (E_MeV + m_p_MeV);  // MeV/c
-
-    // Highland formula
-    float theta_rms = (13.6f / beta_cp) * sqrt(ds / X0);
-    theta_rms *= (1.0f + 0.038f * log(ds / X0));
-
-    // 2D projection correction
-    return theta_rms * MCS_2D_CORRECTION;
-}
-
-// Sample scattering angle using Box-Muller
-__device__ float sample_mcs_angle(float sigma_theta, unsigned& seed) {
-    float u1 = curand_uniform(&seed);
-    float u2 = curand_uniform(&seed);
-    float z0 = sqrt(-2.0f * log(u1)) * cos(2.0f * M_PI * u2);
-    return sigma_theta * z0;
-}
 ```
 
-### Variance Accumulation (v0.8)
+=== Variance Accumulation
 
 For accurate multi-step scattering, variance is accumulated:
 
@@ -66,65 +48,62 @@ sigma_2_total += sigma_theta * sigma_theta;
 
 // Then sample from total variance
 float theta_scatter = sqrt(sigma_2_total) * sample_normal();
-
-// WRONG: Do NOT accumulate sigma directly
-// sigma_total += sigma_theta;  // This overestimates scattering!
 ```
 
-### Direction Update After Scattering
+=== Direction Update
+
+After scattering, direction cosines are updated:
 
 ```cpp
-__device__ void update_direction_after_mcs(
-    float& mu, float& eta,  // Direction cosines
-    float delta_theta
-) {
-    // Current angle
-    float theta = atan2(eta, mu);
+// Current angle
+float theta = atan2(eta, mu);
 
-    // Add scattering
-    theta += delta_theta;
+// Add scattering
+theta += delta_theta;
 
-    // Update direction cosines
-    mu = cos(theta);
-    eta = sin(theta);
+// Update direction cosines
+mu = cos(theta);
+eta = sin(theta);
 
-    // Normalize (ensure mu² + eta² = 1)
-    float norm = sqrt(mu*mu + eta*eta);
-    mu /= norm;
-    eta /= norm;
-}
+// Normalize (ensure mu² + eta² = 1)
+float norm = sqrt(mu*mu + eta*eta);
+mu /= norm;
+eta /= norm;
 ```
 
----
+== 2. Energy Straggling (Vavilov Theory)
 
-## 2. Energy Straggling (Vavilov Theory)
+=== Three Regimes
 
-### Three Regimes
+#figure(
+  table(
+    columns: (auto, auto, 2fr),
+    inset: 8pt,
+    align: left,
+    table.header([*Regime*], [*κ Parameter*], [*Distribution*]),
+    [Bohr], [κ > 10], [Gaussian],
+    [Vavilov], [0.01 < κ < 10], [Vavilov interpolation],
+    [Landau], [κ < 0.01], [Landau (asymmetric)],
+  ),
+  caption: [Energy Straggling Regimes],
+)
 
-| Regime | κ Parameter | Distribution |
-|--------|-------------|--------------|
-| Bohr | κ > 10 | Gaussian |
-| Vavilov | 0.01 < κ < 10 | Vavilov interpolation |
-| Landau | κ < 0.01 | Landau (asymmetric) |
+=== Vavilov Parameter
 
-### Vavilov Parameter
-
-```
-κ = ξ / T_max
-
-ξ = (K/2) × (Z/A) × (z²/β²) × ρ × x
-T_max = (2 m_e c² β² γ²) / (1 + 2γ m_e/m_p + (m_e/m_p)²)
-```
+$ kappa = xi / T_"max" $
 
 Where:
-- `K = 0.307 MeV cm²/g`
-- `Z/A = 0.555` (for water)
-- `m_e c² = 0.511 MeV`
+* $ xi = (K / 2) times (Z / A) times (z^2 / beta^2) times rho times x $
+* $ T_"max" = (2 m_e c^2 beta^2 gamma^2) / (1 + 2 gamma m_e / m_p + (m_e / m_p)^2) $
 
-### Implementation (`energy_straggling.hpp`)
+Constants:
+* $ K = 0.307 " MeV cm"^2 / g $
+* $ Z / A = 0.555 $ (for water)
+* $ m_e c^2 = 0.511 " MeV" $
+
+=== Bohr Straggling Sigma
 
 ```cpp
-// Calculate Bohr straggling sigma
 __host__ __device__ float bohr_straggling_sigma(float E_MeV, float ds) {
     float gamma = 1.0f + E_MeV / m_p_MeV;
     float beta = sqrt(1.0f - 1.0f / (gamma * gamma));
@@ -135,82 +114,23 @@ __host__ __device__ float bohr_straggling_sigma(float E_MeV, float ds) {
 
     return sigma;
 }
-
-// Calculate Vavilov kappa parameter
-__host__ __device__ float vavilov_kappa(float E_MeV, float ds) {
-    float gamma = 1.0f + E_MeV / m_p_MeV;
-    float beta = sqrt(1.0f - 1.0f / (gamma * gamma));
-
-    // Maximum energy transfer
-    float m_ratio = m_ec2_MeV / m_p_MeV;
-    float gamma_sq = gamma * gamma;
-    float T_max = (2 * m_ec2_MeV * beta * beta * gamma_sq) /
-                  (1.0f + 2.0f * gamma * m_ratio + m_ratio * m_ratio);
-
-    // Vavilov parameter
-    float K = 0.307f;  // MeV cm²/g
-    float xi = (K / 2.0f) * 0.555f * (1.0f / (beta * beta)) * ds;  // ρ=1 for water
-
-    return xi / T_max;
-}
-
-// Regime-dependent straggling
-__device__ float energy_straggling_sigma(float E_MeV, float ds) {
-    float kappa = vavilov_kappa(E_MeV, ds);
-
-    if (kappa > 10.0f) {
-        // Bohr regime: Gaussian
-        return bohr_straggling_sigma(E_MeV, ds);
-    } else if (kappa < 0.01f) {
-        // Landau regime: Use Landau width
-        return landau_width(E_MeV, ds);
-    } else {
-        // Vavilov regime: Interpolate
-        float sigma_bohr = bohr_straggling_sigma(E_MeV, ds);
-        float sigma_landau = landau_width(E_MeV, ds);
-        return interpolate_vavilov(kappa, sigma_bohr, sigma_landau);
-    }
-}
-
-// Sample energy loss with straggling
-__device__ float sample_energy_loss_with_straggling(
-    float E_MeV,
-    float ds,
-    unsigned& seed
-) {
-    // Mean energy loss (Bethe-Bloch)
-    float dE_mean = compute_mean_energy_loss(E_MeV, ds);
-
-    // Straggling sigma
-    float sigma = energy_straggling_sigma(E_MeV, ds);
-
-    // Sample Gaussian (Bohr regime, most common for protons)
-    float u1 = curand_uniform(&seed);
-    float u2 = curand_uniform(&seed);
-    float z = sqrt(-2.0f * log(u1)) * cos(2.0f * M_PI * u2);
-
-    return dE_mean + sigma * z;
-}
 ```
 
-### Most Probable Energy Loss (Landau)
+=== Most Probable Energy Loss (Landau)
 
-```
-Δp = ξ [ln(ξ/T_max) + ln(1 + β²γ²) + 0.2 - β² - δ/2]
-```
+$ Delta_"p" = xi [ln(xi / T_"max") + ln(1 + beta^2 gamma^2) + 0.2 - beta^2 - delta / 2] $
 
-Where `δ` is density effect correction (negligible for water < 250 MeV).
+Where $delta$ is density effect correction (negligible for water < 250 MeV).
 
----
+== 3. Nuclear Attenuation
 
-## 3. Nuclear Attenuation
+=== Reference
 
-### Reference: ICRU Report 63
+ICRU Report 63
 
-### Cross-Section Model
+=== Cross-Section Model
 
 ```cpp
-// Energy-dependent total cross-section (mm⁻¹)
 __host__ __device__ float Sigma_total(float E_MeV) {
     // Logarithmic dependence on energy
     constexpr float sigma_100 = 0.0012f;  // at 100 MeV
@@ -232,17 +152,16 @@ __host__ __device__ float Sigma_total(float E_MeV) {
 }
 ```
 
-### Survival Probability
+=== Survival Probability
 
 ```cpp
-// Survival probability after step ds
 __device__ float survival_probability(float E_MeV, float ds) {
     float sigma = Sigma_total(E_MeV);
     return exp(-sigma * ds);
 }
 ```
 
-### Energy Conservation
+=== Energy Conservation
 
 Nuclear interactions remove both weight and energy:
 
@@ -264,13 +183,13 @@ __device__ void apply_nuclear_attenuation(
 }
 ```
 
----
+== 4. R-Based Step Control
 
-## 4. R-Based Step Control
+=== Principle
 
-### Principle: dR/ds = -1 (CSDA Approximation)
+$dR / dif s = -1$ (CSDA Approximation)
 
-### Maximum Step Size
+=== Maximum Step Size
 
 ```cpp
 __host__ __device__ float compute_max_step_physics(float E, const RLUT& lut, float dx = 1.0f, float dz = 1.0f) {
@@ -315,7 +234,7 @@ __host__ __device__ float compute_max_step_physics(float E, const RLUT& lut, flo
 }
 ```
 
-### Energy Update Using R-LUT
+=== Energy Update Using R-LUT
 
 ```cpp
 // Compute energy after step (R-based method)
@@ -332,35 +251,41 @@ __device__ float compute_energy_deposition(float E_in, float ds, const RLUT& lut
 }
 ```
 
-### Why R-Based Instead of S-Based?
+=== R-Based vs S-Based
 
-| Method | Formula | Accuracy | Stability |
-|--------|---------|----------|-----------|
-| S-based | E_out = E_in - S(E) × ds | Good if S constant | Poor near Bragg |
-| R-based | E_out = E⁻¹(R(E) - ds) | Exact (CSDA) | Stable everywhere |
+#figure(
+  table(
+    columns: (auto, 2fr, auto, auto),
+    inset: 8pt,
+    align: left,
+    table.header([*Method*], [*Formula*], [*Accuracy*], [*Stability*]),
+    [S-based], [E_out = E_in - S(E) × ds], [Good if S constant], [Poor near Bragg],
+    [R-based], [E_out = E⁻¹(R(E) - ds)], [Exact (CSDA)], [Stable everywhere],
+  ),
+  caption: [Step Control Methods Comparison],
+)
 
-**Key Advantage**: R is monotonic decreasing, ensuring unique inverse lookup.
+== 5. Fermi-Eyges Lateral Spread
 
----
+=== Theory
 
-## 5. Fermi-Eyges Lateral Spread
+The lateral variance $ sigma_x^2(z) $ is computed from scattering power integrals:
 
-### Theory
+=== Scattering Power
 
-The lateral variance σ²_x(z) is computed from scattering power integrals:
+$ T(z) = d sigma_"theta"^2 / dif z $
 
-```
-Scattering Power: T(z) = dσ_θ²/dz
+=== Moments
 
-Moments:
-A₀(z) = ∫₀ᶻ T(z') dz'        : Total angular variance
-A₁(z) = ∫₀ᶻ z' × T(z') dz'    : First spatial moment
-A₂(z) = ∫₀ᶻ z'² × T(z') dz'   : Second spatial moment
+$ A_0(z) = integral_0^z T(z') dif z' $
+$ A_1(z) = integral_0^z z' times T(z') dif z' $
+$ A_2(z) = integral_0^z z'^2 times T(z') dif z' $
 
-Lateral variance: σ²_x(z) = A₀×z² - 2×A₁×z + A₂
-```
+=== Lateral Variance
 
-### Implementation (`fermi_eyges.hpp`)
+$ sigma_x^2(z) = A_0 times z^2 - 2 times A_1 times z + A_2 $
+
+=== Implementation
 
 ```cpp
 // Scattering power from Highland formula
@@ -399,10 +324,11 @@ __host__ __device__ float fermi_eyges_sigma(
 }
 ```
 
-### Three-Component Lateral Spread
+=== Three-Component Lateral Spread
+
+Total lateral spread = initial + geometric + MCS
 
 ```cpp
-// Total lateral spread = initial + geometric + MCS
 float total_lateral_sigma_squared(
     float sigma_x0,      // Initial beam width
     float sigma_theta0,  // Initial angular spread
@@ -425,11 +351,9 @@ float total_lateral_sigma_squared(
 }
 ```
 
----
+== 6. Physics Pipeline Integration
 
-## 6. Physics Pipeline Integration
-
-### Complete Step Physics
+=== Complete Step Physics
 
 ```cpp
 __device__ void transport_step(
@@ -440,7 +364,7 @@ __device__ void transport_step(
     // LUT
     const RLUT& lut,
     // Output
-    float& E_dep, double& E_nuc_rem, float& boundary_flux[4]
+    float& E_dep, double& E_nuc_rem, float boundary_flux[4]
 ) {
     // 1. Step size control
     float ds = compute_max_step_physics(E, lut);
@@ -451,7 +375,7 @@ __device__ void transport_step(
 
     // 3. Energy straggling
     float dE_straggle = sample_energy_loss_with_straggling(E, ds, seed);
-    E_out += dE_straggle;  // Add straggling correction
+    E_out += dE_straggle;
     E_out = fmaxf(E_out, E_cutoff);
 
     // 4. Energy deposition
@@ -463,7 +387,6 @@ __device__ void transport_step(
     theta += delta_theta;
 
     // 6. Nuclear attenuation
-    float w_before = w;
     apply_nuclear_attenuation(w, E_nuc_rem, E, ds);
 
     // 7. Position update
@@ -475,26 +398,35 @@ __device__ void transport_step(
 }
 ```
 
+== Physical Constants
+
+#figure(
+  table(
+    columns: (auto, auto, auto, 3fr),
+    inset: 8pt,
+    align: left,
+    table.header([*Constant*], [*Value*], [*Unit*], [*Description*]),
+    [m_p], [938.272], [MeV/c^2], [Proton rest mass],
+    [m_e c^2], [0.511], [MeV], [Electron rest energy],
+    [X_0 (water)], [360.8], [mm], [Radiation length of water],
+    [E_"cutoff"], [0.1], [MeV], [Energy cutoff],
+    [E_"trigger"], [10], [MeV], [Fine transport trigger],
+    [rho_"water"], [1.0], [g/cm^3], [Density of water],
+  ),
+  caption: [Physical Constants],
+)
+
+== References
+
+1. NIST PSTAR Database - Stopping powers and ranges for protons
+2. PDG 2024 - Particle Data Group review (Highland formula)
+3. ICRU Report 63 - Nuclear cross-sections for protons
+4. Vavilov (1957) - Energy straggling theory
+5. Fermi-Eyges - Multiple scattering theory
+6. Bethe-Bloch - Mean energy loss formula
+
 ---
+#set align(center)
+*SM_2D Physics Models Documentation*
 
-## Physical Constants
-
-| Constant | Value | Unit | Description |
-|----------|-------|------|-------------|
-| `m_p` | 938.272 | MeV/c² | Proton rest mass |
-| `m_e c²` | 0.511 | MeV | Electron rest energy |
-| `X0_water` | 360.8 | mm | Radiation length of water |
-| `E_cutoff` | 0.1 | MeV | Energy cutoff |
-| `E_trigger` | 10 | MeV | Fine transport trigger |
-| `rho_water` | 1.0 | g/cm³ | Density of water |
-
----
-
-## References
-
-1. **NIST PSTAR Database** - Stopping powers and ranges for protons
-2. **PDG 2024** - Particle Data Group review (Highland formula)
-3. **ICRU Report 63** - Nuclear cross-sections for protons
-4. **Vavilov (1957)** - Energy straggling theory
-5. **Fermi-Eyges** - Multiple scattering theory
-6. **Bethe-Bloch** - Mean energy loss formula
+#text(size: 9pt)[Version 1.0.0]

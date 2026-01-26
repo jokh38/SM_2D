@@ -1,0 +1,219 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 650">
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <linearGradient id="phaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="650" fill="#f8f9fa" />
+
+  <!-- Title -->
+  <text x="400" y="40" font-family="Malgun Gothic, Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    4차원 위상 공간 표현
+  </text>
+
+  <!-- Position Space Grid -->
+  <rect x="50" y="80" width="320" height="250" rx="10" fill="#ecf0f1" stroke="#34495e" stroke-width="2" />
+  <text x="210" y="105" font-family="Malgun Gothic, Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    위치 공간 (2D)
+  </text>
+
+  <!-- Grid cells for position -->
+  <g transform="translate(70, 130)">
+    <!-- Row 1 -->
+    <rect x="0" y="0" width="35" height="35" fill="#a8e6cf" stroke="#27ae60" stroke-width="1" />
+    <rect x="35" y="0" width="35" height="35" fill="#dcedc1" stroke="#27ae60" stroke-width="1" />
+    <rect x="70" y="0" width="35" height="35" fill="#ffd3b6" stroke="#27ae60" stroke-width="1" />
+    <rect x="105" y="0" width="35" height="35" fill="#ffaaa5" stroke="#27ae60" stroke-width="1" />
+    <rect x="140" y="0" width="35" height="35" fill="#ff8b94" stroke="#27ae60" stroke-width="1" />
+    <rect x="175" y="0" width="35" height="35" fill="#a8e6cf" stroke="#27ae60" stroke-width="1" />
+
+    <!-- Row 2 -->
+    <rect x="0" y="35" width="35" height="35" fill="#dcedc1" stroke="#27ae60" stroke-width="1" />
+    <rect x="35" y="35" width="35" height="35" fill="#ffd3b6" stroke="#27ae60" stroke-width="1" />
+    <rect x="70" y="35" width="35" height="35" fill="#ffaaa5" stroke="#27ae60" stroke-width="1" />
+    <rect x="105" y="35" width="35" height="35" fill="#ff8b94" stroke="#27ae60" stroke-width="1" />
+    <rect x="140" y="35" width="35" height="35" fill="#a8e6cf" stroke="#27ae60" stroke-width="1" />
+    <rect x="175" y="35" width="35" height="35" fill="#dcedc1" stroke="#27ae60" stroke-width="1" />
+
+    <!-- Row 3 -->
+    <rect x="0" y="70" width="35" height="35" fill="#ffd3b6" stroke="#27ae60" stroke-width="1" />
+    <rect x="35" y="70" width="35" height="35" fill="#ffaaa5" stroke="#27ae60" stroke-width="1" />
+    <rect x="70" y="70" width="35" height="35" fill="#ff8b94" stroke="#27ae60" stroke-width="1" />
+    <rect x="105" y="70" width="35" height="35" fill="#a8e6cf" stroke="#27ae60" stroke-width="1" />
+    <rect x="140" y="70" width="35" height="35" fill="#dcedc1" stroke="#27ae60" stroke-width="1" />
+    <rect x="175" y="70" width="35" height="35" fill="#ffd3b6" stroke="#27ae60" stroke-width="1" />
+
+    <!-- Row 4 -->
+    <rect x="0" y="105" width="35" height="35" fill="#ffaaa5" stroke="#27ae60" stroke-width="1" />
+    <rect x="35" y="105" width="35" height="35" fill="#ff8b94" stroke="#27ae60" stroke-width="1" />
+    <rect x="70" y="105" width="35" height="35" fill="#a8e6cf" stroke="#27ae60" stroke-width="1" />
+    <rect x="105" y="105" width="35" height="35" fill="#dcedc1" stroke="#27ae60" stroke-width="1" />
+    <rect x="140" y="105" width="35" height="35" fill="#ffd3b6" stroke="#27ae60" stroke-width="1" />
+    <rect x="175" y="105" width="35" height="35" fill="#ffaaa5" stroke="#27ae60" stroke-width="1" />
+  </g>
+
+  <text x="80" y="320" font-family="Malgun Gothic, Arial, sans-serif" font-size="12" fill="#27ae60" font-weight="bold">
+    x →
+  </text>
+  <text x="30" y="220" font-family="Malgun Gothic, Arial, sans-serif" font-size="12" fill="#27ae60" font-weight="bold">
+    z ↓
+  </text>
+
+  <!-- Arrow to phase space detail -->
+  <path d="M 380 200 Q 420 200 420 240" fill="none" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowhead)" />
+
+  <!-- Angle-Energy Phase Space -->
+  <rect x="430" y="80" width="320" height="250" rx="10" fill="#ecf0f1" stroke="#34495e" stroke-width="2" />
+  <text x="590" y="105" font-family="Malgun Gothic, Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    각도-에너지 위상 공간
+  </text>
+
+  <!-- Heat map style grid -->
+  <g transform="translate(450, 130)">
+    <!-- Energy labels -->
+    <text x="-15" y="25" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="end">250</text>
+    <text x="-15" y="60" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="end">150</text>
+    <text x="-15" y="100" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="end">50</text>
+    <text x="-15" y="140" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="end">10</text>
+    <text x="-15" y="175" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="end">0.1</text>
+    <text x="-25" y="100" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#2c3e50" font-weight="bold" transform="rotate(-90, -25, 100)">
+      E (MeV)
+    </text>
+
+    <!-- Theta labels -->
+    <text x="35" y="195" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="middle">-90°</text>
+    <text x="135" y="195" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="middle">0°</text>
+    <text x="235" y="195" font-family="Malgun Gothic, Arial, sans-serif" font-size="10" fill="#7f8c8d" text-anchor="middle">+90°</text>
+    <text x="135" y="215" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#2c3e50" font-weight="bold" text-anchor="middle">
+      θ (theta)
+    </text>
+
+    <!-- Heat map grid (gradient colors) -->
+    <!-- Row 1 (High energy) -->
+    <rect x="10" y="10" width="25" height="25" fill="#1a237e" />
+    <rect x="35" y="10" width="25" height="25" fill="#283593" />
+    <rect x="60" y="10" width="25" height="25" fill="#3949ab" />
+    <rect x="85" y="10" width="25" height="25" fill="#5c6bc0" />
+    <rect x="110" y="10" width="25" height="25" fill="#7986cb" />
+    <rect x="135" y="10" width="25" height="25" fill="#5c6bc0" />
+    <rect x="160" y="10" width="25" height="25" fill="#3949ab" />
+    <rect x="185" y="10" width="25" height="25" fill="#283593" />
+    <rect x="210" y="10" width="25" height="25" fill="#1a237e" />
+
+    <!-- Row 2 -->
+    <rect x="10" y="35" width="25" height="25" fill="#303f9f" />
+    <rect x="35" y="35" width="25" height="25" fill="#3f51b5" />
+    <rect x="60" y="35" width="25" height="25" fill="#5c6bc0" />
+    <rect x="85" y="35" width="25" height="25" fill="#7986cb" />
+    <rect x="110" y="35" width="25" height="25" fill="#9fa8da" />
+    <rect x="135" y="35" width="25" height="25" fill="#7986cb" />
+    <rect x="160" y="35" width="25" height="25" fill="#5c6bc0" />
+    <rect x="185" y="35" width="25" height="25" fill="#3f51b5" />
+    <rect x="210" y="35" width="25" height="25" fill="#303f9f" />
+
+    <!-- Middle rows (medium energy - more particles) -->
+    <rect x="10" y="60" width="25" height="25" fill="#43a047" />
+    <rect x="35" y="60" width="25" height="25" fill="#66bb6a" />
+    <rect x="60" y="60" width="25" height="25" fill="#81c784" />
+    <rect x="85" y="60" width="25" height="25" fill="#a5d6a7" />
+    <rect x="110" y="60" width="25" height="25" fill="#c8e6c9" />
+    <rect x="135" y="60" width="25" height="25" fill="#a5d6a7" />
+    <rect x="160" y="60" width="25" height="25" fill="#81c784" />
+    <rect x="185" y="60" width="25" height="25" fill="#66bb6a" />
+    <rect x="210" y="60" width="25" height="25" fill="#43a047" />
+
+    <rect x="10" y="85" width="25" height="25" fill="#fdd835" />
+    <rect x="35" y="85" width="25" height="25" fill="#ffe082" />
+    <rect x="60" y="85" width="25" height="25" fill="#fff59d" />
+    <rect x="85" y="85" width="25" height="25" fill="#fff9c4" />
+    <rect x="110" y="85" width="25" height="25" fill="#ffffe0" />
+    <rect x="135" y="85" width="25" height="25" fill="#fff9c4" />
+    <rect x="160" y="85" width="25" height="25" fill="#fff59d" />
+    <rect x="185" y="85" width="25" height="25" fill="#ffe082" />
+    <rect x="210" y="85" width="25" height="25" fill="#fdd835" />
+
+    <!-- Row 5 (Bragg peak region - many particles) -->
+    <rect x="10" y="110" width="25" height="25" fill="#e53935" />
+    <rect x="35" y="110" width="25" height="25" fill="#ef5350" />
+    <rect x="60" y="110" width="25" height="25" fill="#f44336" />
+    <rect x="85" y="110" width="25" height="25" fill="#ef9a9a" />
+    <rect x="110" y="110" width="25" height="25" fill="#ffcdd2" />
+    <rect x="135" y="110" width="25" height="25" fill="#ef9a9a" />
+    <rect x="160" y="110" width="25" height="25" fill="#f44336" />
+    <rect x="185" y="110" width="25" height="25" fill="#ef5350" />
+    <rect x="210" y="110" width="25" height="25" fill="#e53935" />
+  </g>
+
+  <!-- Block encoding diagram -->
+  <rect x="50" y="360" width="700" height="130" rx="10" fill="#fff" stroke="#34495e" stroke-width="2" filter="url(#shadow)" />
+  <text x="400" y="390" font-family="Malgun Gothic, Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    블록 인코딩 (24비트)
+  </text>
+
+  <!-- 24-bit bar -->
+  <g transform="translate(150, 420)">
+    <!-- Energy bits (12) -->
+    <rect x="0" y="0" width="250" height="50" rx="5" fill="#3498db" />
+    <text x="125" y="30" font-family="Malgun Gothic, monospace" font-size="14" font-weight="bold" fill="white" text-anchor="middle">
+      b_E (12비트)
+    </text>
+
+    <!-- Theta bits (12) -->
+    <rect x="260" y="0" width="250" height="50" rx="5" fill="#e74c3c" />
+    <text x="385" y="30" font-family="Malgun Gothic, monospace" font-size="14" font-weight="bold" fill="white" text-anchor="middle">
+      b_theta (12비트)
+    </text>
+
+    <!-- Bit numbers -->
+    <text x="0" y="70" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#7f8c8d">23</text>
+    <text x="125" y="70" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#7f8c8d" text-anchor="middle">12</text>
+    <text x="260" y="70" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#7f8c8d">11</text>
+    <text x="385" y="70" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#7f8c8d" text-anchor="middle">0</text>
+
+    <!-- Ranges -->
+    <text x="125" y="-10" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#3498db" text-anchor="middle">범위: 0-4095</text>
+    <text x="385" y="-10" font-family="Malgun Gothic, Arial, sans-serif" font-size="11" fill="#e74c3c" text-anchor="middle">범위: 0-4095</text>
+  </g>
+
+  <!-- Combined label -->
+  <text x="400" y="500" font-family="Malgun Gothic, Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    결합: 24비트 블록 ID = (b_E &lt;&lt; 12) | b_theta
+  </text>
+
+  <!-- Dimension summary box -->
+  <rect x="50" y="520" width="700" height="110" rx="10" fill="url(#phaseGrad)" filter="url(#shadow)" />
+  <text x="400" y="550" font-family="Malgun Gothic, Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+    4차원 위상 공간 차원
+  </text>
+
+  <g transform="translate(100, 570)">
+    <text x="0" y="0" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="white">
+      <tspan font-weight="bold">θ (theta):</tspan> 512개 빈 (-90°에서 +90°)
+    </text>
+    <text x="0" y="25" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="white">
+      <tspan font-weight="bold">E (에너지):</tspan> 256개 빈 (0.1에서 250 MeV, 로그 간격)
+    </text>
+    <text x="350" y="0" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="white">
+      <tspan font-weight="bold">x_sub:</tspan> 셀당 4개 하위 빈
+    </text>
+    <text x="350" y="25" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="white">
+      <tspan font-weight="bold">z_sub:</tspan> 셀당 4개 하위 빈
+    </text>
+  </g>
+
+  <text x="400" y="630" font-family="Malgun Gothic, Arial, sans-serif" font-size="12" fill="#ecf0f1" text-anchor="middle">
+    총: 약 2000억 개의 가능한 빈 (200 × 640 셀 × 512 각도 × 256 에너지)
+  </text>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#e74c3c" />
+    </marker>
+  </defs>
+</svg>

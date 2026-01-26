@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="3" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+    <linearGradient id="psicGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="edepGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="absorbedGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f39c12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d68910;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boundaryGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="activeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1abc9c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a085;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" />
+
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    GPU Memory Layout (4.3 GB Total)
+  </text>
+
+  <!-- Memory blocks container -->
+  <rect x="50" y="70" width="500" height="460" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2" />
+  <text x="300" y="95" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#7f8c8d" text-anchor="middle">
+    GPU Memory
+  </text>
+
+  <!-- PsiC_in (1.1 GB) -->
+  <rect x="80" y="115" width="440" height="55" rx="5" fill="url(#psicGrad)" filter="url(#shadow)" />
+  <text x="300" y="140" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white" text-anchor="middle">
+    PsiC_in (1.1 GB)
+  </text>
+  <text x="300" y="160" font-family="Arial, sans-serif" font-size="12" fill="#ffe6e6" text-anchor="middle">
+    Input phase space - float32[200][640][block][512]
+  </text>
+
+  <!-- PsiC_out (1.1 GB) -->
+  <rect x="80" y="180" width="440" height="55" rx="5" fill="url(#psicGrad)" filter="url(#shadow)" />
+  <text x="300" y="205" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white" text-anchor="middle">
+    PsiC_out (1.1 GB)
+  </text>
+  <text x="300" y="225" font-family="Arial, sans-serif" font-size="12" fill="#ffe6e6" text-anchor="middle">
+    Output phase space - float32[200][640][block][512]
+  </text>
+
+  <!-- EdepC (0.5 GB) -->
+  <rect x="80" y="245" width="440" height="50" rx="5" fill="url(#edepGrad)" filter="url(#shadow)" />
+  <text x="300" y="267" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white" text-anchor="middle">
+    EdepC (0.5 GB)
+  </text>
+  <text x="300" y="285" font-family="Arial, sans-serif" font-size="12" fill="#e6f2ff" text-anchor="middle">
+    Energy deposition - float64[200][640] (double precision)
+  </text>
+
+  <!-- AbsorbedWeight (0.5 GB) -->
+  <rect x="80" y="305" width="215" height="50" rx="5" fill="url(#absorbedGrad)" filter="url(#shadow)" />
+  <text x="187" y="327" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">
+    AbsorbedWeight_
+  </text>
+  <text x="187" y="343" font-family="Arial, sans-serif" font-size="11" fill="#fff5e6" text-anchor="middle">
+    (0.5 GB) cutoff/nuclear
+  </text>
+
+  <!-- AbsorbedEnergy (0.25 GB) -->
+  <rect x="305" y="305" width="215" height="50" rx="5" fill="#d68910" filter="url(#shadow)" />
+  <text x="412" y="327" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">
+    AbsorbedEnergy_
+  </text>
+  <text x="412" y="343" font-family="Arial, sans-serif" font-size="11" fill="#fff5e6" text-anchor="middle">
+    (0.25 GB) nuclear
+  </text>
+
+  <!-- BoundaryLoss (0.1 GB) -->
+  <rect x="80" y="365" width="215" height="50" rx="5" fill="url(#boundaryGrad)" filter="url(#shadow)" />
+  <text x="187" y="387" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">
+    BoundaryLoss
+  </text>
+  <text x="187" y="403" font-family="Arial, sans-serif" font-size="11" fill="#f4ecf7" text-anchor="middle">
+    (0.1 GB) boundary tracking
+  </text>
+
+  <!-- ActiveMask/List (0.5 GB) -->
+  <rect x="305" y="365" width="215" height="50" rx="5" fill="url(#activeGrad)" filter="url(#shadow)" />
+  <text x="412" y="387" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">
+    ActiveMask/List
+  </text>
+  <text x="412" y="403" font-family="Arial, sans-serif" font-size="11" fill="#e8f8f5" text-anchor="middle">
+    (0.5 GB) active cells
+  </text>
+
+  <!-- Total bar -->
+  <rect x="80" y="435" width="440" height="25" rx="5" fill="#34495e" />
+  <text x="300" y="453" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">
+    Total: ~4.3 GB GPU Memory
+  </text>
+
+  <!-- Legend panel -->
+  <rect x="570" y="70" width="200" height="460" rx="10" fill="#ffffff" stroke="#bdc3c7" stroke-width="2" />
+  <text x="670" y="100" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    Buffer Types
+  </text>
+
+  <!-- Legend items -->
+  <rect x="590" y="130" width="20" height="20" rx="3" fill="#e74c3c" />
+  <text x="620" y="147" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">
+    <tspan font-weight="bold">float32</tspan> - 6-7 digits
+  </text>
+  <text x="590" y="165" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d">
+    Phase space (PsiC)
+  </text>
+
+  <rect x="590" y="190" width="20" height="20" rx="3" fill="#3498db" />
+  <text x="620" y="207" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">
+    <tspan font-weight="bold">float64</tspan> - 15-16 digits
+  </text>
+  <text x="590" y="225" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d">
+    Energy deposition (EdepC)
+  </text>
+
+  <rect x="590" y="250" width="20" height="20" rx="3" fill="#f39c12" />
+  <text x="620" y="267" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">
+    <tspan font-weight="bold">float32</tspan> weights
+  </text>
+  <text x="590" y="285" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d">
+    Absorbed weight tracking
+  </text>
+
+  <rect x="590" y="310" width="20" height="20" rx="3" fill="#9b59b6" />
+  <text x="620" y="327" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">
+    <tspan font-weight="bold">float32</tspan> losses
+  </text>
+  <text x="590" y="345" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d">
+    Boundary losses
+  </text>
+
+  <rect x="590" y="370" width="20" height="20" rx="3" fill="#1abc9c" />
+  <text x="620" y="387" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">
+    <tspan font-weight="bold">uint8/uint32</tspan>
+  </text>
+  <text x="590" y="405" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d">
+    Masks and indices
+  </text>
+
+  <!-- Why section -->
+  <rect x="590" y="440" width="160" height="75" rx="5" fill="#ecf0f1" stroke="#bdc3c7" />
+  <text x="670" y="462" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    Why Different Types?
+  </text>
+  <text x="600" y="480" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">
+    • float32: Smaller, faster
+  </text>
+  <text x="600" y="495" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">
+    • float64: More accurate
+  </text>
+  <text x="600" y="510" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">
+    • uint: Compact storage
+  </text>
+
+  <!-- Capacity indicator -->
+  <rect x="50" y="550" width="700" height="40" rx="5" fill="#2c3e50" />
+  <rect x="50" y="550" width="500" height="40" rx="5" fill="#27ae60" />
+  <text x="400" y="577" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">
+    GPU Memory Usage: 4.3 GB / ~8-12 GB typical (RTX 2080+)
+  </text>
+</svg>

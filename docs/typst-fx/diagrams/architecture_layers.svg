@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700">
+  <defs>
+    <linearGradient id="layer1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2ecc71;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#27ae60;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e67e22;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d35400;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer5" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1abc9c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a085;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer6" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="700" fill="#f8f9fa" />
+
+  <!-- Title -->
+  <text x="300" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    SM_2D System Architecture Layers
+  </text>
+
+  <!-- Output Layer -->
+  <rect x="100" y="70" width="400" height="80" rx="8" fill="url(#layer1)" filter="url(#shadow)" />
+  <text x="300" y="100" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    OUTPUT LAYER
+  </text>
+  <text x="300" y="125" font-family="Arial, sans-serif" font-size="13" fill="#e8f8f5" text-anchor="middle">
+    Dose distributions, curves, conservation reports
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="150" x2="300" y2="175" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- CUDA Pipeline Layer -->
+  <rect x="100" y="180" width="400" height="80" rx="8" fill="url(#layer2)" filter="url(#shadow)" />
+  <text x="300" y="210" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    CUDA PIPELINE
+  </text>
+  <text x="300" y="235" font-family="Arial, sans-serif" font-size="13" fill="#eaf2f8" text-anchor="middle">
+    K1-K6: Transport kernels running on GPU
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="260" x2="300" y2="285" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Physics Layer -->
+  <rect x="100" y="290" width="400" height="80" rx="8" fill="url(#layer3)" filter="url(#shadow)" />
+  <text x="300" y="320" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    PHYSICS LAYER
+  </text>
+  <text x="300" y="345" font-family="Arial, sans-serif" font-size="13" fill="#f4ecf7" text-anchor="middle">
+    Scattering, straggling, attenuation, deposition
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="370" x2="300" y2="395" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Core Layer -->
+  <rect x="100" y="400" width="400" height="80" rx="8" fill="url(#layer4)" filter="url(#shadow)" />
+  <text x="300" y="430" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    CORE LAYER
+  </text>
+  <text x="300" y="455" font-family="Arial, sans-serif" font-size="13" fill="#fef5e7" text-anchor="middle">
+    Grids, block encoding, phase-space, buckets
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="480" x2="300" y2="505" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Input Layer -->
+  <rect x="100" y="510" width="400" height="80" rx="8" fill="url(#layer5)" filter="url(#shadow)" />
+  <text x="300" y="540" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    INPUT LAYER
+  </text>
+  <text x="300" y="565" font-family="Arial, sans-serif" font-size="13" fill="#e8f8f5" text-anchor="middle">
+    Configuration, NIST data, command-line parameters
+  </text>
+
+  <!-- Side annotations -->
+  <rect x="520" y="180" width="70" height="360" rx="5" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" />
+  <text x="555" y="210" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d" text-anchor="middle">
+    GPU
+  </text>
+  <text x="555" y="230" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d" text-anchor="middle">
+    Parallel
+  </text>
+  <text x="555" y="250" font-family="Arial, sans-serif" font-size="11" fill="#7f8c8d" text-anchor="middle">
+    Processing
+  </text>
+
+  <!-- Data flow indicator -->
+  <text x="50" y="360" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e74c3c" text-anchor="middle">
+    Data
+  </text>
+  <text x="50" y="380" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e74c3c" text-anchor="middle">
+    Flow
+  </text>
+  <path d="M 70 360 L 90 360 L 90 380 L 70 380" fill="none" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Legend box -->
+  <rect x="100" y="620" width="400" height="60" rx="5" fill="#ffffff" stroke="#bdc3c7" stroke-width="1" />
+  <text x="300" y="645" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    Key Design Principle
+  </text>
+  <text x="300" y="665" font-family="Arial, sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">
+    Each layer has a single responsibility: input → core → physics → GPU → output
+  </text>
+</svg>

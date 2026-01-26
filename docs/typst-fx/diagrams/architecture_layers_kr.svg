@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700">
+  <defs>
+    <linearGradient id="layer1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2ecc71;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#27ae60;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e67e22;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d35400;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="layer5" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1abc9c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a085;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="700" fill="#f8f9fa" />
+
+  <!-- Title -->
+  <text x="300" y="40" font-family="Malgun Gothic, Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    SM_2D 시스템 아키텍처 계층
+  </text>
+
+  <!-- Output Layer -->
+  <rect x="80" y="70" width="440" height="80" rx="8" fill="url(#layer1)" filter="url(#shadow)" />
+  <text x="300" y="100" font-family="Malgun Gothic, Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    출력 계층 (OUTPUT LAYER)
+  </text>
+  <text x="300" y="125" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="#e8f8f5" text-anchor="middle">
+    선량 분포, 곡선, 보존 보고서
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="150" x2="300" y2="175" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- CUDA Pipeline Layer -->
+  <rect x="80" y="180" width="440" height="80" rx="8" fill="url(#layer2)" filter="url(#shadow)" />
+  <text x="300" y="210" font-family="Malgun Gothic, Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    CUDA 파이프라인 (CUDA PIPELINE)
+  </text>
+  <text x="300" y="235" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="#eaf2f8" text-anchor="middle">
+    K1-K6: GPU에서 실행되는 수송 커널
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="260" x2="300" y2="285" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Physics Layer -->
+  <rect x="80" y="290" width="440" height="80" rx="8" fill="url(#layer3)" filter="url(#shadow)" />
+  <text x="300" y="320" font-family="Malgun Gothic, Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    물리 계층 (PHYSICS LAYER)
+  </text>
+  <text x="300" y="345" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="#f4ecf7" text-anchor="middle">
+    산란, 분산, 감쇠, 퇴적
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="370" x2="300" y2="395" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Core Layer -->
+  <rect x="80" y="400" width="440" height="80" rx="8" fill="url(#layer4)" filter="url(#shadow)" />
+  <text x="300" y="430" font-family="Malgun Gothic, Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    코어 계층 (CORE LAYER)
+  </text>
+  <text x="300" y="455" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="#fef5e7" text-anchor="middle">
+    그리드, 블록 인코딩, 위상 공간, 버킷
+  </text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="480" x2="300" y2="505" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Input Layer -->
+  <rect x="80" y="510" width="440" height="80" rx="8" fill="url(#layer5)" filter="url(#shadow)" />
+  <text x="300" y="540" font-family="Malgun Gothic, Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    입력 계층 (INPUT LAYER)
+  </text>
+  <text x="300" y="565" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="#e8f8f5" text-anchor="middle">
+    구성, NIST 데이터, 명령줄 매개변수
+  </text>
+
+  <!-- Side annotations -->
+  <rect x="530" y="180" width="60" height="360" rx="5" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" />
+  <text x="560" y="350" font-family="Malgun Gothic, Arial, sans-serif" font-size="13" fill="#7f8c8d" text-anchor="middle" transform="rotate(90, 560, 350)">
+    GPU 병렬 처리
+  </text>
+
+  <!-- Data flow indicator -->
+  <text x="40" y="360" font-family="Malgun Gothic, Arial, sans-serif" font-size="14" font-weight="bold" fill="#e74c3c" text-anchor="middle">
+    데이터
+  </text>
+  <text x="40" y="380" font-family="Malgun Gothic, Arial, sans-serif" font-size="14" font-weight="bold" fill="#e74c3c" text-anchor="middle">
+    흐름
+  </text>
+  <path d="M 60 360 L 70 360 L 70 380 L 60 380" fill="none" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Legend box -->
+  <rect x="80" y="620" width="440" height="60" rx="5" fill="#ffffff" stroke="#bdc3c7" stroke-width="1" />
+  <text x="300" y="645" font-family="Malgun Gothic, Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50" text-anchor="middle">
+    핵심 설계 원칙
+  </text>
+  <text x="300" y="665" font-family="Malgun Gothic, Arial, sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">
+    각 계층은 단일 책임을 가짐: 입력 → 코어 → 물리 → GPU → 출력
+  </text>
+</svg>
