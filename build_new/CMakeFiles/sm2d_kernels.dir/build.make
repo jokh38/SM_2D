@@ -74,7 +74,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o: CMakeFiles/sm2d
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o: /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.i"
@@ -89,7 +89,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o: CMakeFiles
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o: /workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.i"
@@ -104,7 +104,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o: CMakeFiles/s
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o: /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.i"
@@ -119,7 +119,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o: CMakeFiles/sm2d_k
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o: /workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.i"
@@ -134,7 +134,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o: CMakeFiles/sm2d_kern
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o: /workspaces/SM_2D/src/cuda/kernels/k5_audit.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k5_audit.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k5_audit.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.i"
@@ -149,7 +149,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: CMakeFiles/sm2d_kerne
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src/cuda/kernels/k6_swap.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k6_swap.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/kernels/k6_swap.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.i"
@@ -164,7 +164,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o: CMakeFiles/sm2d
 CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o: /workspaces/SM_2D/src/cuda/gpu_transport_wrapper.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/gpu_transport_wrapper.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/gpu_transport_wrapper.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.i"
@@ -179,7 +179,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o: CMakeFiles/sm2d_kernels
 CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o: /workspaces/SM_2D/src/cuda/k1k6_pipeline.cu
 CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o: CMakeFiles/sm2d_kernels.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CUDA object CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/k1k6_pipeline.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o
+	/usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o -MF CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o.d -x cu -rdc=true -c /workspaces/SM_2D/src/cuda/k1k6_pipeline.cu -o CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o
 
 CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.i"

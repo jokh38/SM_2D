@@ -319,6 +319,7 @@ bool run_k1_active_mask(
 
 bool run_k2_coarse_transport(
     const DevicePsiC& psi_in,
+    DevicePsiC& psi_out,  // CRITICAL FIX: Output phase space
     const uint8_t* d_ActiveMask,
     const uint32_t* d_CoarseList,
     int n_coarse,
@@ -367,7 +368,9 @@ bool run_k2_coarse_transport(
         state.d_AbsorbedEnergy_nuclear,
         state.d_BoundaryLoss_weight,
         state.d_BoundaryLoss_energy,
-        state.d_OutflowBuckets
+        state.d_OutflowBuckets,
+        psi_out.block_id,  // CRITICAL FIX: Output phase space
+        psi_out.value
     );
 
     cudaError_t err = cudaGetLastError();
@@ -389,6 +392,7 @@ bool run_k2_coarse_transport(
 
 bool run_k3_fine_transport(
     const DevicePsiC& psi_in,
+    DevicePsiC& psi_out,  // CRITICAL FIX: Output phase space
     const uint32_t* d_ActiveList,
     int n_active,
     const ::DeviceRLUT& dlut,
@@ -430,7 +434,9 @@ bool run_k3_fine_transport(
         state.d_AbsorbedEnergy_nuclear,
         state.d_BoundaryLoss_weight,
         state.d_BoundaryLoss_energy,
-        state.d_OutflowBuckets
+        state.d_OutflowBuckets,
+        psi_out.block_id,  // CRITICAL FIX: Output phase space
+        psi_out.value
     );
 
     cudaError_t err = cudaGetLastError();
@@ -604,6 +610,31 @@ bool run_k1k6_pipeline_transport(
                   << state.n_active << " active, "
                   << state.n_coarse << " coarse cells" << std::endl;
 
+        // DEBUG: Check weight in psi_in before processing
+        if (iter <= 5) {
+            std::vector<float> h_psi_in_check(psi_in->N_cells * psi_in->Kb * DEVICE_LOCAL_BINS);
+            cudaMemcpy(h_psi_in_check.data(), psi_in->value, psi_in->N_cells * psi_in->Kb * DEVICE_LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
+            double total_weight_in = 0.0;
+            int nonzero_count = 0;
+            for (size_t i = 0; i < h_psi_in_check.size(); ++i) {
+                total_weight_in += h_psi_in_check[i];
+                if (h_psi_in_check[i] > 1e-12f) nonzero_count++;
+            }
+            std::cout << "    psi_in: weight=" << total_weight_in << ", nonzero_bins=" << nonzero_count << std::endl;
+        }
+
+        // DEBUG: Check energy accumulation every 10 iterations
+        if (iter % 10 == 0) {
+            int total_cells = config.Nx * config.Nz;
+            std::vector<double> h_EdepC_check(total_cells);
+            cudaMemcpy(h_EdepC_check.data(), state.d_EdepC, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+            double total_edep_check = 0.0;
+            for (int i = 0; i < total_cells; ++i) {
+                total_edep_check += h_EdepC_check[i];
+            }
+            std::cout << "    Energy so far: " << total_edep_check << " MeV" << std::endl;
+        }
+
         // Check if we're done
         if (state.n_active == 0 && state.n_coarse == 0) {
             std::cout << "  No active cells remaining, transport complete" << std::endl;
@@ -614,10 +645,25 @@ bool run_k1k6_pipeline_transport(
         // K2: Coarse Transport (high energy cells)
         // --------------------------------------------------------------------
         if (state.n_coarse > 0) {
-            if (!run_k2_coarse_transport(*psi_in, state.d_ActiveMask, state.d_CoarseList,
+            std::cout << "    Calling K2 with n_coarse=" << state.n_coarse << std::endl;
+            if (!run_k2_coarse_transport(*psi_in, *psi_out, state.d_ActiveMask, state.d_CoarseList,
                                           state.n_coarse, dlut, config, e_grid, a_grid, state)) {
                 std::cerr << "K2 failed at iteration " << iter << std::endl;
                 return false;
+            }
+            std::cout << "    K2 complete" << std::endl;
+
+            // DEBUG: Check psi_out after K2
+            if (iter <= 3) {
+                std::vector<float> h_psi_out_after_k2(psi_out->N_cells * psi_out->Kb * DEVICE_LOCAL_BINS);
+                cudaMemcpy(h_psi_out_after_k2.data(), psi_out->value, psi_out->N_cells * psi_out->Kb * DEVICE_LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
+                double total_weight_out_k2 = 0.0;
+                int nonzero_count_out_k2 = 0;
+                for (size_t i = 0; i < h_psi_out_after_k2.size(); ++i) {
+                    total_weight_out_k2 += h_psi_out_after_k2[i];
+                    if (h_psi_out_after_k2[i] > 1e-12f) nonzero_count_out_k2++;
+                }
+                std::cout << "    psi_out AFTER K2 (before K4): weight=" << total_weight_out_k2 << ", nonzero_bins=" << nonzero_count_out_k2 << std::endl;
             }
         }
 
@@ -625,7 +671,7 @@ bool run_k1k6_pipeline_transport(
         // K3: Fine Transport (low energy cells)
         // --------------------------------------------------------------------
         if (state.n_active > 0) {
-            if (!run_k3_fine_transport(*psi_in, state.d_ActiveList, state.n_active,
+            if (!run_k3_fine_transport(*psi_in, *psi_out, state.d_ActiveList, state.n_active,
                                        dlut, config, e_grid, a_grid, state)) {
                 std::cerr << "K3 failed at iteration " << iter << std::endl;
                 return false;
@@ -635,9 +681,36 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         // K4: Bucket Transfer (boundary crossings)
         // --------------------------------------------------------------------
+
+        // DEBUG: Check psi_out before K4
+        if (iter <= 5) {
+            std::vector<float> h_psi_out_check(psi_out->N_cells * psi_out->Kb * DEVICE_LOCAL_BINS);
+            cudaMemcpy(h_psi_out_check.data(), psi_out->value, psi_out->N_cells * psi_out->Kb * DEVICE_LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
+            double total_weight_out = 0.0;
+            int nonzero_count_out = 0;
+            for (size_t i = 0; i < h_psi_out_check.size(); ++i) {
+                total_weight_out += h_psi_out_check[i];
+                if (h_psi_out_check[i] > 1e-12f) nonzero_count_out++;
+            }
+            std::cout << "    psi_out before K4: weight=" << total_weight_out << ", nonzero_bins=" << nonzero_count_out << std::endl;
+        }
+
         if (!run_k4_bucket_transfer(*psi_out, state.d_OutflowBuckets, config.Nx, config.Nz)) {
             std::cerr << "K4 failed at iteration " << iter << std::endl;
             return false;
+        }
+
+        // DEBUG: Check psi_out after K4
+        if (iter <= 5) {
+            std::vector<float> h_psi_out_check(psi_out->N_cells * psi_out->Kb * DEVICE_LOCAL_BINS);
+            cudaMemcpy(h_psi_out_check.data(), psi_out->value, psi_out->N_cells * psi_out->Kb * DEVICE_LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
+            double total_weight_out = 0.0;
+            int nonzero_count_out = 0;
+            for (size_t i = 0; i < h_psi_out_check.size(); ++i) {
+                total_weight_out += h_psi_out_check[i];
+                if (h_psi_out_check[i] > 1e-12f) nonzero_count_out++;
+            }
+            std::cout << "    psi_out AFTER K4: weight=" << total_weight_out << ", nonzero_bins=" << nonzero_count_out << std::endl;
         }
 
         // Clear outflow buckets for next iteration
@@ -677,6 +750,16 @@ bool run_k1k6_pipeline_transport(
 
     std::cout << "K1-K6 pipeline: completed " << iter << " iterations" << std::endl;
     std::cout << "GPU K1-K6 pipeline complete." << std::endl;
+
+    // DEBUG: Check total energy deposition
+    int total_cells = config.Nx * config.Nz;
+    std::vector<double> h_EdepC(total_cells);
+    cudaMemcpy(h_EdepC.data(), state.d_EdepC, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+    double total_edep = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_edep += h_EdepC[i];
+    }
+    std::cout << "DEBUG: Total energy deposited = " << total_edep << " MeV (expected ~150 MeV)" << std::endl;
 
     return true;
 }

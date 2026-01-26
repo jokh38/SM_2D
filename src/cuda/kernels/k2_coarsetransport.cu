@@ -55,10 +55,18 @@ __global__ void K2_CoarseTransport(
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets
-    DeviceOutflowBucket* __restrict__ OutflowBuckets
+    DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    // CRITICAL FIX: Output phase space for particles remaining in cell
+    uint32_t* __restrict__ block_ids_out,
+    float* __restrict__ values_out
 ) {
     // Thread ID maps to coarse cell (or use linear iteration)
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // DEBUG: Check which thread is processing which cell
+    if (idx < 10 || (idx >= 95 && idx < 105)) {
+        printf("K2: Thread %d started\n", idx);
+    }
 
     // Linear scan through cells to find those needing coarse transport
     int coarse_count = 0;
@@ -74,6 +82,11 @@ __global__ void K2_CoarseTransport(
         }
     }
 
+    if (idx < 10 || (idx >= 95 && idx < 105)) {
+        constexpr int Kb = DEVICE_Kb;
+        printf("K2: Thread %d assigned to cell %d (has %d particles in slot 0)\n", idx, cell, (cell >= 0) ? block_ids_in[cell * Kb] : -1);
+    }
+
     if (cell < 0 || coarse_count >= n_coarse) return;
 
     // Accumulators for this cell
@@ -83,6 +96,10 @@ __global__ void K2_CoarseTransport(
     double cell_E_nuclear = 0.0f;
     float cell_boundary_weight = 0.0f;
     double cell_boundary_energy = 0.0f;
+
+    // DEBUG: Count particles processed in this cell
+    int particles_in = 0;
+    int particles_out = 0;
 
     // Coarse step size: use full cell size or configured step
     float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
@@ -105,6 +122,8 @@ __global__ void K2_CoarseTransport(
             float weight = values_in[global_idx];
             if (weight < 1e-12f) continue;
 
+            particles_in++;  // DEBUG: Count input particle
+
             // Decode 4D local index
             int theta_local, E_local, x_sub, z_sub;
             decode_local_idx_4d(lidx, theta_local, E_local, x_sub, z_sub);
@@ -122,7 +141,10 @@ __global__ void K2_CoarseTransport(
             float E_max = E_edges[N_E];
             float log_E_min = logf(E_min);
             float dlog = (logf(E_max) - log_E_min) / N_E;
-            float E = expf(log_E_min + (E_bin + 0.5f) * dlog);
+            // CRITICAL FIX: Use bin lower edge instead of center for consistency
+            // When we write: E_bin = floor((log(E) - log_E_min) / dlog)
+            // When we read: should use lower edge to ensure same bin is recovered
+            float E = expf(log_E_min + E_bin * dlog);  // Lower edge for consistency
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -141,22 +163,43 @@ __global__ void K2_CoarseTransport(
             float mu = cosf(theta);
             float eta = sinf(theta);
 
-            // Coarse transport: take one large step through the cell
-            // Energy loss for coarse step
-            float mean_dE = device_compute_energy_deposition(dlut, E, coarse_step);
+            // FIX: Calculate distance to boundary and limit step to avoid crossing
+            float half_dz = dz * 0.5f;
+            float half_dx = dx * 0.5f;
+            float step_to_z_plus = (mu > 0) ? (half_dz - z_cell) / mu : 1e30f;
+            float step_to_z_minus = (mu < 0) ? (-half_dz - z_cell) / mu : 1e30f;
+            float step_to_x_plus = (eta > 0) ? (half_dx - x_cell) / eta : 1e30f;
+            float step_to_x_minus = (eta < 0) ? (-half_dx - x_cell) / eta : 1e30f;
+            float step_to_boundary = fminf(fminf(step_to_z_plus, step_to_z_minus),
+                                           fminf(step_to_x_plus, step_to_x_minus));
+            step_to_boundary = fmaxf(step_to_boundary, 0.0f);
+
+            // CRITICAL FIX: step_to_boundary is a path length, coarse_step is geometric distance
+            // Convert path length to geometric distance for comparison
+            float mu_abs = fmaxf(fabsf(mu), 1e-6f);  // Avoid division by zero
+            float geometric_to_boundary = step_to_boundary * mu_abs;
+
+            // Limit coarse_step to 99.9% of geometric distance to boundary (tiny 0.1% safety margin)
+            float coarse_step_limited = fminf(coarse_step, geometric_to_boundary * 0.999f);
+
+            // Convert limited geometric distance to path length for energy calculation
+            float coarse_range_step = coarse_step_limited / mu_abs;
+
+            // Energy loss for coarse range step
+            float mean_dE = device_compute_energy_deposition(dlut, E, coarse_range_step);
             float dE = mean_dE;  // Coarse: use mean (no straggling)
             dE = fminf(dE, E);
 
             float E_new = E - dE;
             float edep = dE * weight;
 
-            // Nuclear attenuation
+            // Nuclear attenuation for coarse range step
             float w_rem, E_rem;
-            float w_new = device_apply_nuclear_attenuation(weight, E, coarse_step, w_rem, E_rem);
+            float w_new = device_apply_nuclear_attenuation(weight, E, coarse_range_step, w_rem, E_rem);
             edep += E_rem;
 
             // Coarse MCS: use RMS angle (no random sampling for efficiency)
-            float sigma_mcs = device_highland_sigma(E, coarse_step);
+            float sigma_mcs = device_highland_sigma(E, coarse_range_step);
             // Apply RMS scattering as systematic angular spread
             // In coarse mode, we bias the angle toward the mean (zero deflection)
             // This represents the "average" trajectory
@@ -165,13 +208,9 @@ __global__ void K2_CoarseTransport(
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
 
-            // Position update
-            float x_new = x_cell + eta_new * coarse_step;
-            float z_new = z_cell + mu_new * coarse_step;
-
-            // Pre-calculate half sizes for clamping (needed after boundary check)
-            float half_dx = dx * 0.5f;
-            float half_dz = dz * 0.5f;
+            // Position update (use limited step to avoid boundary crossing)
+            float x_new = x_cell + eta_new * coarse_step_limited;
+            float z_new = z_cell + mu_new * coarse_step_limited;
 
             // Check boundary crossing FIRST (using unclamped position)
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
@@ -181,6 +220,10 @@ __global__ void K2_CoarseTransport(
             z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
 
             if (exit_face >= 0) {
+                // DEBUG: See which particles are crossing boundaries
+                if (cell == 100) {
+                    printf("K2: BOUNDARY CROSS: cell=%d, face=%d, z_old=%.4f, z_new=%.4f, step=%.4f\n", cell, exit_face, z_cell, z_new, coarse_step);
+                }
                 // Calculate sub-cell bins for neighbor
                 float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
                 int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
@@ -216,14 +259,76 @@ __global__ void K2_CoarseTransport(
                 cell_boundary_weight += w_new;
                 cell_boundary_energy += E_new * w_new;
             } else {
-                // Remains in cell
+                // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!
+                // Previously: particles were lost if they didn't cross boundaries
                 cell_edep += edep;
                 cell_w_nuclear += w_rem;
                 cell_E_nuclear += E_rem;
 
+                // Cutoff check - don't write to output if below cutoff
                 if (E_new <= 0.1f) {
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
+                } else {
+                    // DEBUG: Verify we reach this code path
+                    if (cell == 100) {  // Source cell (x=100, z=0) using z-major: z*Nx+x = 0*200+100
+                        printf("K2: Writing particle to psi_out: cell=%d, E_new=%.3f, w_new=%.6f\n", cell, E_new, w_new);
+                    }
+                    // CRITICAL: Write particle to output phase space so it persists!
+                    // Get updated position in centered coordinates
+                    int x_sub = get_x_sub_bin(x_new, dx);
+                    int z_sub = get_z_sub_bin(z_new, dz);
+
+                    // Find theta and E bins for new energy/angle
+                    float theta_min = theta_edges[0];
+                    float theta_max = theta_edges[N_theta];
+                    float dtheta = (theta_max - theta_min) / N_theta;
+                    int theta_bin_new = static_cast<int>((theta_new - theta_min) / dtheta);
+                    theta_bin_new = fmaxf(0, fminf(theta_bin_new, N_theta - 1));
+
+                    float log_E_min = logf(E_edges[0]);
+                    float log_E_max = logf(E_edges[N_E]);
+                    float dlog = (log_E_max - log_E_min) / N_E;
+                    int E_bin_new = static_cast<int>((logf(E_new) - log_E_min) / dlog);
+                    E_bin_new = fmaxf(0, fminf(E_bin_new, N_E - 1));
+
+                    // Compute new block_id
+                    uint32_t b_theta_new = static_cast<uint32_t>(theta_bin_new) / N_theta_local;
+                    uint32_t b_E_new = static_cast<uint32_t>(E_bin_new) / N_E_local;
+                    uint32_t bid_new = (b_E_new << 12) | (b_theta_new & 0xFFF);
+
+                    // Find or allocate slot in output
+                    constexpr int Kb = DEVICE_Kb;
+                    int out_slot = -1;
+                    for (int s = 0; s < Kb; ++s) {
+                        uint32_t existing_bid = block_ids_out[cell * Kb + s];
+                        if (existing_bid == bid_new) {
+                            out_slot = s;
+                            break;
+                        }
+                    }
+
+                    // Allocate new slot if needed
+                    if (out_slot < 0) {
+                        for (int s = 0; s < Kb; ++s) {
+                            uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
+                            if (atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new) == expected) {
+                                out_slot = s;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Write weight to local bin
+                    if (out_slot >= 0 && E_new > 0.1f) {
+                        // Compute new local bin index
+                        int theta_local_new = theta_bin_new % N_theta_local;
+                        int E_local_new = E_bin_new % N_E_local;
+                        int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
+                        int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
+                        atomicAdd(&values_out[global_idx_out], w_new);
+                        particles_out++;  // DEBUG: Count output particle
+                    }
                 }
             }
         }
@@ -260,7 +365,9 @@ void run_K2_CoarseTransport(
     double* AbsorbedEnergy_nuclear,
     float* BoundaryLoss_weight,
     double* BoundaryLoss_energy,
-    DeviceOutflowBucket* OutflowBuckets
+    DeviceOutflowBucket* OutflowBuckets,
+    uint32_t* block_ids_out,
+    float* values_out
 ) {
     // Launch kernel
     int threads_per_block = 256;
@@ -275,7 +382,8 @@ void run_K2_CoarseTransport(
         config,
         EdepC, AbsorbedWeight_cutoff, AbsorbedWeight_nuclear, AbsorbedEnergy_nuclear,
         BoundaryLoss_weight, BoundaryLoss_energy,
-        OutflowBuckets
+        OutflowBuckets,
+        block_ids_out, values_out
     );
 
     cudaError_t err = cudaGetLastError();

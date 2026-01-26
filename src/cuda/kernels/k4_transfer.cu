@@ -66,6 +66,9 @@ __global__ void K4_BucketTransfer(
     // FIX: Use DEVICE_Kb instead of hardcoded 32
     constexpr int max_slots_per_cell = DEVICE_Kb;  // = 8
 
+    // DEBUG: Track total weight transferred for cells 100, 300, 700
+    float debug_total_weight = 0.0f;
+
     // Each cell receives buckets from ALL 4 neighbors
     // Process all 4 faces
     for (int face = 0; face < 4; ++face) {
@@ -152,10 +155,16 @@ __global__ void K4_BucketTransfer(
                     if (w > 0) {
                         int global_idx = (cell * max_slots_per_cell + out_slot) * DEVICE_LOCAL_BINS + lidx;
                         atomicAdd(&values_out[global_idx], w);
+                        debug_total_weight += w;
                     }
                 }
             }
         }
+    }
+
+    // DEBUG: Print for key cells
+    if ((cell == 100 || cell == 300 || cell == 500) && debug_total_weight > 0) {
+        printf("K4: cell=%d (ix=%d, iz=%d) received total_weight=%.6f\n", cell, cell % Nx, cell / Nx, debug_total_weight);
     }
 }
 

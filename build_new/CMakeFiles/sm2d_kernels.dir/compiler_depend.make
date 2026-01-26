@@ -253,57 +253,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o: /workspaces/SM_
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
   /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
   /workspaces/SM_2D/src/cuda/device/device_psic.cuh \
@@ -575,57 +575,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/k1k6_pipeline.cu.o: /workspaces/SM_2D/src/c
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
   /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
   /workspaces/SM_2D/src/cuda/device/device_psic.cuh \
@@ -882,57 +882,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o: /workspaces/SM_
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_psic.cuh \
   /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh \
   /workspaces/SM_2D/src/include/core/block_encoding.hpp \
@@ -1180,57 +1180,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o: /workspace
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
   /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
   /workspaces/SM_2D/src/cuda/device/device_physics.cuh \
@@ -1486,57 +1486,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o: /workspaces/
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
   /workspaces/SM_2D/src/cuda/device/device_lut.cuh \
   /workspaces/SM_2D/src/cuda/device/device_physics.cuh \
@@ -1785,57 +1785,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o: /workspaces/SM_2D
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_bucket.cuh \
   /workspaces/SM_2D/src/cuda/device/device_psic.cuh \
   /workspaces/SM_2D/src/cuda/kernels/k4_transfer.cuh \
@@ -2070,57 +2070,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o: /workspaces/SM_2D/sr
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/device/device_psic.cuh \
   /workspaces/SM_2D/src/cuda/kernels/k5_audit.cuh \
   /workspaces/SM_2D/src/include/core/block_encoding.hpp \
@@ -2286,57 +2286,57 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h \
-  /usr/local/cuda/targets/x86_64-linux/include/builtin_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h \
-  /usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h \
-  /usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h \
-  /usr/local/cuda/targets/x86_64-linux/include/device_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/driver_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/library_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h \
-  /usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/surface_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/texture_types.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.h \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp \
-  /usr/local/cuda/targets/x86_64-linux/include/vector_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp \
+  /usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h \
   /workspaces/SM_2D/src/cuda/kernels/k6_swap.cuh \
   /workspaces/SM_2D/src/include/core/block_encoding.hpp \
   /workspaces/SM_2D/src/include/core/local_bins.hpp \
@@ -2357,6 +2357,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/stdc-predef.h:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.h:
+
 /usr/include/c++/12/bits/refwrap.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
@@ -2364,10 +2366,6 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
 
 /usr/include/c++/12/pstl/pstl_config.h:
-
-/usr/include/c++/12/system_error:
-
-/usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
 /usr/include/wchar.h:
 
@@ -2383,25 +2381,27 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/ext/numeric_traits.h:
 
-/usr/include/x86_64-linux-gnu/sys/types.h:
-
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/texture_indirect_functions.h:
+/usr/include/linux/errno.h:
 
 /usr/include/c++/12/bits/ostream.tcc:
 
 /usr/include/limits.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/builtin_types.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/cudacc_ext.h:
 
 /usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/c++/12/initializer_list:
 
 /usr/include/errno.h:
 
 /usr/include/c++/12/utility:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/locale.h:
 
@@ -2421,6 +2421,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/stdexcept:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/texture_indirect_functions.h:
+
 /usr/include/c++/12/pstl/glue_memory_defs.h:
 
 /usr/include/c++/12/bits/locale_classes.tcc:
@@ -2435,13 +2437,13 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/iostream:
 
-/usr/include/stdlib.h:
-
 /usr/include/c++/12/bits/unique_ptr.h:
 
 /usr/include/c++/12/ext/concurrence.h:
 
 /usr/include/linux/limits.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.hpp:
 
 /usr/include/c++/12/ext/aligned_buffer.h:
 
@@ -2457,17 +2459,15 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/streambuf.tcc:
 
-/usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.hpp:
-
 /usr/include/pthread.h:
 
 /usr/include/c++/12/cwctype:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/limits.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.h:
-
 /usr/include/c++/12/cstdlib:
+
+/usr/include/c++/12/bits/specfun.h:
 
 /usr/include/c++/12/cstdio:
 
@@ -2477,7 +2477,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/cpu_defines.h:
 
-/usr/include/c++/12/limits:
+/workspaces/SM_2D/src/cuda/k1k6_pipeline.cuh:
 
 /usr/include/c++/12/bits/align.h:
 
@@ -2501,19 +2501,21 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/iosfwd:
 
-/usr/local/cuda/targets/x86_64-linux/include/crt/common_functions.h:
-
 /workspaces/SM_2D/src/cuda/device/device_lut.cuh:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.h:
-
-/usr/include/c++/12/bits/uses_allocator.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_intrinsics.h:
 
 /usr/include/c++/12/bits/basic_ios.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.h:
+
+/workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh:
 
 /usr/include/c++/12/bits/exception_defines.h:
 
 /usr/include/c++/12/tr1/hypergeometric.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
@@ -2524,6 +2526,10 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /usr/include/c++/12/tr1/exp_integral.tcc:
+
+/usr/include/c++/12/limits:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/texture_types.h:
 
 /usr/include/c++/12/bits/char_traits.h:
 
@@ -2547,11 +2553,15 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/tr1/riemann_zeta.tcc:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.h:
+
 /usr/include/asm-generic/errno.h:
 
-/usr/include/c++/12/bits/locale_facets.tcc:
+/workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu:
 
-/usr/include/c++/12/bits/string_view.tcc:
+/usr/include/c++/12/memory:
+
+/usr/include/c++/12/bits/locale_facets.tcc:
 
 /usr/include/c++/12/new:
 
@@ -2565,9 +2575,9 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/predefined_ops.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/cuda_runtime_api.h:
-
 /usr/include/x86_64-linux-gnu/asm/errno.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_double_functions.hpp:
 
 /usr/include/c++/12/streambuf:
 
@@ -2583,6 +2593,12 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/exception_ptr.h:
 
+/usr/include/c++/12/tr1/ell_integral.tcc:
+
+/usr/include/c++/12/bits/exception.h:
+
+/usr/include/c++/12/bits/functexcept.h:
+
 /usr/include/x86_64-linux-gnu/bits/sched.h:
 
 /usr/include/c++/12/bits/cpp_type_traits.h:
@@ -2591,11 +2607,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/math.h:
 
-/workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu:
-
-/usr/include/c++/12/memory:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_60_atomic_functions.hpp:
 
 /usr/include/strings.h:
 
@@ -2610,8 +2622,6 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
 /usr/include/c++/12/backward/binders.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/sm_35_intrinsics.h:
 
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
@@ -2629,7 +2639,11 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/hash_bytes.h:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.h:
+
 /usr/include/x86_64-linux-gnu/bits/uio_lim.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.h:
 
 /usr/include/c++/12/bits/stl_function.h:
 
@@ -2641,7 +2655,11 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/locale.h:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.h:
+
 /usr/include/c++/12/bits/alloc_traits.h:
+
+/usr/include/c++/12/bits/stl_iterator_base_types.h:
 
 /workspaces/SM_2D/src/cuda/kernels/k1_activemask.cu:
 
@@ -2651,9 +2669,9 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/stl_raw_storage_iter.h:
 
-/usr/include/c++/12/bits/atomic_base.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/channel_descriptor.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_60_atomic_functions.hpp:
+/usr/include/c++/12/bits/atomic_base.h:
 
 /usr/include/c++/12/bits/utility.h:
 
@@ -2664,6 +2682,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/c++/12/bits/charconv.h:
 
 /usr/include/c++/12/bits/stl_uninitialized.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_30_intrinsics.hpp:
 
 /usr/include/c++/12/bits/allocator.h:
 
@@ -2681,6 +2701,10 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/nested_exception.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
+
+/usr/include/c++/12/istream:
+
 /usr/include/c++/12/compare:
 
 /usr/include/c++/12/bits/concept_check.h:
@@ -2691,19 +2715,17 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/range_access.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/cuda_runtime.h:
-
 /usr/include/c++/12/bits/stl_algobase.h:
 
 /usr/include/c++/12/bits/vector.tcc:
-
-/usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.h:
 
 /usr/include/x86_64-linux-gnu/bits/endian.h:
 
 /usr/include/c++/12/bits/shared_ptr.h:
 
 /usr/include/c++/12/tr1/bessel_function.tcc:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.h:
 
 /usr/include/c++/12/ext/string_conversions.h:
 
@@ -2713,9 +2735,15 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/c++/12/bits/shared_ptr_atomic.h:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_config.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/device_launch_parameters.h:
+
 /workspaces/SM_2D/src/cuda/kernels/k5_audit.cuh:
 
 /usr/include/c++/12/bits/functional_hash.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.h:
 
 /usr/include/c++/12/bits/shared_ptr_base.h:
 
@@ -2728,8 +2756,6 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/c++/12/bits/basic_string.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/sm_30_intrinsics.hpp:
 
 /usr/include/c++/12/ios:
 
@@ -2746,8 +2772,6 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/c++/12/string_view:
 
 /usr/include/c++/12/bits/stl_iterator_base_funcs.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/sm_35_atomic_functions.h:
 
 /usr/include/c++/12/bits/stl_pair.h:
 
@@ -2793,29 +2817,29 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.h:
-
 /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
 
 /usr/include/c++/12/cwchar:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_20_intrinsics.hpp:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/timesize.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/timex.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h:
 
-/usr/include/c++/12/bits/specfun.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.hpp:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_device_runtime_api.h:
 
 /usr/include/x86_64-linux-gnu/bits/types.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/device_types.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
@@ -2827,11 +2851,7 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/x86_64-linux-gnu/bits/types/error_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
-
-/usr/include/c++/12/istream:
-
-/usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/surface_types.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
@@ -2845,6 +2865,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cuh:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_35_atomic_functions.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
 
 /workspaces/SM_2D/src/cuda/gpu_transport_wrapper.cu:
@@ -2853,19 +2875,23 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.h:
-
 /usr/include/c++/12/bit:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.hpp:
+
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
 
 /usr/include/c++/12/ext/type_traits.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.hpp:
 
 /workspaces/SM_2D/src/include/lut/nist_loader.hpp:
 
@@ -2874,6 +2900,8 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/atomic_word.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/library_types.h:
 
 /usr/include/c++/12/cmath:
 
@@ -2887,8 +2915,6 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/gthr.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/device_atomic_functions.hpp:
-
 /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h:
 
 /usr/include/x86_64-linux-gnu/sys/single_threaded.h:
@@ -2897,109 +2923,77 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/channel_descriptor.h:
-
-/usr/include/c++/12/tr1/ell_integral.tcc:
-
-/usr/include/c++/12/bits/exception.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/cudacc_ext.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/device_double_functions.hpp:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/device_functions.hpp:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.h:
-
-/workspaces/SM_2D/src/cuda/kernels/k1_activemask.cuh:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/host_config.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/host_defines.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/math_functions.hpp:
-
-/usr/include/linux/errno.h:
-
-/usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_61_intrinsics.hpp:
 
 /usr/include/c++/12/bits/stl_construct.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/crt/sm_80_rt.hpp:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/builtin_types.h:
 
-/workspaces/SM_2D/src/cuda/k1k6_pipeline.cuh:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/common_functions.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/crt/sm_90_rt.h:
+/usr/lib/gcc/x86_64-linux-gnu/12/include/syslimits.h:
 
-/workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/host_defines.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_intrinsics.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/math_functions.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/device_launch_parameters.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/driver_types.h:
 
-/usr/include/c++/12/bits/functexcept.h:
+/usr/include/c++/12/system_error:
 
-/usr/local/cuda/targets/x86_64-linux/include/crt/sm_70_rt.hpp:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_70_rt.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/device_types.h:
+/workspaces/SM_2D/src/include/physics/physics.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/driver_functions.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_80_rt.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/driver_types.h:
+/usr/include/c++/12/bits/string_view.tcc:
 
-/usr/include/c++/12/bits/std_mutex.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/sm_90_rt.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/vector_types.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/library_types.h:
+/workspaces/SM_2D/src/include/core/local_bins.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.h:
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_32_atomic_functions.hpp:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/cuda_runtime_api.h:
 
-/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/device_atomic_functions.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_32_intrinsics.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/driver_functions.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_61_intrinsics.hpp:
+/usr/include/x86_64-linux-gnu/c++/12/bits/c++allocator.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/surface_indirect_functions.h:
+/workspaces/SM_2D/src/include/cuda/gpu_transport_wrapper.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/surface_types.h:
+/usr/include/c++/12/bits/uses_allocator.h:
 
-/usr/include/c++/12/bits/stl_iterator_base_types.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_20_atomic_functions.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/texture_types.h:
+/usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
-/usr/include/c++/12/initializer_list:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_atomic_functions.hpp:
 
-/usr/local/cuda/targets/x86_64-linux/include/vector_functions.h:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/sm_32_intrinsics.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/vector_functions.hpp:
+/usr/local/cuda-12.4/targets/x86_64-linux/include/surface_indirect_functions.h:
 
-/usr/local/cuda/targets/x86_64-linux/include/sm_20_atomic_functions.hpp:
+/usr/include/stdlib.h:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/vector_functions.hpp:
+
+/usr/local/cuda-12.4/targets/x86_64-linux/include/vector_types.h:
 
 /workspaces/SM_2D/src/cuda/device/device_psic.cuh:
 
 /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
 
 /workspaces/SM_2D/src/include/core/grids.hpp:
-
-/workspaces/SM_2D/src/include/core/local_bins.hpp:
-
-/usr/include/x86_64-linux-gnu/c++/12/bits/c++allocator.h:
-
-/workspaces/SM_2D/src/include/cuda/gpu_transport_wrapper.hpp:
-
-/workspaces/SM_2D/src/include/physics/physics.hpp:
 
 /workspaces/SM_2D/src/include/physics/step_control.hpp:
 
@@ -3011,13 +3005,19 @@ CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o: /workspaces/SM_2D/src
 
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
+/usr/local/cuda-12.4/targets/x86_64-linux/include/crt/device_functions.h:
+
 /workspaces/SM_2D/src/cuda/kernels/k6_swap.cuh:
+
+/workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu:
 
 /usr/include/c++/12/bits/chrono.h:
 
 /usr/include/c++/12/bits/postypes.h:
 
 /usr/include/c++/12/bits/parse_numbers.h:
+
+/usr/include/c++/12/bits/std_mutex.h:
 
 /usr/include/c++/12/bits/unique_lock.h:
 

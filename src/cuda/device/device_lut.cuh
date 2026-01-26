@@ -162,9 +162,11 @@ __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, 
     delta_R_max = fminf(delta_R_max, 1.0f);
     delta_R_max = fmaxf(delta_R_max, 0.05f);
 
-    // P5 FIX: Limit by cell size to prevent skipping cells
-    float cell_limit = 0.25f * fminf(dx, dz);
-    delta_R_max = fminf(delta_R_max, cell_limit);
+    // REMOVED: Artificial cell_limit was causing step size to be limited to 0.125mm (0.25 * 0.5mm)
+    // This prevented 150MeV protons from traveling their full ~158mm range
+    // Boundary crossing detection already handles cell-size limiting properly
+    // float cell_limit = 0.25f * fminf(dx, dz);
+    // delta_R_max = fminf(delta_R_max, cell_limit);
 
     return delta_R_max;
 }

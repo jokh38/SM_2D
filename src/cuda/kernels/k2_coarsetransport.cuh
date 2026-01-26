@@ -48,7 +48,10 @@ __global__ void K2_CoarseTransport(
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets (same structure as K3)
-    struct DeviceOutflowBucket* __restrict__ OutflowBuckets
+    struct DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    // CRITICAL FIX: Output phase space for particles remaining in cell
+    uint32_t* __restrict__ block_ids_out,
+    float* __restrict__ values_out
 );
 
 // CPU wrapper declaration
@@ -70,5 +73,7 @@ void run_K2_CoarseTransport(
     double* AbsorbedEnergy_nuclear,
     float* BoundaryLoss_weight,
     double* BoundaryLoss_energy,
-    struct DeviceOutflowBucket* OutflowBuckets
+    struct DeviceOutflowBucket* OutflowBuckets,
+    uint32_t* block_ids_out,
+    float* values_out
 );

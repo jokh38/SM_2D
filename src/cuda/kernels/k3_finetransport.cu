@@ -62,13 +62,23 @@ __global__ void K3_FineTransport(
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets for boundary crossing (P3 FIX)
-    DeviceOutflowBucket* __restrict__ OutflowBuckets
+    DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    // CRITICAL FIX: Output phase space for particles remaining in cell
+    uint32_t* __restrict__ block_ids_out,
+    float* __restrict__ values_out
 ) {
     // Thread ID maps to active cell
     int active_idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (active_idx >= n_active) return;
 
     int cell = ActiveList[active_idx];
+
+    // DEBUG: Print which active cell is being processed
+    if (active_idx == 0) {
+        constexpr int Kb = DEVICE_Kb;
+        uint32_t first_bid = block_ids_in[cell * Kb];
+        printf("K3: Processing active cell %d (n_active=%d, first_bid=%u)\n", cell, n_active, first_bid);
+    }
 
     // Note: With LOCAL_BINS=128, shared buckets would exceed 48KB limit
     // Write directly to global memory instead of using shared memory
@@ -97,6 +107,12 @@ __global__ void K3_FineTransport(
         for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
             int global_idx = (cell * Kb + slot) * DEVICE_LOCAL_BINS + lidx;
             float weight = values_in[global_idx];
+
+            // DEBUG: Find which bins have particles
+            if (active_idx == 0 && slot == 0 && weight > 1e-12f) {
+                printf("K3: lidx=%d has weight=%.6f\n", lidx, weight);
+            }
+
             if (weight < 1e-12f) continue;
 
             // FIX Problem 1: Decode 4D local index (theta_local, E_local, x_sub, z_sub)
@@ -125,7 +141,11 @@ __global__ void K3_FineTransport(
             float log_E_min = logf(E_min);
             float log_E_max = logf(E_max);
             float dlog = (log_E_max - log_E_min) / N_E;
-            float E = expf(log_E_min + (E_bin + 0.5f) * dlog);
+            // CRITICAL FIX: Use bin lower edge instead of center for consistency
+            // When we write: E_bin = floor((log(E) - log_E_min) / dlog)
+            // When we read: should use lower edge to ensure same bin is recovered
+            // OLD: float E = expf(log_E_min + (E_bin + 0.5f) * dlog);  // Center caused 150->160 MeV error
+            float E = expf(log_E_min + E_bin * dlog);  // Lower edge for consistency
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -157,35 +177,69 @@ __global__ void K3_FineTransport(
                                            fminf(step_to_x_plus, step_to_x_minus));
             step_to_boundary = fmaxf(step_to_boundary, 0.0f);
 
-            // Compute physics-limited step size
+            // DEBUG: Check boundary calculation
+            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
+                printf("K3 BOUNDARY DEBUG [lidx=%d]: z_cell=%.4f, x_cell=%.4f, half_dz=%.4f, mu_init=%.4f, eta_init=%.4f\n",
+                       lidx, z_cell, x_cell, half_dz, mu_init, eta_init);
+                printf("K3 BOUNDARY DEBUG [lidx=%d]: step_to_z_plus=%.4f, step_to_z_minus=%.4f, step_to_x_plus=%.4f, step_to_x_minus=%.4f\n",
+                       lidx, step_to_z_plus, step_to_z_minus, step_to_x_plus, step_to_x_minus);
+            }
+
+            // Compute physics-limited step size (returns range step in mm)
             float step_phys = device_compute_max_step(dlut, E, dx, dz);
 
             // P9 FIX: Use minimum of physics step and distance to boundary
-            float actual_step = fminf(step_phys, step_to_boundary);
+            // step_to_boundary is already the path length (computed by dividing geometric distance by direction cosine)
+            // For normal incidence (mu=1), path_length = distance. For angled tracks, path_length > distance.
+            // CRITICAL FIX: Don't divide by mu_init again - step_to_boundary is already path length!
+
+            // Use the smaller of physics-limited range step and path length to boundary
+            // FIX: When physics step would cause boundary crossing, limit step to stay within cell
+            // Apply 99.9% of distance to boundary as tiny safety margin (0.1%)
+            float step_to_boundary_safe = step_to_boundary * 0.999f;
+            float actual_range_step = fminf(step_phys, step_to_boundary_safe);
+
+            // DEBUG: Check if safety margin is working
+            if (slot == 0 && lidx < 4 && weight > 0.001f) {
+                printf("K3: cell=%d, active_idx=%d, lidx=%d, weight=%.4f, step_phys=%.4f, step_boundary=%.4f, safe=%.4f, actual=%.4f, z_cell=%.4f\n",
+                       cell, active_idx, lidx, weight, step_phys, step_to_boundary, step_to_boundary_safe, actual_range_step, z_cell);
+            }
 
             // FIX Problem 2: Mid-point MCS method for better physical accuracy
             // The scattering should occur at the midpoint of the step, not at the start
-            // First half: move with initial direction
-            float half_step = actual_step * 0.5f;
+            // Use the range step directly as the distance traveled (path length = distance along trajectory)
+            float half_step = actual_range_step * 0.5f;
             float x_mid = x_cell + eta_init * half_step;
             float z_mid = z_cell + mu_init * half_step;
 
-            // Energy loss with straggling for actual step
-            float mean_dE = device_compute_energy_deposition(dlut, E, actual_step);
-            float sigma_dE = device_energy_straggling_sigma(E, actual_step, 1.0f);
+            // Energy loss with straggling for actual range step
+            float mean_dE = device_compute_energy_deposition(dlut, E, actual_range_step);
+            float sigma_dE = device_energy_straggling_sigma(E, actual_range_step, 1.0f);
             float dE = device_sample_energy_loss(mean_dE, sigma_dE, seed);
             dE = fminf(dE, E);
 
             float E_new = E - dE;
             float edep = dE * weight;
 
-            // Nuclear attenuation for actual step
+            // DEBUG: Trace energy computation - CRITICAL for finding energy increase bug
+            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
+                float R_current = device_lookup_R(dlut, E);
+                float R_after = R_current - actual_range_step;
+                float E_from_R = device_lookup_E_inverse(dlut, R_after);
+                printf("K3 ENERGY DEBUG [lidx=%d]: E=%.3f -> E_new=%.3f, dE=%.4f, mean_dE=%.4f\n", lidx, E, E_new, dE, mean_dE);
+                printf("K3 RANGE DEBUG [lidx=%d]: R_current=%.3f, step=%.4f, R_after=%.3f, E_from_R_after=%.3f\n", lidx, R_current, actual_range_step, R_after, E_from_R);
+                printf("K3 STEP DEBUG [lidx=%d]: step_phys=%.4f, step_boundary=%.4f, actual_step=%.4f\n", lidx, step_phys, step_to_boundary, actual_range_step);
+                printf("K3 LUT DEBUG: E_min=%.3f, E_max=%.3f, N_E=%d\n", dlut.E_min, dlut.E_max, dlut.N_E);
+            }
+
+            // Nuclear attenuation for actual range step
             float w_rem, E_rem;
-            float w_new = device_apply_nuclear_attenuation(weight, E, actual_step, w_rem, E_rem);
+            float w_new = device_apply_nuclear_attenuation(weight, E, actual_range_step, w_rem, E_rem);
             edep += E_rem;
 
             // MCS at midpoint (using energy at start of step for simplicity)
-            float sigma_mcs = device_highland_sigma(E, actual_step);
+            // MCS depends on path length (range), not geometric distance
+            float sigma_mcs = device_highland_sigma(E, actual_range_step);
             float theta_scatter = device_sample_mcs_angle(sigma_mcs, seed);
             float theta_new = theta + theta_scatter;
 
@@ -198,8 +252,19 @@ __global__ void K3_FineTransport(
             float x_new = x_mid + eta_new * half_step;
             float z_new = z_mid + mu_new * half_step;
 
+            // DEBUG: Check final position before boundary detection
+            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
+                printf("K3 POSITION DEBUG [lidx=%d]: x_cell=%.4f, z_cell=%.4f -> x_new=%.4f, z_new=%.4f (half_dx=%.4f, half_dz=%.4f)\n",
+                       lidx, x_cell, z_cell, x_new, z_new, half_dx, half_dz);
+            }
+
             // Check boundary crossing FIRST (using unclamped position)
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
+
+            // DEBUG: Print exit face
+            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
+                printf("K3 EXIT FACE DEBUG [lidx=%d]: exit_face=%d\n", lidx, exit_face);
+            }
 
             // THEN clamp position to cell bounds for emission calculations
             x_new = fmaxf(-half_dx, fminf(x_new, half_dx));
@@ -244,22 +309,80 @@ __global__ void K3_FineTransport(
                 cell_boundary_weight += w_new;
                 cell_boundary_energy += E_new * w_new;
             } else {
-                // Particle remains in cell - deposit energy locally
+                // DEBUG: Check if we reach the else branch
+                if (active_idx == 0) {
+                    printf("K3: Particle remains in cell, E_new=%.3f, w_new=%.6f\n", E_new, w_new);
+                }
+
+                // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!
+                // Previously: particles were lost if they didn't cross boundaries
                 cell_edep += edep;
                 cell_w_nuclear += w_rem;
                 cell_E_nuclear += E_rem;
 
-                // FIX Problem 1: Update sub-cell bins for next iteration
-                // Recalculate x_sub and z_sub based on new position
-                float x_offset_new = x_new - dx * 0.5f;
-                float z_offset_new = z_new - dz * 0.5f;
-                x_sub = get_x_sub_bin(x_offset_new, dx);
-                z_sub = get_z_sub_bin(z_offset_new, dz);
-
-                // Cutoff check
+                // Cutoff check - don't write to output if below cutoff
                 if (E_new <= 0.1f) {
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
+                } else {
+                    // DEBUG
+                    if (active_idx == 0) {
+                        printf("K3: Writing particle to psi_out\n");
+                    }
+                    // CRITICAL: Write particle to output phase space so it persists!
+                    // Get updated position in centered coordinates
+                    x_sub = get_x_sub_bin(x_new, dx);
+                    z_sub = get_z_sub_bin(z_new, dz);
+
+                    // Find theta and E bins for new energy/angle
+                    float theta_min = theta_edges[0];
+                    float theta_max = theta_edges[N_theta];
+                    float dtheta = (theta_max - theta_min) / N_theta;
+                    int theta_bin_new = static_cast<int>((theta_new - theta_min) / dtheta);
+                    theta_bin_new = fmaxf(0, fminf(theta_bin_new, N_theta - 1));
+
+                    float log_E_min = logf(E_edges[0]);
+                    float log_E_max = logf(E_edges[N_E]);
+                    float dlog = (log_E_max - log_E_min) / N_E;
+                    int E_bin_new = static_cast<int>((logf(E_new) - log_E_min) / dlog);
+                    E_bin_new = fmaxf(0, fminf(E_bin_new, N_E - 1));
+
+                    // Compute new block_id
+                    uint32_t b_theta_new = static_cast<uint32_t>(theta_bin_new) / N_theta_local;
+                    uint32_t b_E_new = static_cast<uint32_t>(E_bin_new) / N_E_local;
+                    uint32_t bid_new = (b_E_new << 12) | (b_theta_new & 0xFFF);
+
+                    // Find or allocate slot in output
+                    constexpr int Kb = DEVICE_Kb;
+                    int out_slot = -1;
+                    for (int s = 0; s < Kb; ++s) {
+                        uint32_t existing_bid = block_ids_out[cell * Kb + s];
+                        if (existing_bid == bid_new) {
+                            out_slot = s;
+                            break;
+                        }
+                    }
+
+                    // Allocate new slot if needed
+                    if (out_slot < 0) {
+                        for (int s = 0; s < Kb; ++s) {
+                            uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
+                            if (atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new) == expected) {
+                                out_slot = s;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Write weight to local bin
+                    if (out_slot >= 0 && E_new > 0.1f) {
+                        // Compute new local bin index
+                        int theta_local_new = theta_bin_new % N_theta_local;
+                        int E_local_new = E_bin_new % N_E_local;
+                        int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
+                        int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
+                        atomicAdd(&values_out[global_idx_out], w_new);
+                    }
                 }
             }
         }

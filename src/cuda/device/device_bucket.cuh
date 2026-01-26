@@ -568,10 +568,18 @@ __device__ inline int device_determine_exit_face(
 ) {
     // Check boundaries (order matters for corner cases)
     // Using centered coordinate system: [-dx/2, +dx/2] x [-dz/2, +dz/2]
-    if (z_new >= dz * 0.5f) return FACE_Z_PLUS;
-    if (z_new < -dz * 0.5f) return FACE_Z_MINUS;
-    if (x_new >= dx * 0.5f) return FACE_X_PLUS;
-    if (x_new < -dx * 0.5f) return FACE_X_MINUS;
+    // CRITICAL FIX: Add epsilon tolerance to detect boundary crossings
+    // even when step is limited by safety margin (0.999 factor)
+    // Without this, particles that step to 0.999 * boundary won't cross!
+    // Using 0.001 mm tolerance (larger than 0.0005 = 0.25 - 0.2495)
+    constexpr float BOUNDARY_EPSILON = 0.001f;  // 0.001 mm tolerance
+    float half_dz = dz * 0.5f;
+    float half_dx = dx * 0.5f;
+
+    if (z_new > half_dz - BOUNDARY_EPSILON) return FACE_Z_PLUS;
+    if (z_new < -half_dz + BOUNDARY_EPSILON) return FACE_Z_MINUS;
+    if (x_new > half_dx - BOUNDARY_EPSILON) return FACE_X_PLUS;
+    if (x_new < -half_dx + BOUNDARY_EPSILON) return FACE_X_MINUS;
 
     return -1;  // Remains in cell
 }

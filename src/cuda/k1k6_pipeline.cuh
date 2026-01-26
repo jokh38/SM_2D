@@ -221,6 +221,7 @@ bool run_k1_active_mask(
 // Run K2 only: Coarse transport
 bool run_k2_coarse_transport(
     const DevicePsiC& psi_in,
+    DevicePsiC& psi_out,  // CRITICAL FIX: Output phase space
     const uint8_t* d_ActiveMask,
     const uint32_t* d_CoarseList,
     int n_coarse,
@@ -234,6 +235,7 @@ bool run_k2_coarse_transport(
 // Run K3 only: Fine transport
 bool run_k3_fine_transport(
     const DevicePsiC& psi_in,
+    DevicePsiC& psi_out,  // CRITICAL FIX: Output phase space
     const uint32_t* d_ActiveList,
     int n_active,
     const ::DeviceRLUT& dlut,

@@ -452,7 +452,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: tests/CMakeFiles/sm2
 tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: /workspaces/SM_2D/tests/unit/test_cuda_smoke.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CUDA object tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o"
-	cd /workspaces/SM_2D/build_new/tests && /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/unit/test_cuda_smoke.cpp -o CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
+	cd /workspaces/SM_2D/build_new/tests && /usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/unit/test_cuda_smoke.cpp -o CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.i"
@@ -467,7 +467,7 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: tests/CMakeFil
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CUDA object tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o"
-	cd /workspaces/SM_2D/build_new/tests && /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o -MF CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp -o CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o
+	cd /workspaces/SM_2D/build_new/tests && /usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o -MF CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp -o CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o
 
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.i"
@@ -482,7 +482,7 @@ tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: tests/CMake
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build_new/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CUDA object tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o"
-	cd /workspaces/SM_2D/build_new/tests && /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o -MF CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp -o CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o
+	cd /workspaces/SM_2D/build_new/tests && /usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o -MF CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp -o CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o
 
 tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.i"

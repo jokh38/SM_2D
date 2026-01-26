@@ -55,6 +55,24 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     // Generate NIST range LUT
     auto lut = GenerateRLUT(0.1f, 300.0f, 256);
 
+    // DEBUG: Verify LUT values
+    std::cout << "=== LUT Verification ===" << std::endl;
+    std::cout << "  R(0.1 MeV) = " << lut.lookup_R(0.1f) << " mm (expected ~0.0016)" << std::endl;
+    std::cout << "  R(150 MeV) = " << lut.lookup_R(150.0f) << " mm (expected ~158)" << std::endl;
+    std::cout << "  R(300 MeV) = " << lut.lookup_R(300.0f) << " mm" << std::endl;
+    std::cout << "  S(150 MeV) = " << lut.lookup_S(150.0f) << " MeV*cm^2/g" << std::endl;
+
+    // Test energy loss calculation
+    float E_test = 150.0f;
+    float step = 0.5f;
+    float R_before = lut.lookup_R(E_test);
+    float R_after = R_before - step;
+    float E_after = lut.lookup_E_inverse(std::max(0.001f, R_after));
+    float dE = E_test - E_after;
+    std::cout << "  Energy loss test: E=" << E_test << " -> E_new=" << E_after
+              << ", dE=" << dE << " MeV (step=" << step << "mm)" << std::endl;
+    std::cout << "=======================" << std::endl;
+
     // Create device LUT wrapper
     DeviceLUTWrapper device_lut;
     if (!init_device_lut(reinterpret_cast<const RLUT&>(lut), device_lut)) {

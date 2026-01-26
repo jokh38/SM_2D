@@ -52,7 +52,10 @@ __global__ void K3_FineTransport(
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets for boundary crossing (P3 FIX)
-    DeviceOutflowBucket* __restrict__ OutflowBuckets
+    DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    // CRITICAL FIX: Output phase space for particles remaining in cell
+    uint32_t* __restrict__ block_ids_out,
+    float* __restrict__ values_out
 );
 
 // CPU test stubs (unchanged)
