@@ -131,10 +131,10 @@ struct AngularBeamConfig {
 };
 
 /**
- * @brief Monte Carlo sampling configuration
+ * @brief Sampling configuration for distributed sources
  */
 struct SamplingConfig {
-    int n_samples = 1000;          // Number of MC samples for distributed sources
+    int n_samples = 1000;          // Number of samples for distributed sources
     unsigned int random_seed = 42; // Random seed for reproducibility
     bool use_stratified = false;   // Use stratified sampling
 };
@@ -191,7 +191,7 @@ struct IncidentParticleConfig {
     SpatialBeamConfig spatial;
     AngularBeamConfig angular;
 
-    // Monte Carlo sampling
+    // Sampling configuration
     SamplingConfig sampling;
 
     // Grid configuration

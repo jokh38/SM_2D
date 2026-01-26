@@ -391,6 +391,20 @@ CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/src/perf/occupancy_analyzer.cpp -o CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.s
 
+CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o: CMakeFiles/sm2d_impl.dir/flags.make
+CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o: /workspaces/SM_2D/src/gpu/gpu_transport_runner.cpp
+CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o: CMakeFiles/sm2d_impl.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o -MF CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o.d -o CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o -c /workspaces/SM_2D/src/gpu/gpu_transport_runner.cpp
+
+CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/SM_2D/src/gpu/gpu_transport_runner.cpp > CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.i
+
+CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/src/gpu/gpu_transport_runner.cpp -o CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.s
+
 # Object files for target sm2d_impl
 sm2d_impl_OBJECTS = \
 "CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.o" \
@@ -415,7 +429,8 @@ sm2d_impl_OBJECTS = \
 "CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.o" \
 "CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.o" \
-"CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.o"
+"CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.o" \
+"CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o"
 
 # External object files for target sm2d_impl
 sm2d_impl_EXTERNAL_OBJECTS =
@@ -443,9 +458,10 @@ libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.o
+libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/build.make
 libsm2d_impl.a: CMakeFiles/sm2d_impl.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Linking CXX static library libsm2d_impl.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Linking CXX static library libsm2d_impl.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/sm2d_impl.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/sm2d_impl.dir/link.txt --verbose=$(VERBOSE)
 

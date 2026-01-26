@@ -1,7 +1,7 @@
 #include "core/config_loader.hpp"
 #include "validation/pencil_beam.hpp"
 #include "validation/bragg_peak.hpp"
-#include "source/source_adapter.hpp"
+#include "gpu/gpu_transport_runner.hpp"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -161,8 +161,19 @@ int main(int argc, char* argv[]) {
         }
 
         std::cout << "\n--- Running Simulation ---" << std::endl;
-        auto pbc = make_pencil_beam_config(config);
-        auto result = run_pencil_beam(pbc);
+
+        SimulationResult result;
+
+        // Try GPU transport first (with proper energy straggling)
+        if (GPUTransportRunner::is_gpu_available()) {
+            std::cout << "Using GPU transport (Vavilov energy straggling)" << std::endl;
+            result = GPUTransportRunner::run(config);
+        } else {
+            std::cout << "GPU not available, using CPU deterministic transport" << std::endl;
+            std::cout << "  Note: CPU mode uses simplified range straggling approximation" << std::endl;
+            auto pbc = make_pencil_beam_config(config);
+            result = run_pencil_beam(pbc);
+        }
 
         int peak_z = find_bragg_peak_z(result);
         double peak_depth = peak_z * result.dz;

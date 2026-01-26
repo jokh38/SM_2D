@@ -394,6 +394,30 @@ src/core/psi_storage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.s
 .PHONY : src/core/psi_storage.cpp.s
 
+src/cuda/gpu_transport_wrapper.o: src/cuda/gpu_transport_wrapper.cu.o
+.PHONY : src/cuda/gpu_transport_wrapper.o
+
+# target to build an object file
+src/cuda/gpu_transport_wrapper.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o
+.PHONY : src/cuda/gpu_transport_wrapper.cu.o
+
+src/cuda/gpu_transport_wrapper.i: src/cuda/gpu_transport_wrapper.cu.i
+.PHONY : src/cuda/gpu_transport_wrapper.i
+
+# target to preprocess a source file
+src/cuda/gpu_transport_wrapper.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.i
+.PHONY : src/cuda/gpu_transport_wrapper.cu.i
+
+src/cuda/gpu_transport_wrapper.s: src/cuda/gpu_transport_wrapper.cu.s
+.PHONY : src/cuda/gpu_transport_wrapper.s
+
+# target to generate assembly for a file
+src/cuda/gpu_transport_wrapper.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.s
+.PHONY : src/cuda/gpu_transport_wrapper.cu.s
+
 src/cuda/kernels/k1_activemask.o: src/cuda/kernels/k1_activemask.cu.o
 .PHONY : src/cuda/kernels/k1_activemask.o
 
@@ -537,6 +561,54 @@ src/cuda/kernels/k6_swap.s: src/cuda/kernels/k6_swap.cu.s
 src/cuda/kernels/k6_swap.cu.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.s
 .PHONY : src/cuda/kernels/k6_swap.cu.s
+
+src/cuda/kernels/simple_gpu_transport.o: src/cuda/kernels/simple_gpu_transport.cu.o
+.PHONY : src/cuda/kernels/simple_gpu_transport.o
+
+# target to build an object file
+src/cuda/kernels/simple_gpu_transport.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o
+.PHONY : src/cuda/kernels/simple_gpu_transport.cu.o
+
+src/cuda/kernels/simple_gpu_transport.i: src/cuda/kernels/simple_gpu_transport.cu.i
+.PHONY : src/cuda/kernels/simple_gpu_transport.i
+
+# target to preprocess a source file
+src/cuda/kernels/simple_gpu_transport.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.i
+.PHONY : src/cuda/kernels/simple_gpu_transport.cu.i
+
+src/cuda/kernels/simple_gpu_transport.s: src/cuda/kernels/simple_gpu_transport.cu.s
+.PHONY : src/cuda/kernels/simple_gpu_transport.s
+
+# target to generate assembly for a file
+src/cuda/kernels/simple_gpu_transport.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.s
+.PHONY : src/cuda/kernels/simple_gpu_transport.cu.s
+
+src/gpu/gpu_transport_runner.o: src/gpu/gpu_transport_runner.cpp.o
+.PHONY : src/gpu/gpu_transport_runner.o
+
+# target to build an object file
+src/gpu/gpu_transport_runner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o
+.PHONY : src/gpu/gpu_transport_runner.cpp.o
+
+src/gpu/gpu_transport_runner.i: src/gpu/gpu_transport_runner.cpp.i
+.PHONY : src/gpu/gpu_transport_runner.i
+
+# target to preprocess a source file
+src/gpu/gpu_transport_runner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.i
+.PHONY : src/gpu/gpu_transport_runner.cpp.i
+
+src/gpu/gpu_transport_runner.s: src/gpu/gpu_transport_runner.cpp.s
+.PHONY : src/gpu/gpu_transport_runner.s
+
+# target to generate assembly for a file
+src/gpu/gpu_transport_runner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.s
+.PHONY : src/gpu/gpu_transport_runner.cpp.s
 
 src/lut/nist_loader.o: src/lut/nist_loader.cpp.o
 .PHONY : src/lut/nist_loader.o
@@ -938,6 +1010,9 @@ help:
 	@echo "... src/core/psi_storage.o"
 	@echo "... src/core/psi_storage.i"
 	@echo "... src/core/psi_storage.s"
+	@echo "... src/cuda/gpu_transport_wrapper.o"
+	@echo "... src/cuda/gpu_transport_wrapper.i"
+	@echo "... src/cuda/gpu_transport_wrapper.s"
 	@echo "... src/cuda/kernels/k1_activemask.o"
 	@echo "... src/cuda/kernels/k1_activemask.i"
 	@echo "... src/cuda/kernels/k1_activemask.s"
@@ -956,6 +1031,12 @@ help:
 	@echo "... src/cuda/kernels/k6_swap.o"
 	@echo "... src/cuda/kernels/k6_swap.i"
 	@echo "... src/cuda/kernels/k6_swap.s"
+	@echo "... src/cuda/kernels/simple_gpu_transport.o"
+	@echo "... src/cuda/kernels/simple_gpu_transport.i"
+	@echo "... src/cuda/kernels/simple_gpu_transport.s"
+	@echo "... src/gpu/gpu_transport_runner.o"
+	@echo "... src/gpu/gpu_transport_runner.i"
+	@echo "... src/gpu/gpu_transport_runner.s"
 	@echo "... src/lut/nist_loader.o"
 	@echo "... src/lut/nist_loader.i"
 	@echo "... src/lut/nist_loader.s"

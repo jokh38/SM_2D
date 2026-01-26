@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/run_simulation.dir/cmake_device_link.o"
   "CMakeFiles/run_simulation.dir/run_simulation.cpp.o"
   "CMakeFiles/run_simulation.dir/run_simulation.cpp.o.d"
   "run_simulation"
@@ -6,6 +7,6 @@ file(REMOVE_RECURSE
 )
 
 # Per-language clean rules from dependency scanning.
-foreach(lang CXX)
+foreach(lang CUDA CXX)
   include(CMakeFiles/run_simulation.dir/cmake_clean_${lang}.cmake OPTIONAL)
 endforeach()

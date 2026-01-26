@@ -31,6 +31,8 @@ set(CUDA_KERNEL_SOURCES
     src/cuda/kernels/k4_transfer.cu
     src/cuda/kernels/k5_audit.cu
     src/cuda/kernels/k6_swap.cu
+    src/cuda/kernels/simple_gpu_transport.cu
+    src/cuda/gpu_transport_wrapper.cu
 )
 
 # Create CUDA object library for kernel files
@@ -66,16 +68,18 @@ add_library(sm2d_impl STATIC
     src/perf/memory_profiler.cpp
     src/perf/kernel_profiler.cpp
     src/perf/occupancy_analyzer.cpp
+    src/gpu/gpu_transport_runner.cpp
 )
 
 target_link_libraries(sm2d_impl sm2d_core)
 
 # Add CUDA include directories for C++ files that include CUDA headers
 target_include_directories(sm2d_impl PRIVATE /usr/local/cuda-12.4/include)
+target_include_directories(sm2d_impl PRIVATE ${CMAKE_SOURCE_DIR}/src/cuda)
 
 # Main simulation executable
 add_executable(run_simulation run_simulation.cpp)
-target_link_libraries(run_simulation sm2d_core sm2d_impl)
+target_link_libraries(run_simulation sm2d_core sm2d_impl sm2d_kernels)
 target_include_directories(run_simulation PRIVATE /usr/local/cuda-12.4/include)
 
 # Copy executable to project root after build

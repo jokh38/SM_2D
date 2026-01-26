@@ -243,14 +243,7 @@ CMakeFiles/run_simulation.dir/run_simulation.cpp.o: \
  /workspaces/SM_2D/src/include/core/block_encoding.hpp \
  /usr/include/c++/12/array /usr/include/c++/12/compare \
  /workspaces/SM_2D/src/include/validation/bragg_peak.hpp \
- /workspaces/SM_2D/src/include/source/source_adapter.hpp \
- /workspaces/SM_2D/src/include/source/pencil_source.hpp \
- /workspaces/SM_2D/src/include/source/gaussian_source.hpp \
- /usr/include/c++/12/random /usr/include/c++/12/bits/random.h \
- /usr/include/x86_64-linux-gnu/c++/12/bits/opt_random.h \
- /usr/include/c++/12/bits/random.tcc /usr/include/c++/12/numeric \
- /usr/include/c++/12/bits/stl_numeric.h \
- /usr/include/c++/12/pstl/glue_numeric_defs.h \
+ /workspaces/SM_2D/src/include/gpu/gpu_transport_runner.hpp \
  /usr/include/c++/12/iostream /usr/include/c++/12/iomanip \
  /usr/include/c++/12/locale \
  /usr/include/c++/12/bits/locale_facets_nonio.h /usr/include/c++/12/ctime \

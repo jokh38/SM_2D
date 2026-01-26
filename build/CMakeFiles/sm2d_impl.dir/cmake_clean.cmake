@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sm2d_impl.dir/src/core/grids.cpp.o.d"
   "CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.o"
   "CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.o.d"
+  "CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o"
+  "CMakeFiles/sm2d_impl.dir/src/gpu/gpu_transport_runner.cpp.o.d"
   "CMakeFiles/sm2d_impl.dir/src/lut/nist_loader.cpp.o"
   "CMakeFiles/sm2d_impl.dir/src/lut/nist_loader.cpp.o.d"
   "CMakeFiles/sm2d_impl.dir/src/lut/r_lut.cpp.o"
