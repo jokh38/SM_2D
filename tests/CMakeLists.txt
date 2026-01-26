@@ -1,7 +1,6 @@
-# Create test executable with CUDA enabled
-add_executable(sm2d_tests
+# Test files that work in both CPU and GPU mode
+set(TEST_COMMON_FILES
     unit/test_build_system.cpp
-    unit/test_cuda_smoke.cpp
     unit/test_memory_budget.cpp
     unit/test_logging.cpp
     unit/test_memory_pool.cpp
@@ -14,8 +13,6 @@ add_executable(sm2d_tests
     unit/test_step_control.cpp
     unit/test_highland.cpp
     unit/test_nuclear.cpp
-    kernels/test_k1_activemask.cpp
-    kernels/test_k3_finetransport.cpp
     source/test_pencil.cpp
     source/test_gaussian.cpp
     boundary/test_boundaries.cpp
@@ -30,29 +27,58 @@ add_executable(sm2d_tests
     validation/test_determinism.cpp
     validation/test_validation_report.cpp
     perf/test_memory_profiling.cpp
+)
+
+# CUDA-specific test files
+set(TEST_CUDA_FILES
+    unit/test_cuda_smoke.cpp
+    kernels/test_k1_activemask.cpp
+    kernels/test_k3_finetransport.cpp
     perf/test_kernel_profiling.cpp
     perf/test_occupancy.cpp
 )
 
-# Set test property to treat .cpp files with CUDA kernel calls as CUDA
-set_source_files_properties(
-    unit/test_cuda_smoke.cpp
-    kernels/test_k1_activemask.cpp
-    kernels/test_k3_finetransport.cpp
-    PROPERTIES LANGUAGE CUDA
-)
+if(CUDA_ENABLED)
+    # Create test executable with all tests including CUDA
+    add_executable(sm2d_tests
+        ${TEST_COMMON_FILES}
+        ${TEST_CUDA_FILES}
+    )
 
-target_link_libraries(sm2d_tests
-    sm2d_core
-    sm2d_cuda
-    sm2d_impl
-    sm2d_kernels
-    GTest::gtest_main
-    GTest::gtest
-)
+    # Set test property to treat .cpp files with CUDA kernel calls as CUDA
+    set_source_files_properties(
+        unit/test_cuda_smoke.cpp
+        kernels/test_k1_activemask.cpp
+        kernels/test_k3_finetransport.cpp
+        PROPERTIES LANGUAGE CUDA
+    )
 
-# Add CUDA include directories for tests
-target_include_directories(sm2d_tests PRIVATE /usr/local/cuda-12.4/include)
+    target_link_libraries(sm2d_tests
+        sm2d_core
+        sm2d_cuda
+        sm2d_impl
+        sm2d_kernels
+        GTest::gtest_main
+        GTest::gtest
+    )
 
-include(GoogleTest)
-gtest_discover_tests(sm2d_tests)
+    target_include_directories(sm2d_tests PRIVATE ${CMAKE_CUDA_TOOLKIT_ROOT_DIR}/include)
+
+    include(GoogleTest)
+    gtest_discover_tests(sm2d_tests)
+else()
+    # Create test executable with CPU-only tests
+    add_executable(sm2d_tests ${TEST_COMMON_FILES})
+
+    target_link_libraries(sm2d_tests
+        sm2d_core
+        sm2d_impl
+        GTest::gtest_main
+        GTest::gtest
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(sm2d_tests)
+
+    message(STATUS "CUDA tests skipped (CUDA not available)")
+endif()

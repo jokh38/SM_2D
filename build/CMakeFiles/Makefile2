@@ -63,7 +63,6 @@ CMAKE_BINARY_DIR = /workspaces/SM_2D/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/sm2d_kernels.dir/all
 all: CMakeFiles/sm2d_impl.dir/all
 all: CMakeFiles/run_simulation.dir/all
 all: tests/all
@@ -74,7 +73,6 @@ preinstall: tests/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/sm2d_kernels.dir/clean
 clean: CMakeFiles/sm2d_impl.dir/clean
 clean: CMakeFiles/run_simulation.dir/clean
 clean: tests/clean
@@ -96,44 +94,18 @@ tests/clean: tests/CMakeFiles/sm2d_tests.dir/clean
 .PHONY : tests/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/sm2d_kernels.dir
-
-# All Build rule for target.
-CMakeFiles/sm2d_kernels.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=29,30,31,32,33,34,35,36 "Built target sm2d_kernels"
-.PHONY : CMakeFiles/sm2d_kernels.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/sm2d_kernels.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 8
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/sm2d_kernels.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 0
-.PHONY : CMakeFiles/sm2d_kernels.dir/rule
-
-# Convenience name for target.
-sm2d_kernels: CMakeFiles/sm2d_kernels.dir/rule
-.PHONY : sm2d_kernels
-
-# clean rule for target.
-CMakeFiles/sm2d_kernels.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/clean
-.PHONY : CMakeFiles/sm2d_kernels.dir/clean
-
-#=============================================================================
 # Target rules for target CMakeFiles/sm2d_impl.dir
 
 # All Build rule for target.
 CMakeFiles/sm2d_impl.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28 "Built target sm2d_impl"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22 "Built target sm2d_impl"
 .PHONY : CMakeFiles/sm2d_impl.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/sm2d_impl.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 25
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 20
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/sm2d_impl.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 0
 .PHONY : CMakeFiles/sm2d_impl.dir/rule
@@ -151,16 +123,15 @@ CMakeFiles/sm2d_impl.dir/clean:
 # Target rules for target CMakeFiles/run_simulation.dir
 
 # All Build rule for target.
-CMakeFiles/run_simulation.dir/all: CMakeFiles/sm2d_kernels.dir/all
 CMakeFiles/run_simulation.dir/all: CMakeFiles/sm2d_impl.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=1,2,3 "Built target run_simulation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=1,2 "Built target run_simulation"
 .PHONY : CMakeFiles/run_simulation.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/run_simulation.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 36
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 22
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/run_simulation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 0
 .PHONY : CMakeFiles/run_simulation.dir/rule
@@ -178,16 +149,15 @@ CMakeFiles/run_simulation.dir/clean:
 # Target rules for target tests/CMakeFiles/sm2d_tests.dir
 
 # All Build rule for target.
-tests/CMakeFiles/sm2d_tests.dir/all: CMakeFiles/sm2d_kernels.dir/all
 tests/CMakeFiles/sm2d_tests.dir/all: CMakeFiles/sm2d_impl.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70 "Built target sm2d_tests"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50 "Built target sm2d_tests"
 .PHONY : tests/CMakeFiles/sm2d_tests.dir/all
 
 # Build rule for subdir invocation for target.
 tests/CMakeFiles/sm2d_tests.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 67
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 48
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/sm2d_tests.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/SM_2D/build/CMakeFiles 0
 .PHONY : tests/CMakeFiles/sm2d_tests.dir/rule

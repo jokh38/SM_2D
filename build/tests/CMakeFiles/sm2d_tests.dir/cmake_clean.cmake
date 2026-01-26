@@ -11,17 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o"
   "CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o.d"
-  "CMakeFiles/sm2d_tests.dir/cmake_device_link.o"
-  "CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o"
-  "CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o.d"
-  "CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o"
-  "CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o.d"
-  "CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o"
-  "CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o"
   "CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o.d"
-  "CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o"
-  "CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o"
   "CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o"
@@ -32,8 +23,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o"
   "CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o.d"
-  "CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o"
-  "CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o"
   "CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o.d"
   "CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o"
@@ -70,6 +59,6 @@ file(REMOVE_RECURSE
 )
 
 # Per-language clean rules from dependency scanning.
-foreach(lang CUDA CXX)
+foreach(lang CXX)
   include(CMakeFiles/sm2d_tests.dir/cmake_clean_${lang}.cmake OPTIONAL)
 endforeach()

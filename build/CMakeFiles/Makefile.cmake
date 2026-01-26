@@ -11,7 +11,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfigVersion.cmake"
   "/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets-none.cmake"
   "/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets.cmake"
-  "/usr/local/share/cmake-3.30/Modules/CMakeCUDAInformation.cmake"
   "/usr/local/share/cmake-3.30/Modules/CMakeCXXInformation.cmake"
   "/usr/local/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake"
   "/usr/local/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
@@ -26,8 +25,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/local/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
   "/usr/local/share/cmake-3.30/Modules/Compiler/GNU-CXX.cmake"
   "/usr/local/share/cmake-3.30/Modules/Compiler/GNU.cmake"
-  "/usr/local/share/cmake-3.30/Modules/Compiler/NVIDIA-CUDA.cmake"
-  "/usr/local/share/cmake-3.30/Modules/Compiler/NVIDIA.cmake"
   "/usr/local/share/cmake-3.30/Modules/FindGTest.cmake"
   "/usr/local/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
   "/usr/local/share/cmake-3.30/Modules/FindPackageMessage.cmake"
@@ -37,11 +34,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/local/share/cmake-3.30/Modules/Platform/Linux-GNU-CXX.cmake"
   "/usr/local/share/cmake-3.30/Modules/Platform/Linux-GNU.cmake"
   "/usr/local/share/cmake-3.30/Modules/Platform/Linux-Initialize.cmake"
-  "/usr/local/share/cmake-3.30/Modules/Platform/Linux-NVIDIA-CUDA.cmake"
   "/usr/local/share/cmake-3.30/Modules/Platform/Linux.cmake"
   "/usr/local/share/cmake-3.30/Modules/Platform/UnixPaths.cmake"
   "/workspaces/SM_2D/CMakeLists.txt"
-  "CMakeFiles/3.30.0/CMakeCUDACompiler.cmake"
   "CMakeFiles/3.30.0/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.30.0/CMakeSystem.cmake"
   "/workspaces/SM_2D/tests/CMakeLists.txt"
@@ -61,7 +56,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/sm2d_kernels.dir/DependInfo.cmake"
   "CMakeFiles/sm2d_impl.dir/DependInfo.cmake"
   "CMakeFiles/run_simulation.dir/DependInfo.cmake"
   "tests/CMakeFiles/sm2d_tests.dir/DependInfo.cmake"

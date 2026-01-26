@@ -8,18 +8,13 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp" "tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o.d"
-  "/workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp" "tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o.d"
-  "/workspaces/SM_2D/tests/unit/test_cuda_smoke.cpp" "tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o.d"
   "/workspaces/SM_2D/tests/audit/test_cell_energy_audit.cpp" "tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o.d"
   "/workspaces/SM_2D/tests/audit/test_cell_weight_audit.cpp" "tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o.d"
   "/workspaces/SM_2D/tests/audit/test_global_budget.cpp" "tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o.d"
   "/workspaces/SM_2D/tests/audit/test_reporting.cpp" "tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o.d"
   "/workspaces/SM_2D/tests/boundary/test_boundaries.cpp" "tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o.d"
   "/workspaces/SM_2D/tests/boundary/test_loss_tracking.cpp" "tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o.d"
-  "/workspaces/SM_2D/tests/perf/test_kernel_profiling.cpp" "tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o.d"
   "/workspaces/SM_2D/tests/perf/test_memory_profiling.cpp" "tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o.d"
-  "/workspaces/SM_2D/tests/perf/test_occupancy.cpp" "tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o.d"
   "/workspaces/SM_2D/tests/source/test_gaussian.cpp" "tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o.d"
   "/workspaces/SM_2D/tests/source/test_pencil.cpp" "tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o.d"
   "/workspaces/SM_2D/tests/unit/test_block_encoding.cpp" "tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o" "gcc" "tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o.d"

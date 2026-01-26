@@ -1,6 +1,17 @@
 #pragma once
 #include <cstdint>
+
+#ifdef SM2D_HAS_CUDA
 #include <cuda_runtime.h>
+#endif
+
+// For CPU builds, define __host__ and __device__ as empty
+#ifndef __host__
+#define __host__
+#endif
+#ifndef __device__
+#define __device__
+#endif
 
 // Block ID: 24-bit encoding
 // Bits 0-11:   b_theta (12 bits)

@@ -1,12 +1,19 @@
 #include "gpu/gpu_transport_runner.hpp"
+
+#ifdef SM2D_HAS_CUDA
 #include "cuda/gpu_transport_wrapper.hpp"
+#include <cuda_runtime.h>
+#endif
+
 #include "lut/r_lut.hpp"
 #include "lut/nist_loader.hpp"
-#include <cuda_runtime.h>
+#include "core/grids.hpp"
 #include <iostream>
 #include <stdexcept>
 
 namespace sm_2d {
+
+#ifdef SM2D_HAS_CUDA
 
 bool GPUTransportRunner::is_gpu_available() {
     int device_count = 0;
@@ -57,31 +64,75 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     float x_min = -(config.grid.Nx * config.grid.dx) / 2.0f;
     float z_min = 0.0f;
 
-    // Number of particles (use n_samples from config)
-    int n_particles = config.sampling.n_samples;
+    // Create phase-space grids for K1-K6 pipeline
+    // TODO: Make these configurable via IncidentParticleConfig
+    const int N_theta = 36;           // Global angular bins
+    const int N_E = 32;               // Global energy bins
+    const int N_theta_local = 6;      // Local angular bins per cell
+    const int N_E_local = 6;          // Local energy bins per cell
 
-    std::cout << "Running GPU transport with " << n_particles << " particles..." << std::endl;
+    // Angular grid: [-pi/2, pi/2] for full angular coverage
+    AngularGrid theta_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
+
+    // Energy grid: log-spaced from 0.1 MeV to 300 MeV
+    EnergyGrid E_grid(0.1f, 300.0f, N_E);
+
+    // Allocate device memory for grid edges
+    float* d_theta_edges = nullptr;
+    float* d_E_edges = nullptr;
+
+    cudaMalloc(&d_theta_edges, (N_theta + 1) * sizeof(float));
+    cudaMalloc(&d_E_edges, (N_E + 1) * sizeof(float));
+
+    cudaMemcpy(d_theta_edges, theta_grid.edges.data(), (N_theta + 1) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_E_edges, E_grid.edges.data(), (N_E + 1) * sizeof(float), cudaMemcpyHostToDevice);
+
+    std::cout << "Running K1-K6 GPU pipeline transport..." << std::endl;
     std::cout << "  GPU: " << get_gpu_name() << std::endl;
     std::cout << "  Energy: " << config.get_energy_MeV() << " MeV" << std::endl;
+    std::cout << "  Phase-space: " << N_theta << " x " << N_E << " bins" << std::endl;
 
-    // Run GPU transport
-    run_gpu_transport(
+    // Run K1-K6 pipeline transport
+    run_k1k6_pipeline_transport(
         config.get_position_x_mm(),
         config.get_position_z_mm(),
         config.get_angle_rad(),
         config.get_energy_MeV(),
         config.W_total,
-        n_particles,
         config.grid.Nx, config.grid.Nz,
         config.grid.dx, config.grid.dz,
         x_min, z_min,
+        N_theta, N_E,
+        N_theta_local, N_E_local,
+        d_theta_edges,
+        d_E_edges,
         *device_lut.get(),
         result.edep
     );
+
+    // Cleanup device edges
+    cudaFree(d_theta_edges);
+    cudaFree(d_E_edges);
 
     std::cout << "GPU transport complete." << std::endl;
 
     return result;
 }
+
+#else // !SM2D_HAS_CUDA (CPU-only build)
+
+bool GPUTransportRunner::is_gpu_available() {
+    return false;  // No CUDA support in this build
+}
+
+std::string GPUTransportRunner::get_gpu_name() {
+    return "N/A (CPU-only build)";
+}
+
+SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
+    throw std::runtime_error("GPU transport not available. This binary was built without CUDA support. Please use the CPU deterministic transport path.");
+}
+
+#endif // SM2D_HAS_CUDA
 
 } // namespace sm_2d

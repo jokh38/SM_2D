@@ -127,19 +127,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named sm2d_kernels
-
-# Build rule for target.
-sm2d_kernels: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 sm2d_kernels
-.PHONY : sm2d_kernels
-
-# fast build rule for target.
-sm2d_kernels/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/build
-.PHONY : sm2d_kernels/fast
-
-#=============================================================================
 # Target rules for targets named sm2d_impl
 
 # Build rule for target.
@@ -394,198 +381,6 @@ src/core/psi_storage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/core/psi_storage.cpp.s
 .PHONY : src/core/psi_storage.cpp.s
 
-src/cuda/gpu_transport_wrapper.o: src/cuda/gpu_transport_wrapper.cu.o
-.PHONY : src/cuda/gpu_transport_wrapper.o
-
-# target to build an object file
-src/cuda/gpu_transport_wrapper.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o
-.PHONY : src/cuda/gpu_transport_wrapper.cu.o
-
-src/cuda/gpu_transport_wrapper.i: src/cuda/gpu_transport_wrapper.cu.i
-.PHONY : src/cuda/gpu_transport_wrapper.i
-
-# target to preprocess a source file
-src/cuda/gpu_transport_wrapper.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.i
-.PHONY : src/cuda/gpu_transport_wrapper.cu.i
-
-src/cuda/gpu_transport_wrapper.s: src/cuda/gpu_transport_wrapper.cu.s
-.PHONY : src/cuda/gpu_transport_wrapper.s
-
-# target to generate assembly for a file
-src/cuda/gpu_transport_wrapper.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.s
-.PHONY : src/cuda/gpu_transport_wrapper.cu.s
-
-src/cuda/kernels/k1_activemask.o: src/cuda/kernels/k1_activemask.cu.o
-.PHONY : src/cuda/kernels/k1_activemask.o
-
-# target to build an object file
-src/cuda/kernels/k1_activemask.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
-.PHONY : src/cuda/kernels/k1_activemask.cu.o
-
-src/cuda/kernels/k1_activemask.i: src/cuda/kernels/k1_activemask.cu.i
-.PHONY : src/cuda/kernels/k1_activemask.i
-
-# target to preprocess a source file
-src/cuda/kernels/k1_activemask.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.i
-.PHONY : src/cuda/kernels/k1_activemask.cu.i
-
-src/cuda/kernels/k1_activemask.s: src/cuda/kernels/k1_activemask.cu.s
-.PHONY : src/cuda/kernels/k1_activemask.s
-
-# target to generate assembly for a file
-src/cuda/kernels/k1_activemask.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.s
-.PHONY : src/cuda/kernels/k1_activemask.cu.s
-
-src/cuda/kernels/k2_coarsetransport.o: src/cuda/kernels/k2_coarsetransport.cu.o
-.PHONY : src/cuda/kernels/k2_coarsetransport.o
-
-# target to build an object file
-src/cuda/kernels/k2_coarsetransport.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o
-.PHONY : src/cuda/kernels/k2_coarsetransport.cu.o
-
-src/cuda/kernels/k2_coarsetransport.i: src/cuda/kernels/k2_coarsetransport.cu.i
-.PHONY : src/cuda/kernels/k2_coarsetransport.i
-
-# target to preprocess a source file
-src/cuda/kernels/k2_coarsetransport.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.i
-.PHONY : src/cuda/kernels/k2_coarsetransport.cu.i
-
-src/cuda/kernels/k2_coarsetransport.s: src/cuda/kernels/k2_coarsetransport.cu.s
-.PHONY : src/cuda/kernels/k2_coarsetransport.s
-
-# target to generate assembly for a file
-src/cuda/kernels/k2_coarsetransport.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.s
-.PHONY : src/cuda/kernels/k2_coarsetransport.cu.s
-
-src/cuda/kernels/k3_finetransport.o: src/cuda/kernels/k3_finetransport.cu.o
-.PHONY : src/cuda/kernels/k3_finetransport.o
-
-# target to build an object file
-src/cuda/kernels/k3_finetransport.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
-.PHONY : src/cuda/kernels/k3_finetransport.cu.o
-
-src/cuda/kernels/k3_finetransport.i: src/cuda/kernels/k3_finetransport.cu.i
-.PHONY : src/cuda/kernels/k3_finetransport.i
-
-# target to preprocess a source file
-src/cuda/kernels/k3_finetransport.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.i
-.PHONY : src/cuda/kernels/k3_finetransport.cu.i
-
-src/cuda/kernels/k3_finetransport.s: src/cuda/kernels/k3_finetransport.cu.s
-.PHONY : src/cuda/kernels/k3_finetransport.s
-
-# target to generate assembly for a file
-src/cuda/kernels/k3_finetransport.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.s
-.PHONY : src/cuda/kernels/k3_finetransport.cu.s
-
-src/cuda/kernels/k4_transfer.o: src/cuda/kernels/k4_transfer.cu.o
-.PHONY : src/cuda/kernels/k4_transfer.o
-
-# target to build an object file
-src/cuda/kernels/k4_transfer.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
-.PHONY : src/cuda/kernels/k4_transfer.cu.o
-
-src/cuda/kernels/k4_transfer.i: src/cuda/kernels/k4_transfer.cu.i
-.PHONY : src/cuda/kernels/k4_transfer.i
-
-# target to preprocess a source file
-src/cuda/kernels/k4_transfer.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.i
-.PHONY : src/cuda/kernels/k4_transfer.cu.i
-
-src/cuda/kernels/k4_transfer.s: src/cuda/kernels/k4_transfer.cu.s
-.PHONY : src/cuda/kernels/k4_transfer.s
-
-# target to generate assembly for a file
-src/cuda/kernels/k4_transfer.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.s
-.PHONY : src/cuda/kernels/k4_transfer.cu.s
-
-src/cuda/kernels/k5_audit.o: src/cuda/kernels/k5_audit.cu.o
-.PHONY : src/cuda/kernels/k5_audit.o
-
-# target to build an object file
-src/cuda/kernels/k5_audit.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
-.PHONY : src/cuda/kernels/k5_audit.cu.o
-
-src/cuda/kernels/k5_audit.i: src/cuda/kernels/k5_audit.cu.i
-.PHONY : src/cuda/kernels/k5_audit.i
-
-# target to preprocess a source file
-src/cuda/kernels/k5_audit.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.i
-.PHONY : src/cuda/kernels/k5_audit.cu.i
-
-src/cuda/kernels/k5_audit.s: src/cuda/kernels/k5_audit.cu.s
-.PHONY : src/cuda/kernels/k5_audit.s
-
-# target to generate assembly for a file
-src/cuda/kernels/k5_audit.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.s
-.PHONY : src/cuda/kernels/k5_audit.cu.s
-
-src/cuda/kernels/k6_swap.o: src/cuda/kernels/k6_swap.cu.o
-.PHONY : src/cuda/kernels/k6_swap.o
-
-# target to build an object file
-src/cuda/kernels/k6_swap.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
-.PHONY : src/cuda/kernels/k6_swap.cu.o
-
-src/cuda/kernels/k6_swap.i: src/cuda/kernels/k6_swap.cu.i
-.PHONY : src/cuda/kernels/k6_swap.i
-
-# target to preprocess a source file
-src/cuda/kernels/k6_swap.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.i
-.PHONY : src/cuda/kernels/k6_swap.cu.i
-
-src/cuda/kernels/k6_swap.s: src/cuda/kernels/k6_swap.cu.s
-.PHONY : src/cuda/kernels/k6_swap.s
-
-# target to generate assembly for a file
-src/cuda/kernels/k6_swap.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.s
-.PHONY : src/cuda/kernels/k6_swap.cu.s
-
-src/cuda/kernels/simple_gpu_transport.o: src/cuda/kernels/simple_gpu_transport.cu.o
-.PHONY : src/cuda/kernels/simple_gpu_transport.o
-
-# target to build an object file
-src/cuda/kernels/simple_gpu_transport.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o
-.PHONY : src/cuda/kernels/simple_gpu_transport.cu.o
-
-src/cuda/kernels/simple_gpu_transport.i: src/cuda/kernels/simple_gpu_transport.cu.i
-.PHONY : src/cuda/kernels/simple_gpu_transport.i
-
-# target to preprocess a source file
-src/cuda/kernels/simple_gpu_transport.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.i
-.PHONY : src/cuda/kernels/simple_gpu_transport.cu.i
-
-src/cuda/kernels/simple_gpu_transport.s: src/cuda/kernels/simple_gpu_transport.cu.s
-.PHONY : src/cuda/kernels/simple_gpu_transport.s
-
-# target to generate assembly for a file
-src/cuda/kernels/simple_gpu_transport.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_kernels.dir/build.make CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.s
-.PHONY : src/cuda/kernels/simple_gpu_transport.cu.s
-
 src/gpu/gpu_transport_runner.o: src/gpu/gpu_transport_runner.cpp.o
 .PHONY : src/gpu/gpu_transport_runner.o
 
@@ -658,78 +453,6 @@ src/lut/r_lut.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/lut/r_lut.cpp.s
 .PHONY : src/lut/r_lut.cpp.s
 
-src/perf/kernel_profiler.o: src/perf/kernel_profiler.cpp.o
-.PHONY : src/perf/kernel_profiler.o
-
-# target to build an object file
-src/perf/kernel_profiler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.o
-.PHONY : src/perf/kernel_profiler.cpp.o
-
-src/perf/kernel_profiler.i: src/perf/kernel_profiler.cpp.i
-.PHONY : src/perf/kernel_profiler.i
-
-# target to preprocess a source file
-src/perf/kernel_profiler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.i
-.PHONY : src/perf/kernel_profiler.cpp.i
-
-src/perf/kernel_profiler.s: src/perf/kernel_profiler.cpp.s
-.PHONY : src/perf/kernel_profiler.s
-
-# target to generate assembly for a file
-src/perf/kernel_profiler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/kernel_profiler.cpp.s
-.PHONY : src/perf/kernel_profiler.cpp.s
-
-src/perf/memory_profiler.o: src/perf/memory_profiler.cpp.o
-.PHONY : src/perf/memory_profiler.o
-
-# target to build an object file
-src/perf/memory_profiler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.o
-.PHONY : src/perf/memory_profiler.cpp.o
-
-src/perf/memory_profiler.i: src/perf/memory_profiler.cpp.i
-.PHONY : src/perf/memory_profiler.i
-
-# target to preprocess a source file
-src/perf/memory_profiler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.i
-.PHONY : src/perf/memory_profiler.cpp.i
-
-src/perf/memory_profiler.s: src/perf/memory_profiler.cpp.s
-.PHONY : src/perf/memory_profiler.s
-
-# target to generate assembly for a file
-src/perf/memory_profiler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/memory_profiler.cpp.s
-.PHONY : src/perf/memory_profiler.cpp.s
-
-src/perf/occupancy_analyzer.o: src/perf/occupancy_analyzer.cpp.o
-.PHONY : src/perf/occupancy_analyzer.o
-
-# target to build an object file
-src/perf/occupancy_analyzer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.o
-.PHONY : src/perf/occupancy_analyzer.cpp.o
-
-src/perf/occupancy_analyzer.i: src/perf/occupancy_analyzer.cpp.i
-.PHONY : src/perf/occupancy_analyzer.i
-
-# target to preprocess a source file
-src/perf/occupancy_analyzer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.i
-.PHONY : src/perf/occupancy_analyzer.cpp.i
-
-src/perf/occupancy_analyzer.s: src/perf/occupancy_analyzer.cpp.s
-.PHONY : src/perf/occupancy_analyzer.s
-
-# target to generate assembly for a file
-src/perf/occupancy_analyzer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/perf/occupancy_analyzer.cpp.s
-.PHONY : src/perf/occupancy_analyzer.cpp.s
-
 src/source/gaussian_source.o: src/source/gaussian_source.cpp.o
 .PHONY : src/source/gaussian_source.o
 
@@ -778,30 +501,6 @@ src/source/pencil_source.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/source/pencil_source.cpp.s
 .PHONY : src/source/pencil_source.cpp.s
 
-src/utils/cuda_pool.o: src/utils/cuda_pool.cpp.o
-.PHONY : src/utils/cuda_pool.o
-
-# target to build an object file
-src/utils/cuda_pool.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/cuda_pool.cpp.o
-.PHONY : src/utils/cuda_pool.cpp.o
-
-src/utils/cuda_pool.i: src/utils/cuda_pool.cpp.i
-.PHONY : src/utils/cuda_pool.i
-
-# target to preprocess a source file
-src/utils/cuda_pool.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/cuda_pool.cpp.i
-.PHONY : src/utils/cuda_pool.cpp.i
-
-src/utils/cuda_pool.s: src/utils/cuda_pool.cpp.s
-.PHONY : src/utils/cuda_pool.s
-
-# target to generate assembly for a file
-src/utils/cuda_pool.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/cuda_pool.cpp.s
-.PHONY : src/utils/cuda_pool.cpp.s
-
 src/utils/logger.o: src/utils/logger.cpp.o
 .PHONY : src/utils/logger.o
 
@@ -825,30 +524,6 @@ src/utils/logger.s: src/utils/logger.cpp.s
 src/utils/logger.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/logger.cpp.s
 .PHONY : src/utils/logger.cpp.s
-
-src/utils/memory_tracker.o: src/utils/memory_tracker.cpp.o
-.PHONY : src/utils/memory_tracker.o
-
-# target to build an object file
-src/utils/memory_tracker.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.o
-.PHONY : src/utils/memory_tracker.cpp.o
-
-src/utils/memory_tracker.i: src/utils/memory_tracker.cpp.i
-.PHONY : src/utils/memory_tracker.i
-
-# target to preprocess a source file
-src/utils/memory_tracker.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.i
-.PHONY : src/utils/memory_tracker.cpp.i
-
-src/utils/memory_tracker.s: src/utils/memory_tracker.cpp.s
-.PHONY : src/utils/memory_tracker.s
-
-# target to generate assembly for a file
-src/utils/memory_tracker.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/sm2d_impl.dir/build.make CMakeFiles/sm2d_impl.dir/src/utils/memory_tracker.cpp.s
-.PHONY : src/utils/memory_tracker.cpp.s
 
 src/validation/bragg_peak.o: src/validation/bragg_peak.cpp.o
 .PHONY : src/validation/bragg_peak.o
@@ -981,7 +656,6 @@ help:
 	@echo "... test"
 	@echo "... run_simulation"
 	@echo "... sm2d_impl"
-	@echo "... sm2d_kernels"
 	@echo "... sm2d_tests"
 	@echo "... run_simulation.o"
 	@echo "... run_simulation.i"
@@ -1010,30 +684,6 @@ help:
 	@echo "... src/core/psi_storage.o"
 	@echo "... src/core/psi_storage.i"
 	@echo "... src/core/psi_storage.s"
-	@echo "... src/cuda/gpu_transport_wrapper.o"
-	@echo "... src/cuda/gpu_transport_wrapper.i"
-	@echo "... src/cuda/gpu_transport_wrapper.s"
-	@echo "... src/cuda/kernels/k1_activemask.o"
-	@echo "... src/cuda/kernels/k1_activemask.i"
-	@echo "... src/cuda/kernels/k1_activemask.s"
-	@echo "... src/cuda/kernels/k2_coarsetransport.o"
-	@echo "... src/cuda/kernels/k2_coarsetransport.i"
-	@echo "... src/cuda/kernels/k2_coarsetransport.s"
-	@echo "... src/cuda/kernels/k3_finetransport.o"
-	@echo "... src/cuda/kernels/k3_finetransport.i"
-	@echo "... src/cuda/kernels/k3_finetransport.s"
-	@echo "... src/cuda/kernels/k4_transfer.o"
-	@echo "... src/cuda/kernels/k4_transfer.i"
-	@echo "... src/cuda/kernels/k4_transfer.s"
-	@echo "... src/cuda/kernels/k5_audit.o"
-	@echo "... src/cuda/kernels/k5_audit.i"
-	@echo "... src/cuda/kernels/k5_audit.s"
-	@echo "... src/cuda/kernels/k6_swap.o"
-	@echo "... src/cuda/kernels/k6_swap.i"
-	@echo "... src/cuda/kernels/k6_swap.s"
-	@echo "... src/cuda/kernels/simple_gpu_transport.o"
-	@echo "... src/cuda/kernels/simple_gpu_transport.i"
-	@echo "... src/cuda/kernels/simple_gpu_transport.s"
 	@echo "... src/gpu/gpu_transport_runner.o"
 	@echo "... src/gpu/gpu_transport_runner.i"
 	@echo "... src/gpu/gpu_transport_runner.s"
@@ -1043,30 +693,15 @@ help:
 	@echo "... src/lut/r_lut.o"
 	@echo "... src/lut/r_lut.i"
 	@echo "... src/lut/r_lut.s"
-	@echo "... src/perf/kernel_profiler.o"
-	@echo "... src/perf/kernel_profiler.i"
-	@echo "... src/perf/kernel_profiler.s"
-	@echo "... src/perf/memory_profiler.o"
-	@echo "... src/perf/memory_profiler.i"
-	@echo "... src/perf/memory_profiler.s"
-	@echo "... src/perf/occupancy_analyzer.o"
-	@echo "... src/perf/occupancy_analyzer.i"
-	@echo "... src/perf/occupancy_analyzer.s"
 	@echo "... src/source/gaussian_source.o"
 	@echo "... src/source/gaussian_source.i"
 	@echo "... src/source/gaussian_source.s"
 	@echo "... src/source/pencil_source.o"
 	@echo "... src/source/pencil_source.i"
 	@echo "... src/source/pencil_source.s"
-	@echo "... src/utils/cuda_pool.o"
-	@echo "... src/utils/cuda_pool.i"
-	@echo "... src/utils/cuda_pool.s"
 	@echo "... src/utils/logger.o"
 	@echo "... src/utils/logger.i"
 	@echo "... src/utils/logger.s"
-	@echo "... src/utils/memory_tracker.o"
-	@echo "... src/utils/memory_tracker.i"
-	@echo "... src/utils/memory_tracker.s"
 	@echo "... src/validation/bragg_peak.o"
 	@echo "... src/validation/bragg_peak.i"
 	@echo "... src/validation/bragg_peak.s"

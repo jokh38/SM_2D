@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/local/cuda-12.4/include -I/workspaces/SM_2D/src/cuda -I/workspaces/SM_2D/src/include
+CXX_INCLUDES = -I/workspaces/SM_2D/src/include
 
-CXX_FLAGS = -O3 -DNDEBUG
+CXX_FLAGS = 
 

@@ -83,25 +83,10 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.s"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/tests/unit/test_build_system.cpp -o CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.s
 
-tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
-tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: tests/CMakeFiles/sm2d_tests.dir/includes_CUDA.rsp
-tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: /workspaces/SM_2D/tests/unit/test_cuda_smoke.cpp
-tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CUDA object tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o"
-	cd /workspaces/SM_2D/build/tests && /usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/unit/test_cuda_smoke.cpp -o CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
-
-tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.i"
-	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
-
-tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CUDA source to assembly CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.s"
-	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
-
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o: /workspaces/SM_2D/tests/unit/test_memory_budget.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o -c /workspaces/SM_2D/tests/unit/test_memory_budget.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.i: cmake_force
@@ -115,7 +100,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o: /workspaces/SM_2D/tests/unit/test_logging.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o -c /workspaces/SM_2D/tests/unit/test_logging.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.i: cmake_force
@@ -129,7 +114,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o: /workspaces/SM_2D/tests/unit/test_memory_pool.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o -c /workspaces/SM_2D/tests/unit/test_memory_pool.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.i: cmake_force
@@ -143,7 +128,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o: /workspaces/SM_2D/tests/unit/test_grids.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o -c /workspaces/SM_2D/tests/unit/test_grids.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.i: cmake_force
@@ -157,7 +142,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o: /workspaces/SM_2D/tests/unit/test_r_lut.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o -c /workspaces/SM_2D/tests/unit/test_r_lut.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.i: cmake_force
@@ -171,7 +156,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o: /workspaces/SM_2D/tests/unit/test_local_bins.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o -c /workspaces/SM_2D/tests/unit/test_local_bins.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.i: cmake_force
@@ -185,7 +170,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o: /workspaces/SM_2D/tests/unit/test_block_encoding.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o -c /workspaces/SM_2D/tests/unit/test_block_encoding.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.i: cmake_force
@@ -199,7 +184,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o: /workspaces/SM_2D/tests/unit/test_psi_storage.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o -c /workspaces/SM_2D/tests/unit/test_psi_storage.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.i: cmake_force
@@ -213,7 +198,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o: /workspaces/SM_2D/tests/unit/test_buckets.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o -c /workspaces/SM_2D/tests/unit/test_buckets.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.i: cmake_force
@@ -227,7 +212,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o: /workspaces/SM_2D/tests/unit/test_step_control.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o -c /workspaces/SM_2D/tests/unit/test_step_control.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.i: cmake_force
@@ -241,7 +226,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o: /workspaces/SM_2D/tests/unit/test_highland.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o -c /workspaces/SM_2D/tests/unit/test_highland.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.i: cmake_force
@@ -255,7 +240,7 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o: /workspaces/SM_2D/tests/unit/test_nuclear.cpp
 tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o -MF CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o.d -o CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o -c /workspaces/SM_2D/tests/unit/test_nuclear.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.i: cmake_force
@@ -266,40 +251,10 @@ tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.s"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/tests/unit/test_nuclear.cpp -o CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.s
 
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: tests/CMakeFiles/sm2d_tests.dir/includes_CUDA.rsp
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CUDA object tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o"
-	cd /workspaces/SM_2D/build/tests && /usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o -MF CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/kernels/test_k1_activemask.cpp -o CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o
-
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.i"
-	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
-
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CUDA source to assembly CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.s"
-	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
-
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: tests/CMakeFiles/sm2d_tests.dir/includes_CUDA.rsp
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CUDA object tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o"
-	cd /workspaces/SM_2D/build/tests && /usr/local/cuda-12.4/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o -MF CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o.d -x cu -rdc=true -c /workspaces/SM_2D/tests/kernels/test_k3_finetransport.cpp -o CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o
-
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.i"
-	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
-
-tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CUDA source to assembly CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.s"
-	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
-
 tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: /workspaces/SM_2D/tests/source/test_pencil.cpp
 tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o -MF CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o.d -o CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o -c /workspaces/SM_2D/tests/source/test_pencil.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.i: cmake_force
@@ -313,7 +268,7 @@ tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o: /workspaces/SM_2D/tests/source/test_gaussian.cpp
 tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o -MF CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o.d -o CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o -c /workspaces/SM_2D/tests/source/test_gaussian.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.i: cmake_force
@@ -327,7 +282,7 @@ tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o: /workspaces/SM_2D/tests/boundary/test_boundaries.cpp
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o -MF CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o.d -o CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o -c /workspaces/SM_2D/tests/boundary/test_boundaries.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.i: cmake_force
@@ -341,7 +296,7 @@ tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o: /workspaces/SM_2D/tests/boundary/test_loss_tracking.cpp
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o -MF CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o.d -o CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o -c /workspaces/SM_2D/tests/boundary/test_loss_tracking.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.i: cmake_force
@@ -355,7 +310,7 @@ tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o: /workspaces/SM_2D/tests/audit/test_cell_weight_audit.cpp
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o -MF CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o.d -o CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o -c /workspaces/SM_2D/tests/audit/test_cell_weight_audit.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.i: cmake_force
@@ -369,7 +324,7 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o: /workspaces/SM_2D/tests/audit/test_cell_energy_audit.cpp
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o -MF CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o.d -o CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o -c /workspaces/SM_2D/tests/audit/test_cell_energy_audit.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.i: cmake_force
@@ -383,7 +338,7 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o: /workspaces/SM_2D/tests/audit/test_global_budget.cpp
 tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o -MF CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o.d -o CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o -c /workspaces/SM_2D/tests/audit/test_global_budget.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.i: cmake_force
@@ -397,7 +352,7 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o: /workspaces/SM_2D/tests/audit/test_reporting.cpp
 tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o -MF CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o.d -o CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o -c /workspaces/SM_2D/tests/audit/test_reporting.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.i: cmake_force
@@ -411,7 +366,7 @@ tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o: /workspaces/SM_2D/tests/validation/test_pencil_beam.cpp
 tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o -MF CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o.d -o CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o -c /workspaces/SM_2D/tests/validation/test_pencil_beam.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.i: cmake_force
@@ -425,7 +380,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o: /workspaces/SM_2D/tests/validation/test_bragg_peak.cpp
 tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o -MF CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o.d -o CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o -c /workspaces/SM_2D/tests/validation/test_bragg_peak.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.i: cmake_force
@@ -439,7 +394,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o: /workspaces/SM_2D/tests/validation/test_lateral_spread.cpp
 tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o -MF CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o.d -o CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o -c /workspaces/SM_2D/tests/validation/test_lateral_spread.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.i: cmake_force
@@ -453,7 +408,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.s: cmake_forc
 tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o: /workspaces/SM_2D/tests/validation/test_determinism.cpp
 tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o -MF CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o.d -o CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o -c /workspaces/SM_2D/tests/validation/test_determinism.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.i: cmake_force
@@ -467,7 +422,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.s: cmake_force
 tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: /workspaces/SM_2D/tests/validation/test_validation_report.cpp
 tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o -MF CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o.d -o CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o -c /workspaces/SM_2D/tests/validation/test_validation_report.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.i: cmake_force
@@ -481,7 +436,7 @@ tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.s: cmake_f
 tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
 tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o: /workspaces/SM_2D/tests/perf/test_memory_profiling.cpp
 tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o -MF CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o.d -o CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o -c /workspaces/SM_2D/tests/perf/test_memory_profiling.cpp
 
 tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.i: cmake_force
@@ -492,38 +447,9 @@ tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.s"
 	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/tests/perf/test_memory_profiling.cpp -o CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.s
 
-tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
-tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o: /workspaces/SM_2D/tests/perf/test_kernel_profiling.cpp
-tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o"
-	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o -MF CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o.d -o CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o -c /workspaces/SM_2D/tests/perf/test_kernel_profiling.cpp
-
-tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.i"
-	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/SM_2D/tests/perf/test_kernel_profiling.cpp > CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.i
-
-tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.s"
-	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/tests/perf/test_kernel_profiling.cpp -o CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.s
-
-tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o: tests/CMakeFiles/sm2d_tests.dir/flags.make
-tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o: /workspaces/SM_2D/tests/perf/test_occupancy.cpp
-tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o: tests/CMakeFiles/sm2d_tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o"
-	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o -MF CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o.d -o CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o -c /workspaces/SM_2D/tests/perf/test_occupancy.cpp
-
-tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.i"
-	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/SM_2D/tests/perf/test_occupancy.cpp > CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.i
-
-tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.s"
-	cd /workspaces/SM_2D/build/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/SM_2D/tests/perf/test_occupancy.cpp -o CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.s
-
 # Object files for target sm2d_tests
 sm2d_tests_OBJECTS = \
 "CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o" \
@@ -536,8 +462,6 @@ sm2d_tests_OBJECTS = \
 "CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o" \
@@ -551,123 +475,12 @@ sm2d_tests_OBJECTS = \
 "CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o" \
 "CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o"
+"CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o"
 
 # External object files for target sm2d_tests
-sm2d_tests_EXTERNAL_OBJECTS = \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o"
-
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/build.make
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: libsm2d_impl.a
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: /usr/lib/x86_64-linux-gnu/libgtest_main.a
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: /usr/lib/x86_64-linux-gnu/libgtest.a
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/deviceLinkLibs.rsp
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/deviceObjects1.rsp
-tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o: tests/CMakeFiles/sm2d_tests.dir/dlink.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Linking CUDA device code CMakeFiles/sm2d_tests.dir/cmake_device_link.o"
-	cd /workspaces/SM_2D/build/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/sm2d_tests.dir/dlink.txt --verbose=$(VERBOSE)
-
-# Rule to build all files generated by this target.
-tests/CMakeFiles/sm2d_tests.dir/build: tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o
-.PHONY : tests/CMakeFiles/sm2d_tests.dir/build
-
-# Object files for target sm2d_tests
-sm2d_tests_OBJECTS = \
-"CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_grids.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_r_lut.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_local_bins.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_block_encoding.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_psi_storage.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/audit/test_cell_weight_audit.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/audit/test_cell_energy_audit.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/audit/test_global_budget.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/audit/test_reporting.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/validation/test_pencil_beam.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/validation/test_bragg_peak.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o" \
-"CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o"
-
-# External object files for target sm2d_tests
-sm2d_tests_EXTERNAL_OBJECTS = \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o" \
-"/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o"
+sm2d_tests_EXTERNAL_OBJECTS =
 
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.o
-tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_budget.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_logging.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_memory_pool.cpp.o
@@ -680,8 +493,6 @@ tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_buckets.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_step_control.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_highland.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/unit/test_nuclear.cpp.o
-tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o
-tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/source/test_pencil.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/source/test_gaussian.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/boundary/test_boundaries.cpp.o
@@ -696,23 +507,12 @@ tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/validation/test_lateral_spread
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/validation/test_determinism.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/validation/test_validation_report.cpp.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.o
-tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o
-tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k1_activemask.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k2_coarsetransport.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k3_finetransport.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o
-tests/sm2d_tests: CMakeFiles/sm2d_kernels.dir/src/cuda/gpu_transport_wrapper.cu.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/build.make
 tests/sm2d_tests: libsm2d_impl.a
 tests/sm2d_tests: /usr/lib/x86_64-linux-gnu/libgtest_main.a
 tests/sm2d_tests: /usr/lib/x86_64-linux-gnu/libgtest.a
-tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/cmake_device_link.o
 tests/sm2d_tests: tests/CMakeFiles/sm2d_tests.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Linking CXX executable sm2d_tests"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/SM_2D/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Linking CXX executable sm2d_tests"
 	cd /workspaces/SM_2D/build/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/sm2d_tests.dir/link.txt --verbose=$(VERBOSE)
 	cd /workspaces/SM_2D/build/tests && /usr/local/bin/cmake -D TEST_TARGET=sm2d_tests -D TEST_EXECUTABLE=/workspaces/SM_2D/build/tests/sm2d_tests -D TEST_EXECUTOR= -D TEST_WORKING_DIR=/workspaces/SM_2D/build/tests -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=sm2d_tests_TESTS -D CTEST_FILE=/workspaces/SM_2D/build/tests/sm2d_tests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P /usr/local/share/cmake-3.30/Modules/GoogleTestAddTests.cmake
 

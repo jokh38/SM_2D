@@ -284,78 +284,6 @@ boundary/test_loss_tracking.cpp.s:
 	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/boundary/test_loss_tracking.cpp.s
 .PHONY : boundary/test_loss_tracking.cpp.s
 
-kernels/test_k1_activemask.o: kernels/test_k1_activemask.cpp.o
-.PHONY : kernels/test_k1_activemask.o
-
-# target to build an object file
-kernels/test_k1_activemask.cpp.o:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.o
-.PHONY : kernels/test_k1_activemask.cpp.o
-
-kernels/test_k1_activemask.i: kernels/test_k1_activemask.cpp.i
-.PHONY : kernels/test_k1_activemask.i
-
-# target to preprocess a source file
-kernels/test_k1_activemask.cpp.i:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.i
-.PHONY : kernels/test_k1_activemask.cpp.i
-
-kernels/test_k1_activemask.s: kernels/test_k1_activemask.cpp.s
-.PHONY : kernels/test_k1_activemask.s
-
-# target to generate assembly for a file
-kernels/test_k1_activemask.cpp.s:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/kernels/test_k1_activemask.cpp.s
-.PHONY : kernels/test_k1_activemask.cpp.s
-
-kernels/test_k3_finetransport.o: kernels/test_k3_finetransport.cpp.o
-.PHONY : kernels/test_k3_finetransport.o
-
-# target to build an object file
-kernels/test_k3_finetransport.cpp.o:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.o
-.PHONY : kernels/test_k3_finetransport.cpp.o
-
-kernels/test_k3_finetransport.i: kernels/test_k3_finetransport.cpp.i
-.PHONY : kernels/test_k3_finetransport.i
-
-# target to preprocess a source file
-kernels/test_k3_finetransport.cpp.i:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.i
-.PHONY : kernels/test_k3_finetransport.cpp.i
-
-kernels/test_k3_finetransport.s: kernels/test_k3_finetransport.cpp.s
-.PHONY : kernels/test_k3_finetransport.s
-
-# target to generate assembly for a file
-kernels/test_k3_finetransport.cpp.s:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/kernels/test_k3_finetransport.cpp.s
-.PHONY : kernels/test_k3_finetransport.cpp.s
-
-perf/test_kernel_profiling.o: perf/test_kernel_profiling.cpp.o
-.PHONY : perf/test_kernel_profiling.o
-
-# target to build an object file
-perf/test_kernel_profiling.cpp.o:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.o
-.PHONY : perf/test_kernel_profiling.cpp.o
-
-perf/test_kernel_profiling.i: perf/test_kernel_profiling.cpp.i
-.PHONY : perf/test_kernel_profiling.i
-
-# target to preprocess a source file
-perf/test_kernel_profiling.cpp.i:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.i
-.PHONY : perf/test_kernel_profiling.cpp.i
-
-perf/test_kernel_profiling.s: perf/test_kernel_profiling.cpp.s
-.PHONY : perf/test_kernel_profiling.s
-
-# target to generate assembly for a file
-perf/test_kernel_profiling.cpp.s:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_kernel_profiling.cpp.s
-.PHONY : perf/test_kernel_profiling.cpp.s
-
 perf/test_memory_profiling.o: perf/test_memory_profiling.cpp.o
 .PHONY : perf/test_memory_profiling.o
 
@@ -379,30 +307,6 @@ perf/test_memory_profiling.s: perf/test_memory_profiling.cpp.s
 perf/test_memory_profiling.cpp.s:
 	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_memory_profiling.cpp.s
 .PHONY : perf/test_memory_profiling.cpp.s
-
-perf/test_occupancy.o: perf/test_occupancy.cpp.o
-.PHONY : perf/test_occupancy.o
-
-# target to build an object file
-perf/test_occupancy.cpp.o:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.o
-.PHONY : perf/test_occupancy.cpp.o
-
-perf/test_occupancy.i: perf/test_occupancy.cpp.i
-.PHONY : perf/test_occupancy.i
-
-# target to preprocess a source file
-perf/test_occupancy.cpp.i:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.i
-.PHONY : perf/test_occupancy.cpp.i
-
-perf/test_occupancy.s: perf/test_occupancy.cpp.s
-.PHONY : perf/test_occupancy.s
-
-# target to generate assembly for a file
-perf/test_occupancy.cpp.s:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/perf/test_occupancy.cpp.s
-.PHONY : perf/test_occupancy.cpp.s
 
 source/test_gaussian.o: source/test_gaussian.cpp.o
 .PHONY : source/test_gaussian.o
@@ -523,30 +427,6 @@ unit/test_build_system.s: unit/test_build_system.cpp.s
 unit/test_build_system.cpp.s:
 	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/unit/test_build_system.cpp.s
 .PHONY : unit/test_build_system.cpp.s
-
-unit/test_cuda_smoke.o: unit/test_cuda_smoke.cpp.o
-.PHONY : unit/test_cuda_smoke.o
-
-# target to build an object file
-unit/test_cuda_smoke.cpp.o:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.o
-.PHONY : unit/test_cuda_smoke.cpp.o
-
-unit/test_cuda_smoke.i: unit/test_cuda_smoke.cpp.i
-.PHONY : unit/test_cuda_smoke.i
-
-# target to preprocess a source file
-unit/test_cuda_smoke.cpp.i:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.i
-.PHONY : unit/test_cuda_smoke.cpp.i
-
-unit/test_cuda_smoke.s: unit/test_cuda_smoke.cpp.s
-.PHONY : unit/test_cuda_smoke.s
-
-# target to generate assembly for a file
-unit/test_cuda_smoke.cpp.s:
-	cd /workspaces/SM_2D/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/sm2d_tests.dir/build.make tests/CMakeFiles/sm2d_tests.dir/unit/test_cuda_smoke.cpp.s
-.PHONY : unit/test_cuda_smoke.cpp.s
 
 unit/test_grids.o: unit/test_grids.cpp.o
 .PHONY : unit/test_grids.o
@@ -936,21 +816,9 @@ help:
 	@echo "... boundary/test_loss_tracking.o"
 	@echo "... boundary/test_loss_tracking.i"
 	@echo "... boundary/test_loss_tracking.s"
-	@echo "... kernels/test_k1_activemask.o"
-	@echo "... kernels/test_k1_activemask.i"
-	@echo "... kernels/test_k1_activemask.s"
-	@echo "... kernels/test_k3_finetransport.o"
-	@echo "... kernels/test_k3_finetransport.i"
-	@echo "... kernels/test_k3_finetransport.s"
-	@echo "... perf/test_kernel_profiling.o"
-	@echo "... perf/test_kernel_profiling.i"
-	@echo "... perf/test_kernel_profiling.s"
 	@echo "... perf/test_memory_profiling.o"
 	@echo "... perf/test_memory_profiling.i"
 	@echo "... perf/test_memory_profiling.s"
-	@echo "... perf/test_occupancy.o"
-	@echo "... perf/test_occupancy.i"
-	@echo "... perf/test_occupancy.s"
 	@echo "... source/test_gaussian.o"
 	@echo "... source/test_gaussian.i"
 	@echo "... source/test_gaussian.s"
@@ -966,9 +834,6 @@ help:
 	@echo "... unit/test_build_system.o"
 	@echo "... unit/test_build_system.i"
 	@echo "... unit/test_build_system.s"
-	@echo "... unit/test_cuda_smoke.o"
-	@echo "... unit/test_cuda_smoke.i"
-	@echo "... unit/test_cuda_smoke.s"
 	@echo "... unit/test_grids.o"
 	@echo "... unit/test_grids.i"
 	@echo "... unit/test_grids.s"

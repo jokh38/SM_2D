@@ -1,6 +1,17 @@
 #pragma once
 #include <cstdint>
+
+#ifdef SM2D_HAS_CUDA
 #include <cuda_runtime.h>
+#endif
+
+// For CPU builds, define __host__ and __device__ as empty
+#ifndef __host__
+#define __host__
+#endif
+#ifndef __device__
+#define __device__
+#endif
 
 constexpr int N_theta_local = 8;
 constexpr int N_E_local = 4;

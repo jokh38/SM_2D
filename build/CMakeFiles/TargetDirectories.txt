@@ -1,4 +1,3 @@
-/workspaces/SM_2D/build/CMakeFiles/sm2d_kernels.dir
 /workspaces/SM_2D/build/CMakeFiles/sm2d_impl.dir
 /workspaces/SM_2D/build/CMakeFiles/run_simulation.dir
 /workspaces/SM_2D/build/CMakeFiles/test.dir
