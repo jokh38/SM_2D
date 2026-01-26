@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/workspaces/SM_2D/src/include
 
-CXX_FLAGS = 
+CXX_FLAGS = -O3 -DNDEBUG
 

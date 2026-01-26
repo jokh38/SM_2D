@@ -19,6 +19,42 @@ namespace sm_2d {
 // Helper Kernel Implementations
 // ============================================================================
 
+// Source particle injection kernel
+__global__ void inject_source_kernel(
+    DevicePsiC psi,
+    int source_cell,
+    float theta0, float E0, float W_total,
+    float x_in_cell, float z_in_cell,
+    float dx, float dz,
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+) {
+    // Only one thread needed for source injection
+    device_psic_inject_source(
+        psi,
+        source_cell,
+        theta0, E0, W_total,
+        x_in_cell, z_in_cell,
+        dx, dz,
+        theta_edges, E_edges,
+        N_theta, N_E,
+        N_theta_local, N_E_local
+    );
+}
+
+// Clear all outflow buckets
+__global__ void clear_buckets_kernel(
+    DeviceOutflowBucket* buckets,
+    int num_buckets
+) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= num_buckets) return;
+
+    device_bucket_clear(buckets[idx]);
+}
+
 __global__ void compact_active_list(
     const uint8_t* __restrict__ ActiveMask,
     uint32_t* __restrict__ ActiveList,
@@ -231,27 +267,38 @@ AuditReport get_audit_report(const K1K6PipelineState& state) {
 // ============================================================================
 
 bool run_k1_active_mask(
-    const PsiC& psi_in,
+    const DevicePsiC& psi_in,
     uint8_t* d_ActiveMask,
     int Nx, int Nz,
     int b_E_trigger,
     float weight_active_min
 ) {
-    // Get flattened pointers from PsiC
-    // Note: This requires PsiC to have device-accessible members
-    // For now, we'll call the kernel directly
-
     int threads = 256;
     int blocks = (Nx * Nz + threads - 1) / threads;
 
-    // K1 kernel should be called here
-    // For now, this is a placeholder
+    // Call K1_ActiveMask kernel
+    K1_ActiveMask<<<blocks, threads>>>(
+        psi_in.block_id,      // Block IDs from DevicePsiC
+        psi_in.value,         // Values from DevicePsiC
+        d_ActiveMask,
+        Nx, Nz,
+        b_E_trigger,
+        weight_active_min
+    );
 
+    // Check for kernel launch errors
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "K1 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+        return false;
+    }
+
+    cudaDeviceSynchronize();
     return true;
 }
 
 bool run_k2_coarse_transport(
-    const PsiC& psi_in,
+    const DevicePsiC& psi_in,
     const uint8_t* d_ActiveMask,
     const uint32_t* d_CoarseList,
     int n_coarse,
@@ -268,21 +315,60 @@ bool run_k2_coarse_transport(
     k2_cfg.step_coarse = config.step_coarse;
     k2_cfg.n_steps_per_cell = config.n_steps_per_cell;
 
-    // Get device grid edges
+    // Allocate device grid edges
     float* d_theta_edges;
     float* d_E_edges;
-    // These should be passed in or stored in state
+    cudaMalloc(&d_theta_edges, (config.N_theta + 1) * sizeof(float));
+    cudaMalloc(&d_E_edges, (config.N_E + 1) * sizeof(float));
+
+    // Copy grid edges to device
+    cudaMemcpy(d_theta_edges, a_grid.edges.data(), (config.N_theta + 1) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_E_edges, e_grid.edges.data(), (config.N_E + 1) * sizeof(float), cudaMemcpyHostToDevice);
 
     int threads = 256;
     int blocks = (n_coarse + threads - 1) / threads;
 
-    // K2_CoarseTransport<<<blocks, threads>>>(...);
+    // Call K2_CoarseTransport kernel
+    K2_CoarseTransport<<<blocks, threads>>>(
+        psi_in.block_id,
+        psi_in.value,
+        d_ActiveMask,
+        config.Nx, config.Nz, config.dx, config.dz,
+        n_coarse,
+        dlut,
+        d_theta_edges,
+        d_E_edges,
+        config.N_theta, config.N_E,
+        config.N_theta_local, config.N_E_local,
+        k2_cfg,
+        state.d_EdepC,
+        state.d_AbsorbedWeight_cutoff,
+        state.d_AbsorbedWeight_nuclear,
+        state.d_AbsorbedEnergy_nuclear,
+        state.d_BoundaryLoss_weight,
+        state.d_BoundaryLoss_energy,
+        state.d_OutflowBuckets
+    );
+
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "K2 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_theta_edges);
+        cudaFree(d_E_edges);
+        return false;
+    }
+
+    cudaDeviceSynchronize();
+
+    // Cleanup
+    cudaFree(d_theta_edges);
+    cudaFree(d_E_edges);
 
     return true;
 }
 
 bool run_k3_fine_transport(
-    const PsiC& psi_in,
+    const DevicePsiC& psi_in,
     const uint32_t* d_ActiveList,
     int n_active,
     const DeviceRLUT& dlut,
@@ -293,44 +379,118 @@ bool run_k3_fine_transport(
 ) {
     if (n_active == 0) return true;
 
+    // Allocate device grid edges
+    float* d_theta_edges;
+    float* d_E_edges;
+    cudaMalloc(&d_theta_edges, (config.N_theta + 1) * sizeof(float));
+    cudaMalloc(&d_E_edges, (config.N_E + 1) * sizeof(float));
+
+    // Copy grid edges to device
+    cudaMemcpy(d_theta_edges, a_grid.edges.data(), (config.N_theta + 1) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_E_edges, e_grid.edges.data(), (config.N_E + 1) * sizeof(float), cudaMemcpyHostToDevice);
+
     int threads = 256;
     int blocks = (n_active + threads - 1) / threads;
 
-    // K3_FineTransport<<<blocks, threads>>>(...);
+    // Call K3_FineTransport kernel
+    K3_FineTransport<<<blocks, threads>>>(
+        psi_in.block_id,
+        psi_in.value,
+        d_ActiveList,
+        config.Nx, config.Nz, config.dx, config.dz,
+        n_active,
+        dlut,
+        d_theta_edges,
+        d_E_edges,
+        config.N_theta, config.N_E,
+        config.N_theta_local, config.N_E_local,
+        state.d_EdepC,
+        state.d_AbsorbedWeight_cutoff,
+        state.d_AbsorbedWeight_nuclear,
+        state.d_AbsorbedEnergy_nuclear,
+        state.d_BoundaryLoss_weight,
+        state.d_BoundaryLoss_energy,
+        state.d_OutflowBuckets
+    );
+
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "K3 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_theta_edges);
+        cudaFree(d_E_edges);
+        return false;
+    }
+
+    cudaDeviceSynchronize();
+
+    // Cleanup
+    cudaFree(d_theta_edges);
+    cudaFree(d_E_edges);
 
     return true;
 }
 
 bool run_k4_bucket_transfer(
-    PsiC& psi_out,
+    DevicePsiC& psi_out,
     const DeviceOutflowBucket* d_OutflowBuckets,
     int Nx, int Nz
 ) {
     int threads = 256;
     int blocks = (Nx * Nz + threads - 1) / threads;
 
-    // K4_BucketTransfer<<<blocks, threads>>>(...);
+    // Call K4_BucketTransfer kernel
+    K4_BucketTransfer<<<blocks, threads>>>(
+        d_OutflowBuckets,
+        psi_out.value,
+        psi_out.block_id,
+        Nx, Nz
+    );
 
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "K4 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+        return false;
+    }
+
+    cudaDeviceSynchronize();
     return true;
 }
 
 bool run_k5_weight_audit(
-    const PsiC& psi_in,
-    const PsiC& psi_out,
+    const DevicePsiC& psi_in,
+    const DevicePsiC& psi_out,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
     AuditReport* d_report,
     int Nx, int Nz
 ) {
-    // K5_WeightAudit<<<1, 1>>>(...);
+    int N_cells = Nx * Nz;
 
+    // Call K5_WeightAudit kernel
+    K5_WeightAudit<<<1, 1>>>(
+        psi_in.block_id,
+        psi_in.value,
+        psi_out.block_id,
+        psi_out.value,
+        d_AbsorbedWeight_cutoff,
+        d_AbsorbedWeight_nuclear,
+        d_report,
+        N_cells
+    );
+
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "K5 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+        return false;
+    }
+
+    cudaDeviceSynchronize();
     return true;
 }
 
-void run_k6_swap_buffers(PsiC*& psi_in, PsiC*& psi_out) {
+void run_k6_swap_buffers(DevicePsiC*& psi_in, DevicePsiC*& psi_out) {
     // K6 is just a pointer swap
-    // K6_SwapBuffers(psi_in, psi_out);
-    PsiC* temp = psi_in;
+    DevicePsiC* temp = psi_in;
     psi_in = psi_out;
     psi_out = temp;
 }
@@ -339,203 +499,164 @@ void run_k6_swap_buffers(PsiC*& psi_in, PsiC*& psi_out) {
 // Main Pipeline Implementation
 // ============================================================================
 
-// Simplified wrapper that uses existing kernels
-// This is a transitional implementation that calls the individual kernels
-
-void run_k1k6_pipeline_transport(
-    float x0, float z0, float theta0, float E0, float W_total,
-    int Nx, int Nz, float dx, float dz,
-    float x_min, float z_min,
-    int N_theta, int N_E,
-    int N_theta_local, int N_E_local,
-    const float* theta_edges,
-    const float* E_edges,
-    const DeviceRLUT& dlut,
-    std::vector<std::vector<double>>& edep
-) {
-    std::cout << "Running K1-K6 GPU pipeline..." << std::endl;
-    std::cout << "  Grid: " << Nx << " x " << Nz << " cells" << std::endl;
-    std::cout << "  Phase-space: " << N_theta << " x " << N_E << " global bins" << std::endl;
-    std::cout << "  Local bins: " << N_theta_local << " x " << N_E_local << " per block" << std::endl;
-
-    // Cast from sm_2d::DeviceRLUT to ::DeviceRLUT (same type, different namespace)
-    const ::DeviceRLUT& native_dlut = reinterpret_cast<const ::DeviceRLUT&>(dlut);
-
-    // Initialize pipeline configuration
-    K1K6PipelineConfig config;
-    config.Nx = Nx;
-    config.Nz = Nz;
-    config.dx = dx;
-    config.dz = dz;
-
-    // Energy thresholds
-    config.E_trigger = 50.0f;          // Fine transport below 50 MeV
-    config.weight_active_min = 1e-6f;   // Minimum weight for active cell
-
-    // Coarse transport settings
-    config.E_coarse_max = 300.0f;       // Up to 300 MeV
-    config.step_coarse = 5.0f;          // 5 mm coarse steps
-    config.n_steps_per_cell = 1;        // One step per cell for coarse
-
-    // Phase-space dimensions
-    config.N_theta = N_theta;
-    config.N_E = N_E;
-    config.N_theta_local = N_theta_local;
-    config.N_E_local = N_E_local;
-
-    // ========================================================================
-    // STEP 1: Allocate Device PsiC Buffers
-    // ========================================================================
-
-    DevicePsiC psi_in, psi_out;
-
-    if (!device_psic_init(psi_in, Nx, Nz)) {
-        std::cerr << "Failed to allocate psi_in" << std::endl;
-        return;
-    }
-
-    if (!device_psic_init(psi_out, Nx, Nz)) {
-        std::cerr << "Failed to allocate psi_out" << std::endl;
-        device_psic_cleanup(psi_in);
-        return;
-    }
-
-    // ========================================================================
-    // STEP 2: Allocate Auxiliary Arrays
-    // ========================================================================
-
-    K1K6PipelineState state;
-    if (!init_pipeline_state(config, state)) {
-        std::cerr << "Failed to allocate pipeline state" << std::endl;
-        device_psic_cleanup(psi_in);
-        device_psic_cleanup(psi_out);
-        return;
-    }
-
-    // ========================================================================
-    // STEP 3: Inject Source Particle
-    // ========================================================================
-
-    // Convert source position to cell coordinates
-    float x_rel = x0 - x_min;
-    float z_rel = z0 - z_min;
-
-    int source_cell_x = static_cast<int>(x_rel / dx);
-    int source_cell_z = static_cast<int>(z_rel / dz);
-    int source_cell = source_cell_z * Nx + source_cell_x;
-
-    // Clamp to valid range
-    source_cell_x = (source_cell_x < 0) ? 0 : (source_cell_x >= Nx) ? Nx - 1 : source_cell_x;
-    source_cell_z = (source_cell_z < 0) ? 0 : (source_cell_z >= Nz) ? Nz - 1 : source_cell_z;
-    source_cell = source_cell_z * Nx + source_cell_x;
-
-    // Position within cell
-    float x_in_cell = x_rel - source_cell_x * dx;
-    float z_in_cell = z_rel - source_cell_z * dz;
-
-    std::cout << "  Source: cell (" << source_cell_x << ", " << source_cell_z
-              << ") at (" << x0 << ", " << z0 << ") mm" << std::endl;
-    std::cout << "  Energy: " << E0 << " MeV, Angle: " << theta0 << " rad" << std::endl;
-
-    // For now, use simple transport with increased particle count
-    // The full K1-K6 implementation requires more infrastructure
-
-    std::cout << "  Using simplified transport (full K1-K6 pending)" << std::endl;
-
-    // ========================================================================
-    // STEP 4: Main Transport Loop (simplified)
-    // ========================================================================
-
-    // The full K1-K6 loop would be:
-    // while (remaining_weight > threshold && iteration < max_iter) {
-    //     // K1: Active mask
-    //     K1_ActiveMask<<<blocks, threads>>>(...);
-    //
-    //     // Build active list
-    //     compact_active_list<<<blocks, threads>>>(...);
-    //
-    //     // K3: Fine transport
-    //     K3_FineTransport<<<blocks, threads>>>(...);
-    //
-    //     // K4: Bucket transfer
-    //     K4_BucketTransfer<<<blocks, threads>>>(...);
-    //
-    //     // K5: Weight audit
-    //     K5_WeightAudit<<<1, 1>>>(...);
-    //
-    //     // K6: Swap buffers
-    //     K6_SwapBuffers(psi_in, psi_out);
-    // }
-
-    // ========================================================================
-    // STEP 5: Use Existing Simple Transport (transitional)
-    // ========================================================================
-
-    // For now, fall back to simple transport with the physics-enhanced kernel
-    // This provides correct results while we build the full K1-K6 infrastructure
-    extern void run_simple_gpu_transport(
-        float x0, float z0, float theta0, float E0, float W_total,
-        int n_particles,
-        int Nx, int Nz, float dx, float dz,
-        float x_min, float z_min,
-        const ::DeviceRLUT& dlut,
-        std::vector<std::vector<double>>& edep
-    );
-
-    // Use a reasonable number of particles for good statistics
-    int n_particles = 100000;
-
-    run_simple_gpu_transport(
-        x0, z0, theta0, E0, W_total,
-        n_particles,
-        Nx, Nz, dx, dz,
-        x_min, z_min,
-        native_dlut,
-        edep
-    );
-
-    std::cout << "  K1-K6 pipeline: transport complete" << std::endl;
-
-    // ========================================================================
-    // STEP 6: Cleanup
-    // ========================================================================
-
-    state.cleanup();
-    device_psic_cleanup(psi_in);
-    device_psic_cleanup(psi_out);
-
-    std::cout << "GPU K1-K6 pipeline complete." << std::endl;
-}
-
-// ============================================================================
-// Full Pipeline with K1-K6 Kernel Calls (Future Implementation)
-// ============================================================================
-
-// This function will be implemented once all kernel infrastructure is complete
-// It will call:
-// - K1_ActiveMask
-// - compact_active_list
-// - K2_CoarseTransport (optional)
-// - K3_FineTransport
-// - K4_BucketTransfer
-// - K5_WeightAudit
-// - K6_SwapBuffers
-
-bool run_full_k1k6_pipeline(
-    PsiC* psi_in,
-    PsiC* psi_out,
+bool run_k1k6_pipeline_transport(
+    DevicePsiC* psi_in,
+    DevicePsiC* psi_out,
     const DeviceRLUT& dlut,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
     const K1K6PipelineConfig& config,
     K1K6PipelineState& state
 ) {
-    // TODO: Implement full K1-K6 pipeline with all kernel calls
-    // This requires:
-    // 1. Device-side PsiC structures to be fully integrated
-    // 2. All kernels to be properly initialized
-    // 3. Host-device transfer functions
-    return false;
+    std::cout << "Running K1-K6 GPU pipeline..." << std::endl;
+    std::cout << "  Grid: " << config.Nx << " x " << config.Nz << " cells" << std::endl;
+    std::cout << "  Phase-space: " << config.N_theta << " x " << config.N_E << " global bins" << std::endl;
+
+    // Compute b_E_trigger from E_trigger
+    int b_E_trigger = compute_b_E_trigger(config.E_trigger, e_grid, config.N_E_local);
+
+    std::cout << "  Energy threshold: " << config.E_trigger << " MeV (b_E_trigger=" << b_E_trigger << ")" << std::endl;
+    std::cout << "  Min weight: " << config.weight_active_min << std::endl;
+
+    // Reset pipeline state
+    reset_pipeline_state(state, config.Nx, config.Nz);
+
+    // Clear output buffer
+    device_psic_clear(*psi_out);
+
+    // Maximum iterations
+    const int max_iter = 100;
+    const double weight_threshold = 1e-6;
+
+    int iter = 0;
+    double total_weight_remaining = 0.0;
+
+    std::cout << "Starting main transport loop..." << std::endl;
+
+    // ========================================================================
+    // Main Transport Loop
+    // ========================================================================
+    while (iter < max_iter) {
+        iter++;
+
+        // --------------------------------------------------------------------
+        // K1: Active Mask Identification
+        // --------------------------------------------------------------------
+        if (!run_k1_active_mask(*psi_in, state.d_ActiveMask, config.Nx, config.Nz,
+                                 b_E_trigger, config.weight_active_min)) {
+            std::cerr << "K1 failed at iteration " << iter << std::endl;
+            return false;
+        }
+
+        // --------------------------------------------------------------------
+        // Compact Active List and Coarse List
+        // --------------------------------------------------------------------
+        // Reset counters
+        int zero = 0;
+        cudaMemcpy(state.d_n_active, &zero, sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(state.d_n_coarse, &zero, sizeof(int), cudaMemcpyHostToDevice);
+
+        // Launch compaction kernels
+        int threads = 256;
+        int blocks = (config.Nx * config.Nz + threads - 1) / threads;
+
+        compact_active_list<<<blocks, threads>>>(
+            state.d_ActiveMask,
+            state.d_ActiveList,
+            config.Nx, config.Nz,
+            state.d_n_active
+        );
+
+        compact_coarse_list<<<blocks, threads>>>(
+            state.d_ActiveMask,
+            state.d_CoarseList,
+            config.Nx, config.Nz,
+            state.d_n_coarse
+        );
+
+        cudaDeviceSynchronize();
+
+        // Get counts
+        cudaMemcpy(&state.n_active, state.d_n_active, sizeof(int), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&state.n_coarse, state.d_n_coarse, sizeof(int), cudaMemcpyDeviceToHost);
+
+        std::cout << "  Iteration " << iter << ": "
+                  << state.n_active << " active, "
+                  << state.n_coarse << " coarse cells" << std::endl;
+
+        // Check if we're done
+        if (state.n_active == 0 && state.n_coarse == 0) {
+            std::cout << "  No active cells remaining, transport complete" << std::endl;
+            break;
+        }
+
+        // --------------------------------------------------------------------
+        // K2: Coarse Transport (high energy cells)
+        // --------------------------------------------------------------------
+        if (state.n_coarse > 0) {
+            if (!run_k2_coarse_transport(*psi_in, state.d_ActiveMask, state.d_CoarseList,
+                                          state.n_coarse, dlut, config, e_grid, a_grid, state)) {
+                std::cerr << "K2 failed at iteration " << iter << std::endl;
+                return false;
+            }
+        }
+
+        // --------------------------------------------------------------------
+        // K3: Fine Transport (low energy cells)
+        // --------------------------------------------------------------------
+        if (state.n_active > 0) {
+            if (!run_k3_fine_transport(*psi_in, state.d_ActiveList, state.n_active,
+                                       dlut, config, e_grid, a_grid, state)) {
+                std::cerr << "K3 failed at iteration " << iter << std::endl;
+                return false;
+            }
+        }
+
+        // --------------------------------------------------------------------
+        // K4: Bucket Transfer (boundary crossings)
+        // --------------------------------------------------------------------
+        if (!run_k4_bucket_transfer(*psi_out, state.d_OutflowBuckets, config.Nx, config.Nz)) {
+            std::cerr << "K4 failed at iteration " << iter << std::endl;
+            return false;
+        }
+
+        // Clear outflow buckets for next iteration
+        size_t num_buckets = config.Nx * config.Nz * 4;
+        int b_threads = 256;
+        int b_blocks = (num_buckets + b_threads - 1) / b_threads;
+        clear_buckets_kernel<<<b_blocks, b_threads>>>(state.d_OutflowBuckets, num_buckets);
+        cudaDeviceSynchronize();
+
+        // --------------------------------------------------------------------
+        // K5: Weight Audit (conservation check)
+        // --------------------------------------------------------------------
+        if (!run_k5_weight_audit(*psi_in, *psi_out,
+                                 state.d_AbsorbedWeight_cutoff,
+                                 state.d_AbsorbedWeight_nuclear,
+                                 state.d_audit_report,
+                                 config.Nx, config.Nz)) {
+            std::cerr << "K5 failed at iteration " << iter << std::endl;
+            return false;
+        }
+
+        // Get audit report
+        AuditReport report = get_audit_report(state);
+        std::cout << "  Weight audit: error=" << report.W_error
+                  << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
+
+        // --------------------------------------------------------------------
+        // K6: Swap Buffers
+        // --------------------------------------------------------------------
+        run_k6_swap_buffers(psi_in, psi_out);
+
+        // Clear new input buffer for next iteration
+        device_psic_clear(*psi_in);
+    }
+
+    std::cout << "K1-K6 pipeline: completed " << iter << " iterations" << std::endl;
+    std::cout << "GPU K1-K6 pipeline complete." << std::endl;
+
+    return true;
 }
 
 } // namespace sm_2d

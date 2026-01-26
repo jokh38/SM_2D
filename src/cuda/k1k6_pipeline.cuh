@@ -21,6 +21,7 @@
 
 // Forward declarations
 struct PsiC;
+struct DevicePsiC;
 struct EnergyGrid;
 struct AngularGrid;
 
@@ -53,6 +54,19 @@ struct K1K6PipelineConfig {
 // Helper Kernel Declarations
 // ============================================================================
 
+// Inject source particle into PsiC
+__global__ void inject_source_kernel(
+    DevicePsiC psi,
+    int source_cell,
+    float theta0, float E0, float W_total,
+    float x_in_cell, float z_in_cell,
+    float dx, float dz,
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+);
+
 // Compact active list from mask
 // Converts ActiveMask binary array to compact list of active cell indices
 // Input:  ActiveMask[Nx*Nz] (uint8_t, 1 = active)
@@ -61,7 +75,8 @@ struct K1K6PipelineConfig {
 __global__ void compact_active_list(
     const uint8_t* __restrict__ ActiveMask,
     uint32_t* __restrict__ ActiveList,
-    int Nx, int Nz
+    int Nx, int Nz,
+    int* d_n_active
 );
 
 // Count coarse cells from mask (for K2 scheduling)
@@ -71,7 +86,8 @@ __global__ void compact_active_list(
 __global__ void compact_coarse_list(
     const uint8_t* __restrict__ ActiveMask,
     uint32_t* __restrict__ CoarseList,
-    int Nx, int Nz
+    int Nx, int Nz,
+    int* d_n_coarse
 );
 
 // Compute total weight in phase space
@@ -91,8 +107,8 @@ __global__ void compute_total_weight(
 
 struct K1K6PipelineState {
     // Input/output buffers
-    PsiC* psi_in;
-    PsiC* psi_out;
+    DevicePsiC* psi_in;
+    DevicePsiC* psi_out;
 
     // Active cell tracking
     uint8_t* d_ActiveMask;     // Binary mask [Nx*Nz]
@@ -176,8 +192,8 @@ struct K1K6PipelineState {
 //   true if pipeline executed successfully
 //   false if errors occurred (check CUDA status)
 bool run_k1k6_pipeline_transport(
-    PsiC* psi_in,
-    PsiC* psi_out,
+    DevicePsiC* psi_in,
+    DevicePsiC* psi_out,
     const DeviceRLUT& dlut,
     const EnergyGrid& e_grid,
     const AngularGrid& a_grid,
@@ -191,7 +207,7 @@ bool run_k1k6_pipeline_transport(
 
 // Run K1 only: Generate active mask
 bool run_k1_active_mask(
-    const PsiC& psi_in,
+    const DevicePsiC& psi_in,
     uint8_t* d_ActiveMask,
     int Nx, int Nz,
     int b_E_trigger,
@@ -200,7 +216,7 @@ bool run_k1_active_mask(
 
 // Run K2 only: Coarse transport
 bool run_k2_coarse_transport(
-    const PsiC& psi_in,
+    const DevicePsiC& psi_in,
     const uint8_t* d_ActiveMask,
     const uint32_t* d_CoarseList,
     int n_coarse,
@@ -213,7 +229,7 @@ bool run_k2_coarse_transport(
 
 // Run K3 only: Fine transport
 bool run_k3_fine_transport(
-    const PsiC& psi_in,
+    const DevicePsiC& psi_in,
     const uint32_t* d_ActiveList,
     int n_active,
     const DeviceRLUT& dlut,
@@ -225,15 +241,15 @@ bool run_k3_fine_transport(
 
 // Run K4 only: Bucket transfer
 bool run_k4_bucket_transfer(
-    PsiC& psi_out,
+    DevicePsiC& psi_out,
     const DeviceOutflowBucket* d_OutflowBuckets,
     int Nx, int Nz
 );
 
 // Run K5 only: Weight audit
 bool run_k5_weight_audit(
-    const PsiC& psi_in,
-    const PsiC& psi_out,
+    const DevicePsiC& psi_in,
+    const DevicePsiC& psi_out,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
     AuditReport* d_report,
@@ -242,8 +258,8 @@ bool run_k5_weight_audit(
 
 // Run K6 only: Swap buffers
 void run_k6_swap_buffers(
-    PsiC*& psi_in,
-    PsiC*& psi_out
+    DevicePsiC*& psi_in,
+    DevicePsiC*& psi_out
 );
 
 // ============================================================================
