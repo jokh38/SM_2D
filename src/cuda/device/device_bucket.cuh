@@ -137,7 +137,176 @@ __device__ inline void device_emit_component_to_bucket(
 }
 
 // ============================================================================
-// 3D Phase-Space Emission (theta, E, x_sub)
+// 3D Phase-Space Emission with Linear Interpolation (theta, E, x_sub)
+// ============================================================================
+
+__device__ inline void device_emit_component_to_bucket_3d_interp(
+    DeviceOutflowBucket& bucket,
+    float theta,            // Polar angle [rad]
+    float E,                // Energy [MeV]
+    float weight,           // Statistical weight
+    int x_sub,              // Sub-cell x bin (0-3)
+    const float* __restrict__ theta_edges,  // Angular grid edges
+    const float* __restrict__ E_edges,      // Energy grid edges
+    int N_theta,            // Number of angular bins
+    int N_E,                // Number of energy bins
+    int N_theta_local,      // Local angular bins per block (8)
+    int N_E_local           // Local energy bins per block (4)
+) {
+    if (weight <= 0.0f) return;
+
+    // Get grid bounds
+    float theta_min = theta_edges[0];
+    float theta_max = theta_edges[N_theta];
+    float E_min = E_edges[0];
+    float E_max = E_edges[N_E];
+
+    // Clamp values to grid bounds
+    theta = fmaxf(theta_min, fminf(theta, theta_max));
+    E = fmaxf(E_min, fminf(E, E_max));
+
+    // Calculate continuous bin positions
+    float dtheta = (theta_max - theta_min) / N_theta;
+    float theta_cont = (theta - theta_min) / dtheta;
+    int theta_bin = (int)theta_cont;
+    float frac_theta = theta_cont - theta_bin;
+
+    float log_E = logf(E);
+    float log_E_min = logf(E_min);
+    float log_E_max = logf(E_max);
+    float dlog = (log_E_max - log_E_min) / N_E;
+    float log_E_cont = (log_E - log_E_min) / dlog;
+    int E_bin = (int)log_E_cont;
+    float frac_E = log_E_cont - E_bin;
+
+    // Handle boundary conditions
+    if (theta_bin >= N_theta - 1) {
+        theta_bin = N_theta - 1;
+        frac_theta = 0.0f;
+    }
+    if (E_bin >= N_E - 1) {
+        E_bin = N_E - 1;
+        frac_E = 0.0f;
+    }
+
+    // Bilinear interpolation weights
+    float w00 = (1.0f - frac_theta) * (1.0f - frac_E);
+    float w10 = frac_theta * (1.0f - frac_E);
+    float w01 = (1.0f - frac_theta) * frac_E;
+    float w11 = frac_theta * frac_E;
+
+    for (int ti = 0; ti < 2; ++ti) {
+        for (int ei = 0; ei < 2; ++ei) {
+            int t_bin = theta_bin + ti;
+            int e_bin = E_bin + ei;
+
+            if (t_bin >= N_theta || e_bin >= N_E) continue;
+
+            float w = (ti == 0 && ei == 0) ? w00 :
+                      (ti == 1 && ei == 0) ? w10 :
+                      (ti == 0 && ei == 1) ? w01 : w11;
+
+            if (w <= 0.0f) continue;
+
+            uint32_t b_theta = t_bin / N_theta_local;
+            uint32_t b_E = e_bin / N_E_local;
+            uint32_t bid = encode_block(b_theta, b_E);
+
+            int theta_local = t_bin % N_theta_local;
+            int E_local = e_bin % N_E_local;
+
+            uint16_t lidx = encode_local_idx_3d(theta_local, E_local, x_sub);
+            device_emit_to_bucket(bucket, bid, lidx, weight * w);
+        }
+    }
+}
+
+// ============================================================================
+// 2D Phase-Space Emission with Linear Interpolation (theta, E)
+// ============================================================================
+
+__device__ inline void device_emit_component_to_bucket_interp(
+    DeviceOutflowBucket& bucket,
+    float theta,            // Polar angle [rad]
+    float E,                // Energy [MeV]
+    float weight,           // Statistical weight
+    const float* __restrict__ theta_edges,  // Angular grid edges
+    const float* __restrict__ E_edges,      // Energy grid edges
+    int N_theta,            // Number of angular bins
+    int N_E,                // Number of energy bins
+    int N_theta_local,      // Local angular bins per block (8)
+    int N_E_local           // Local energy bins per block (4)
+) {
+    if (weight <= 0.0f) return;
+
+    // Get grid bounds
+    float theta_min = theta_edges[0];
+    float theta_max = theta_edges[N_theta];
+    float E_min = E_edges[0];
+    float E_max = E_edges[N_E];
+
+    // Clamp values to grid bounds
+    theta = fmaxf(theta_min, fminf(theta, theta_max));
+    E = fmaxf(E_min, fminf(E, E_max));
+
+    // Calculate continuous bin positions
+    float dtheta = (theta_max - theta_min) / N_theta;
+    float theta_cont = (theta - theta_min) / dtheta;
+    int theta_bin = (int)theta_cont;
+    float frac_theta = theta_cont - theta_bin;
+
+    float log_E = logf(E);
+    float log_E_min = logf(E_min);
+    float log_E_max = logf(E_max);
+    float dlog = (log_E_max - log_E_min) / N_E;
+    float log_E_cont = (log_E - log_E_min) / dlog;
+    int E_bin = (int)log_E_cont;
+    float frac_E = log_E_cont - E_bin;
+
+    // Handle boundary conditions
+    if (theta_bin >= N_theta - 1) {
+        theta_bin = N_theta - 1;
+        frac_theta = 0.0f;
+    }
+    if (E_bin >= N_E - 1) {
+        E_bin = N_E - 1;
+        frac_E = 0.0f;
+    }
+
+    // Bilinear interpolation weights
+    float w00 = (1.0f - frac_theta) * (1.0f - frac_E);
+    float w10 = frac_theta * (1.0f - frac_E);
+    float w01 = (1.0f - frac_theta) * frac_E;
+    float w11 = frac_theta * frac_E;
+
+    for (int ti = 0; ti < 2; ++ti) {
+        for (int ei = 0; ei < 2; ++ei) {
+            int t_bin = theta_bin + ti;
+            int e_bin = E_bin + ei;
+
+            if (t_bin >= N_theta || e_bin >= N_E) continue;
+
+            float w = (ti == 0 && ei == 0) ? w00 :
+                      (ti == 1 && ei == 0) ? w10 :
+                      (ti == 0 && ei == 1) ? w01 : w11;
+
+            if (w <= 0.0f) continue;
+
+            uint32_t b_theta = t_bin / N_theta_local;
+            uint32_t b_E = e_bin / N_E_local;
+            uint32_t bid = encode_block(b_theta, b_E);
+
+            int theta_local = t_bin % N_theta_local;
+            int E_local = e_bin % N_E_local;
+
+            uint16_t lidx = encode_local_idx(theta_local, E_local);
+            device_emit_to_bucket(bucket, bid, lidx, weight * w);
+        }
+    }
+}
+
+// ============================================================================
+// 3D Phase-Space Emission (theta, E, x_sub) - DEPRECATED: Use _interp version
 // ============================================================================
 
 // Emit a component to a bucket with 3D phase-space encoding (theta, E, x_sub)
@@ -247,6 +416,126 @@ __device__ inline void device_emit_component_to_bucket_4d(
 
     // Emit to bucket
     device_emit_to_bucket(bucket, bid, lidx, weight);
+}
+
+// ============================================================================
+// 4D Phase-Space Emission with Linear Interpolation (theta, E, x_sub, z_sub)
+// ============================================================================
+// Uses bilinear interpolation in theta-E space for improved accuracy
+// Distributes particle weight across 4 neighboring phase-space bins
+//
+// Interpolation diagram (theta-E plane):
+//
+//         E_bin+1
+//            ↑
+//            │  (0,1)        (1,1)
+//            │    o------------o
+//            │    │            │
+//            │    │  ● value   │  frac_E
+//            │    │            │
+//            │    o------------o
+//         E_bin│  (0,0)        (1,1)
+//            │
+//            └────────────────────→
+//          theta_bin        theta_bin+1
+//                frac_theta
+//
+// Weight distribution:
+//   w00 = (1-frac_theta) * (1-frac_E)  → bin (theta_bin, E_bin)
+//   w10 = frac_theta     * (1-frac_E)  → bin (theta_bin+1, E_bin)
+//   w01 = (1-frac_theta) * frac_E      → bin (theta_bin, E_bin+1)
+//   w11 = frac_theta     * frac_E      → bin (theta_bin+1, E_bin+1)
+// ============================================================================
+
+__device__ inline void device_emit_component_to_bucket_4d_interp(
+    DeviceOutflowBucket& bucket,
+    float theta,            // Polar angle [rad]
+    float E,                // Energy [MeV]
+    float weight,           // Statistical weight
+    int x_sub,              // Sub-cell x bin (0-3)
+    int z_sub,              // Sub-cell z bin (0-3)
+    const float* __restrict__ theta_edges,  // Angular grid edges
+    const float* __restrict__ E_edges,      // Energy grid edges
+    int N_theta,            // Number of angular bins
+    int N_E,                // Number of energy bins
+    int N_theta_local,      // Local angular bins per block (8)
+    int N_E_local           // Local energy bins per block (4)
+) {
+    if (weight <= 0.0f) return;
+
+    // Get grid bounds
+    float theta_min = theta_edges[0];
+    float theta_max = theta_edges[N_theta];
+    float E_min = E_edges[0];
+    float E_max = E_edges[N_E];
+
+    // Clamp values to grid bounds
+    theta = fmaxf(theta_min, fminf(theta, theta_max));
+    E = fmaxf(E_min, fminf(E, E_max));
+
+    // Calculate continuous bin positions
+    float dtheta = (theta_max - theta_min) / N_theta;
+    float theta_cont = (theta - theta_min) / dtheta;  // Continuous position in [0, N_theta]
+    int theta_bin = (int)theta_cont;                  // Lower bin index
+    float frac_theta = theta_cont - theta_bin;         // Fraction toward upper bin
+
+    // For log-spaced E grid
+    float log_E = logf(E);
+    float log_E_min = logf(E_min);
+    float log_E_max = logf(E_max);
+    float dlog = (log_E_max - log_E_min) / N_E;
+    float log_E_cont = (log_E - log_E_min) / dlog;    // Continuous position in [0, N_E]
+    int E_bin = (int)log_E_cont;                      // Lower bin index
+    float frac_E = log_E_cont - E_bin;                // Fraction toward upper bin
+
+    // Handle boundary conditions
+    // If at upper boundary, don't interpolate beyond grid
+    if (theta_bin >= N_theta - 1) {
+        theta_bin = N_theta - 1;
+        frac_theta = 0.0f;
+    }
+    if (E_bin >= N_E - 1) {
+        E_bin = N_E - 1;
+        frac_E = 0.0f;
+    }
+
+    // Calculate interpolation weights (bilinear)
+    float w00 = (1.0f - frac_theta) * (1.0f - frac_E);  // (theta_bin, E_bin)
+    float w10 = frac_theta * (1.0f - frac_E);            // (theta_bin+1, E_bin)
+    float w01 = (1.0f - frac_theta) * frac_E;            // (theta_bin, E_bin+1)
+    float w11 = frac_theta * frac_E;                     // (theta_bin+1, E_bin+1)
+
+    // Emit to 4 neighboring bins (or fewer if at boundary)
+    int theta_offsets[2] = {0, 1};
+    int E_offsets[2] = {0, 1};
+    float weights[4] = {w00, w10, w01, w11};
+
+    for (int ti = 0; ti < 2; ++ti) {
+        for (int ei = 0; ei < 2; ++ei) {
+            int t_bin = theta_bin + theta_offsets[ti];
+            int e_bin = E_bin + E_offsets[ei];
+
+            // Skip if out of bounds (shouldn't happen with clamping above)
+            if (t_bin >= N_theta || e_bin >= N_E) continue;
+
+            float w = weights[ti * 2 + ei];
+            if (w <= 0.0f) continue;
+
+            // Encode to coarse block and local index
+            uint32_t b_theta = t_bin / N_theta_local;
+            uint32_t b_E = e_bin / N_E_local;
+            uint32_t bid = encode_block(b_theta, b_E);
+
+            int theta_local = t_bin % N_theta_local;
+            int E_local = e_bin % N_E_local;
+
+            // 4D local index encoding with x_sub and z_sub
+            uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
+
+            // Emit interpolated weight to bucket
+            device_emit_to_bucket(bucket, bid, lidx, weight * w);
+        }
+    }
 }
 
 // Transform x_sub when crossing to neighbor cell

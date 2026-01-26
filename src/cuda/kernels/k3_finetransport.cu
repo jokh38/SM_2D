@@ -219,7 +219,8 @@ __global__ void K3_FineTransport(
                 // Write directly to global memory
                 int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
                 DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                device_emit_component_to_bucket_4d(
+                // Use bilinear interpolation for improved accuracy
+                device_emit_component_to_bucket_4d_interp(
                     bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
                     theta_edges, E_edges, N_theta, N_E,
                     N_theta_local, N_E_local
