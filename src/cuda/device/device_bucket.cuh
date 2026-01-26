@@ -306,62 +306,6 @@ __device__ inline void device_emit_component_to_bucket_interp(
 }
 
 // ============================================================================
-// 3D Phase-Space Emission (theta, E, x_sub) - DEPRECATED: Use _interp version
-// ============================================================================
-
-// Emit a component to a bucket with 3D phase-space encoding (theta, E, x_sub)
-__device__ inline void device_emit_component_to_bucket_3d(
-    DeviceOutflowBucket& bucket,
-    float theta,            // Polar angle [rad]
-    float E,                // Energy [MeV]
-    float weight,           // Statistical weight
-    int x_sub,              // Sub-cell x bin (0-3)
-    const float* __restrict__ theta_edges,  // Angular grid edges
-    const float* __restrict__ E_edges,      // Energy grid edges
-    int N_theta,            // Number of angular bins
-    int N_E,                // Number of energy bins
-    int N_theta_local,      // Local angular bins per block (8)
-    int N_E_local           // Local energy bins per block (4)
-) {
-    if (weight <= 0.0f) return;
-
-    // Find global bins
-    int theta_bin = 0;
-    int E_bin = 0;
-
-    // For uniform theta grid
-    float theta_min = theta_edges[0];
-    float theta_max = theta_edges[N_theta];
-    float dtheta = (theta_max - theta_min) / N_theta;
-    theta_bin = (int)((theta - theta_min) / dtheta);
-    theta_bin = max(0, min(theta_bin, N_theta - 1));
-
-    // For log-spaced E grid
-    float E_min = E_edges[0];
-    float E_max = E_edges[N_E];
-    float log_E = logf(E);
-    float log_E_min = logf(E_min);
-    float log_E_max = logf(E_max);
-    float dlog = (log_E_max - log_E_min) / N_E;
-    E_bin = (int)((log_E - log_E_min) / dlog);
-    E_bin = max(0, min(E_bin, N_E - 1));
-
-    // Encode to coarse block and local index
-    uint32_t b_theta = theta_bin / N_theta_local;
-    uint32_t b_E = E_bin / N_E_local;
-    uint32_t bid = encode_block(b_theta, b_E);
-
-    int theta_local = theta_bin % N_theta_local;
-    int E_local = E_bin % N_E_local;
-
-    // 3D local index encoding with x_sub
-    uint16_t lidx = encode_local_idx_3d(theta_local, E_local, x_sub);
-
-    // Emit to bucket
-    device_emit_to_bucket(bucket, bid, lidx, weight);
-}
-
-// ============================================================================
 // 4D Phase-Space Emission (theta, E, x_sub, z_sub)
 // FIX Problem 1: Added z_sub for complete particle position tracking
 // ============================================================================
@@ -616,16 +560,18 @@ __device__ inline int device_bucket_index(int cell, int face, int Nx, int Nz) {
 
 // Determine which face a particle will exit through
 // Returns -1 if particle remains in cell
+// NOTE: Assumes centered coordinate system: x ∈ [-dx/2, +dx/2], z ∈ [-dz/2, +dz/2]
 __device__ inline int device_determine_exit_face(
     float x_old, float z_old,  // Old position [mm]
     float x_new, float z_new,  // New position [mm]
     float dx, float dz         // Cell dimensions [mm]
 ) {
     // Check boundaries (order matters for corner cases)
-    if (z_new >= dz) return FACE_Z_PLUS;
-    if (z_new < 0) return FACE_Z_MINUS;
-    if (x_new >= dx) return FACE_X_PLUS;
-    if (x_new < 0) return FACE_X_MINUS;
+    // Using centered coordinate system: [-dx/2, +dx/2] x [-dz/2, +dz/2]
+    if (z_new >= dz * 0.5f) return FACE_Z_PLUS;
+    if (z_new < -dz * 0.5f) return FACE_Z_MINUS;
+    if (x_new >= dx * 0.5f) return FACE_X_PLUS;
+    if (x_new < -dx * 0.5f) return FACE_X_MINUS;
 
     return -1;  // Remains in cell
 }

@@ -146,10 +146,13 @@ __global__ void K3_FineTransport(
             float eta_init = sinf(theta);
 
             // P9 FIX: First estimate step to boundary for initial direction
-            float step_to_z_plus = (mu_init > 0) ? (dz - z_cell) / mu_init : 1e30f;
-            float step_to_z_minus = (mu_init < 0) ? (-z_cell) / mu_init : 1e30f;
-            float step_to_x_plus = (eta_init > 0) ? (dx - x_cell) / eta_init : 1e30f;
-            float step_to_x_minus = (eta_init < 0) ? (-x_cell) / eta_init : 1e30f;
+            // Using centered coordinate system: [-dx/2, +dx/2] x [-dz/2, +dz/2]
+            float half_dz = dz * 0.5f;
+            float half_dx = dx * 0.5f;
+            float step_to_z_plus = (mu_init > 0) ? (half_dz - z_cell) / mu_init : 1e30f;
+            float step_to_z_minus = (mu_init < 0) ? (-half_dz - z_cell) / mu_init : 1e30f;
+            float step_to_x_plus = (eta_init > 0) ? (half_dx - x_cell) / eta_init : 1e30f;
+            float step_to_x_minus = (eta_init < 0) ? (-half_dx - x_cell) / eta_init : 1e30f;
             float step_to_boundary = fminf(fminf(step_to_z_plus, step_to_z_minus),
                                            fminf(step_to_x_plus, step_to_x_minus));
             step_to_boundary = fmaxf(step_to_boundary, 0.0f);
@@ -195,9 +198,9 @@ __global__ void K3_FineTransport(
             float x_new = x_mid + eta_new * half_step;
             float z_new = z_mid + mu_new * half_step;
 
-            // Clamp position to cell bounds
-            x_new = fmaxf(0.0f, fminf(x_new, dx));
-            z_new = fmaxf(0.0f, fminf(z_new, dz));
+            // Clamp position to cell bounds (using centered coordinate system)
+            x_new = fmaxf(-half_dx, fminf(x_new, half_dx));
+            z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
 
             // Check boundary crossing
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
@@ -230,10 +233,16 @@ __global__ void K3_FineTransport(
                     N_theta_local, N_E_local
                 );
 
+                // FIX: Deposit energy in current cell before particle leaves
+                // Both electronic (dE * weight) and nuclear (E_rem) energy are
+                // deposited locally in this cell, not carried across boundary.
+                cell_edep += edep;
+                cell_w_nuclear += w_rem;
+                cell_E_nuclear += E_rem;
+
+                // Account for energy/weight carried out by surviving particle
                 cell_boundary_weight += w_new;
                 cell_boundary_energy += E_new * w_new;
-                // P6 FIX: Add nuclear energy to boundary energy accounting
-                cell_boundary_energy += E_rem;
             } else {
                 // Particle remains in cell - deposit energy locally
                 cell_edep += edep;

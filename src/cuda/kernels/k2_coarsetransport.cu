@@ -169,9 +169,11 @@ __global__ void K2_CoarseTransport(
             float x_new = x_cell + eta_new * coarse_step;
             float z_new = z_cell + mu_new * coarse_step;
 
-            // Clamp to cell bounds
-            x_new = fmaxf(0.0f, fminf(x_new, dx));
-            z_new = fmaxf(0.0f, fminf(z_new, dz));
+            // Clamp to cell bounds (using centered coordinate system)
+            float half_dx = dx * 0.5f;
+            float half_dz = dz * 0.5f;
+            x_new = fmaxf(-half_dx, fminf(x_new, half_dx));
+            z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
 
             // Check boundary crossing
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
@@ -201,9 +203,16 @@ __global__ void K2_CoarseTransport(
                     N_theta_local, N_E_local
                 );
 
+                // FIX: Deposit energy in current cell before particle leaves
+                // Both electronic (dE * weight) and nuclear (E_rem) energy are
+                // deposited locally in this cell, not carried across boundary.
+                cell_edep += edep;
+                cell_w_nuclear += w_rem;
+                cell_E_nuclear += E_rem;
+
+                // Account for energy/weight carried out by surviving particle
                 cell_boundary_weight += w_new;
                 cell_boundary_energy += E_new * w_new;
-                cell_boundary_energy += E_rem;
             } else {
                 // Remains in cell
                 cell_edep += edep;

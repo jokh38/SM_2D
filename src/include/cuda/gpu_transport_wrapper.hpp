@@ -41,18 +41,6 @@ private:
 bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper);
 
 /**
- * @brief Run GPU transport
- */
-void run_gpu_transport(
-    float x0, float z0, float theta0, float E0, float W_total,
-    int n_particles,
-    int Nx, int Nz, float dx, float dz,
-    float x_min, float z_min,
-    const DeviceRLUT& dlut,
-    std::vector<std::vector<double>>& edep
-);
-
-/**
  * @brief Run K1-K6 pipeline GPU transport with phase-space binning
  *
  * This function runs the full multi-stage transport pipeline with:

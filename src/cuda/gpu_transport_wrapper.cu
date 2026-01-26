@@ -1,6 +1,5 @@
 #include "cuda/gpu_transport_wrapper.hpp"
 #include "k1k6_pipeline.cuh"
-#include "kernels/simple_gpu_transport.cuh"
 #include "kernels/k3_finetransport.cuh"
 #include "device/device_psic.cuh"
 #include "lut/r_lut.hpp"
@@ -37,26 +36,6 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper) {
         wrapper.dlut_ptr = reinterpret_cast<const DeviceRLUT*>(&wrapper.p_impl->impl.dlut);
     }
     return result;
-}
-
-void run_gpu_transport(
-    float x0, float z0, float theta0, float E0, float W_total,
-    int n_particles,
-    int Nx, int Nz, float dx, float dz,
-    float x_min, float z_min,
-    const DeviceRLUT& dlut,
-    std::vector<std::vector<double>>& edep
-) {
-    // Cast from sm_2d::DeviceRLUT to ::DeviceRLUT (same type, different namespace)
-    const ::DeviceRLUT& native_dlut = reinterpret_cast<const ::DeviceRLUT&>(dlut);
-    run_simple_gpu_transport(
-        x0, z0, theta0, E0, W_total,
-        n_particles,
-        Nx, Nz, dx, dz,
-        x_min, z_min,
-        native_dlut,
-        edep
-    );
 }
 
 void run_k1k6_pipeline_transport(

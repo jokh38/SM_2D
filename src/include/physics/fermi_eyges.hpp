@@ -71,20 +71,6 @@ __host__ __device__ inline float fermi_eyges_scattering_power(
     return 0.0f;
 }
 
-// Device function to update Fermi-Eyges moments during transport
-__device__ inline void device_update_fermi_eyges_moments(
-    FermiEygesMoments& moments,
-    float E_MeV,
-    float z_step,    // Current depth position [mm]
-    float ds,        // Step size [mm]
-    float X0 = 360.8f
-) {
-    float T = fermi_eyges_scattering_power(E_MeV, ds, X0);
-    moments.A0 += T * ds;
-    moments.A1 += T * z_step * ds;
-    moments.A2 += T * z_step * z_step * ds;
-}
-
 // Compute lateral spread correction based on Fermi-Eyges theory
 // This can be used to adjust particle positions after transport
 __device__ inline void device_apply_fermi_eyges_spread(

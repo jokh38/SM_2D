@@ -102,7 +102,6 @@ if(CUDA_ENABLED)
         src/cuda/kernels/k4_transfer.cu
         src/cuda/kernels/k5_audit.cu
         src/cuda/kernels/k6_swap.cu
-        src/cuda/kernels/simple_gpu_transport.cu
         src/cuda/gpu_transport_wrapper.cu
         src/cuda/k1k6_pipeline.cu
     )
