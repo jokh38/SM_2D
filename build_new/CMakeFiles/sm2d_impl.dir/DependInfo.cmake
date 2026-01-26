@@ -34,8 +34,12 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspaces/SM_2D/src/validation/validation_report.cpp" "CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o" "gcc" "CMakeFiles/sm2d_impl.dir/src/validation/validation_report.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.

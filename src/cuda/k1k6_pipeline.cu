@@ -669,8 +669,10 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         run_k6_swap_buffers(psi_in, psi_out);
 
-        // Clear new input buffer for next iteration
-        device_psic_clear(*psi_in);
+        // Clear psi_out (which will receive fresh bucket transfers in next iteration)
+        // After swap, psi_in contains transferred particles to process next iteration
+        // psi_out contains the old input which is now done
+        device_psic_clear(*psi_out);
     }
 
     std::cout << "K1-K6 pipeline: completed " << iter << " iterations" << std::endl;

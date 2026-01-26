@@ -198,12 +198,12 @@ __global__ void K3_FineTransport(
             float x_new = x_mid + eta_new * half_step;
             float z_new = z_mid + mu_new * half_step;
 
-            // Clamp position to cell bounds (using centered coordinate system)
+            // Check boundary crossing FIRST (using unclamped position)
+            int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
+
+            // THEN clamp position to cell bounds for emission calculations
             x_new = fmaxf(-half_dx, fminf(x_new, half_dx));
             z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
-
-            // Check boundary crossing
-            int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
 
             if (exit_face >= 0) {
                 // FIX Problem 1: Calculate x_sub and z_sub for neighbor cell

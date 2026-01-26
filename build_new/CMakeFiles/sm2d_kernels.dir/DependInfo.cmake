@@ -16,11 +16,14 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspaces/SM_2D/src/cuda/kernels/k4_transfer.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k4_transfer.cu.o.d"
   "/workspaces/SM_2D/src/cuda/kernels/k5_audit.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k5_audit.cu.o.d"
   "/workspaces/SM_2D/src/cuda/kernels/k6_swap.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/k6_swap.cu.o.d"
-  "/workspaces/SM_2D/src/cuda/kernels/simple_gpu_transport.cu" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o" "gcc" "CMakeFiles/sm2d_kernels.dir/src/cuda/kernels/simple_gpu_transport.cu.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.
