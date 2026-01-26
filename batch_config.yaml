@@ -15,15 +15,15 @@ sweep:
     section: "[energy]"
     mean_MeV: [70, 110, 150, 190, 230]
 
-  # 위치 스윕
-  position:
-    section: "[spatial]"
-    x0_mm: [-10, -5, 0, 5, 10]
+  # 위치 스윕 (제거됨 - 에너지만 변화)
+  # position:
+  #   section: "[spatial]"
+  #   x0_mm: [-10, -5, 0, 5, 10]
 
 # 실행 설정
 execution:
   # 병렬 프로세스 수 (0 = 사용 가능한 모든 코어 사용)
-  parallel: 0
+  parallel: 1
   # 각 시뮬레이션 타임아웃 (초)
   timeout: 300
 
