@@ -1,1 +1,0 @@
--I/include -I/workspaces/SM_2D/src/include -I"/usr/local/cuda-12.4/include" -I/workspaces/SM_2D/src/cuda

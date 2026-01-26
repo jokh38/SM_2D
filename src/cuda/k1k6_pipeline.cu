@@ -53,6 +53,11 @@ __global__ void clear_buckets_kernel(
     if (idx >= num_buckets) return;
 
     device_bucket_clear(buckets[idx]);
+
+    // DEBUG: Print first few bucket clears
+    if (idx < 5) {
+        printf("clear_buckets_kernel: Clearing bucket %d\n", idx);
+    }
 }
 
 __global__ void compact_active_list(

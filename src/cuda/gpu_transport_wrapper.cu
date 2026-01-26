@@ -64,12 +64,16 @@ void run_k1k6_pipeline_transport(
     config.dz = dz;
 
     // Energy thresholds
-    config.E_trigger = 300.0f;         // TEMP: Force all particles through fine transport (debug)
+    // FIX: Set E_trigger LOWER than beam energy so high-energy particles use coarse transport only
+    // Beam energy is 150 MeV, so particles above 50 MeV should use coarse transport
+    config.E_trigger = 50.0f;          // Particles below 50 MeV use fine transport
     config.weight_active_min = 1e-6f;   // Minimum weight for active cell
 
     // Coarse transport settings
     config.E_coarse_max = 300.0f;       // Up to 300 MeV
-    config.step_coarse = 0.05f;         // FIX: 0.05mm - MUST be < 0.0625mm to avoid boundary crossing from top sub-bin
+    // FIX: Coarse step must be LARGER than half cell size to allow boundary crossing
+    // Cell size is 0.5mm, so half_dz = 0.25mm. Step of 0.3mm ensures crossing in one step.
+    config.step_coarse = 0.3f;           // 0.3mm - allows crossing 0.5mm cells in a few steps
     config.n_steps_per_cell = 1;        // One step per cell for coarse
 
     // Phase-space dimensions

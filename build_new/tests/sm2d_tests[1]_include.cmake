@@ -1,5 +1,0 @@
-if(EXISTS "/workspaces/SM_2D/build_new/tests/sm2d_tests[1]_tests.cmake")
-  include("/workspaces/SM_2D/build_new/tests/sm2d_tests[1]_tests.cmake")
-else()
-  add_test(sm2d_tests_NOT_BUILT sm2d_tests_NOT_BUILT)
-endif()

@@ -91,6 +91,13 @@ __global__ void K3_FineTransport(
     float cell_boundary_weight = 0.0f;
     double cell_boundary_energy = 0.0;
 
+    // DEBUG: Track weight flow for this cell
+    float weight_read_from_psi_in = 0.0f;
+    float weight_to_bucket[4] = {0.0f, 0.0f, 0.0f, 0.0f};  // Per face: Z+, Z-, X+, X-
+    float weight_to_psi_out = 0.0f;
+    int particles_to_bucket = 0;
+    int particles_to_psi_out = 0;
+
     // FIX: Use DEVICE_Kb instead of hardcoded 32
     constexpr int Kb = DEVICE_Kb;  // = 8
 
@@ -114,6 +121,9 @@ __global__ void K3_FineTransport(
             }
 
             if (weight < 1e-12f) continue;
+
+            // DEBUG: Track weight read from psi_in
+            weight_read_from_psi_in += weight;
 
             // FIX Problem 1: Decode 4D local index (theta_local, E_local, x_sub, z_sub)
             int theta_local, E_local, x_sub, z_sub;
@@ -298,6 +308,10 @@ __global__ void K3_FineTransport(
                     N_theta_local, N_E_local
                 );
 
+                // DEBUG: Track weight to bucket
+                weight_to_bucket[exit_face] += w_new;
+                particles_to_bucket++;
+
                 // FIX: Deposit energy in current cell before particle leaves
                 // Both electronic (dE * weight) and nuclear (E_rem) energy are
                 // deposited locally in this cell, not carried across boundary.
@@ -382,10 +396,24 @@ __global__ void K3_FineTransport(
                         int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
                         int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
                         atomicAdd(&values_out[global_idx_out], w_new);
+
+                        // DEBUG: Track weight to psi_out
+                        weight_to_psi_out += w_new;
+                        particles_to_psi_out++;
                     }
                 }
             }
         }
+    }
+
+    // DEBUG: Print weight flow summary for this cell
+    if (weight_read_from_psi_in > 0.001f || weight_to_bucket[0] > 0.001f ||
+        weight_to_bucket[1] > 0.001f || weight_to_bucket[2] > 0.001f || weight_to_bucket[3] > 0.001f ||
+        weight_to_psi_out > 0.001f) {
+        printf("K3 SUMMARY cell=%d: read=%.4f, to_bucket[Z+=%.4f,Z-=%.4f,X+=%.4f,X-=%.4f], to_psi_out=%.4f, particles=[bucket=%d,psi_out=%d]\n",
+               cell, weight_read_from_psi_in, weight_to_bucket[0], weight_to_bucket[1],
+               weight_to_bucket[2], weight_to_bucket[3], weight_to_psi_out,
+               particles_to_bucket, particles_to_psi_out);
     }
 
     // Write accumulators to global memory (atomic for thread safety)

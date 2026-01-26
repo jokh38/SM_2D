@@ -66,8 +66,10 @@ __global__ void K4_BucketTransfer(
     // FIX: Use DEVICE_Kb instead of hardcoded 32
     constexpr int max_slots_per_cell = DEVICE_Kb;  // = 8
 
-    // DEBUG: Track total weight transferred for cells 100, 300, 700
+    // DEBUG: Track total weight transferred for this cell
     float debug_total_weight = 0.0f;
+    float debug_weight_from_face[4] = {0.0f, 0.0f, 0.0f, 0.0f};  // Per face: from -Z, +Z, -X, +X neighbor
+    int debug_source_cell[4] = {-1, -1, -1, -1};  // Track which source cells sent data
 
     // Each cell receives buckets from ALL 4 neighbors
     // Process all 4 faces
@@ -113,6 +115,12 @@ __global__ void K4_BucketTransfer(
         int bucket_idx = source_cell * 4 + source_face;
         const DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
 
+        // DEBUG: Print when reading from cell 100's bucket
+        if (source_cell == 100) {
+            printf("K4: Reading from bucket %d (cell=%d, face=%d), slot0_bid=%u\n",
+                   bucket_idx, source_cell, source_face, bucket.block_id[0]);
+        }
+
         // Transfer all slots from bucket to this cell
         for (int slot = 0; slot < DEVICE_Kb_out; ++slot) {
             uint32_t bid = bucket.block_id[slot];
@@ -156,15 +164,22 @@ __global__ void K4_BucketTransfer(
                         int global_idx = (cell * max_slots_per_cell + out_slot) * DEVICE_LOCAL_BINS + lidx;
                         atomicAdd(&values_out[global_idx], w);
                         debug_total_weight += w;
+                        debug_weight_from_face[face] += w;
+                        debug_source_cell[face] = source_cell;
                     }
                 }
             }
         }
     }
 
-    // DEBUG: Print for key cells
-    if ((cell == 100 || cell == 300 || cell == 500) && debug_total_weight > 0) {
-        printf("K4: cell=%d (ix=%d, iz=%d) received total_weight=%.6f\n", cell, cell % Nx, cell / Nx, debug_total_weight);
+    // DEBUG: Print detailed summary for key cells
+    if (debug_total_weight > 0.001f) {
+        printf("K4 SUMMARY cell=%d (ix=%d, iz=%d): total=%.6f, from[src%d_face0=%.6f, src%d_face1=%.6f, src%d_face2=%.6f, src%d_face3=%.6f]\n",
+               cell, cell % Nx, cell / Nx, debug_total_weight,
+               debug_source_cell[0], debug_weight_from_face[0],
+               debug_source_cell[1], debug_weight_from_face[1],
+               debug_source_cell[2], debug_weight_from_face[2],
+               debug_source_cell[3], debug_weight_from_face[3]);
     }
 }
 
