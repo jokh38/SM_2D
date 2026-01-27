@@ -134,7 +134,11 @@ __device__ inline float device_compute_energy_deposition(const DeviceRLUT& lut, 
 // Device Functions for Step Size Control
 // ============================================================================
 
-// P5 FIX: Compute maximum step size based on physics AND cell geometry
+// FIX: Compute maximum step size based on physics AND cell geometry
+// Step size is designed to:
+// 1. Resolve sub-cell features (sub-cell size = dx / N_x_sub = 0.5 / 4 = 0.125mm)
+// 2. Allow boundary crossing (cell half-width = 0.25mm, need ~2-3 steps minimum)
+// 3. Adapt to energy-dependent stopping power variations
 __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, float dx = 1.0f, float dz = 1.0f) {
     float R = device_lookup_R(lut, E);
 
@@ -142,25 +146,36 @@ __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, 
     float delta_R_max = 0.02f * R;
 
     // Energy-dependent refinement factor
+    // Adjusted for E_trigger = 10 MeV threshold between coarse and fine transport
     float dS_factor = 1.0f;
 
     if (E < 5.0f) {
-        dS_factor = 0.2f;
+        // Very low energy (near end of range) - use sub-cell resolution
+        // Sub-cell size = 0.125mm, use 0.1mm to resolve features while allowing progress
+        dS_factor = 0.6f;
         delta_R_max = fminf(delta_R_max, 0.1f);
     } else if (E < 10.0f) {
-        dS_factor = 0.3f;
-        delta_R_max = fminf(delta_R_max, 0.2f);
-    } else if (E < 20.0f) {
-        dS_factor = 0.5f;
-        delta_R_max = fminf(delta_R_max, 0.5f);
-    } else if (E < 50.0f) {
+        // Low energy (Bragg peak region) - intermediate step
+        // Need enough resolution but must allow boundary crossing
         dS_factor = 0.7f;
-        delta_R_max = fminf(delta_R_max, 0.7f);
+        delta_R_max = fminf(delta_R_max, 0.15f);
+    } else if (E < 20.0f) {
+        // Below coarse transport threshold - larger steps
+        dS_factor = 0.8f;
+        delta_R_max = fminf(delta_R_max, 0.3f);
+    } else if (E < 50.0f) {
+        // Just above threshold - even larger steps
+        dS_factor = 0.9f;
+        delta_R_max = fminf(delta_R_max, 0.5f);
     }
 
     delta_R_max = delta_R_max * dS_factor;
     delta_R_max = fminf(delta_R_max, 1.0f);
-    delta_R_max = fmaxf(delta_R_max, 0.05f);
+
+    // CRITICAL FIX: Minimum step must allow boundary crossing in 2-3 iterations
+    // Cell half-width = 0.25mm, so minimum step should be at least 0.1mm
+    // This prevents particles from getting trapped in cells
+    delta_R_max = fmaxf(delta_R_max, 0.1f);
 
     // REMOVED: Artificial cell_limit was causing step size to be limited to 0.125mm (0.25 * 0.5mm)
     // This prevented 150MeV protons from traveling their full ~158mm range
