@@ -75,7 +75,7 @@ TEST(K1Test, ComputeBETriggerFromEnergy) {
     constexpr int N_E_local = 4;
 
     // E_trigger = 10 MeV should map to a specific block index
-    int b_E_trigger = compute_b_E_trigger(10.0f, e_grid, N_E_local);
+    int b_E_trigger = sm_2d::compute_b_E_trigger(10.0f, e_grid, N_E_local);
 
     // With log-spaced grid from 0.1 to 300 MeV:
     // log(0.1) = -2.303, log(300) = 5.704, delta_log = 8.007/256 = 0.0313
@@ -85,7 +85,7 @@ TEST(K1Test, ComputeBETriggerFromEnergy) {
     EXPECT_LT(b_E_trigger, 45);
 
     // Higher E_trigger should give higher b_E_trigger
-    int b_E_trigger_50 = compute_b_E_trigger(50.0f, e_grid, N_E_local);
+    int b_E_trigger_50 = sm_2d::compute_b_E_trigger(50.0f, e_grid, N_E_local);
     EXPECT_GT(b_E_trigger_50, b_E_trigger);
 
     // 50 MeV → log(50) = 3.912 → bin ≈ 198 → block ≈ 49

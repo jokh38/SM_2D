@@ -52,7 +52,27 @@ __global__ void clear_buckets_kernel(
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= num_buckets) return;
 
-    device_bucket_clear(buckets[idx]);
+    // DEBUG: Print before clearing for bucket 400
+    if (idx == 400) {
+        printf("clear_buckets_kernel: BEFORE clear, bucket %d slot0_bid=%u\n", idx, buckets[idx].block_id[0]);
+    }
+
+    // CRITICAL FIX: Clear the bucket directly instead of using device_bucket_clear
+    // The device function might not be working properly due to caching or other issues
+    DeviceOutflowBucket& bucket = buckets[idx];
+    for (int i = 0; i < DEVICE_Kb_out; ++i) {
+        bucket.block_id[i] = DEVICE_EMPTY_BLOCK_ID;
+        bucket.local_count[i] = 0;
+        for (int j = 0; j < DEVICE_LOCAL_BINS; ++j) {
+            bucket.value[i][j] = 0.0f;
+        }
+    }
+
+    // DEBUG: Print after clearing for bucket 400
+    if (idx == 400) {
+        printf("clear_buckets_kernel: AFTER clear, bucket %d slot0_bid=%u (expected=%u)\n",
+               idx, buckets[idx].block_id[0], DEVICE_EMPTY_BLOCK_ID);
+    }
 
     // DEBUG: Print first few bucket clears
     if (idx < 5) {
@@ -646,6 +666,18 @@ bool run_k1k6_pipeline_transport(
             break;
         }
 
+        // CRITICAL FIX: Clear psi_out BEFORE K2/K3 write to it
+        // This prevents accumulation of particles from previous iterations
+        device_psic_clear(*psi_out);
+
+        // CRITICAL FIX: Clear buckets BEFORE K2/K3 run
+        // This ensures buckets only contain transfers from CURRENT iteration
+        size_t num_buckets = config.Nx * config.Nz * 4;
+        int b_threads = 256;
+        int b_blocks = (num_buckets + b_threads - 1) / b_threads;
+        clear_buckets_kernel<<<b_blocks, b_threads>>>(state.d_OutflowBuckets, num_buckets);
+        cudaDeviceSynchronize();
+
         // --------------------------------------------------------------------
         // K2: Coarse Transport (high energy cells)
         // --------------------------------------------------------------------
@@ -718,16 +750,14 @@ bool run_k1k6_pipeline_transport(
             std::cout << "    psi_out AFTER K4: weight=" << total_weight_out << ", nonzero_bins=" << nonzero_count_out << std::endl;
         }
 
-        // Clear outflow buckets for next iteration
-        size_t num_buckets = config.Nx * config.Nz * 4;
-        int b_threads = 256;
-        int b_blocks = (num_buckets + b_threads - 1) / b_threads;
-        clear_buckets_kernel<<<b_blocks, b_threads>>>(state.d_OutflowBuckets, num_buckets);
-        cudaDeviceSynchronize();
+        // Note: Buckets are cleared at START of next iteration (before K2/K3)
+        // This is correct because K4 needs to read the buckets AFTER K2/K3 write to them
 
         // --------------------------------------------------------------------
         // K5: Weight Audit (conservation check)
         // --------------------------------------------------------------------
+        // Note: psi_in now contains processed particles (moved from original)
+        //       psi_out contains K2+K3+K4 results (cleared at start of iteration)
         if (!run_k5_weight_audit(*psi_in, *psi_out,
                                  state.d_AbsorbedWeight_cutoff,
                                  state.d_AbsorbedWeight_nuclear,
