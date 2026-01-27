@@ -401,6 +401,7 @@ bool run_k2_coarse_transport(
         psi_in.block_id,
         psi_in.value,
         d_ActiveMask,
+        d_CoarseList,  // CRITICAL FIX: Pass CoarseList (was missing)
         config.Nx, config.Nz, config.dx, config.dz,
         n_coarse,
         dlut,

@@ -1,0 +1,796 @@
+========================================
+SM_2D: Proton Therapy Simulation
+========================================
+Loading configuration from: sim.ini
+=== Incident Particle Configuration ===
+Particle Type: proton
+Beam Profile: gaussian
+Energy: 150 MeV (sigma = 1 MeV)
+Position: (0, 0) mm
+Angle: 0 rad (sigma = 0.001 rad)
+Weight: 1
+Samples: 1000
+
+Grid: 200 x 640 (dx=0.5mm, dz=0.5mm)
+Output Dir: results
+======================================
+
+--- Running Simulation ---
+Using GPU transport (Vavilov energy straggling)
+=== LUT Verification ===
+  R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
+  R(150 MeV) = 157.667 mm (expected ~158)
+  R(300 MeV) = -nan mm
+  S(150 MeV) = 5.44494 MeV*cm^2/g
+  Energy loss test: E=150 -> E_new=149.707, dE=0.292603 MeV (step=0.5mm)
+=======================
+Running K1-K6 GPU pipeline transport...
+  GPU: NVIDIA GeForce RTX 2080
+  Energy: 150 MeV
+  Phase-space: 36 x 32 bins
+Running K1-K6 GPU pipeline wrapper...
+  Grid: 200 x 640 cells
+  Source: (0, 0) mm, 150 MeV
+DevicePsiC allocation:
+  Grid: 200x640 = 128000 cells
+  Kb: 8, LOCAL_BINS: 128
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 524288000 bytes (500 MB)
+  total per PsiC: 503.906 MB
+DevicePsiC allocation successful
+DevicePsiC allocation:
+  Grid: 200x640 = 128000 cells
+  Kb: 8, LOCAL_BINS: 128
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 524288000 bytes (500 MB)
+  total per PsiC: 503.906 MB
+DevicePsiC allocation successful
+Allocating pipeline state for 200x640 (128000 cells)
+Pipeline state allocation successful
+  Source: cell (100, 0) at (0, 0) mm
+  Energy: 150 MeV, Angle: 0 rad
+  Source injection verification:
+    Total weight in source cell: 1 (expected: 1)
+    Non-zero bins: 2 / 1024
+Running K1-K6 GPU pipeline...
+  Grid: 200 x 640 cells
+  Phase-space: 36 x 32 global bins
+  Energy threshold: 10 MeV (b_E_trigger=9)
+  Min weight: 1e-06
+Starting main transport loop...
+  Iteration 1: 0 active, 1 coarse cells
+    psi_in: weight=1, nonzero_bins=2
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=1
+K2: Thread 0 assigned to cell 100 via CoarseList
+K2: Writing particle to psi_out: cell=100, E_new=141.456, w_new=0.770121
+K2: Writing particle to psi_out: cell=100, E_new=141.455, w_new=0.229537
+    K2 complete
+    psi_out AFTER K2 (before K4): weight=0.999658, nonzero_bins=2
+    psi_out before K4: weight=0.999658, nonzero_bins=2
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+    psi_out AFTER K4: weight=0.999658, nonzero_bins=2
+  Weight audit: error=0 pass=yes
+  Iteration 2: 0 active, 1 coarse cells
+    psi_in: weight=0.999658, nonzero_bins=2
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=1
+K2: Thread 0 assigned to cell 100 via CoarseList
+K2: BOUNDARY CROSS: cell=100, face=0, z_old=0.0625, z_new=0.2496, step=0.3000
+K2: Writing particle to psi_out: cell=100, E_new=110.147, w_new=0.229486
+    K2 complete
+    psi_out AFTER K2 (before K4): weight=0.229486, nonzero_bins=1
+    psi_out before K4: weight=0.229486, nonzero_bins=1
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=53252
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+K4 SUMMARY cell=300 (ix=100, iz=1): total=0.769950, from[src100_face0=0.769950, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.999436, nonzero_bins=5
+  Weight audit: error=0 pass=yes
+  Iteration 3: 0 active, 2 coarse cells
+    psi_in: weight=0.999436, nonzero_bins=5
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=53252
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=2
+K2: Thread 0 assigned to cell 300 via CoarseList
+K2: Thread 1 assigned to cell 100 via CoarseList
+K2: BOUNDARY CROSS: cell=100, face=0, z_old=0.1875, z_new=0.2494, step=0.3000
+    K2 complete
+    psi_out AFTER K2 (before K4): weight=0.769669, nonzero_bins=4
+    psi_out before K4: weight=0.769669, nonzero_bins=4
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=53252
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+K4 SUMMARY cell=300 (ix=100, iz=1): total=0.229468, from[src100_face0=0.229468, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.999138, nonzero_bins=8
+  Weight audit: error=0 pass=yes
+  Iteration 4: 0 active, 1 coarse cells
+    psi_in: weight=0.999138, nonzero_bins=8
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=53252
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=1
+K2: Thread 0 assigned to cell 300 via CoarseList
+    K2 complete
+    psi_out before K4: weight=0.995297, nonzero_bins=6
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4 SUMMARY cell=500 (ix=100, iz=2): total=0.003571, from[src300_face0=0.003571, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+    psi_out AFTER K4: weight=0.998868, nonzero_bins=12
+  Weight audit: error=0 pass=yes
+  Iteration 5: 0 active, 2 coarse cells
+    psi_in: weight=0.998868, nonzero_bins=12
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=2
+K2: Thread 0 assigned to cell 500 via CoarseList
+K2: Thread 1 assigned to cell 300 via CoarseList
+    K2 complete
+    psi_out before K4: weight=0.232893, nonzero_bins=10
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+K4 SUMMARY cell=500 (ix=100, iz=2): total=0.765854, from[src300_face0=0.765854, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.998747, nonzero_bins=16
+  Weight audit: error=0 pass=yes
+  Iteration 6: 0 active, 2 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=2
+K2: Thread 0 assigned to cell 500 via CoarseList
+K2: Thread 1 assigned to cell 300 via CoarseList
+    K2 complete
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 7: 0 active, 3 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=3
+K2: Thread 0 assigned to cell 700 via CoarseList
+K2: Thread 1 assigned to cell 500 via CoarseList
+K2: Thread 2 assigned to cell 300 via CoarseList
+    K2 complete
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4 SUMMARY cell=700 (ix=100, iz=3): total=0.003536, from[src500_face0=0.003536, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 8: 0 active, 3 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=3
+K2: Thread 0 assigned to cell 700 via CoarseList
+K2: Thread 1 assigned to cell 500 via CoarseList
+K2: Thread 2 assigned to cell 300 via CoarseList
+    K2 complete
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+K4 SUMMARY cell=700 (ix=100, iz=3): total=0.003664, from[src500_face0=0.003664, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+  Weight audit: error=0 pass=yes
+  Iteration 9: 0 active, 4 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=4
+K2: Thread 0 assigned to cell 700 via CoarseList
+K2: Thread 1 assigned to cell 900 via CoarseList
+K2: Thread 2 assigned to cell 500 via CoarseList
+K2: Thread 3 assigned to cell 300 via CoarseList
+    K2 complete
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 10: 0 active, 4 coarse cells
+    Energy so far: 1.76491 MeV
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=4
+K2: Thread 0 assigned to cell 700 via CoarseList
+K2: Thread 1 assigned to cell 900 via CoarseList
+K2: Thread 2 assigned to cell 500 via CoarseList
+K2: Thread 3 assigned to cell 300 via CoarseList
+    K2 complete
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 11: 0 active, 5 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=5
+K2: Thread 0 assigned to cell 900 via CoarseList
+K2: Thread 1 assigned to cell 1100 via CoarseList
+K2: Thread 2 assigned to cell 700 via CoarseList
+K2: Thread 3 assigned to cell 500 via CoarseList
+K2: Thread 4 assigned to cell 300 via CoarseList
+    K2 complete
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 12: 0 active, 5 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=5
+K2: Thread 0 assigned to cell 900 via CoarseList
+K2: Thread 1 assigned to cell 1100 via CoarseList
+K2: Thread 2 assigned to cell 500 via CoarseList
+K2: Thread 3 assigned to cell 300 via CoarseList
+K2: Thread 4 assigned to cell 700 via CoarseList
+    K2 complete
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 13: 5 active, 1 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=1
+K2: Thread 0 assigned to cell 1300 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=5, first_bid=32773)
+K3: lidx=108 has weight=0.000981
+K3 SUMMARY cell=300: read=0.2287, to_bucket[Z+=0.2286,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=2,psi_out=0]
+K3 SUMMARY cell=500: read=0.7619, to_bucket[Z+=0.7619,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=3,psi_out=0]
+K3 SUMMARY cell=700: read=0.0071, to_bucket[Z+=0.0071,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=4,psi_out=0]
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4 SUMMARY cell=500 (ix=100, iz=2): total=0.228647, from[src300_face0=0.228647, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=900 (ix=100, iz=4): total=0.007105, from[src700_face0=0.007105, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=700 (ix=100, iz=3): total=0.761908, from[src500_face0=0.761908, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 14: 4 active, 1 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=1
+K2: Thread 0 assigned to cell 1300 via CoarseList
+    K2 complete
+K3: Processing active cell 1100 (n_active=4, first_bid=32772)
+K3: cell=700, active_idx=1, lidx=0, weight=0.0020, step_phys=0.1000, step_boundary=0.4525, safe=0.4520, actual=0.1000, z_cell=-0.1875
+K3: cell=500, active_idx=2, lidx=0, weight=0.0036, step_phys=0.1000, step_boundary=0.4521, safe=0.4517, actual=0.1000, z_cell=-0.1875
+K3: cell=700, active_idx=1, lidx=1, weight=0.0035, step_phys=0.1000, step_boundary=0.4650, safe=0.4645, actual=0.1000, z_cell=-0.1875
+K3: cell=500, active_idx=2, lidx=1, weight=0.0130, step_phys=0.1000, step_boundary=0.4644, safe=0.4640, actual=0.1000, z_cell=-0.1875
+K3: lidx=3 has weight=0.000000
+K3: Particle remains in cell, E_new=5.069, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=7 has weight=0.000000
+K3 BOUNDARY DEBUG [lidx=7]: z_cell=-0.1875, x_cell=-0.1875, half_dz=0.2500, mu_init=0.9852, eta_init=0.1713
+K3 BOUNDARY DEBUG [lidx=7]: step_to_z_plus=0.4441, step_to_z_minus=1000000015047466219876688855040.0000, step_to_x_plus=2.5545, step_to_x_minus=1000000015047466219876688855040.0000
+K3 ENERGY DEBUG [lidx=7]: E=7.034 -> E_new=6.522, dE=0.5124, mean_dE=0.6244
+K3 RANGE DEBUG [lidx=7]: R_current=0.661, step=0.1000, R_after=0.561, E_from_R_after=6.410
+K3 STEP DEBUG [lidx=7]: step_phys=0.1000, step_boundary=0.4441, actual_step=0.1000
+K3 LUT DEBUG: E_min=0.100, E_max=300.000, N_E=256
+K3 POSITION DEBUG [lidx=7]: x_cell=-0.1875, z_cell=-0.1875 -> x_new=-0.1714, z_new=-0.0888 (half_dx=0.2500, half_dz=0.2500)
+K3 EXIT FACE DEBUG [lidx=7]: exit_face=-1
+K3: Particle remains in cell, E_new=6.522, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=35 has weight=0.000000
+K3: Particle remains in cell, E_new=4.680, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=103 has weight=0.000000
+K3: Particle remains in cell, E_new=4.703, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=5.392, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.947, w_new=0.000002
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.612, w_new=0.000004
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.337, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.015, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.794, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.093, w_new=0.000001
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.649, w_new=0.000019
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.887, w_new=0.000021
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=11.379, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=11.503, w_new=0.000000
+K3: Writing particle to psi_out
+K3 SUMMARY cell=700: read=0.7619, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.7619, particles=[bucket=0,psi_out=8]
+K3 SUMMARY cell=500: read=0.2286, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.2286, particles=[bucket=0,psi_out=6]
+K3: Particle remains in cell, E_new=11.499, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.073, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.858, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=10.886, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.181, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=10.903, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=11.041, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=14.405, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=18.721, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=14.444, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=18.696, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=14.320, w_new=0.000001
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=14.401, w_new=0.000013
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=18.694, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=18.719, w_new=0.000002
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=14.311, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=18.718, w_new=0.000000
+K3: Writing particle to psi_out
+K3 SUMMARY cell=900: read=0.0072, to_bucket[Z+=0.0001,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0071, particles=[bucket=10,psi_out=21]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 15: 4 active, 2 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=2
+K2: Thread 0 assigned to cell 1500 via CoarseList
+K2: Thread 1 assigned to cell 1300 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=4, first_bid=28677)
+K3: lidx=36 has weight=0.002002
+K3: Particle remains in cell, E_new=3.617, w_new=0.002002
+K3: Writing particle to psi_out
+K3: lidx=37 has weight=0.003507
+K3: Particle remains in cell, E_new=3.024, w_new=0.003507
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.586, w_new=0.073985
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.436, w_new=0.141496
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.289, w_new=0.358850
+K3: Writing particle to psi_out
+K3 SUMMARY cell=500: read=0.2286, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.2286, particles=[bucket=0,psi_out=6]
+K3: Particle remains in cell, E_new=8.687, w_new=0.022391
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=8.313, w_new=0.159627
+K3: Writing particle to psi_out
+K3 SUMMARY cell=700: read=0.7619, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.7619, particles=[bucket=0,psi_out=7]
+K3 SUMMARY cell=900: read=0.0071, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0071, particles=[bucket=0,psi_out=19]
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 16: 4 active, 2 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=2
+K2: Thread 0 assigned to cell 1500 via CoarseList
+K2: Thread 1 assigned to cell 1300 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=4, first_bid=28677)
+K3: lidx=65 has weight=0.002002
+K3: Particle remains in cell, E_new=2.640, w_new=0.002002
+K3: Writing particle to psi_out
+K3: lidx=69 has weight=0.073985
+K3: Particle remains in cell, E_new=3.775, w_new=0.073985
+K3: Writing particle to psi_out
+K3: lidx=70 has weight=0.141496
+K3: Particle remains in cell, E_new=3.792, w_new=0.141496
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.549, w_new=0.003507
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.335, w_new=0.358849
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.270, w_new=0.022391
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.754, w_new=0.159623
+K3: Writing particle to psi_out
+K3 SUMMARY cell=700: read=0.7619, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.7619, particles=[bucket=0,psi_out=7]
+K3 SUMMARY cell=500: read=0.2286, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.2286, particles=[bucket=0,psi_out=6]
+K3 SUMMARY cell=900: read=0.0071, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0071, particles=[bucket=10,psi_out=9]
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 17: 4 active, 3 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=3
+K2: Thread 0 assigned to cell 1700 via CoarseList
+K2: Thread 1 assigned to cell 1500 via CoarseList
+K2: Thread 2 assigned to cell 1300 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=4, first_bid=24581)
+K3: lidx=101 has weight=0.002002
+K3 SUMMARY cell=700: read=0.7619, to_bucket[Z+=0.7619,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=6,psi_out=0]
+K3 SUMMARY cell=500: read=0.2286, to_bucket[Z+=0.2286,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=5,psi_out=0]
+K3 SUMMARY cell=900: read=0.0071, to_bucket[Z+=0.0071,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=8,psi_out=0]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+K4 SUMMARY cell=900 (ix=100, iz=4): total=0.761852, from[src700_face0=0.761852, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1100 (ix=100, iz=5): total=0.004039, from[src900_face0=0.004039, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=700 (ix=100, iz=3): total=0.228636, from[src500_face0=0.228636, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+  Weight audit: error=0 pass=yes
+  Iteration 18: 4 active, 2 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=2
+K2: Thread 0 assigned to cell 1500 via CoarseList
+K2: Thread 1 assigned to cell 1700 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=4, first_bid=5)
+K3: lidx=0 has weight=0.001603
+K3: lidx=4 has weight=0.002034
+K3: Particle remains in cell, E_new=0.128, w_new=0.002034
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.001002
+K3: Particle remains in cell, E_new=0.000, w_new=0.000636
+K3: Particle remains in cell, E_new=0.159, w_new=0.006961
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.022, w_new=0.004421
+K3: Particle remains in cell, E_new=0.135, w_new=0.001874
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.003111
+K3: Particle remains in cell, E_new=0.000, w_new=0.039559
+K3: Particle remains in cell, E_new=0.000, w_new=0.065662
+K3: Particle remains in cell, E_new=1.859, w_new=0.042201
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.282, w_new=0.029687
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=3.207, w_new=0.020263
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=3.374, w_new=0.006709
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=3.278, w_new=0.002856
+K3: Writing particle to psi_out
+K3 SUMMARY cell=900: read=0.7619, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.6921, particles=[bucket=0,psi_out=10]
+K3: Particle remains in cell, E_new=4.746, w_new=0.000012
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.609, w_new=0.000046
+K3: Writing particle to psi_out
+K3 SUMMARY cell=700: read=0.2286, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.1126, particles=[bucket=0,psi_out=10]
+K3 SUMMARY cell=1100: read=0.0041, to_bucket[Z+=0.0001,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0015, particles=[bucket=14,psi_out=24]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 19: 4 active, 3 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=3
+K2: Thread 0 assigned to cell 1900 via CoarseList
+K2: Thread 1 assigned to cell 1700 via CoarseList
+K2: Thread 2 assigned to cell 1500 via CoarseList
+    K2 complete
+K3: Processing active cell 1100 (n_active=4, first_bid=12292)
+K3: lidx=67 has weight=0.000000
+K3: Particle remains in cell, E_new=0.449, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.449, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000024
+K3: Particle remains in cell, E_new=0.000, w_new=0.000019
+K3: Particle remains in cell, E_new=0.607, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.248, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3 SUMMARY cell=700: read=0.1126, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0319, particles=[bucket=0,psi_out=5]
+K3: Particle remains in cell, E_new=0.349, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=1.253, w_new=0.000014
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=1.536, w_new=0.000026
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=1.400, w_new=0.001229
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.761, w_new=0.000026
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=3.757, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.616, w_new=0.000001
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=1.641, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.164, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.193, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.731, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.703, w_new=0.000067
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.323, w_new=0.000087
+K3: Writing particle to psi_out
+K3 SUMMARY cell=1100: read=0.0015, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0013, particles=[bucket=0,psi_out=15]
+K3 SUMMARY cell=900: read=0.6921, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.3098, particles=[bucket=0,psi_out=6]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 20: 4 active, 3 coarse cells
+    Energy so far: 8.29666 MeV
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=3
+K2: Thread 0 assigned to cell 1900 via CoarseList
+K2: Thread 1 assigned to cell 1500 via CoarseList
+K2: Thread 2 assigned to cell 1700 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=4, first_bid=5)
+K3: lidx=70 has weight=0.002034
+K3: Particle remains in cell, E_new=0.128, w_new=0.002034
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.023119
+K3: Particle remains in cell, E_new=1.506, w_new=0.000012
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.356, w_new=0.000046
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.006709
+K3 SUMMARY cell=700: read=0.0319, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0021, particles=[bucket=0,psi_out=3]
+K3 SUMMARY cell=900: read=0.3098, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.1210, particles=[bucket=0,psi_out=3]
+K3 SUMMARY cell=1100: read=0.0013, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0013, particles=[bucket=6,psi_out=5]
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 21: 4 active, 3 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=3
+K2: Thread 0 assigned to cell 1700 via CoarseList
+K2: Thread 1 assigned to cell 1900 via CoarseList
+K2: Thread 2 assigned to cell 1500 via CoarseList
+    K2 complete
+K3: Processing active cell 700 (n_active=4, first_bid=6)
+K3: lidx=100 has weight=0.002034
+K3 SUMMARY cell=900: read=0.1210, to_bucket[Z+=0.1210,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=3,psi_out=0]
+K3: Particle remains in cell, E_new=0.000, w_new=0.000046
+K3 SUMMARY cell=700: read=0.0021, to_bucket[Z+=0.0020,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=2,psi_out=0]
+K3 SUMMARY cell=1100: read=0.0013, to_bucket[Z+=0.0012,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=4,psi_out=0]
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+K4 SUMMARY cell=900 (ix=100, iz=4): total=0.002046, from[src700_face0=0.002046, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1300 (ix=100, iz=6): total=0.001243, from[src1100_face0=0.001243, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1100 (ix=100, iz=5): total=0.120967, from[src900_face0=0.120967, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+  Weight audit: error=0 pass=yes
+  Iteration 22: 3 active, 0 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+K3: Processing active cell 1100 (n_active=3, first_bid=6)
+K3: lidx=1 has weight=0.001587
+K3: lidx=5 has weight=0.001113
+K3: Particle remains in cell, E_new=0.000, w_new=0.001113
+K3: lidx=6 has weight=0.000000
+K3 BOUNDARY DEBUG [lidx=6]: z_cell=-0.1875, x_cell=-0.1875, half_dz=0.2500, mu_init=0.7090, eta_init=0.7052
+K3 BOUNDARY DEBUG [lidx=6]: step_to_z_plus=0.6171, step_to_z_minus=1000000015047466219876688855040.0000, step_to_x_plus=0.6204, step_to_x_minus=1000000015047466219876688855040.0000
+K3 ENERGY DEBUG [lidx=6]: E=0.128 -> E_new=0.000, dE=0.1284, mean_dE=0.1284
+K3 RANGE DEBUG [lidx=6]: R_current=0.002, step=0.1000, R_after=-0.098, E_from_R_after=0.100
+K3 STEP DEBUG [lidx=6]: step_phys=0.1000, step_boundary=0.6171, actual_step=0.1000
+K3 LUT DEBUG: E_min=0.100, E_max=300.000, N_E=256
+K3 POSITION DEBUG [lidx=6]: x_cell=-0.1875, z_cell=-0.1875 -> x_new=-0.1074, z_new=-0.1300 (half_dx=0.2500, half_dz=0.2500)
+K3 EXIT FACE DEBUG [lidx=6]: exit_face=-1
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: lidx=7 has weight=0.100269
+K3 BOUNDARY DEBUG [lidx=7]: z_cell=-0.1875, x_cell=-0.1875, half_dz=0.2500, mu_init=0.6446, eta_init=0.7645
+K3 BOUNDARY DEBUG [lidx=7]: step_to_z_plus=0.6787, step_to_z_minus=1000000015047466219876688855040.0000, step_to_x_plus=0.5723, step_to_x_minus=1000000015047466219876688855040.0000
+K3 ENERGY DEBUG [lidx=7]: E=0.128 -> E_new=0.128, dE=0.0000, mean_dE=0.1284
+K3 RANGE DEBUG [lidx=7]: R_current=0.002, step=0.1000, R_after=-0.098, E_from_R_after=0.100
+K3 STEP DEBUG [lidx=7]: step_phys=0.1000, step_boundary=0.5723, actual_step=0.1000
+K3 LUT DEBUG: E_min=0.100, E_max=300.000, N_E=256
+K3 POSITION DEBUG [lidx=7]: x_cell=-0.1875, z_cell=-0.1875 -> x_new=-0.1631, z_new=-0.1072 (half_dx=0.2500, half_dz=0.2500)
+K3 EXIT FACE DEBUG [lidx=7]: exit_face=-1
+K3: Particle remains in cell, E_new=0.128, w_new=0.100269
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.012884
+K3: Particle remains in cell, E_new=0.000, w_new=0.000509
+K3 SUMMARY cell=900: read=0.0020, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=0,psi_out=0]
+K3: Particle remains in cell, E_new=0.000, w_new=0.000243
+K3: Particle remains in cell, E_new=0.449, w_new=0.002951
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.576, w_new=0.001409
+K3: Writing particle to psi_out
+K3 SUMMARY cell=1100: read=0.1210, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.1046, particles=[bucket=0,psi_out=3]
+K3 SUMMARY cell=1300: read=0.0012, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0007, particles=[bucket=1,psi_out=5]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 23: 2 active, 1 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+    Calling K2 with n_coarse=1
+K2: Thread 0 assigned to cell 1500 via CoarseList
+    K2 complete
+K3: Processing active cell 1100 (n_active=2, first_bid=3)
+K3: lidx=38 has weight=0.100269
+K3: Particle remains in cell, E_new=0.003, w_new=0.100269
+K3: Particle remains in cell, E_new=0.449, w_new=0.002951
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.001409
+K3 SUMMARY cell=1100: read=0.1046, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0030, particles=[bucket=0,psi_out=1]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 24: 2 active, 0 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+K3: Processing active cell 1100 (n_active=2, first_bid=12293)
+K3: lidx=67 has weight=0.002951
+K3: Particle remains in cell, E_new=0.449, w_new=0.002951
+K3: Writing particle to psi_out
+K3 SUMMARY cell=1100: read=0.0030, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0030, particles=[bucket=0,psi_out=1]
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 25: 1 active, 0 coarse cells
+clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
+clear_buckets_kernel: Clearing bucket 0
+clear_buckets_kernel: Clearing bucket 1
+clear_buckets_kernel: Clearing bucket 2
+clear_buckets_kernel: Clearing bucket 3
+clear_buckets_kernel: Clearing bucket 4
+clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
+K3: Processing active cell 1100 (n_active=1, first_bid=12294)
+K3: lidx=96 has weight=0.002951
+K3: Particle remains in cell, E_new=0.000, w_new=0.002951
+K3 SUMMARY cell=1100: read=0.0030, to_bucket[Z+=0.0000,Z-=0.0000,X+=0.0000,X-=0.0000], to_psi_out=0.0000, particles=[bucket=0,psi_out=0]
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
+  Weight audit: error=0 pass=yes
+  Iteration 26: 0 active, 0 coarse cells
+  No active cells remaining, transport complete
+K1-K6 pipeline: completed 26 iterations
+GPU K1-K6 pipeline complete.
+DEBUG: Total energy deposited = 8.52941 MeV (expected ~150 MeV)
+  Energy deposition extracted
+K1-K6 pipeline wrapper complete.
+GPU transport complete.
+Simulation complete.
+  Bragg Peak: 1.5 mm depth, 2.53308 Gy
+
+--- Saving Results ---
+  2D dose saved to: results/dose_2d.txt
+  PDD saved to: results/pdd.txt
+
+=== Simulation Complete ===
