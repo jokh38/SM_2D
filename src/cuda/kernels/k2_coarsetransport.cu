@@ -208,9 +208,10 @@ __global__ void K2_CoarseTransport(
             z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
 
             if (exit_face >= 0) {
-                // DEBUG: See which particles are crossing boundaries
-                if (cell == 100) {
-                    printf("K2: BOUNDARY CROSS: cell=%d, face=%d, z_old=%.4f, z_new=%.4f, step=%.4f\n", cell, exit_face, z_cell, z_new, coarse_step);
+                // DEBUG: See which particles are crossing boundaries - ALWAYS print for key cells
+                int z_cell_idx = cell / 200;
+                if (cell % 200 == 100 && z_cell_idx < 10) {
+                    printf("K2 CROSS: cell=%d (z=%d), face=%d, E_new=%.3f, w=%.6e, z_old=%.4f, z_new=%.4f\n", cell, z_cell_idx, exit_face, E_new, w_new, z_cell, z_new);
                 }
                 // Calculate sub-cell bins for neighbor
                 float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
@@ -258,15 +259,14 @@ __global__ void K2_CoarseTransport(
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 } else {
-                    // DEBUG: Track particles at different depths
+                    // DEBUG: Track particles at different depths - ALWAYS print for key cells
                     // cell = z * Nx + x, with Nx = 200
                     // cell 100: z=0, x=100 (source)
                     // cell 300: z=1, x=100
                     // cell 500: z=2, x=100
-                    // cell 2100: z=10, x=100
                     int z_cell_idx = cell / 200;
-                    if (cell % 200 == 100 && (z_cell_idx < 5 || z_cell_idx == 10 || z_cell_idx == 20 || z_cell_idx == 50 || z_cell_idx == 100)) {
-                        printf("K2: cell=%d (z=%d), E=%.3f, w=%.6f, z_pos=%.4f\n", cell, z_cell_idx, E_new, w_new, z_new);
+                    if (cell % 200 == 100 && z_cell_idx < 10) {
+                        printf("K2 STAY: cell=%d (z=%d), E=%.3f, w=%.6e, z_pos=%.4f, stay_reason=boundary\n", cell, z_cell_idx, E_new, w_new, z_new);
                     }
                     // CRITICAL: Write particle to output phase space so it persists!
                     // Get updated position in centered coordinates

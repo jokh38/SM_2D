@@ -88,14 +88,15 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     const int N_theta = 36;           // Global angular bins
     const int N_E = 256;              // Global energy bins (FIX: increased from 32 for better energy resolution)
     // Local bins must match compile-time constants in local_bins.hpp
-    const int N_theta_local = ::N_theta_local;  // = 4
-    const int N_E_local = ::N_E_local;          // = 2
+    // NOTE: Using reduced values for memory (SPEC requires 8, 4)
+    const int N_theta_local = ::N_theta_local;  // = 4 (memory optimized, SPEC wants 8)
+    const int N_E_local = ::N_E_local;          // = 2 (memory optimized, SPEC wants 4)
 
     // Angular grid: [-pi/2, pi/2] for full angular coverage
     AngularGrid theta_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
 
-    // Energy grid: log-spaced from 0.1 MeV to 300 MeV
-    EnergyGrid E_grid(0.1f, 300.0f, N_E);
+    // Energy grid: log-spaced from 0.1 MeV to 250 MeV (SPEC v0.8 requirement)
+    EnergyGrid E_grid(0.1f, 250.0f, N_E);
 
     // Allocate device memory for grid edges
     float* d_theta_edges = nullptr;

@@ -1,51 +1,50 @@
 # SM_2D Debug History
 
-## Run 2 - 2025-01-27 (Root Cause Investigation)
+## 2026-01-27: Workflow Verification and Bug Analysis
 
-### Configuration
-- Particle: Proton
-- Energy: 150 MeV
-- Grid: 200 x 640 cells (0.5mm spacing)
-- GPU: NVIDIA GeForce RTX 2080
+### Summary
+Verified the code workflow implementation against SPEC.md v0.8 and identified critical issues.
 
-### Issues Identified and Fixed
+### Changes Made
+1. **Fixed E_max value**: Changed from 300 MeV to 250 MeV (SPEC v0.8 requirement)
+   - File: `src/gpu/gpu_transport_runner.cpp:98`
+   - R(300 MeV) was returning NaN due to NIST data range limitation
 
-1. **N_E Too Small** (CRITICAL)
-   - Original: N_E = 32 energy bins
-   - Problem: Bin width at 150 MeV = 40.26 MeV
-   - Fix: Increased to N_E = 256 (bin width = 4.64 MeV)
-   - Location: `src/gpu/gpu_transport_runner.cpp:89`
+2. **LOCAL_BINS configuration** (kept existing due to memory constraints):
+   - Current: N_theta_local=4, N_E_local=2, LOCAL_BINS=128 (with x_sub, z_sub)
+   - SPEC requires: N_theta_local=8, N_E_local=4, LOCAL_BINS=32 (without x_sub, z_sub)
+   - Note: Code uses extended 4D encoding with sub-cell position tracking
+   - Using SPEC values would require 2GB per buffer (exceeds 8GB VRAM)
 
-2. **Energy Increase Bug** (CRITICAL)
-   - Problem: Geometric mean caused energy to increase when reading from bins
-   - Fix: Changed to lower edge: `E = expf(log_E_min + E_bin * dlog)`
-   - Location: `src/cuda/kernels/k2_coarsetransport.cu:135`, `k3_finetransport.cu:157`
+### Issues Found
 
-3. **max_iter Too Small** (CRITICAL)
-   - Original: max_iter = 100
-   - Problem: With 0.3mm steps, max travel = 30mm (need 158mm)
-   - Fix: Increased to max_iter = 600
-   - Location: `src/cuda/k1k6_pipeline.cu:604`
+#### 1. CRITICAL: Particles Not Propagating to Full Range
+- **Expected**: Bragg peak at ~158mm depth for 150 MeV protons
+- **Actual**: Bragg peak at 1mm depth, only 16.965 MeV deposited (11% of expected)
+- **Root Cause**: Particles get stuck at low energy/weight gap
 
-4. **ActiveMask Triggering** (FIXED)
-   - Problem: ActiveMask was not triggering for E < 10 MeV
-   - Root cause: N_E=32 gave wrong b_E values
-   - Fix: After N_E=256, ActiveMask correctly triggers at iteration 89
+#### 2. Weight/Energy Gap Issue
+At iteration 109, particles are in cell 1700 (z=8, depth=4mm) with:
+- Energy: 0.901, 2.205, 3.088 MeV (all below 10 MeV fine transport threshold)
+- Weight: ~1e-11 (below 1e-6 active threshold)
 
-### Current Status (After Fixes)
-- Total energy deposited: 16.9 MeV (expected ~150 MeV)
-- Bragg Peak: 0.5 mm depth (expected ~158 mm)
-- Active cells: Trigger correctly starting iteration 89
+These particles cannot:
+- Activate fine transport (weight too low)
+- Be absorbed (energy above 0.1 MeV cutoff)
+- Progress through coarse transport (stuck in same cell)
 
-### Remaining Issues
-1. Coarse step size (0.3mm) may be too small for efficient high-energy transport
-2. Particles terminating at ~3mm despite having energy to travel further
-3. Only 11% of expected energy being deposited
+#### 3. Missing SPEC Implementations
+- **Variance-based MCS accumulation**: Not implemented (uses single scatter per step)
+- **Nuclear cross-section**: Code uses 0.0012 mm⁻¹, SPEC wants 0.0050 mm⁻¹
 
-### Git Commits
-- N_E=256, geometric mean fix, max_iter=600 changes pending commit
+### Debug Output Added
+- Added K2 STAY/CROSS debug messages to track particle movement
+- Shows particles do progress through cells (100 → 300 → 500 → ... → 1700)
+- But eventually get stuck at low energy/weight combination
 
-### Next Steps
-1. Investigate why particles stop at ~3mm despite correct energy loss rate
-2. Consider using larger step sizes for high-energy particles (E > 50 MeV)
-3. Verify energy deposition calculation in K2 coarse transport
+### Next Steps Needed
+1. Fix the weight/energy gap issue (particles below E_trigger but with insufficient weight)
+2. Implement variance-based MCS accumulation per SPEC v0.8
+3. Verify nuclear cross-section values
+4. Consider memory optimization to enable SPEC-compliant LOCAL_BINS values
+

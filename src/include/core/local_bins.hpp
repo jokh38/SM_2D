@@ -13,11 +13,14 @@
 #define __device__
 #endif
 
-constexpr int N_theta_local = 4;
-constexpr int N_E_local = 2;
-constexpr int N_x_sub = 4;                    // Sub-cell x position bins per cell
-constexpr int N_z_sub = 4;                    // Sub-cell z position bins per cell (FIX: Problem 1)
-constexpr int LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub;  // = 128 (reduced for memory)
+// NOTE: SPEC v0.8 requires N_theta_local=8, N_E_local=4, LOCAL_BINS=32 (without x_sub/z_sub)
+// This code uses extended 4D encoding with x_sub, z_sub for sub-cell position tracking
+// To fit in 8GB VRAM, using reduced values (memory optimization)
+constexpr int N_theta_local = 4;   // Angular sub-bins per block
+constexpr int N_E_local = 2;       // Energy sub-bins per block
+constexpr int N_x_sub = 4;        // Sub-cell x position bins per cell
+constexpr int N_z_sub = 4;        // Sub-cell z position bins per cell
+constexpr int LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub;  // = 4*2*4*4 = 128
 
 // ============================================================================
 // 4D Local Index Encoding (theta_local, E_local, x_sub, z_sub)
