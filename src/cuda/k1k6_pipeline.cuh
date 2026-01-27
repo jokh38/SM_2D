@@ -85,10 +85,13 @@ __global__ void compact_active_list(
 
 // Count coarse cells from mask (for K2 scheduling)
 // Input:  ActiveMask[Nx*Nz] (uint8_t, 0 = needs coarse transport)
+//         block_ids, values (check for actual weight)
 // Output: CoarseList[Nx*Nz] (uint32_t, compacted indices)
-// Returns: Number of coarse cells (n_coarse)
+// Returns: Number of coarse cells (n_coarse) with actual weights
 __global__ void compact_coarse_list(
     const uint8_t* __restrict__ ActiveMask,
+    const uint32_t* __restrict__ block_ids,
+    const float* __restrict__ values,
     uint32_t* __restrict__ CoarseList,
     int Nx, int Nz,
     int* d_n_coarse

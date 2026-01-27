@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
+# Set project before any find_package that might use FindThreads
+project(SM_2D LANGUAGES C CXX)
+
 # Check if nvcc exists before trying to use CUDA
 find_program(NVCC_EXECUTABLE nvcc)
 
@@ -8,16 +11,15 @@ if(NVCC_EXECUTABLE)
     find_package(CUDAToolkit QUIET)
 
     if(CUDAToolkit_FOUND)
-        project(SM_2D LANGUAGES CXX CUDA)
+        # Enable CUDA language
+        enable_language(CUDA)
         message(STATUS "CUDA found - building with GPU support")
         set(CUDA_ENABLED TRUE)
     else()
-        project(SM_2D LANGUAGES CXX)
         message(STATUS "nvcc found but CUDA toolkit not complete - building CPU-only version")
         set(CUDA_ENABLED FALSE)
     endif()
 else()
-    project(SM_2D LANGUAGES CXX)
     message(STATUS "nvcc not found - building CPU-only version")
     set(CUDA_ENABLED FALSE)
 endif()

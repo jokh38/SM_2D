@@ -35,6 +35,7 @@ __global__ void K2_CoarseTransport(
     const uint32_t* __restrict__ block_ids_in,
     const float* __restrict__ values_in,
     const uint8_t* __restrict__ ActiveMask,
+    const uint32_t* __restrict__ CoarseList,  // CRITICAL FIX: Use CoarseList instead of scanning
     // Grid
     int Nx, int Nz, float dx, float dz,
     int n_coarse,
@@ -60,34 +61,21 @@ __global__ void K2_CoarseTransport(
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out
 ) {
-    // Thread ID maps to coarse cell (or use linear iteration)
+    // Thread ID maps to coarse cell index
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    // DEBUG: Check which thread is processing which cell
-    if (idx < 10 || (idx >= 95 && idx < 105)) {
-        printf("K2: Thread %d started\n", idx);
-    }
+    // CRITICAL FIX: Use CoarseList directly instead of scanning ActiveMask
+    // This changes from O(N_cells * n_coarse) to O(n_coarse)
+    if (idx >= n_coarse) return;
 
-    // Linear scan through cells to find those needing coarse transport
-    int coarse_count = 0;
-    int cell = -1;
-
-    for (int c = 0; c < Nx * Nz; ++c) {
-        if (ActiveMask[c] == 0) {
-            if (coarse_count == idx) {
-                cell = c;
-                break;
-            }
-            coarse_count++;
-        }
-    }
+    int cell = CoarseList[idx];
 
     if (idx < 10 || (idx >= 95 && idx < 105)) {
         constexpr int Kb = DEVICE_Kb;
-        printf("K2: Thread %d assigned to cell %d (has %d particles in slot 0)\n", idx, cell, (cell >= 0) ? block_ids_in[cell * Kb] : -1);
+        printf("K2: Thread %d assigned to cell %d via CoarseList\n", idx, cell);
     }
 
-    if (cell < 0 || coarse_count >= n_coarse) return;
+    if (cell < 0 || cell >= Nx * Nz) return;
 
     // Accumulators for this cell
     double cell_edep = 0.0;
@@ -351,6 +339,7 @@ void run_K2_CoarseTransport(
     const uint32_t* block_ids_in,
     const float* values_in,
     const uint8_t* ActiveMask,
+    const uint32_t* CoarseList,  // CRITICAL FIX: Pass CoarseList to kernel
     int Nx, int Nz, float dx, float dz,
     int n_coarse,
     DeviceRLUT dlut,
@@ -374,7 +363,7 @@ void run_K2_CoarseTransport(
     int blocks = (n_coarse + threads_per_block - 1) / threads_per_block;
 
     K2_CoarseTransport<<<blocks, threads_per_block>>>(
-        block_ids_in, values_in, ActiveMask,
+        block_ids_in, values_in, ActiveMask, CoarseList,
         Nx, Nz, dx, dz, n_coarse,
         dlut,
         theta_edges, E_edges,

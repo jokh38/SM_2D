@@ -121,6 +121,8 @@ __global__ void compact_active_list(
 
 __global__ void compact_coarse_list(
     const uint8_t* __restrict__ ActiveMask,
+    const uint32_t* __restrict__ block_ids,  // CRITICAL FIX: Check for actual weights
+    const float* __restrict__ values,         // CRITICAL FIX: Check for actual weights
     uint32_t* __restrict__ CoarseList,
     int Nx, int Nz,
     int* d_n_coarse
@@ -130,10 +132,30 @@ __global__ void compact_coarse_list(
 
     if (cell >= N_cells) return;
 
-    // Coarse cells are those where ActiveMask == 0 (not active for fine transport)
-    uint32_t needs_coarse = (ActiveMask[cell] == 0) ? 1 : 0;
+    // CRITICAL FIX: Only collect cells that BOTH:
+    // 1. Have ActiveMask == 0 (need coarse transport)
+    // 2. Have actual weight (non-empty cells)
+    if (ActiveMask[cell] != 0) return;  // Skip active cells
 
-    if (needs_coarse) {
+    // Check if cell has any non-zero weight
+    constexpr int Kb = DEVICE_Kb;
+    constexpr int LOCAL_BINS_val = DEVICE_LOCAL_BINS;
+    bool has_weight = false;
+
+    for (int slot = 0; slot < Kb && !has_weight; ++slot) {
+        uint32_t bid = block_ids[cell * Kb + slot];
+        if (bid == DEVICE_EMPTY_BLOCK_ID) continue;
+
+        for (int lidx = 0; lidx < LOCAL_BINS_val && !has_weight; ++lidx) {
+            float w = values[(cell * Kb + slot) * LOCAL_BINS_val + lidx];
+            if (w > 1e-12f) {
+                has_weight = true;
+                break;
+            }
+        }
+    }
+
+    if (has_weight) {
         uint32_t idx = atomicAdd(d_n_coarse, 1);
         CoarseList[idx] = cell;
     }
@@ -620,6 +642,8 @@ bool run_k1k6_pipeline_transport(
 
         compact_coarse_list<<<blocks, threads>>>(
             state.d_ActiveMask,
+            psi_in->block_id,  // CRITICAL FIX: Check for actual weights
+            psi_in->value,     // CRITICAL FIX: Check for actual weights
             state.d_CoarseList,
             config.Nx, config.Nz,
             state.d_n_coarse

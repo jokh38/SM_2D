@@ -28,6 +28,7 @@ __global__ void K2_CoarseTransport(
     const uint32_t* __restrict__ block_ids_in,
     const float* __restrict__ values_in,
     const uint8_t* __restrict__ ActiveMask,  // 0 = needs coarse transport
+    const uint32_t* __restrict__ CoarseList,  // CRITICAL FIX: List of cells needing coarse transport
     // Grid
     int Nx, int Nz, float dx, float dz,
     int n_coarse,  // Number of cells needing coarse transport
@@ -59,6 +60,7 @@ void run_K2_CoarseTransport(
     const uint32_t* block_ids_in,
     const float* values_in,
     const uint8_t* ActiveMask,
+    const uint32_t* CoarseList,  // CRITICAL FIX: List of cells needing coarse transport
     int Nx, int Nz, float dx, float dz,
     int n_coarse,
     DeviceRLUT dlut,
