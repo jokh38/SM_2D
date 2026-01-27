@@ -37,10 +37,14 @@
    - **Do not use non-existing module names or file names**
    - Before revising code, **verify the file/function/module actually exists**
 
+8. **Check SPEC.md**:
+   - Check SPEC.md and compare the code
+   - The spec should be reflected in the code
+
 ## Safety Rules
 
-8. **Never Remove Whole Codebase**: Do not delete the entire codebase at any time.
+9. **Never Remove Whole Codebase**: Do not delete the entire codebase at any time.
 
-9. **Clean Up Temporary Files**:
+10. **Clean Up Temporary Files**:
    - Any test files, debug files, or temporary documents must be **removed after use**
    - Do **not** include temporary files in git commits
