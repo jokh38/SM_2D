@@ -86,7 +86,7 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     // Create phase-space grids for K1-K6 pipeline
     // TODO: Make these configurable via IncidentParticleConfig
     const int N_theta = 36;           // Global angular bins
-    const int N_E = 32;               // Global energy bins
+    const int N_E = 256;              // Global energy bins (FIX: increased from 32 for better energy resolution)
     // Local bins must match compile-time constants in local_bins.hpp
     const int N_theta_local = ::N_theta_local;  // = 4
     const int N_E_local = ::N_E_local;          // = 2

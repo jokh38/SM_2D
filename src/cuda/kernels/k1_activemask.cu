@@ -39,6 +39,16 @@ __global__ void K1_ActiveMask(
         }
     }
 
+    // DEBUG: Check if active mask should be set
+    if (needs_fine_transport) {
+        int is_active = (W_cell > weight_active_min) ? 1 : 0;
+        if (is_active) {
+            printf("K1 ACTIVE SET: cell=%d, W_cell=%.6f, threshold=%.6f\n", cell, W_cell, weight_active_min);
+        } else {
+            printf("K1 NOT ACTIVE (low weight): cell=%d, W_cell=%.6f, threshold=%.6f\n", cell, W_cell, weight_active_min);
+        }
+    }
+
     ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;
 }
 

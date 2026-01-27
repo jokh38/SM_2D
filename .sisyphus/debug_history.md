@@ -1,6 +1,6 @@
 # SM_2D Debug History
 
-## Run 1 - 2025-01-27
+## Run 2 - 2025-01-27 (Root Cause Investigation)
 
 ### Configuration
 - Particle: Proton
@@ -8,33 +8,44 @@
 - Grid: 200 x 640 cells (0.5mm spacing)
 - GPU: NVIDIA GeForce RTX 2080
 
-### Critical Physics Deviation Found
+### Issues Identified and Fixed
 
-**Issue**: Bragg Peak at 1.5mm instead of expected ~158mm
+1. **N_E Too Small** (CRITICAL)
+   - Original: N_E = 32 energy bins
+   - Problem: Bin width at 150 MeV = 40.26 MeV
+   - Fix: Increased to N_E = 256 (bin width = 4.64 MeV)
+   - Location: `src/gpu/gpu_transport_runner.cpp:89`
 
-**Details**:
-- LUT Verification shows: `R(150 MeV) = 157.667 mm (expected ~158)` ✓ LUT is correct
-- But actual Bragg Peak output: `Bragg Peak: 1.5 mm depth, 2.53308 Gy`
-- Total energy deposited: `8.52941 MeV (expected ~150 MeV)` - only ~5.7% of expected!
+2. **Energy Increase Bug** (CRITICAL)
+   - Problem: Geometric mean caused energy to increase when reading from bins
+   - Fix: Changed to lower edge: `E = expf(log_E_min + E_bin * dlog)`
+   - Location: `src/cuda/kernels/k2_coarsetransport.cu:135`, `k3_finetransport.cu:157`
 
-**Analysis**:
-1. The LUT (lookup table) for range calculation is correct (157.667 mm for 150 MeV)
-2. The actual simulation stops depositing energy at ~2.5mm depth
-3. Weight audits pass throughout all iterations (weight conservation is OK)
-4. The K1-K6 pipeline completes 26 iterations successfully
+3. **max_iter Too Small** (CRITICAL)
+   - Original: max_iter = 100
+   - Problem: With 0.3mm steps, max travel = 30mm (need 158mm)
+   - Fix: Increased to max_iter = 600
+   - Location: `src/cuda/k1k6_pipeline.cu:604`
 
-**Possible Root Causes**:
-1. Energy threshold issue - particles may be terminated too early
-2. Range calculation in transport step may not be using LUT correctly
-3. Step size calculation may be wrong
-4. CSDA range vs actual transport range mismatch
+4. **ActiveMask Triggering** (FIXED)
+   - Problem: ActiveMask was not triggering for E < 10 MeV
+   - Root cause: N_E=32 gave wrong b_E values
+   - Fix: After N_E=256, ActiveMask correctly triggers at iteration 89
 
-**Next Steps**:
-- Investigate why particles stop at ~2.5mm despite having correct LUT values
-- Check energy threshold (currently: `Energy threshold: 10 MeV (b_E_trigger=9)`)
-- Verify step size calculation in K2/K3 kernels
+### Current Status (After Fixes)
+- Total energy deposited: 16.9 MeV (expected ~150 MeV)
+- Bragg Peak: 0.5 mm depth (expected ~158 mm)
+- Active cells: Trigger correctly starting iteration 89
 
-### Output Files
-- `output_message.txt` - Full simulation output (overwritten on each run)
-- `results/pdd.txt` - Depth-dose curve showing shallow Bragg peak
-- `results/dose_2d.txt` - 2D dose distribution
+### Remaining Issues
+1. Coarse step size (0.3mm) may be too small for efficient high-energy transport
+2. Particles terminating at ~3mm despite having energy to travel further
+3. Only 11% of expected energy being deposited
+
+### Git Commits
+- N_E=256, geometric mean fix, max_iter=600 changes pending commit
+
+### Next Steps
+1. Investigate why particles stop at ~3mm despite correct energy loss rate
+2. Consider using larger step sizes for high-energy particles (E > 50 MeV)
+3. Verify energy deposition calculation in K2 coarse transport

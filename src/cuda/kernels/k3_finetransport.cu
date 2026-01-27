@@ -151,11 +151,10 @@ __global__ void K3_FineTransport(
             float log_E_min = logf(E_min);
             float log_E_max = logf(E_max);
             float dlog = (log_E_max - log_E_min) / N_E;
-            // CRITICAL FIX: Use bin lower edge instead of center for consistency
-            // When we write: E_bin = floor((log(E) - log_E_min) / dlog)
-            // When we read: should use lower edge to ensure same bin is recovered
-            // OLD: float E = expf(log_E_min + (E_bin + 0.5f) * dlog);  // Center caused 150->160 MeV error
-            float E = expf(log_E_min + E_bin * dlog);  // Lower edge for consistency
+            // CRITICAL FIX: Use lower edge to prevent energy increase
+            // Geometric mean causes energy to increase when reading bins
+            // Lower edge ensures monotonic energy decrease
+            float E = expf(log_E_min + E_bin * dlog);  // Lower edge
 
             // Cutoff check
             if (E <= 0.1f) {

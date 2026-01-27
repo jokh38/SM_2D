@@ -129,10 +129,10 @@ __global__ void K2_CoarseTransport(
             float E_max = E_edges[N_E];
             float log_E_min = logf(E_min);
             float dlog = (logf(E_max) - log_E_min) / N_E;
-            // CRITICAL FIX: Use bin lower edge instead of center for consistency
-            // When we write: E_bin = floor((log(E) - log_E_min) / dlog)
-            // When we read: should use lower edge to ensure same bin is recovered
-            float E = expf(log_E_min + E_bin * dlog);  // Lower edge for consistency
+            // CRITICAL FIX: Use lower edge to prevent energy increase
+            // Geometric mean causes energy to increase when reading bins
+            // Lower edge ensures monotonic energy decrease
+            float E = expf(log_E_min + E_bin * dlog);  // Lower edge
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -258,9 +258,15 @@ __global__ void K2_CoarseTransport(
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 } else {
-                    // DEBUG: Verify we reach this code path
-                    if (cell == 100) {  // Source cell (x=100, z=0) using z-major: z*Nx+x = 0*200+100
-                        printf("K2: Writing particle to psi_out: cell=%d, E_new=%.3f, w_new=%.6f\n", cell, E_new, w_new);
+                    // DEBUG: Track particles at different depths
+                    // cell = z * Nx + x, with Nx = 200
+                    // cell 100: z=0, x=100 (source)
+                    // cell 300: z=1, x=100
+                    // cell 500: z=2, x=100
+                    // cell 2100: z=10, x=100
+                    int z_cell_idx = cell / 200;
+                    if (cell % 200 == 100 && (z_cell_idx < 5 || z_cell_idx == 10 || z_cell_idx == 20 || z_cell_idx == 50 || z_cell_idx == 100)) {
+                        printf("K2: cell=%d (z=%d), E=%.3f, w=%.6f, z_pos=%.4f\n", cell, z_cell_idx, E_new, w_new, z_new);
                     }
                     // CRITICAL: Write particle to output phase space so it persists!
                     // Get updated position in centered coordinates
@@ -279,6 +285,13 @@ __global__ void K2_CoarseTransport(
                     float dlog = (log_E_max - log_E_min) / N_E;
                     int E_bin_new = static_cast<int>((logf(E_new) - log_E_min) / dlog);
                     E_bin_new = fmaxf(0, fminf(E_bin_new, N_E - 1));
+
+                    // DEBUG: Track binning for all low energies
+                    if (E_new < 12.0f) {
+                        uint32_t b_E_new_debug = static_cast<uint32_t>(E_bin_new) / N_E_local;
+                        printf("K2 WRITE LOW: cell=%d, E_new=%.3f, log_E=%.3f, E_bin=%d, b_E=%u\n",
+                               cell, E_new, logf(E_new), E_bin_new, b_E_new_debug);
+                    }
 
                     // Compute new block_id
                     uint32_t b_theta_new = static_cast<uint32_t>(theta_bin_new) / N_theta_local;

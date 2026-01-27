@@ -2,6 +2,7 @@
 #include "kernels/k1_activemask.cuh"
 #include "core/psi_storage.hpp"
 #include "core/grids.hpp"
+#include "k1k6_pipeline.cuh"  // For compute_b_E_trigger
 
 TEST(K1Test, LowEnergyTriggersFineTransport) {
     // P4 FIX: Test now correctly uses b_E_trigger (block index) instead of E_trigger (MeV)

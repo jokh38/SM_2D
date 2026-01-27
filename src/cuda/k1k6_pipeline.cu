@@ -96,6 +96,11 @@ __global__ void compact_active_list(
 
     uint32_t is_active = (ActiveMask[cell] == 1) ? 1 : 0;
     s_buffer[threadIdx.x] = is_active;
+
+    // DEBUG: Track active cells
+    if (is_active && cell < 2000) {
+        printf("compact_active: cell=%d, ActiveMask=%d\n", cell, ActiveMask[cell]);
+    }
     __syncthreads();
 
     // Exclusive scan in shared memory
@@ -113,9 +118,17 @@ __global__ void compact_active_list(
     if (is_active && threadIdx.x > 0) {
         uint32_t idx = atomicAdd(d_n_active, 1);
         ActiveList[idx] = cell;
+        // DEBUG: Track atomicAdd
+        if (cell < 2000) {
+            printf("compact_active write: cell=%d, idx=%u, threadIdx.x=%d\n", cell, idx, threadIdx.x);
+        }
     } else if (is_active && threadIdx.x == 0) {
         uint32_t idx = atomicAdd(d_n_active, 1);
         ActiveList[idx] = cell;
+        // DEBUG: Track atomicAdd
+        if (cell < 2000) {
+            printf("compact_active write (thread 0): cell=%d, idx=%u\n", cell, idx);
+        }
     }
 }
 
@@ -599,7 +612,9 @@ bool run_k1k6_pipeline_transport(
     device_psic_clear(*psi_out);
 
     // Maximum iterations
-    const int max_iter = 100;
+    // FIX: Need enough iterations for 150 MeV protons to travel ~158mm
+    // With coarse_step = 0.3mm, need at least 158/0.3 ≈ 527 iterations
+    const int max_iter = 600;
     const double weight_threshold = 1e-6;
 
     int iter = 0;
@@ -655,6 +670,18 @@ bool run_k1k6_pipeline_transport(
         // Get counts
         cudaMemcpy(&state.n_active, state.d_n_active, sizeof(int), cudaMemcpyDeviceToHost);
         cudaMemcpy(&state.n_coarse, state.d_n_coarse, sizeof(int), cudaMemcpyDeviceToHost);
+
+        // DEBUG: Print n_active directly
+        if (iter <= 5 || state.n_active > 0) {
+            std::cout << "  DEBUG n_active=" << state.n_active << ", n_coarse=" << state.n_coarse << std::endl;
+        }
+
+        // EXTRA DEBUG: Read d_n_active directly to verify
+        int n_active_verify = 0;
+        cudaMemcpy(&n_active_verify, state.d_n_active, sizeof(int), cudaMemcpyDeviceToHost);
+        if (n_active_verify != state.n_active) {
+            std::cout << "  WARNING: n_active mismatch! state=" << state.n_active << ", verify=" << n_active_verify << std::endl;
+        }
 
         std::cout << "  Iteration " << iter << ": "
                   << state.n_active << " active, "

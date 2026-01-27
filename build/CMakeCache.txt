@@ -22,7 +22,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=Release
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -480,6 +480,9 @@ SM_2D_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 SM_2D_SOURCE_DIR:STATIC=/workspaces/SM_2D
+
+//No help, variable specified on the command line.
+USE_GPU:UNINITIALIZED=ON
 
 
 ########################
