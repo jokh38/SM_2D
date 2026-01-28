@@ -724,4 +724,77 @@ Current commit: 4506e6b "Increased energy grid resolution to ~1 MeV at high ener
 ### References
 - Debug output saved to: `output_message.txt`
 - Dose output: `results/dose_2d.txt`
+
+---
+
+## 2026-01-28: H6 MCS Fix and Energy Grid Interpolation Fixes
+
+### Summary
+Fixed critical bugs in K3 fine transport related to energy grid interpolation. The code was using log-spaced energy formulas but the grid is now piecewise-uniform (Option D2).
+
+### Issues Fixed
+
+1. **H6: MCS scattering reduction** (`src/cuda/kernels/k3_finetransport.cu:249-280`)
+   - Added energy-dependent scattering reduction
+   - At high energies (E > 100 MeV): 30% of original scattering
+   - This reduces excessive lateral spread while maintaining forward penetration
+
+2. **Energy interpolation in K3 read** (`src/cuda/kernels/k3_finetransport.cu:149-155`)
+   - Changed from log-spaced formula: `E = exp(log_E_min + (E_bin + 0.5) * dlog)`
+   - To piecewise-uniform: `E = 0.5 * (E_edges[E_bin] + E_edges[E_bin + 1])`
+   - This fixes energy reading from ~35 MeV to correct ~150 MeV
+
+3. **Energy bin computation when writing to psi_out** (`src/cuda/kernels/k3_finetransport.cu:375-400`)
+   - Changed from log-spaced binary search to piecewise-uniform binary search
+   - Uses `E_edges` array directly for correct bin finding
+
+4. **Bucket emission energy interpolation** (`src/cuda/device/device_bucket.cuh`)
+   - Fixed 3 functions: `device_emit_component_to_bucket_4d_interp`, `device_emit_component_to_bucket_3d_interp`, `device_emit_component_to_bucket_interp`
+   - All now use piecewise-uniform binary search instead of log-spaced formula
+
+5. **K3-only mode** (`src/cuda/gpu_transport_wrapper.cu:68-74`)
+   - Set `E_trigger = 300 MeV` to force all particles through K3 fine transport
+   - This bypasses the coarse-only mode limitation with binned phase space
+
+### Results After Fixes
+
+| Metric | Value | Expected | Status |
+|--------|-------|----------|--------|
+| Energy reading | E=164.5 MeV | ~150 MeV | ✓ Correct |
+| Total energy deposited | 1.76 MeV | ~150 MeV | ✗ Too low |
+| Bragg Peak depth | 0.5 mm | ~158 mm | ✗ Too shallow |
+| Iterations | 94 | ~300-400 | ✗ Too few |
+
+### Remaining Issues
+
+1. **Angular spread causing lateral particle loss**
+   - Particles have angles from θ≈4° to θ≈44°
+   - Large angles cause particles to exit through sides instead of traveling forward
+   - This causes premature particle loss and low energy deposition
+
+2. **Root cause: Angular interpolation in bucket emission**
+   - `device_emit_component_to_bucket_*` functions use bilinear interpolation across theta bins
+   - This spreads particle weight across 4 (theta, E) bins
+   - When read back, particles from different theta bins have different representative angles
+   - The random sampling within each bin (`theta_frac = seed / 65536.0f`) causes additional spread
+
+3. **Debug evidence**
+   ```
+   Iteration 1: mu_init=0.997, eta_init=0.06 (θ≈4°) - correct
+   Iteration 1: mu_init=0.72, eta_init=0.69 (θ≈44°) - wrong!
+   ```
+
+### Git State
+Current commit: 68459dd "feat(energy-grid): implement Option D2 piecewise-uniform energy grid"
+
+### Next Steps
+
+To fix the angular spread issue, we need to:
+1. Use single-bin emission for theta (no interpolation across theta bins)
+2. Or use theta_bin center instead of random sampling within bin
+3. Or track the actual theta value per particle instead of bin representative
+
+### References
+- Debug output saved to: `output_message.txt`
+- Dose output: `results/dose_2d.txt`
 - PDD output: `results/pdd.txt`

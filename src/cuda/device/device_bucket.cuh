@@ -182,13 +182,35 @@ __device__ inline void device_emit_component_to_bucket_3d_interp(
     int theta_bin = (int)theta_cont;
     float frac_theta = theta_cont - theta_bin;
 
-    float log_E = logf(E);
-    float log_E_min = logf(E_min);
-    float log_E_max = logf(E_max);
-    float dlog = (log_E_max - log_E_min) / N_E;
-    float log_E_cont = (log_E - log_E_min) / dlog;
-    int E_bin = (int)log_E_cont;
-    float frac_E = log_E_cont - E_bin;
+    // H6 FIX: Use piecewise-uniform energy grid (Option D2) instead of log-spaced
+    // Binary search in E_edges to find the bin containing energy E
+    int E_bin = 0;
+    float frac_E = 0.0f;
+    if (E <= E_edges[0]) {
+        E_bin = 0;
+        frac_E = 0.0f;
+    } else if (E >= E_edges[N_E]) {
+        E_bin = N_E - 1;
+        frac_E = 0.0f;
+    } else {
+        int lo = 0, hi = N_E;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (E_edges[mid + 1] <= E) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        E_bin = lo;
+        // Calculate fractional position within bin for interpolation
+        float E_bin_lower = E_edges[E_bin];
+        float E_bin_upper = E_edges[E_bin + 1];
+        float bin_width = E_bin_upper - E_bin_lower;
+        if (bin_width > 1e-10f) {
+            frac_E = (E - E_bin_lower) / bin_width;
+        }
+    }
 
     // Handle boundary conditions
     if (theta_bin >= N_theta - 1) {
@@ -266,13 +288,35 @@ __device__ inline void device_emit_component_to_bucket_interp(
     int theta_bin = (int)theta_cont;
     float frac_theta = theta_cont - theta_bin;
 
-    float log_E = logf(E);
-    float log_E_min = logf(E_min);
-    float log_E_max = logf(E_max);
-    float dlog = (log_E_max - log_E_min) / N_E;
-    float log_E_cont = (log_E - log_E_min) / dlog;
-    int E_bin = (int)log_E_cont;
-    float frac_E = log_E_cont - E_bin;
+    // H6 FIX: Use piecewise-uniform energy grid (Option D2) instead of log-spaced
+    // Binary search in E_edges to find the bin containing energy E
+    int E_bin = 0;
+    float frac_E = 0.0f;
+    if (E <= E_edges[0]) {
+        E_bin = 0;
+        frac_E = 0.0f;
+    } else if (E >= E_edges[N_E]) {
+        E_bin = N_E - 1;
+        frac_E = 0.0f;
+    } else {
+        int lo = 0, hi = N_E;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (E_edges[mid + 1] <= E) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        E_bin = lo;
+        // Calculate fractional position within bin for interpolation
+        float E_bin_lower = E_edges[E_bin];
+        float E_bin_upper = E_edges[E_bin + 1];
+        float bin_width = E_bin_upper - E_bin_lower;
+        if (bin_width > 1e-10f) {
+            frac_E = (E - E_bin_lower) / bin_width;
+        }
+    }
 
     // Handle boundary conditions
     if (theta_bin >= N_theta - 1) {
@@ -445,14 +489,35 @@ __device__ inline void device_emit_component_to_bucket_4d_interp(
     int theta_bin = (int)theta_cont;                  // Lower bin index
     float frac_theta = theta_cont - theta_bin;         // Fraction toward upper bin
 
-    // For log-spaced E grid
-    float log_E = logf(E);
-    float log_E_min = logf(E_min);
-    float log_E_max = logf(E_max);
-    float dlog = (log_E_max - log_E_min) / N_E;
-    float log_E_cont = (log_E - log_E_min) / dlog;    // Continuous position in [0, N_E]
-    int E_bin = (int)log_E_cont;                      // Lower bin index
-    float frac_E = log_E_cont - E_bin;                // Fraction toward upper bin
+    // H6 FIX: Use piecewise-uniform energy grid (Option D2) instead of log-spaced
+    // Binary search in E_edges to find the bin containing energy E
+    int E_bin = 0;
+    float frac_E = 0.0f;
+    if (E <= E_edges[0]) {
+        E_bin = 0;
+        frac_E = 0.0f;
+    } else if (E >= E_edges[N_E]) {
+        E_bin = N_E - 1;
+        frac_E = 0.0f;
+    } else {
+        int lo = 0, hi = N_E;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (E_edges[mid + 1] <= E) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        E_bin = lo;
+        // Calculate fractional position within bin for interpolation
+        float E_bin_lower = E_edges[E_bin];
+        float E_bin_upper = E_edges[E_bin + 1];
+        float bin_width = E_bin_upper - E_bin_lower;
+        if (bin_width > 1e-10f) {
+            frac_E = (E - E_bin_lower) / bin_width;
+        }
+    }
 
     // Handle boundary conditions
     // If at upper boundary, don't interpolate beyond grid

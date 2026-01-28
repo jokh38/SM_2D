@@ -66,10 +66,12 @@ void run_k1k6_pipeline_transport(
     config.dz = dz;
 
     // Energy thresholds
-    // COARSE-ONLY TEST: Set E_trigger below minimum energy (0.1 MeV) to force coarse-only transport
-    // This makes b_E_trigger = 0, so fine transport never activates
-    // Particles will only use coarse transport (K2) for approximate but reasonable results
-    config.E_trigger = 0.05f;          // Below min energy (0.1 MeV) → b_E_trigger=0 → coarse-only
+    // H6 FIX: Use E_trigger = 300 MeV (above max particle energy) to force ALL particles
+    // to use K3 fine transport, which tracks continuous energy values properly.
+    // Coarse-only mode (K2) has fundamental limitation with binned phase space:
+    // particles cannot track energy loss when dE/step < bin_width.
+    // K3 fine transport solves this by using continuous energy values.
+    config.E_trigger = 300.0f;         // Above max energy (250 MeV) → ALL particles use K3
     config.weight_active_min = 1e-12f;  // FIX: Lowered from 1e-6 to fix transport gap (per debug report)
 
     // Coarse transport settings
