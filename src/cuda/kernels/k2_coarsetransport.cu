@@ -238,8 +238,11 @@ __global__ void K2_CoarseTransport(
 
                 int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
                 DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                // Use bilinear interpolation for improved accuracy
-                device_emit_component_to_bucket_4d_interp(
+                // COARSE-ONLY FIX: Use single-bin emission instead of interpolation
+                // Interpolation causes exponential particle splitting, leading to
+                // weights of ~10^-18 after 60 iterations. For coarse transport,
+                // single-bin emission is sufficient and prevents fragmentation.
+                device_emit_component_to_bucket_4d(
                     bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
                     theta_edges, E_edges, N_theta, N_E,
                     N_theta_local, N_E_local

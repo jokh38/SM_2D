@@ -421,3 +421,56 @@ The particles are being transported entirely in K3 (fine transport) mode after a
 1. Investigate why particles switch to K3 (fine transport) so quickly
 2. Check if K3 step size is limited differently than K2
 3. Verify the E_trigger threshold and b_E_trigger calculation
+
+---
+
+## 2026-01-28: Coarse-Only Investigation and Particle Splitting Fix
+
+### Summary
+Investigated coarse-only transport mode by setting E_trigger=0.05 MeV (b_E_trigger=0) to force coarse-only transport. Discovered and partially fixed particle splitting issue.
+
+### Changes Made
+**H8: Single-Bin Emission Fix**
+- File: `src/cuda/kernels/k2_coarsetransport.cu:253-263`
+- Changed from `device_emit_component_to_bucket_4d_interp` to `device_emit_component_to_bucket_4d`
+- Reason: Bilinear interpolation splits each particle into 4 output bins at each boundary crossing
+- Impact: Reduces particle splitting from 4^n to 1^n per boundary crossing
+
+### Results After H8 Fix
+
+| Metric | Before H8 | After H8 | Expected |
+|--------|-----------|----------|----------|
+| Max cell reached | 119900 (z=599mm) | 119900 (z=599mm) | ~31600 (z=158mm) |
+| Energy deposited | 23.81 MeV | 23.81 MeV | ~150 MeV |
+| Bragg Peak | 2.5mm | 2.5mm | ~158mm |
+| PDD dose extent | 0-11.5mm | 0-11.5mm | 0-158mm |
+
+### Critical Finding
+**Particles ARE traveling to z=599mm (cell 119900), but only 16% of energy is being deposited correctly.**
+
+This reveals a fundamental issue:
+1. Particles reach deep cells (beyond expected range)
+2. But energy deposition only occurs in first 11.5mm
+3. PDD shows dose only at shallow depths
+4. Total energy deposited is only 23.81/150 = 16%
+
+### Root Cause Analysis
+The particle splitting fix (H8) did NOT change the energy deposition, which means:
+- Particle splitting is NOT the primary cause of low energy deposition
+- The issue is in **how energy is being deposited or tracked**
+
+### Possible Explanations
+1. **Energy deposition in wrong cells**: Energy might be deposited in source cells instead of destination cells
+2. **Weight too low for later cells**: Particles reach deep cells but have negligible weight
+3. **EdepC accumulation issue**: The energy deposition array might not be correctly accumulated
+4. **PDD calculation bug**: The depth-dose might be calculated incorrectly
+
+### Next Steps
+1. Verify EdepC accumulation in K2 kernel
+2. Check if energy is deposited in current cell or destination cell
+3. Investigate why PDD shows dose only in first 11.5mm despite particles reaching z=599mm
+
+### Files Modified
+- `src/cuda/kernels/k2_coarsetransport.cu` (H8: single-bin emission)
+- `src/cuda/device/device_physics.cuh` (nuclear restored to original)
+

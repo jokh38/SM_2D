@@ -64,10 +64,10 @@ void run_k1k6_pipeline_transport(
     config.dz = dz;
 
     // Energy thresholds
-    // FIX: Set E_trigger to 10 MeV for coarse/fine transport threshold
-    // Particles above 10 MeV use coarse transport (fast, less accurate)
-    // Particles below 10 MeV use fine transport (detailed physics near Bragg peak)
-    config.E_trigger = 10.0f;          // Particles below 10 MeV use fine transport
+    // COARSE-ONLY TEST: Set E_trigger below minimum energy (0.1 MeV) to force coarse-only transport
+    // This makes b_E_trigger = 0, so fine transport never activates
+    // Particles will only use coarse transport (K2) for approximate but reasonable results
+    config.E_trigger = 0.05f;          // Below min energy (0.1 MeV) → b_E_trigger=0 → coarse-only
     config.weight_active_min = 1e-12f;  // FIX: Lowered from 1e-6 to fix transport gap (per debug report)
 
     // Coarse transport settings
