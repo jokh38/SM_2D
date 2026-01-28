@@ -113,14 +113,25 @@ __device__ inline void device_emit_component_to_bucket(
     theta_bin = (int)((theta - theta_min) / dtheta);
     theta_bin = max(0, min(theta_bin, N_theta - 1));
 
-    // For log-spaced E grid
-    float E_min = E_edges[0];
-    float E_max = E_edges[N_E];
-    float log_E = logf(E);
-    float log_E_min = logf(E_min);
-    float log_E_max = logf(E_max);
-    float dlog = (log_E_max - log_E_min) / N_E;
-    E_bin = (int)((log_E - log_E_min) / dlog);
+    // Option D2: Use binary search for energy bin (works for both log-spaced and piecewise-uniform)
+    // Binary search in E_edges to find the bin containing energy E
+    float E_clamped = max(E_edges[0], min(E, E_edges[N_E]));
+    if (E_clamped <= E_edges[0]) {
+        E_bin = 0;
+    } else if (E_clamped >= E_edges[N_E]) {
+        E_bin = N_E - 1;
+    } else {
+        int lo = 0, hi = N_E;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (E_edges[mid + 1] <= E_clamped) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        E_bin = lo;
+    }
     E_bin = max(0, min(E_bin, N_E - 1));
 
     // Encode to coarse block and local index
@@ -337,14 +348,25 @@ __device__ inline void device_emit_component_to_bucket_4d(
     theta_bin = (int)((theta - theta_min) / dtheta);
     theta_bin = max(0, min(theta_bin, N_theta - 1));
 
-    // For log-spaced E grid
-    float E_min = E_edges[0];
-    float E_max = E_edges[N_E];
-    float log_E = logf(E);
-    float log_E_min = logf(E_min);
-    float log_E_max = logf(E_max);
-    float dlog = (log_E_max - log_E_min) / N_E;
-    E_bin = (int)((log_E - log_E_min) / dlog);
+    // Option D2: Use binary search for energy bin (works for both log-spaced and piecewise-uniform)
+    // Binary search in E_edges to find the bin containing energy E
+    float E_clamped = max(E_edges[0], min(E, E_edges[N_E]));
+    if (E_clamped <= E_edges[0]) {
+        E_bin = 0;
+    } else if (E_clamped >= E_edges[N_E]) {
+        E_bin = N_E - 1;
+    } else {
+        int lo = 0, hi = N_E;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (E_edges[mid + 1] <= E_clamped) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        E_bin = lo;
+    }
     E_bin = max(0, min(E_bin, N_E - 1));
 
     // Encode to coarse block and local index

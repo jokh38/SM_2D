@@ -7,6 +7,8 @@
 #include <cuda_runtime.h>
 #include <iostream>
 #include <memory>
+#include <vector>
+#include <tuple>
 
 // Bring CUDA types into sm_2d namespace for compatibility
 using ::DeviceLUTWrapper;
@@ -72,10 +74,12 @@ void run_k1k6_pipeline_transport(
 
     // Coarse transport settings
     config.E_coarse_max = 300.0f;       // Up to 300 MeV (original value)
-    // PER BUG FIX: Use larger step size per SPEC.md:203 (2% of range)
-    // Previous 0.6 * cell_size = 0.3mm was too small
-    // Now use 5mm to allow proper particle penetration
-    config.step_coarse = 0.5f;  // Match cell size (dx=dz=0.5mm) for accurate dose deposition
+    // Option D2: Adaptive step size for coarse transport
+    // To ensure particles cross energy bins: dE/step > bin_width
+    // At 150 MeV: dE/dx ≈ 0.54 MeV/mm, bin_width = 1 MeV
+    // Need step > 1 / 0.54 ≈ 2mm for particles to cross bins
+    // Using 5mm step gives dE ≈ 2.7 MeV > bin_width ✓
+    config.step_coarse = 5.0f;  // Adaptive step for high energy (100-250 MeV)
     config.n_steps_per_cell = 1;        // One step per cell for coarse
 
     // Phase-space dimensions
@@ -85,10 +89,16 @@ void run_k1k6_pipeline_transport(
     config.N_E_local = N_E_local;
 
     // Create grids
-    // H7 FIX: E_max changed from 300.0 to 250.0 MeV
-    // R(300 MeV) returns NaN due to NIST data range limitation (capped at 250 MeV)
-    // This was causing energy grid corruption and particles to appear at wrong energies
-    EnergyGrid e_grid(0.1f, 250.0f, N_E);
+    // Option D2: Piecewise-uniform energy grid (must match gpu_transport_runner.cpp)
+    // [0.1-2 MeV]: 0.1 MeV/bin (19 bins), [2-20 MeV]: 0.25 MeV/bin (72 bins)
+    // [20-100 MeV]: 0.5 MeV/bin (160 bins), [100-250 MeV]: 1 MeV/bin (150 bins)
+    std::vector<std::tuple<float, float, float>> energy_groups = {
+        {0.1f, 2.0f, 0.1f},      // 19 bins - Bragg peak core
+        {2.0f, 20.0f, 0.25f},    // 72 bins - Bragg peak falloff
+        {20.0f, 100.0f, 0.5f},   // 160 bins - Mid-energy plateau
+        {100.0f, 250.0f, 1.0f}    // 150 bins - High energy
+    };
+    EnergyGrid e_grid(energy_groups);  // Option D2: piecewise-uniform
     AngularGrid a_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
 
     // ========================================================================

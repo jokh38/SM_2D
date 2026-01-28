@@ -20,5 +20,8 @@ struct RLUT {
     float lookup_E_inverse(float R) const;
 };
 
-// Generate LUT from NIST data
+// Generate LUT from NIST data (log-spaced grid)
 RLUT GenerateRLUT(float E_min, float E_max, int N_E);
+
+// Generate LUT from NIST data (using existing EnergyGrid, e.g., piecewise-uniform)
+RLUT GenerateRLUT(const EnergyGrid& grid);

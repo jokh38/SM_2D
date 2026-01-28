@@ -70,14 +70,10 @@ __global__ void K2_CoarseTransport(
 
     int cell = CoarseList[idx];
 
-    if (idx < 10 || (idx >= 95 && idx < 105)) {
-        constexpr int Kb = DEVICE_Kb;
-        printf("K2: Thread %d assigned to cell %d via CoarseList\n", idx, cell);
-    }
-
     if (cell < 0 || cell >= Nx * Nz) return;
 
     // Accumulators for this cell
+    constexpr int Kb = DEVICE_Kb;
     double cell_edep = 0.0;
     float cell_w_cutoff = 0.0f;
     float cell_w_nuclear = 0.0f;
@@ -92,9 +88,6 @@ __global__ void K2_CoarseTransport(
     // Coarse step size: limit to cell size for accurate dose deposition
     // With N_E=1024, finer energy grid reduces binning error
     float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
-
-    // FIX: Use DEVICE_Kb instead of hardcoded 32
-    constexpr int Kb = DEVICE_Kb;  // = 8
 
     // Process all slots in this cell
     for (int slot = 0; slot < Kb; ++slot) {
@@ -126,14 +119,10 @@ __global__ void K2_CoarseTransport(
             float dtheta = (theta_max - theta_min) / N_theta;
             float theta = theta_min + (theta_bin + 0.5f) * dtheta;
 
-            float E_min = E_edges[0];
-            float E_max = E_edges[N_E];
-            float log_E_min = logf(E_min);
-            float dlog = (logf(E_max) - log_E_min) / N_E;
-            // PER SPEC.md:76: Use geometric mean for energy representation
-            // E_rep[i] = sqrt(E_edges[i] * E_edges[i+1])
-            // Geometric mean approximation: E_edges[i] * exp(0.5 * dlog)
-            float E = expf(log_E_min + (E_bin + 0.5f) * dlog);  // Geometric mean
+            // Option D2: Use actual bin edges for energy (works for both log-spaced and piecewise-uniform)
+            // For log-spaced: this gives midpoint (approx geometric mean)
+            // For piecewise-uniform: this gives exact midpoint
+            float E = 0.5f * (E_edges[E_bin] + E_edges[E_bin + 1]);
 
             // H7 DEBUG: Print energy being read from bin
             if (cell % 200 == 100 && (cell / 200) < 5 && weight > 0.01f) {
@@ -300,17 +289,15 @@ __global__ void K2_CoarseTransport(
                     int theta_bin_new = static_cast<int>((theta_new - theta_min) / dtheta);
                     theta_bin_new = fmaxf(0, fminf(theta_bin_new, N_theta - 1));
 
-                    float log_E_min = logf(E_edges[0]);
-                    float log_E_max = logf(E_edges[N_E]);
-                    float dlog = (log_E_max - log_E_min) / N_E;
-                    int E_bin_new = static_cast<int>((logf(E_new) - log_E_min) / dlog);
+                    // Option D2: Use binary search with E_edges for piecewise-uniform grid
+                    int E_bin_new = device_find_bin_edges(E_edges, N_E, E_new);
                     E_bin_new = fmaxf(0, fminf(E_bin_new, N_E - 1));
 
                     // DEBUG: Track binning for all low energies
                     if (E_new < 12.0f) {
                         uint32_t b_E_new_debug = static_cast<uint32_t>(E_bin_new) / N_E_local;
-                        printf("K2 WRITE LOW: cell=%d, E_new=%.3f, log_E=%.3f, E_bin=%d, b_E=%u\n",
-                               cell, E_new, logf(E_new), E_bin_new, b_E_new_debug);
+                        printf("K2 WRITE LOW: cell=%d, E_new=%.3f, E_bin=%d, b_E=%u\n",
+                               cell, E_new, E_bin_new, b_E_new_debug);
                     }
 
                     // Compute new block_id

@@ -1,9 +1,10 @@
 #include "core/grids.hpp"
 #include <algorithm>
+#include <tuple>
 
-// EnergyGrid implementation
+// EnergyGrid implementation - Original log-spaced constructor
 EnergyGrid::EnergyGrid(float E_min, float E_max, int N_E)
-    : N_E(N_E), E_min(E_min), E_max(E_max)
+    : N_E(N_E), E_min(E_min), E_max(E_max), is_piecewise(false)
 {
     edges.resize(N_E + 1);
     rep.resize(N_E);
@@ -19,6 +20,79 @@ EnergyGrid::EnergyGrid(float E_min, float E_max, int N_E)
     for (int i = 0; i < N_E; ++i) {
         rep[i] = sqrtf(edges[i] * edges[i+1]);
     }
+}
+
+// EnergyGrid implementation - Piecewise-uniform constructor (Option D2)
+// Compute N_E first, then use delegating constructor pattern
+namespace {
+    struct PiecewiseGridResult {
+        int N_E;
+        float E_min;
+        float E_max;
+        std::vector<float> edges;
+        std::vector<float> rep;
+    };
+
+    PiecewiseGridResult create_piecewise_grid(const std::vector<std::tuple<float, float, float>>& groups) {
+        // First pass: count total bins and set E_min, E_max
+        int total_bins = 0;
+        float first_E_min = std::get<0>(groups[0]);
+        float last_E_max = std::get<1>(groups.back());
+
+        for (const auto& group : groups) {
+            float E_start = std::get<0>(group);
+            float E_end = std::get<1>(group);
+            float resolution = std::get<2>(group);
+            int n_bins = static_cast<int>((E_end - E_start) / resolution + 0.5f);
+            total_bins += n_bins;
+        }
+
+        std::vector<float> edges(total_bins + 1);
+        std::vector<float> rep(total_bins);
+
+        // Second pass: fill edges and rep
+        int bin_offset = 0;
+        for (const auto& group : groups) {
+            float E_start = std::get<0>(group);
+            float E_end = std::get<1>(group);
+            float resolution = std::get<2>(group);
+            int n_bins = static_cast<int>((E_end - E_start) / resolution + 0.5f);
+
+            for (int i = 0; i <= n_bins; ++i) {
+                edges[bin_offset + i] = E_start + i * resolution;
+            }
+
+            // Representative energy: midpoint for uniform bins
+            for (int i = 0; i < n_bins; ++i) {
+                rep[bin_offset + i] = 0.5f * (edges[bin_offset + i] + edges[bin_offset + i + 1]);
+            }
+
+            bin_offset += n_bins;
+        }
+
+        // Ensure last edge is exact
+        edges[total_bins] = last_E_max;
+
+        return {total_bins, first_E_min, last_E_max, edges, rep};
+    }
+}
+
+EnergyGrid::EnergyGrid(const std::vector<std::tuple<float, float, float>>& groups)
+    : EnergyGrid(0.1f, 250.0f, 1)  // Dummy values, will be replaced
+{
+    // Create the piecewise grid data
+    auto result = create_piecewise_grid(groups);
+
+    // Now we need to copy the data to this object
+    // Since N_E, E_min, E_max are const, we need to cast away const
+    // This is safe because we're in the constructor
+    const_cast<int&>(N_E) = result.N_E;
+    const_cast<float&>(E_min) = result.E_min;
+    const_cast<float&>(E_max) = result.E_max;
+    is_piecewise = true;
+
+    edges = std::move(result.edges);
+    rep = std::move(result.rep);
 }
 
 int EnergyGrid::FindBin(float E) const {

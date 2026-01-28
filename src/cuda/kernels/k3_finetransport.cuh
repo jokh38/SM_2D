@@ -67,6 +67,7 @@ K3Result run_K3_with_forced_split(const Component& c);
 // ============================================================================
 // This function copies CPU LUT data to GPU memory for kernel use
 // P2 FIX: Enables device LUT access in K3 kernel
+// Option D2: Added E_edges for piecewise-uniform grid support
 struct DeviceLUTWrapper {
     DeviceRLUT dlut;
     float* d_R;
@@ -74,9 +75,10 @@ struct DeviceLUTWrapper {
     float* d_log_E;
     float* d_log_R;
     float* d_log_S;
+    float* d_E_edges;  // For piecewise-uniform grid binary search
 
     DeviceLUTWrapper() : d_R(nullptr), d_S(nullptr), d_log_E(nullptr),
-                         d_log_R(nullptr), d_log_S(nullptr) {}
+                         d_log_R(nullptr), d_log_S(nullptr), d_E_edges(nullptr) {}
 
     // Initialize from CPU RLUT (allocates and copies to GPU)
     bool init(const RLUT& cpu_lut) {
@@ -84,12 +86,14 @@ struct DeviceLUTWrapper {
 
         // Allocate device memory
         size_t data_size = N_E * sizeof(float);
+        size_t edges_size = (N_E + 1) * sizeof(float);
 
         cudaMalloc(&d_R, data_size);
         cudaMalloc(&d_S, data_size);
         cudaMalloc(&d_log_E, data_size);
         cudaMalloc(&d_log_R, data_size);
         cudaMalloc(&d_log_S, data_size);
+        cudaMalloc(&d_E_edges, edges_size);  // Option D2: Edges for binary search
 
         // Copy data to device
         cudaMemcpy(d_R, cpu_lut.R.data(), data_size, cudaMemcpyHostToDevice);
@@ -97,6 +101,7 @@ struct DeviceLUTWrapper {
         cudaMemcpy(d_log_E, cpu_lut.log_E.data(), data_size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_log_R, cpu_lut.log_R.data(), data_size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_log_S, cpu_lut.log_S.data(), data_size, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_E_edges, cpu_lut.grid.edges.data(), edges_size, cudaMemcpyHostToDevice);
 
         // Fill device LUT structure
         dlut.N_E = N_E;
@@ -107,6 +112,7 @@ struct DeviceLUTWrapper {
         dlut.log_E = d_log_E;
         dlut.log_R = d_log_R;
         dlut.log_S = d_log_S;
+        dlut.E_edges = d_E_edges;  // Option D2: Edges for binary search
 
         return true;
     }
@@ -118,7 +124,8 @@ struct DeviceLUTWrapper {
         if (d_log_E) cudaFree(d_log_E);
         if (d_log_R) cudaFree(d_log_R);
         if (d_log_S) cudaFree(d_log_S);
-        d_R = d_S = d_log_E = d_log_R = d_log_S = nullptr;
+        if (d_E_edges) cudaFree(d_E_edges);  // Option D2
+        d_R = d_S = d_log_E = d_log_R = d_log_S = d_E_edges = nullptr;
     }
 
     ~DeviceLUTWrapper() {

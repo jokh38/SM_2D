@@ -52,10 +52,44 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
         result.z_centers[j] = j * config.grid.dz;
     }
 
-    // Generate NIST range LUT
-    // H7 FIX: E_max changed from 300.0 to 250.0 MeV
-    // R(300 MeV) returns NaN due to NIST data range limitation (capped at 250 MeV)
-    auto lut = GenerateRLUT(0.1f, 250.0f, 256);
+    // Create phase-space grids for K1-K6 pipeline
+    // TODO: Make these configurable via IncidentParticleConfig
+    const int N_theta = 36;           // Global angular bins
+    // Option D2: Piecewise-uniform energy grid (401 bins total)
+    // [0.1-2 MeV]: 0.1 MeV → 19 bins (Bragg peak core)
+    // [2-20 MeV]: 0.25 MeV → 72 bins (Bragg peak falloff)
+    // [20-100 MeV]: 0.5 MeV → 160 bins (Mid-energy plateau)
+    // [100-250 MeV]: 1 MeV → 150 bins (High energy)
+    // Local bins must match compile-time constants in local_bins.hpp
+    // NOTE: Using reduced values for memory (SPEC requires 8, 4)
+    const int N_theta_local = ::N_theta_local;  // = 4 (memory optimized, SPEC wants 8)
+    const int N_E_local = ::N_E_local;          // = 2 (memory optimized, SPEC wants 4)
+
+    // Angular grid: [-pi/2, pi/2] for full angular coverage
+    AngularGrid theta_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
+
+    // Energy grid: piecewise-uniform (Option D2)
+    // Format: {{E_start, E_end, resolution}, ...}
+    std::vector<std::tuple<float, float, float>> energy_groups = {
+        {0.1f, 2.0f, 0.1f},      // 19 bins - Bragg peak core
+        {2.0f, 20.0f, 0.25f},    // 72 bins - Bragg peak falloff
+        {20.0f, 100.0f, 0.5f},   // 160 bins - Mid-energy plateau
+        {100.0f, 250.0f, 1.0f}    // 150 bins - High energy
+    };
+    EnergyGrid E_grid(energy_groups);
+    const int N_E = E_grid.N_E;  // Will be 401
+
+    std::cout << "=== Option D2 Energy Grid ===" << std::endl;
+    std::cout << "  N_E = " << N_E << " bins" << std::endl;
+    std::cout << "  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)" << std::endl;
+    std::cout << "  [2-20 MeV]: 0.25 MeV/bin (72 bins)" << std::endl;
+    std::cout << "  [20-100 MeV]: 0.5 MeV/bin (160 bins)" << std::endl;
+    std::cout << "  [100-250 MeV]: 1 MeV/bin (150 bins)" << std::endl;
+    std::cout << "=============================" << std::endl;
+
+    // Generate NIST range LUT using the piecewise-uniform energy grid (Option D2)
+    // This ensures LUT uses the same energy bins as the transport
+    auto lut = GenerateRLUT(E_grid);
 
     // DEBUG: Verify LUT values
     std::cout << "=== LUT Verification ===" << std::endl;
@@ -66,7 +100,7 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
 
     // Test energy loss calculation
     float E_test = 150.0f;
-    float step = 0.5f;
+    float step = 2.0f;  // Use 2mm step for Option D2
     float R_before = lut.lookup_R(E_test);
     float R_after = R_before - step;
     float E_after = lut.lookup_E_inverse(std::max(0.001f, R_after));
@@ -84,24 +118,6 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     // Grid origin
     float x_min = -(config.grid.Nx * config.grid.dx) / 2.0f;
     float z_min = 0.0f;
-
-    // Create phase-space grids for K1-K6 pipeline
-    // TODO: Make these configurable via IncidentParticleConfig
-    const int N_theta = 36;           // Global angular bins
-    const int N_E = 1280;             // Global energy bins (~1 MeV resolution at high energy)
-                                      // Bin width: 0.92 MeV at 150 MeV, 1.53 MeV at 250 MeV
-                                      // This reduces energy loss from geometric mean rounding
-                                      // Memory: ~2.1 GB for phase space (fits in 8GB VRAM)
-    // Local bins must match compile-time constants in local_bins.hpp
-    // NOTE: Using reduced values for memory (SPEC requires 8, 4)
-    const int N_theta_local = ::N_theta_local;  // = 4 (memory optimized, SPEC wants 8)
-    const int N_E_local = ::N_E_local;          // = 2 (memory optimized, SPEC wants 4)
-
-    // Angular grid: [-pi/2, pi/2] for full angular coverage
-    AngularGrid theta_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
-
-    // Energy grid: log-spaced from 0.1 MeV to 250 MeV (SPEC v0.8 requirement)
-    EnergyGrid E_grid(0.1f, 250.0f, N_E);
 
     // Allocate device memory for grid edges
     float* d_theta_edges = nullptr;

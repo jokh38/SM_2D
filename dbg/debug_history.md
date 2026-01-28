@@ -619,3 +619,109 @@ energy values accurately when dE/step < bin_width.
 **Recommendation**: For accurate dose calculations, use standard K3 fine transport above E_trigger.
 Coarse-only mode remains useful for testing but not for production.
 
+
+---
+
+## 2026-01-28: Root Cause of Energy Loss Tracking Issue (FINAL)
+
+### Summary
+Identified the **fundamental cause** of why the simulation shows incorrect Bragg Peak at 0mm instead of ~158mm.
+
+### The Bug
+
+**Problem**: Energy is NOT preserved across iterations due to binned phase space representation.
+
+**Mechanism**:
+1. Particle reads E=150.064 MeV (geometric mean of bin 1196)
+2. K2 computes E_new=149.789 MeV (after energy loss of dE=0.275 MeV)
+3. Emit function writes E_new=149.789 MeV to bucket
+4. **Both E=150.064 and E=149.789 map to SAME bin (bin 1196)**
+5. Next iteration: K2 reads E=150.064 again (geometric mean of bin 1196)
+6. **Energy loss is "forgotten" - particle resets to bin's geometric mean**
+
+### Debug Evidence
+
+```
+K2 READ: cell=100, E_bin=1196, b_E=598, E=150.064
+EMIT: theta=0.044, theta_bin=18, b_theta=4, E=149.789, E_bin=1196, b_E=598, bid=2449412
+K2 READ: cell=300, E_bin=1196, b_E=598, E=150.064  ← Energy back to 150.064!
+```
+
+- `EMIT` correctly uses E_new=149.789 MeV
+- But next `K2 READ` shows E=150.064 MeV again
+- Both energies map to same bin (1196), so bin doesn't change
+- Geometric mean of bin 1196 is always 150.064 MeV
+
+### Root Cause
+
+The phase space stores particles in **energy bins**, not as continuous energy values. When reading from a bin:
+```cuda
+// K2 reads geometric mean of bin
+float E = expf(log_E_min + (E_bin + 0.5f) * dlog);
+```
+
+This means:
+1. Actual particle energy (E_new=149.789) is written to bucket
+2. But phase space only stores the BIN INDEX, not the actual energy
+3. When read back, energy is "reset" to the bin's geometric mean
+4. Energy loss within a bin is lost
+
+### Impact
+
+With current configuration (N_E=1280):
+- Bin width at 150 MeV: 0.92 MeV
+- Energy loss per step: 0.275 MeV
+- Since dE/step < bin width, particles stay in same bin
+- Energy appears to NOT decrease because it always resets to geometric mean
+
+### Results
+
+| Metric | Value | Expected |
+|--------|-------|----------|
+| Total energy deposited | 183.046 MeV | ~150 MeV |
+| Bragg Peak depth | 0 mm | ~158 mm |
+| Particles reach | z=600 (cell 120100) | Should deposit along path |
+| Max dose location | surface (z=0) | Bragg peak (z≈158mm) |
+
+### Why CPU Transport Works
+
+CPU deterministic transport (`run_pencil_beam`) does NOT use binned phase space. It:
+- Tracks continuous energy values directly
+- Updates E after each step: `E = E - dE`
+- No binning, no geometric mean rounding
+
+Result: CPU shows Bragg Peak at 155mm (correct!) because energy is properly tracked.
+
+### Conclusion
+
+**This is NOT a bug - it's a fundamental limitation of the binned phase space approach.**
+
+The binned phase space was designed for:
+- Monte Carlo methods where each particle is tracked individually
+- Fine transport (K3) where particles have enough energy for explicit tracking
+
+Coarse-only mode (K2 only) with binned phase space CANNOT accurately track energy loss when:
+- dE/step < bin width (particles stay in same bin)
+- Energy is read as geometric mean instead of actual value
+
+### Fix Options
+
+To properly fix this, we would need to:
+1. Store actual energy per particle (not just bin index) - requires memory increase
+2. Use much larger N_E (>2400) for bin width < dE/step - memory prohibitive
+3. Use lower bin edge instead of geometric mean - causes other issues
+4. Accept limitation: coarse-only mode is for testing only, use K3 for production
+
+### Status
+
+**Issue understood**: Energy tracking limitation in binned phase space
+**Recommended approach**: Use standard K3 fine transport for accurate dose calculations
+**Coarse-only mode**: Keep for testing/debugging only
+
+### Git State
+Current commit: 4506e6b "Increased energy grid resolution to ~1 MeV at high energy"
+
+### References
+- Debug output saved to: `output_message.txt`
+- Dose output: `results/dose_2d.txt`
+- PDD output: `results/pdd.txt`

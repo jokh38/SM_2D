@@ -22,6 +22,7 @@ struct DeviceRLUT {
     const float* __restrict__ log_E;   // Pre-computed log(E) (device pointer)
     const float* __restrict__ log_R;   // Pre-computed log(R) (device pointer)
     const float* __restrict__ log_S;   // Pre-computed log(S) (device pointer)
+    const float* __restrict__ E_edges; // Energy bin edges (N_E+1 values) - Option D2
 };
 
 // ============================================================================
@@ -29,12 +30,29 @@ struct DeviceRLUT {
 // ============================================================================
 
 // Find energy bin using binary search (device version)
-// Note: For log-spaced grid, can also compute directly: floor(log(E/E_min) / dlog)
-__device__ inline int device_find_bin(float E, int N_E, float E_min, float E_max) {
+// Works for both log-spaced and piecewise-uniform grids
+__device__ inline int device_find_bin_edges(const float* __restrict__ edges, int N_E, float E) {
+    if (E <= edges[0]) return 0;
+    if (E >= edges[N_E]) return N_E - 1;
+
+    // Binary search for piecewise-uniform grid
+    int lo = 0, hi = N_E;
+    while (lo < hi) {
+        int mid = (lo + hi) / 2;
+        if (edges[mid + 1] <= E) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    return lo;
+}
+
+// Legacy: Find bin using log-spaced formula (kept for compatibility)
+__device__ inline int device_find_bin_log(float E, int N_E, float E_min, float E_max) {
     if (E <= E_min) return 0;
     if (E >= E_max) return N_E - 1;
 
-    // For log-spaced grid, use direct computation (faster than binary search)
     float log_E = logf(E);
     float log_E_min = logf(E_min);
     float log_E_max = logf(E_max);
@@ -47,7 +65,8 @@ __device__ inline int device_find_bin(float E, int N_E, float E_min, float E_max
 // Lookup R(E) using log-log interpolation on device
 __device__ inline float device_lookup_R(const DeviceRLUT& lut, float E) {
     float E_clamped = fmaxf(lut.E_min, fminf(E, lut.E_max));
-    int bin = device_find_bin(E_clamped, lut.N_E, lut.E_min, lut.E_max);
+    // Option D2: Use binary search with E_edges for piecewise-uniform grid
+    int bin = device_find_bin_edges(lut.E_edges, lut.N_E, E_clamped);
 
     float log_E_val = logf(E_clamped);
     float log_E0 = lut.log_E[bin];
@@ -65,7 +84,8 @@ __device__ inline float device_lookup_R(const DeviceRLUT& lut, float E) {
 // Lookup S(E) using log-log interpolation on device
 __device__ inline float device_lookup_S(const DeviceRLUT& lut, float E) {
     float E_clamped = fmaxf(lut.E_min, fminf(E, lut.E_max));
-    int bin = device_find_bin(E_clamped, lut.N_E, lut.E_min, lut.E_max);
+    // Option D2: Use binary search with E_edges for piecewise-uniform grid
+    int bin = device_find_bin_edges(lut.E_edges, lut.N_E, E_clamped);
 
     float log_E_val = logf(E_clamped);
     float log_E0 = lut.log_E[bin];
@@ -138,46 +158,39 @@ __device__ inline float device_compute_energy_deposition(const DeviceRLUT& lut, 
 // Step size is designed to:
 // 1. Resolve sub-cell features (sub-cell size = dx / N_x_sub = 0.5 / 4 = 0.125mm)
 // 2. Allow boundary crossing (cell half-width = 0.25mm, need ~2-3 steps minimum)
-// 3. Adapt to energy-dependent stopping power variations
+// 3. Adapt to energy-dependent stopping power variations (Option D2 adaptive)
 __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, float dx = 1.0f, float dz = 1.0f) {
     float R = device_lookup_R(lut, E);
 
     // Base: 2% of remaining range
     float delta_R_max = 0.02f * R;
 
-    // Energy-dependent refinement factor
-    // Adjusted for E_trigger = 10 MeV threshold between coarse and fine transport
-    float dS_factor = 1.0f;
+    // Option D2: Adaptive step size per energy group
+    // Each group has a minimum step to ensure particles cross energy bins
+    float step_min_group;
 
-    if (E < 5.0f) {
-        // Very low energy (near end of range) - use sub-cell resolution
-        // Sub-cell size = 0.125mm, use 0.1mm to resolve features while allowing progress
-        dS_factor = 0.6f;
-        delta_R_max = fminf(delta_R_max, 0.1f);
-    } else if (E < 10.0f) {
-        // Low energy (Bragg peak region) - intermediate step
-        // Need enough resolution but must allow boundary crossing
-        dS_factor = 0.7f;
-        delta_R_max = fminf(delta_R_max, 0.15f);
+    if (E < 2.0f) {
+        // [0.1-2 MeV]: 0.1 MeV/bin, use 0.2mm step to cross bins
+        step_min_group = 0.2f;
     } else if (E < 20.0f) {
-        // Below coarse transport threshold - larger steps
-        dS_factor = 0.8f;
-        delta_R_max = fminf(delta_R_max, 0.3f);
-    } else if (E < 50.0f) {
-        // Just above threshold - even larger steps
-        dS_factor = 0.9f;
-        delta_R_max = fminf(delta_R_max, 0.5f);
+        // [2-20 MeV]: 0.25 MeV/bin, use 0.5mm step
+        step_min_group = 0.5f;
+    } else if (E < 100.0f) {
+        // [20-100 MeV]: 0.5 MeV/bin, use 1.0mm step
+        step_min_group = 1.0f;
+    } else {
+        // [100-250 MeV]: 1 MeV/bin, use 2.0mm step
+        step_min_group = 2.0f;
     }
 
-    delta_R_max = delta_R_max * dS_factor;
-    // H5 FIX: Removed 1.0mm cap per SPEC.md:203 which requires delta_R_max = 0.02 * R
-    // At 150 MeV: delta_R_max = 0.02 * 157.7mm = 3.15mm (was limited to 1.0mm)
-    // This 3.15x smaller step size was causing particles to stop at 42mm instead of 158mm
+    // Use the larger of: 2% of range OR group minimum step
+    delta_R_max = fmaxf(delta_R_max, step_min_group);
 
-    // CRITICAL FIX: Minimum step must allow boundary crossing in 2-3 iterations
-    // Cell half-width = 0.25mm, so minimum step should be at least 0.1mm
-    // This prevents particles from getting trapped in cells
-    delta_R_max = fmaxf(delta_R_max, 0.1f);
+    // Additional refinement near Bragg peak for accuracy
+    if (E < 0.5f) {
+        // End of range - use very small steps
+        delta_R_max = fminf(delta_R_max, 0.1f);
+    }
 
     // REMOVED: Artificial cell_limit was causing step size to be limited to 0.125mm (0.25 * 0.5mm)
     // This prevented 150MeV protons from traveling their full ~158mm range
