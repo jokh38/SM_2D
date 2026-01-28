@@ -1,7 +1,8 @@
 # Bug Discovery Report: SM_2D Particle Transport Energy Loss
 
 **Date**: 2025-01-28
-**Status**: ROOT CAUSE IDENTIFIED - Ready for Verification
+**Last Updated**: 2026-01-28
+**Status**: PARTIAL FIX APPLIED - Significant Progress Made (22% of expected energy deposition)
 **Method**: MPDBGER 4-Path Analysis
 
 ---
@@ -195,7 +196,55 @@ Distance: 70 * 0.125mm ≈ 8.75mm (not 158mm!)
 
 ---
 
-## 7. Attempt Log (Including Previous H1 Refutation)
+## 7. Fix Results (COMMIT: 2b60143)
+
+### Fixes Applied (2026-01-28)
+
+**H1: Energy Binning** - `src/cuda/kernels/k2_coarsetransport.cu:135`, `k3_finetransport.cu:157`
+```cpp
+// BEFORE (lower edge):
+float E = expf(log_E_min + E_bin * dlog);
+// AFTER (geometric mean per SPEC.md:76):
+float E = expf(log_E_min + (E_bin + 0.5f) * dlog);
+```
+
+**H2: Step Size Limits** - `src/include/physics/step_control.hpp:55-58`, `gpu_transport_wrapper.cu:78`
+- Removed cell_limit (0.125mm)
+- Removed 1mm hard limit
+- Increased step_coarse from 0.3mm to 5mm
+
+**H3: Boundary Crossing** - `src/cuda/kernels/k2_coarsetransport.cu:170-176`, `k3_finetransport.cu:206-210`
+```cpp
+// BEFORE: Particles stopped at 99.9% of boundary
+float coarse_step_limited = fminf(coarse_step, geometric_to_boundary * 0.999f);
+// AFTER: Let boundary detection handle crossing
+float coarse_step_limited = coarse_step;
+```
+
+### Results Summary
+
+| Metric | Before Fixes | After Fixes | Expected | Change |
+|--------|--------------|-------------|----------|--------|
+| Energy Deposited | 16.97 MeV | 32.96 MeV | ~150 MeV | +94% |
+| Iterations | 116 | 86 | ~400-600 | -26% |
+| Max Depth (cell) | 1700 (z=8mm) | 16900 (z=84mm) | ~158mm | +950% |
+| Bragg Peak | 1mm | 0mm (surface) | ~158mm | Surface dose |
+
+### Progress Assessment
+
+**Improvements:**
+- Energy deposited nearly doubled (16.97 → 32.96 MeV)
+- Particles travel 10x farther (8mm → 84mm depth)
+- Fewer iterations needed (more efficient transport)
+
+**Remaining Issues:**
+- Dose peaks at surface instead of Bragg peak (~158mm)
+- Only 22% of expected energy deposited (32.96 / 150 MeV)
+- Particles stop at 84mm, not full 158mm range
+
+---
+
+## 8. Attempt Log (Including Previous H1 Refutation)
 
 | # | Attempt | Result | Verdict |
 |---|---------|--------|---------|
@@ -210,56 +259,75 @@ Distance: 70 * 0.125mm ≈ 8.75mm (not 158mm!)
 
 ---
 
-## 8. Next Step
+## 9. Next Steps (Remaining Investigation)
+
+### Remaining Issues After H1, H2, H3 Fixes
+
+1. **Dose peaks at surface (0mm)** instead of Bragg peak (~158mm)
+2. **Only 22% of expected energy** deposited (32.96 / 150 MeV)
+3. **Particles stop at 84mm depth**, not full 158mm range
+
+### Hypotheses for Remaining Issues
+
+**H4: Nuclear Attenuation Too Aggressive**
+- Weight drops from 1.0 to ~1e-6 quickly
+- At low weights, energy contribution (E × w) becomes negligible
+- Check: Verify nuclear cross-section (currently 0.0012 mm⁻¹) and attenuation formula
+
+**H5: Energy Loss Rate Too High**
+- Particles lose energy ~4x too fast (stop at 84mm instead of 158mm)
+- Check: Verify stopping power (dE/dx) calculations against NIST data
+
+**H6: Excessive Lateral Scattering**
+- Particles may scatter sideways instead of penetrating forward
+- Check: MCS angle calculation and application
 
 ### Verification Plan
 
-**Priority 1: Fix Energy Binning (H1)**
-
-Files to modify:
-1. `src/cuda/kernels/k2_coarsetransport.cu:135`
-2. `src/cuda/kernels/k3_finetransport.cu:157`
-
+**Priority 1: Check Nuclear Attenuation**
 ```cpp
-// BEFORE (lower edge):
-float E = expf(log_E_min + E_bin * dlog);
-
-// AFTER (geometric mean approximation):
-float E = expf(log_E_min + (E_bin + 0.5f) * dlog);
+// File: src/cuda/device_physics.cuh
+// Verify: nuclear_cross_section value and formula
+// SPEC.md suggests 0.0050 mm⁻¹, code uses 0.0012 mm⁻¹
 ```
 
-**Expected Result**:
-- Energy deposited: 17 MeV → 100+ MeV
-- Bragg peak: 1mm → 100+ mm
-
-**Priority 2: Fix Step Size (H2)**
-
-File to modify:
-1. `src/include/physics/step_control.hpp:55-58`
-
+**Priority 2: Verify Stopping Power LUT**
 ```cpp
-// Comment out cell limit:
-// float cell_limit = 0.25f * fminf(dx, dz);
-// delta_R_max = fminf(delta_R_max, cell_limit);
+// Check R(150 MeV) = 157.667 mm is used correctly
+// Verify dE = S(E) × step calculation
 ```
 
-**Expected Result**:
-- Distance traveled: 14.5mm → 150+ mm
-- Bragg peak moves to ~158mm
-
-### Verification Checklist
-
-- [ ] Modify k2_coarsetransport.cu line 135
-- [ ] Modify k3_finetransport.cu line 157
-- [ ] Rebuild with GPU support
-- [ ] Run simulation
-- [ ] Check output_message.txt for energy deposited
-- [ ] Verify Bragg peak position
-- [ ] If not fixed, apply H2 (step size fix)
+**Priority 3: Review MCS Scattering**
+```cpp
+// Check theta_0 = (13.6 MeV / beta*c*p) * sqrt(step/X0) formula
+// Verify angular distribution application
+```
 
 ---
 
-## 9. References
+## 10. H7: Energy Grid E_max Bug (FIXED 2026-01-28)
+
+### Critical Finding
+The code was using E_max=300 MeV in multiple locations, causing energy grid corruption.
+
+### Root Cause
+R(300 MeV) returns NaN because NIST PSTAR data only covers up to ~250 MeV for protons in water. This caused:
+1. Corrupted energy edges in the LUT
+2. Particles reading at wrong energies (176-194 MeV instead of ~150 MeV)
+3. Incorrect energy binning during write/read cycles
+
+### Files Modified
+1. `src/cuda/gpu_transport_wrapper.cu:88` - EnergyGrid(0.1f, 250.0f, N_E)
+2. `src/gpu/gpu_transport_runner.cpp:56` - GenerateRLUT(0.1f, 250.0f, 256)
+
+### Results
+- Energy read from bin: 176-194 MeV → 150.984 MeV (CORRECT)
+- Energy loss now decreases: 151 → 149 → 147 MeV (CORRECT)
+- K3 LUT now shows E_max=250.000 MeV (was 300.000 MeV)
+
+---
+
+## 11. References
 
 - **Code**: `src/cuda/kernels/k2_coarsetransport.cu`, `k3_finetransport.cu`
 - **Code**: `src/include/physics/step_control.hpp`

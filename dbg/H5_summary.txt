@@ -1,0 +1,119 @@
+================================================================================
+H5: STOPPING POWER (dE/dx) INVESTIGATION - CRITICAL BUG FOUND
+================================================================================
+
+STATUS: ✗ CRITICAL BUG IDENTIFIED
+ROOT CAUSE: Artificial 1.0mm cap on step size violates SPEC.md
+
+================================================================================
+PROBLEM SUMMARY
+================================================================================
+
+Particles lose energy ~4x too fast:
+  Expected range:  158 mm (for 150 MeV protons in water)
+  Actual range:    42 mm (26.6% of expected)
+  Energy deposited: 33 MeV vs 150 MeV expected (22%)
+
+================================================================================
+ROOT CAUSE
+================================================================================
+
+File: src/cuda/device/device_lut.cuh
+Line: 173
+
+BUGGY CODE:
+  delta_R_max = fminf(delta_R_max, 1.0f);  // ← ARTIFICIAL 1mm CAP
+
+SPEC.md REQUIREMENT (line 203):
+  delta_R_max = 0.02f * R;  // Max 2% range loss per substep
+  // NO 1.0mm cap mentioned!
+
+IMPACT:
+  At 150 MeV: SPEC requires 3.15mm step, code uses 1.0mm step
+  Step is 3.15x too small → particles take 3x more iterations
+  As energy drops, step gets even smaller (0.1-0.5mm limits)
+  Result: Particles stop at 42mm instead of 158mm
+
+================================================================================
+VERIFICATION OF PHYSICS IMPLEMENTATION
+================================================================================
+
+✓ NIST PSTAR data: Correct (5.443 MeV·cm²/g, 157.7 mm at 150 MeV)
+✓ Range LUT generation: Correct (log-log interpolation from NIST)
+✓ Energy loss calculation: Correct (R-based method, dE = E - E_new)
+✓ Unit conversions: Correct (g/cm² → mm using ×10/rho)
+
+The PHYSICS is correct. The STEP SIZE LIMIT is wrong.
+
+================================================================================
+ADDITIONAL SPEC DEVIATIONS
+================================================================================
+
+1. Line 173: fminf(delta_R_max, 1.0f) ← CRITICAL BUG (not in SPEC)
+2. Lines 148-172: dS_factor (0.6-0.9) ← not in SPEC, reduces step 10-40%
+3. Lines 155-156: E < 5 MeV case ← not in SPEC (SPEC starts at E < 10 MeV)
+4. Line 161: 0.15f limit vs SPEC 0.2f at E < 10 MeV
+
+================================================================================
+RECOMMENDED FIX
+================================================================================
+
+PRIMARY (CRITICAL):
+  File: src/cuda/device/device_lut.cuh
+  Line: 173
+  Action: REMOVE this line: delta_R_max = fminf(delta_R_max, 1.0f);
+
+SECONDARY (HIGH):
+  Remove dS_factor logic (lines 148-172) - not in SPEC, reduces efficiency
+
+TERTIARY (LOW):
+  Fix K2 coarse transport division bug (k2_coarsetransport.cu:176)
+  Change: coarse_range_step = coarse_step / mu_abs
+  To:     coarse_range_step = coarse_step
+
+================================================================================
+EXPECTED IMPACT OF FIX
+================================================================================
+
+Removing 1.0mm cap:
+  Step size at 150 MeV: 1.0mm → 3.15mm (3.15x increase)
+  Range: 42mm → 158mm (3.76x increase)
+  Energy deposition: 33 MeV → 150 MeV (4.5x increase)
+  Iterations: 86 → ~50 (1.7x decrease, more efficient)
+
+================================================================================
+FILES INVESTIGATED
+================================================================================
+
+  src/lut/nist_loader.cpp          - NIST data loading ✓
+  src/lut/r_lut.cpp                - Range LUT generation ✓
+  src/cuda/device/device_lut.cuh   - Step size calculation ✗ BUG
+  src/cuda/device/device_physics.cuh - Energy loss functions ✓
+  src/cuda/kernels/k2_coarsetransport.cu - Coarse transport (minor issue)
+  src/cuda/kernels/k3_finetransport.cu - Fine transport ✓
+  src/include/physics/step_control.hpp - CPU step control ✓
+  src/data/nist/pstar_water.txt    - NIST data ✓
+  SPEC.md                          - Specification (line 203)
+
+================================================================================
+TEST PROGRAM CREATED
+================================================================================
+
+  /tmp/test_r_lut - LUT verification program
+  Results: R(150 MeV) = 157.7 mm ✓, S(150 MeV) = 5.443 ✓
+  Inverse lookup: E(157.7 mm) = 150 MeV ✓
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The stopping power (dE/dx) IMPLEMENTATION IS PHYSICALLY CORRECT.
+
+The bug is an ARTIFICIAL 1.0mm CAP on step size that violates SPEC.md line 203.
+
+FIX: Remove line 173 in src/cuda/device/device_lut.cuh
+     Rebuild and test
+
+Full report: dbg/H5_stopping_power_investigation.md
+
+================================================================================

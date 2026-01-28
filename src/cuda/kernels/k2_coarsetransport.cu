@@ -135,6 +135,12 @@ __global__ void K2_CoarseTransport(
             // Geometric mean approximation: E_edges[i] * exp(0.5 * dlog)
             float E = expf(log_E_min + (E_bin + 0.5f) * dlog);  // Geometric mean
 
+            // H7 DEBUG: Print energy being read from bin
+            if (cell % 200 == 100 && (cell / 200) < 5 && weight > 0.01f) {
+                printf("K2 READ: cell=%d, E_bin=%d, b_E=%d, E=%.3f (expected ~150)\n",
+                       cell, E_bin, b_E, E);
+            }
+
             // Cutoff check
             if (E <= 0.1f) {
                 cell_edep += E * weight;

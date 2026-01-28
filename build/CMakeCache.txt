@@ -475,17 +475,11 @@ NVCC_EXECUTABLE:FILEPATH=/usr/local/cuda-12.4/bin/nvcc
 //Value Computed by CMake
 SM_2D_BINARY_DIR:STATIC=/workspaces/SM_2D/build
 
-//No help, variable specified on the command line.
-SM_2D_ENABLE_GPU:UNINITIALIZED=ON
-
 //Value Computed by CMake
 SM_2D_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 SM_2D_SOURCE_DIR:STATIC=/workspaces/SM_2D
-
-//No help, variable specified on the command line.
-USE_GPU:UNINITIALIZED=ON
 
 
 ########################

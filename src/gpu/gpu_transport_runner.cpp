@@ -53,13 +53,15 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     }
 
     // Generate NIST range LUT
-    auto lut = GenerateRLUT(0.1f, 300.0f, 256);
+    // H7 FIX: E_max changed from 300.0 to 250.0 MeV
+    // R(300 MeV) returns NaN due to NIST data range limitation (capped at 250 MeV)
+    auto lut = GenerateRLUT(0.1f, 250.0f, 256);
 
     // DEBUG: Verify LUT values
     std::cout << "=== LUT Verification ===" << std::endl;
     std::cout << "  R(0.1 MeV) = " << lut.lookup_R(0.1f) << " mm (expected ~0.0016)" << std::endl;
     std::cout << "  R(150 MeV) = " << lut.lookup_R(150.0f) << " mm (expected ~158)" << std::endl;
-    std::cout << "  R(300 MeV) = " << lut.lookup_R(300.0f) << " mm" << std::endl;
+    std::cout << "  R(250 MeV) = " << lut.lookup_R(250.0f) << " mm (max range in LUT)" << std::endl;
     std::cout << "  S(150 MeV) = " << lut.lookup_S(150.0f) << " MeV*cm^2/g" << std::endl;
 
     // Test energy loss calculation

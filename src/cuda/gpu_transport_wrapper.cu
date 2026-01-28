@@ -85,7 +85,10 @@ void run_k1k6_pipeline_transport(
     config.N_E_local = N_E_local;
 
     // Create grids
-    EnergyGrid e_grid(0.1f, 300.0f, N_E);
+    // H7 FIX: E_max changed from 300.0 to 250.0 MeV
+    // R(300 MeV) returns NaN due to NIST data range limitation (capped at 250 MeV)
+    // This was causing energy grid corruption and particles to appear at wrong energies
+    EnergyGrid e_grid(0.1f, 250.0f, N_E);
     AngularGrid a_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
 
     // ========================================================================

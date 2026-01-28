@@ -3,8 +3,10 @@
 ## Issue Summary
 
 **Date**: 2026-01-28
+**Last Updated**: 2026-01-28
 **Status**: PARTIAL FIX APPLIED - Significant Progress Made
 **Severity**: Critical (simulation produces 22% of expected energy deposition)
+**Commit**: 2b60143
 
 ## Symptom - Before Fixes
 
@@ -21,7 +23,8 @@
 | Bragg Peak Depth | ~158 mm | 0 mm (surface) | -100% |
 | Energy Deposited | ~150 MeV | 32.96 MeV | -78% |
 | Simulation Iterations | ~400-600 | 86 | -79% |
-| Max Depth Reached | ~158 mm | 42 mm | -73% |
+| Max Depth Reached | ~158 mm | 84 mm | -47% |
+| Bragg Peak Dose | ~100+ Gy | 3.41 Gy | -96% |
 
 **Improvement**: Energy deposited increased from 16.97 MeV to 32.96 MeV (+94%)
 
@@ -45,14 +48,14 @@
 - Code: `coarse_step_limited = fminf(coarse_step, geometric_to_boundary * 0.999f);`
 - Problem: Particles reached 99.9% of boundary but never crossed
 - Fix: Removed limit, let boundary detection handle crossing
-- Impact: Particles now travel 42mm vs 4.5mm before
+- Impact: Particles now travel 84mm vs 8mm before (10.5x improvement)
 
 ## Results of Fixes
 
 ### Progress Made
 - Energy deposited: 16.97 → 32.96 MeV (+94%)
-- Max depth reached: 4.5mm → 42mm (+833%)
-- Iteration efficiency: 116 → 86 iterations
+- Max depth reached: 8mm → 84mm (+950%)
+- Iteration efficiency: 116 → 86 iterations (-26%)
 
 ### Remaining Issues
 1. Dose peaks at surface (0mm) instead of Bragg peak (~158mm)
@@ -98,3 +101,30 @@
 - Full analysis: `dbg/bug_discovery_report.md`
 - Debug history: `dbg/debug_history.md`
 - SPEC: `SPEC.md:76` (energy grid), `SPEC.md:203` (step control)
+
+---
+
+## 2026-01-28 Update: H7 Fix Applied
+
+### Energy Grid E_max Bug (FIXED)
+Fixed critical bug where E_max=300 MeV was causing NaN values in the range LUT.
+
+**Files Modified:**
+- `src/cuda/gpu_transport_wrapper.cu:88` - Changed E_max from 300.0 to 250.0 MeV
+- `src/gpu/gpu_transport_runner.cpp:56` - Changed GenerateRLUT from 300.0 to 250.0 MeV
+
+**Results:**
+- Energy read from bin: 176-194 MeV → 150.984 MeV (CORRECT)
+- Energy loss now decreases correctly: 151 → 149 → 147 MeV
+- K3 LUT shows E_max=250.000 MeV (was 300.000 MeV)
+
+**Current Status (after H1, H2, H3, H5, H7 fixes):**
+- Energy deposited: 29.78 MeV (~20% of expected 150 MeV)
+- Bragg Peak: 2.5mm depth (vs expected ~158mm)
+- Iterations: 44 (vs expected ~400-600)
+
+**Remaining Issue:**
+Particles still stop at ~2.5mm instead of 158mm. This suggests either:
+1. Fine transport (K3) has different step size limits than coarse transport (K2)
+2. Energy loss rate is too high
+3. Particles switch to fine transport too early

@@ -19,10 +19,10 @@ Output Dir: results
 Using GPU transport (Vavilov energy straggling)
 === LUT Verification ===
   R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
-  R(150 MeV) = 157.667 mm (expected ~158)
-  R(300 MeV) = -nan mm
-  S(150 MeV) = 5.44494 MeV*cm^2/g
-  Energy loss test: E=150 -> E_new=149.707, dE=0.292603 MeV (step=0.5mm)
+  R(150 MeV) = 157.7 mm (expected ~158)
+  R(250 MeV) = -nan mm (max range in LUT)
+  S(150 MeV) = 5.443 MeV*cm^2/g
+  Energy loss test: E=150 -> E_new=149.725, dE=0.274673 MeV (step=0.5mm)
 =======================
 Running K1-K6 GPU pipeline transport...
   GPU: NVIDIA GeForce RTX 2080
@@ -55,7 +55,7 @@ Pipeline state allocation successful
 Running K1-K6 GPU pipeline...
   Grid: 200 x 640 cells
   Phase-space: 36 x 256 global bins
-  Energy threshold: 10 MeV (b_E_trigger=73)
+  Energy threshold: 10 MeV (b_E_trigger=75)
   Min weight: 1e-12
 Starting main transport loop...
   DEBUG n_active=0, n_coarse=1
@@ -70,20 +70,22 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 100 via CoarseList
-K2 CROSS: cell=100 (z=0), face=0, E_new=176.639, w=7.101322e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=100 (z=0), face=0, E_new=176.621, w=2.843899e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=100, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=100 (z=0), face=0, E_new=148.232, w=7.100230e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=100, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=100 (z=0), face=0, E_new=148.210, w=2.843459e-01, z_old=-0.1875, z_new=0.2500
     K2 complete
     psi_out AFTER K2 (before K4): weight=0, nonzero_bins=0
     psi_out before K4: weight=0, nonzero_bins=0
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=487428
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=300 (ix=100, iz=1): total=0.994522, from[src100_face0=0.994522, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
-    psi_out AFTER K4: weight=0.994522, nonzero_bins=8
+K4 SUMMARY cell=300 (ix=100, iz=1): total=0.994369, from[src100_face0=0.994369, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.994369, nonzero_bins=8
   Weight audit: error=0 pass=yes
   DEBUG n_active=0, n_coarse=1
   Iteration 2: 0 active, 1 coarse cells
-    psi_in: weight=0.994522, nonzero_bins=8
+    psi_in: weight=0.994369, nonzero_bins=8
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=487428
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -93,26 +95,34 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 300 via CoarseList
-K2 CROSS: cell=300 (z=1), face=0, E_new=176.639, w=3.305323e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=176.621, w=2.259205e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=176.621, w=1.328411e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=182.384, w=3.305416e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=182.365, w=2.259269e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=182.365, w=1.328449e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=176.583, w=8.569939e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=300 (z=1), face=0, E_new=182.328, w=8.570186e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=143.659, w=3.603004e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=143.637, w=3.169633e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=148.232, w=3.603103e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=148.210, w=3.169721e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=143.637, w=1.509069e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=148.210, w=1.509110e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=143.593, w=1.262622e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=300, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=300 (z=1), face=0, E_new=148.167, w=1.262658e-01, z_old=-0.1875, z_new=0.2500
     K2 complete
     psi_out AFTER K2 (before K4): weight=0, nonzero_bins=0
     psi_out before K4: weight=0, nonzero_bins=0
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4 SUMMARY cell=500 (ix=100, iz=2): total=0.989085, from[src300_face0=0.989085, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-    psi_out AFTER K4: weight=0.989085, nonzero_bins=15
+K4 SUMMARY cell=500 (ix=100, iz=2): total=0.988706, from[src300_face0=0.988706, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.988706, nonzero_bins=15
   Weight audit: error=0 pass=yes
   DEBUG n_active=0, n_coarse=1
   Iteration 3: 0 active, 1 coarse cells
-    psi_in: weight=0.989085, nonzero_bins=15
+    psi_in: weight=0.988706, nonzero_bins=15
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -122,33 +132,45 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 500 via CoarseList
-K2 CROSS: cell=500 (z=2), face=0, E_new=176.639, w=1.538469e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=176.621, w=1.051551e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=176.621, w=7.260425e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=182.384, w=3.038844e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=182.365, w=2.485412e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=188.307, w=1.500374e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=188.290, w=1.433872e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=182.365, w=1.434043e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=188.290, w=7.080001e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=176.583, w=8.716103e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=176.524, w=2.287671e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=182.328, w=1.914168e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=182.271, w=5.590395e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=188.253, w=1.042562e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=500 (z=2), face=0, E_new=188.197, w=3.302754e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=500 (z=2), face=0, E_new=139.194, w=2.281194e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=139.172, w=1.563093e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=139.172, w=2.183120e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=500 (z=2), face=0, E_new=143.659, w=4.109647e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=143.637, w=3.171607e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=500 (z=2), face=0, E_new=148.232, w=1.828440e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=148.210, w=1.608515e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=143.637, w=3.945492e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=148.210, w=1.762361e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=139.128, w=1.521607e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=139.058, w=5.383037e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=143.593, w=3.069178e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=143.525, w=1.092905e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=148.167, w=1.547572e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=500, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=500 (z=2), face=0, E_new=148.100, w=5.546014e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
     psi_out AFTER K2 (before K4): weight=0, nonzero_bins=0
     psi_out before K4: weight=0, nonzero_bins=0
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=700 (ix=100, iz=3): total=0.983687, from[src500_face0=0.983687, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
-    psi_out AFTER K4: weight=0.983687, nonzero_bins=24
+K4 SUMMARY cell=700 (ix=100, iz=3): total=0.982978, from[src500_face0=0.982978, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.982978, nonzero_bins=24
   Weight audit: error=0 pass=yes
   DEBUG n_active=0, n_coarse=1
   Iteration 4: 0 active, 1 coarse cells
-    psi_in: weight=0.983687, nonzero_bins=24
+    psi_in: weight=0.982978, nonzero_bins=24
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -158,41 +180,53 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 700 via CoarseList
-K2 CROSS: cell=700 (z=3), face=0, E_new=176.639, w=7.160831e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=176.621, w=4.894463e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=176.621, w=3.882599e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=182.384, w=2.095438e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=182.365, w=1.807658e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=188.307, w=2.043985e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=188.290, w=2.133368e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=182.365, w=1.154647e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=188.290, w=1.144795e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=176.583, w=6.605747e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=176.524, w=3.415056e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=176.441, w=4.891080e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=182.328, w=2.241583e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=182.271, w=1.338370e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=182.190, w=2.361533e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=188.253, w=2.497282e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=188.197, w=1.664825e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=188.118, w=3.357969e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=194.397, w=6.646307e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=194.379, w=8.151566e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=194.379, w=3.784082e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=194.343, w=9.162737e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=194.288, w=6.679604e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=700 (z=3), face=0, E_new=194.210, w=1.485548e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=134.851, w=1.818227e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=134.828, w=9.522300e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=139.194, w=4.420245e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=139.172, w=2.735147e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=134.828, w=3.081841e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=139.172, w=7.761130e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=134.783, w=2.885188e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=134.712, w=6.746134e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=134.612, w=2.160524e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=139.128, w=8.125214e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=139.058, w=2.068811e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=138.961, w=6.735043e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=143.659, w=3.529880e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=143.637, w=2.599179e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=148.232, w=9.278655e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=148.210, w=8.162616e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=143.637, w=6.468310e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=700 (z=3), face=0, E_new=148.210, w=1.789027e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=143.593, w=7.631879e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=143.525, w=2.110101e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=143.431, w=6.969173e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=148.167, w=2.391854e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=148.100, w=7.159030e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=700, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=700 (z=3), face=0, E_new=148.006, w=2.394652e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
     psi_out before K4: weight=0, nonzero_bins=0
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=900 (ix=100, iz=4): total=0.978328, from[src700_face0=0.978328, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
-    psi_out AFTER K4: weight=0.978328, nonzero_bins=35
+K4 SUMMARY cell=900 (ix=100, iz=4): total=0.977151, from[src700_face0=0.977151, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.977151, nonzero_bins=35
   Weight audit: error=0 pass=yes
   DEBUG n_active=0, n_coarse=1
   Iteration 5: 0 active, 1 coarse cells
-    psi_in: weight=0.978328, nonzero_bins=35
+    psi_in: weight=0.977151, nonzero_bins=35
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -202,48 +236,65 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 900 via CoarseList
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.639, w=3.333022e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.621, w=2.278137e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.621, w=2.042222e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.384, w=1.284433e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.365, w=1.136785e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.307, w=1.856560e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.290, w=2.019460e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.365, w=8.124757e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.290, w=1.211884e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.583, w=4.425535e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.524, w=3.388071e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.441, w=9.664354e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=176.331, w=6.816468e-08, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.328, w=2.028679e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.271, w=1.823185e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.190, w=6.560428e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=182.083, w=6.931125e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.253, w=3.421040e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.197, w=3.479424e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.118, w=1.462262e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=188.014, w=1.911367e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.397, w=1.194033e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.379, w=1.529796e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.674, w=2.886038e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.656, w=4.193061e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.379, w=8.039991e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.656, w=2.003685e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.343, w=2.520249e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.288, w=2.828876e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.210, w=1.331317e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=194.107, w=1.996373e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.621, w=6.853348e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.566, w=8.338304e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.490, w=4.284534e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=900 (z=4), face=0, E_new=200.388, w=7.099524e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.635, w=1.785578e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.611, w=7.253160e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.611, w=4.071007e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.851, w=5.308786e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.828, w=2.570462e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=139.194, w=5.758152e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=139.172, w=3.376547e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.828, w=1.270593e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=139.172, w=1.459656e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.565, w=4.669021e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=235, b_E=117, E=133.610 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.492, w=1.902635e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=235, b_E=117, E=133.610 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.390, w=2.850862e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=130.255, w=7.990917e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.783, w=1.613155e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.712, w=7.207663e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.612, w=1.187418e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=236, b_E=118, E=137.757 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=134.480, w=3.425308e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=139.128, w=2.076984e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=139.058, w=1.021297e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=138.961, w=1.847666e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=237, b_E=118, E=142.032 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=138.833, w=5.467626e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.659, w=2.705802e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.637, w=1.945623e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=148.232, w=4.708572e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=148.210, w=4.142224e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.637, w=7.344338e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=148.210, w=1.382706e-04, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.593, w=1.184747e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.525, w=6.425264e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.431, w=1.272523e-01, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=238, b_E=119, E=146.440 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=143.305, w=3.850437e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=900 (z=4), face=0, E_new=148.167, w=2.540156e-03, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=148.100, w=1.517324e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=148.006, w=3.271889e-02, z_old=-0.1875, z_new=0.2500
+K2 READ: cell=900, E_bin=239, b_E=119, E=150.984 (expected ~150)
+K2 CROSS: cell=900 (z=4), face=0, E_new=147.881, w=1.009027e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
     psi_out before K4: weight=0, nonzero_bins=0
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=1100 (ix=100, iz=5): total=0.942595, from[src900_face0=0.942595, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
-    psi_out AFTER K4: weight=0.942595, nonzero_bins=38
+K4 SUMMARY cell=1100 (ix=100, iz=5): total=0.947669, from[src900_face0=0.947669, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+    psi_out AFTER K4: weight=0.947669, nonzero_bins=46
   Weight audit: error=0 pass=yes
   Iteration 6: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -255,49 +306,57 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 1100 via CoarseList
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.639, w=1.551361e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.621, w=1.060363e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.621, w=1.060355e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.384, w=7.381459e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.365, w=6.632039e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.307, w=1.405412e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.290, w=1.565825e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.365, w=5.278789e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.290, w=1.050226e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.583, w=2.766303e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.524, w=2.793245e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.441, w=1.191266e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.331, w=1.682836e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.328, w=1.594104e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.271, w=1.906441e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.190, w=1.038503e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=182.083, w=2.236985e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.253, w=3.595173e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.197, w=4.902196e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.118, w=3.155190e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=188.014, w=8.564071e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.397, w=1.340886e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.379, w=1.761951e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.674, w=6.414935e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.656, w=9.585232e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.379, w=1.045293e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.656, w=5.205141e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.343, w=3.972833e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.288, w=6.007866e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.210, w=4.365821e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=194.107, w=1.377134e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.621, w=2.159016e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.566, w=3.553750e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.490, w=2.840424e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=200.388, w=1.001383e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=176.189, w=2.764290e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=181.944, w=1.213468e-08, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1100 (z=5), face=0, E_new=187.878, w=6.816357e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.541, w=2.103050e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.518, w=6.773154e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.635, w=7.316568e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.611, w=2.795083e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.518, w=5.786732e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.611, w=2.120316e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.469, w=7.710724e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.395, w=4.308641e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.291, w=1.110005e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=126.152, w=1.125720e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.565, w=3.093261e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.492, w=1.889754e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.390, w=5.370303e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.255, w=6.006842e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.851, w=9.803141e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.828, w=4.521411e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=139.194, w=6.302808e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=139.172, w=3.577530e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.828, w=3.020235e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=139.172, w=2.089385e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.783, w=4.884833e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.712, w=3.285679e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.612, w=1.033439e-01, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.480, w=1.275251e-01, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=139.128, w=3.801027e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=139.058, w=2.835583e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=138.961, w=9.897682e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=138.833, w=1.345773e-01, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=125.973, w=2.650292e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=130.080, w=1.476940e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=134.309, w=3.260851e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=138.666, w=3.563288e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.659, w=1.952126e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.637, w=1.384089e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=148.232, w=2.389425e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=148.210, w=2.102024e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.637, w=7.061600e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=148.210, w=9.536847e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.593, w=1.465079e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.525, w=1.219290e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.431, w=4.725730e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=143.305, w=7.054997e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=148.167, w=2.266964e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=148.100, w=2.104961e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=148.006, w=9.021411e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1100 (z=5), face=0, E_new=147.881, w=1.468647e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=1300 (ix=100, iz=6): total=0.861857, from[src1100_face0=0.861857, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1300 (ix=100, iz=6): total=0.623034, from[src1100_face0=0.623034, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 7: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -309,54 +368,52 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 1300 via CoarseList
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.639, w=7.220840e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.621, w=4.935479e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.621, w=5.448318e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.384, w=4.072556e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.365, w=3.695510e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.307, w=9.576016e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.290, w=1.083745e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.365, w=3.251279e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.290, w=8.070148e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.583, w=1.653048e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.524, w=2.067336e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.441, w=1.172707e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.331, w=2.489624e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.328, w=1.144751e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.271, w=1.704979e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.190, w=1.244515e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=182.083, w=4.070580e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.253, w=3.225708e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.197, w=5.503292e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.118, w=4.779636e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=188.014, w=1.991252e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.397, w=1.204803e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.379, w=1.609485e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.674, w=8.556668e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.656, w=1.302108e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.379, w=1.068513e-01, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.656, w=7.956909e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.343, w=4.741454e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.288, w=8.998936e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.210, w=8.867212e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=194.107, w=4.325723e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.621, w=3.854094e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.566, w=7.983040e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.490, w=8.689528e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=200.388, w=4.769755e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=170.608, w=2.420035e-12, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=170.421, w=1.348399e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.189, w=6.848627e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=176.007, w=1.348447e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=181.944, w=4.492207e-08, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=181.766, w=6.050094e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=187.878, w=3.291572e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1300 (z=6), face=0, E_new=187.704, w=1.287206e-09, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.567, w=2.912555e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.543, w=7.541551e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.543, w=9.147412e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.541, w=1.153007e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.518, w=3.529537e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.635, w=1.824479e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.611, w=6.686048e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.518, w=3.810139e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.611, w=6.399622e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.494, w=1.368548e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.417, w=9.468892e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.311, w=3.357399e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=122.169, w=5.741469e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.469, w=6.184230e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.395, w=4.654241e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.291, w=1.814414e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=126.152, w=3.437426e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.565, w=1.139062e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.492, w=9.393562e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.390, w=4.045555e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.255, w=8.507309e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=121.985, w=4.030275e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=121.748, w=7.552059e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=125.973, w=2.671200e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=125.742, w=5.328516e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=130.080, w=7.313284e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=129.855, w=1.543137e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.851, w=1.465104e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.828, w=6.541676e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=139.194, w=6.259757e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=139.172, w=3.477922e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.828, w=5.517417e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=139.172, w=2.568475e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.783, w=1.091545e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.712, w=9.953203e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.612, w=4.762957e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=134.480, w=1.114445e-01, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=139.128, w=5.740685e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=139.058, w=5.847436e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=138.961, w=3.127629e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1300 (z=6), face=0, E_new=138.833, w=8.156615e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=1500 (ix=100, iz=7): total=0.744369, from[src1300_face0=0.744369, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1500 (ix=100, iz=7): total=0.517780, from[src1300_face0=0.517780, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 8: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -368,58 +425,65 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 1500 via CoarseList
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.639, w=3.360953e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.621, w=2.297228e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.621, w=2.775500e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.384, w=2.184642e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.365, w=1.996333e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.307, w=6.090421e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.290, w=6.969177e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.365, w=1.926757e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.290, w=5.717676e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.583, w=9.568235e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.524, w=1.424809e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.441, w=1.008541e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.331, w=2.861399e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.328, w=7.720383e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.271, w=1.374151e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.190, w=1.257568e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=182.083, w=5.532743e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.253, w=2.603348e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.197, w=5.324733e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.118, w=5.824693e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=188.014, w=3.286589e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.397, w=9.473445e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.379, w=1.280339e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.674, w=8.878585e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.656, w=1.368553e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.379, w=9.424612e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.656, w=9.315135e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.343, w=4.764165e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.288, w=1.086328e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.210, w=1.352490e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=194.107, w=8.979104e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.621, w=5.141370e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.566, w=1.281862e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.490, w=1.767974e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=200.388, w=1.326355e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=170.608, w=6.052090e-12, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=170.421, w=3.441013e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=170.181, w=1.249589e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.189, w=1.015616e-09, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=176.007, w=3.381228e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=175.773, w=9.291218e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=181.944, w=9.274427e-08, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=181.766, w=2.246119e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=181.537, w=2.938827e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=187.878, w=8.359177e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=187.704, w=6.782659e-09, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1500 (z=7), face=0, E_new=187.480, w=4.201665e-12, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.709, w=4.671115e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.684, w=9.806606e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.567, w=2.063946e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.543, w=5.115380e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.684, w=1.619696e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.543, w=7.511024e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.633, w=2.658111e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.555, w=2.153874e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.446, w=9.524163e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.300, w=2.239293e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.494, w=1.327124e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.417, w=1.163307e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.311, w=5.629132e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=122.169, w=1.463399e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.541, w=3.745733e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.518, w=1.105552e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.635, w=3.587722e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.611, w=1.276541e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.518, w=1.441921e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.611, w=1.475610e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.469, w=2.768064e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.395, w=2.643106e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.291, w=1.406595e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=126.152, w=4.053463e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.565, w=3.113066e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.492, w=3.266072e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.390, w=1.923736e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.255, w=6.167646e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=118.112, w=2.585074e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=117.869, w=1.246346e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=117.558, w=1.715785e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=121.985, w=1.882974e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=121.748, w=1.014321e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=121.445, w=1.530511e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=125.973, w=5.812291e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=125.742, w=3.485816e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=125.446, w=5.700623e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=130.080, w=8.130912e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=129.855, w=2.596195e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=129.566, w=4.341831e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.851, w=1.937770e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.828, w=8.457651e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=139.194, w=4.989480e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=139.172, w=2.613059e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.828, w=8.627345e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=139.172, w=2.399148e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.783, w=2.029522e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.712, w=2.364902e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.612, w=1.553824e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=134.480, w=5.567801e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=139.128, w=6.232104e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=139.058, w=7.940212e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=138.961, w=5.690166e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1500 (z=7), face=0, E_new=138.833, w=2.214169e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=1700 (ix=100, iz=8): total=0.609431, from[src1500_face0=0.609431, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1700 (ix=100, iz=8): total=0.214185, from[src1500_face0=0.214185, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 9: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -431,65 +495,61 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 1700 via CoarseList
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.639, w=1.564362e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.621, w=1.069249e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.621, w=1.403767e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.384, w=1.148052e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.365, w=1.054587e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.307, w=3.689477e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.290, w=4.256532e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.365, w=1.108899e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.290, w=3.819500e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.583, w=5.407518e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.524, w=9.332735e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.441, w=7.918583e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.331, w=2.815844e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.328, w=4.970357e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.271, w=1.027976e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.190, w=1.131237e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=182.083, w=6.264313e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.253, w=1.946757e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.197, w=4.637386e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.118, w=6.119144e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=188.014, w=4.366106e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.397, w=6.811470e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.379, w=9.285432e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.674, w=7.897821e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.656, w=1.229017e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.379, w=7.514577e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.656, w=9.231744e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.343, w=4.252935e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.288, w=1.131223e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.210, w=1.702622e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=194.107, w=1.434039e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.621, w=5.706646e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.566, w=1.662088e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.490, w=2.776827e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=200.388, w=2.650563e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=170.608, w=9.032315e-12, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=170.421, w=5.207975e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=170.181, w=3.282377e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=169.871, w=9.588576e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.189, w=1.169278e-09, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=176.007, w=5.063292e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=175.773, w=2.735908e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=175.470, w=5.545889e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=181.944, w=1.414293e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=181.766, w=4.647793e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=181.537, w=1.100687e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=181.241, w=1.569706e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=187.878, w=1.508667e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=187.704, w=1.885206e-08, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=187.480, w=2.220546e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1700 (z=8), face=0, E_new=187.192, w=2.018420e-12, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.962, w=8.573642e-09, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.937, w=1.464493e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.937, w=3.210978e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.709, w=4.167517e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.684, w=8.413866e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.567, w=8.497759e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.543, w=2.038175e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.684, w=1.633436e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.543, w=3.509309e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.885, w=5.685029e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.805, w=5.211237e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.693, w=2.720304e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.544, w=8.001876e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.633, w=3.093510e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.555, w=3.051510e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.446, w=1.734536e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.300, w=5.622223e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.494, w=7.164922e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.417, w=7.653711e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.311, w=4.760297e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=122.169, w=1.704735e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.350, w=1.261708e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=114.102, w=9.696364e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=113.783, w=3.049770e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=113.370, w=2.654159e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=118.112, w=9.883959e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=117.869, w=8.572225e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=117.558, w=3.083007e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=117.155, w=3.120344e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=121.985, w=3.340929e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=121.748, w=3.257248e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=121.445, w=1.326036e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=121.051, w=1.520224e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.541, w=9.413293e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.518, w=2.704174e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.635, w=6.128702e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.611, w=2.133956e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.518, w=4.131331e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.611, w=2.890365e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.469, w=9.180846e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.395, w=1.070341e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.291, w=7.328629e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=126.152, w=2.910790e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.565, w=7.076409e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.492, w=9.092255e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.390, w=6.906683e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1700 (z=8), face=0, E_new=130.255, w=3.058336e-02, z_old=-0.1875, z_new=0.2500
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=1900 (ix=100, iz=9): total=0.475932, from[src1700_face0=0.475932, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=1900 (ix=100, iz=9): total=0.155451, from[src1700_face0=0.155451, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 10: 0 active, 1 coarse cells
-    Energy so far: 27.428 MeV
+    Energy so far: 28.172 MeV
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -499,62 +559,59 @@ clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 1900 via CoarseList
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.639, w=7.281352e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.621, w=4.976839e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.621, w=7.056578e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.384, w=5.939174e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.365, w=5.477745e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.307, w=2.155423e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.290, w=2.502463e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.365, w=6.236780e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.290, w=2.439876e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.583, w=2.999508e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.524, w=5.883571e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.441, w=5.820864e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.331, w=2.491410e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.328, w=3.087118e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.271, w=7.270019e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.190, w=9.348632e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=182.083, w=6.248577e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.253, w=1.374101e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.197, w=3.733486e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.118, w=5.769671e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=188.014, w=4.985240e-05, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.397, w=4.592026e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.379, w=6.301640e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.674, w=6.323894e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.656, w=9.913350e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.379, w=5.564993e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.656, w=8.151046e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.343, w=3.480904e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.288, w=1.057358e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.210, w=1.866835e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=194.107, w=1.908456e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.621, w=5.570745e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.566, w=1.855044e-02, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.490, w=3.640832e-03, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=200.388, w=4.226917e-04, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=170.608, w=1.044699e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=170.421, w=6.085921e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=170.181, w=5.091557e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=169.871, w=2.780421e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.189, w=1.152149e-09, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=176.007, w=5.880688e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=175.773, w=4.803221e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=175.470, w=1.792262e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=181.944, w=1.778700e-07, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=181.766, w=7.100531e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=181.537, w=2.294766e-10, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=181.241, w=6.286408e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=187.878, w=2.185239e-06, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=187.704, w=3.715608e-08, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=187.480, w=6.188351e-11, z_old=-0.1875, z_new=0.2500
-K2 CROSS: cell=1900 (z=9), face=0, E_new=187.192, w=1.074808e-11, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=111.324, w=1.783720e-09, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=111.298, w=2.477847e-09, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.962, w=9.433077e-09, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.937, w=1.554396e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=111.298, w=7.105151e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.937, w=3.921161e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=111.245, w=1.340406e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=111.163, w=1.357957e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=111.048, w=8.083771e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=110.895, w=2.819637e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.885, w=7.869370e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.805, w=8.537216e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.693, w=5.507938e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.544, w=2.108932e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.709, w=2.127811e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.684, w=4.167846e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.567, w=2.666562e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.543, w=6.236898e-08, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.684, w=9.284640e-07, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.543, w=1.230310e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.633, w=1.995500e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.555, w=2.331534e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.446, w=1.637578e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.300, w=6.900759e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.494, w=2.854959e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.417, w=3.617473e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.311, w=2.781644e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=122.169, w=1.294864e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=110.697, w=5.552029e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=110.442, w=5.744578e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=110.115, w=2.758184e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=109.691, w=4.840716e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.350, w=4.623212e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=114.102, w=5.418185e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=113.783, w=3.022784e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=113.370, w=6.491021e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=118.112, w=1.683868e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=117.869, w=2.225411e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=117.558, w=1.425008e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=117.155, w=3.624164e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=121.985, w=2.174272e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=121.748, w=1.741089e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=121.445, w=1.150352e-02, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=121.051, w=3.023589e-03, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=109.134, w=1.643909e-06, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=112.826, w=3.250602e-05, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=116.625, w=2.343153e-04, z_old=-0.1875, z_new=0.2500
+K2 CROSS: cell=1900 (z=9), face=0, E_new=120.534, w=2.034624e-04, z_old=-0.1875, z_new=0.2500
     K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=2100 (ix=100, iz=10): total=0.356811, from[src1900_face0=0.356811, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=2100 (ix=100, iz=10): total=0.062072, from[src1900_face0=0.062072, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 11: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -567,10 +624,10 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 2100 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=2300 (ix=100, iz=11): total=0.258286, from[src2100_face0=0.258286, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=2300 (ix=100, iz=11): total=0.053228, from[src2100_face0=0.053228, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 12: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -586,7 +643,7 @@ K2: Thread 0 assigned to cell 2300 via CoarseList
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=2500 (ix=100, iz=12): total=0.181407, from[src2300_face0=0.181407, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=2500 (ix=100, iz=12): total=0.019196, from[src2300_face0=0.019196, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 13: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -599,10 +656,10 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 2500 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=2700 (ix=100, iz=13): total=0.124127, from[src2500_face0=0.124127, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=2700 (ix=100, iz=13): total=0.014943, from[src2500_face0=0.014943, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 14: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -615,10 +672,10 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 2700 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=2900 (ix=100, iz=14): total=0.083022, from[src2700_face0=0.083022, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=2900 (ix=100, iz=14): total=0.005271, from[src2700_face0=0.005271, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 15: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -634,7 +691,7 @@ K2: Thread 0 assigned to cell 2900 via CoarseList
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=3100 (ix=100, iz=15): total=0.054432, from[src2900_face0=0.054432, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=3100 (ix=100, iz=15): total=0.004550, from[src2900_face0=0.004550, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 16: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -650,7 +707,7 @@ K2: Thread 0 assigned to cell 3100 via CoarseList
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=3300 (ix=100, iz=16): total=0.035064, from[src3100_face0=0.035064, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=3300 (ix=100, iz=16): total=0.002168, from[src3100_face0=0.002168, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 17: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -663,10 +720,10 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 3300 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=3500 (ix=100, iz=17): total=0.022235, from[src3300_face0=0.022235, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=3500 (ix=100, iz=17): total=0.001605, from[src3300_face0=0.001605, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 18: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -682,7 +739,7 @@ K2: Thread 0 assigned to cell 3500 via CoarseList
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=3700 (ix=100, iz=18): total=0.013903, from[src3500_face0=0.013903, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
+K4 SUMMARY cell=3700 (ix=100, iz=18): total=0.001149, from[src3500_face0=0.001149, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 19: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -695,13 +752,12 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 3700 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=3900 (ix=100, iz=19): total=0.008584, from[src3700_face0=0.008584, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 20: 0 active, 1 coarse cells
-    Energy so far: 32.8808 MeV
+    Energy so far: 29.7752 MeV
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -715,7 +771,6 @@ K2: Thread 0 assigned to cell 3900 via CoarseList
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=4100 (ix=100, iz=20): total=0.005239, from[src3900_face0=0.005239, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 21: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -728,10 +783,9 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 4100 via CoarseList
     K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=4300 (ix=100, iz=21): total=0.003164, from[src4100_face0=0.003164, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 22: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -747,7 +801,6 @@ K2: Thread 0 assigned to cell 4300 via CoarseList
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=4500 (ix=100, iz=22): total=0.001893, from[src4300_face0=0.001893, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 23: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -763,7 +816,6 @@ K2: Thread 0 assigned to cell 4500 via CoarseList
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-K4 SUMMARY cell=4700 (ix=100, iz=23): total=0.001122, from[src4500_face0=0.001122, src-1_face1=0.000000, src-1_face2=0.000000, src-1_face3=0.000000]
   Weight audit: error=0 pass=yes
   Iteration 24: 0 active, 1 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
@@ -776,8 +828,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 4700 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 25: 0 active, 1 coarse cells
@@ -791,8 +843,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 4900 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 26: 0 active, 1 coarse cells
@@ -806,8 +858,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 5100 via CoarseList
     K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 27: 0 active, 1 coarse cells
@@ -851,12 +903,12 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 5700 via CoarseList
     K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 30: 0 active, 1 coarse cells
-    Energy so far: 32.955 MeV
+    Energy so far: 29.7838 MeV
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -867,8 +919,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 5900 via CoarseList
     K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 31: 0 active, 1 coarse cells
@@ -882,8 +934,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 6100 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 32: 0 active, 1 coarse cells
@@ -897,8 +949,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 6300 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 33: 0 active, 1 coarse cells
@@ -927,8 +979,8 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 6700 via CoarseList
     K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
   Iteration 35: 0 active, 1 coarse cells
@@ -942,11 +994,13 @@ clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=429
     Calling K2 with n_coarse=1
 K2: Thread 0 assigned to cell 6900 via CoarseList
     K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 36: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=64 < b_E_trigger=75)
+  DEBUG n_active=1, n_coarse=0
+  Iteration 36: 1 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -954,14 +1008,66 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 7100 via CoarseList
-    K2 complete
+K3: Processing active cell 7100 (n_active=1, first_bid=262150)
+K3: lidx=17 has weight=0.000000
+K3: Particle remains in cell, E_new=3.543, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=18 has weight=0.000000
+K3: Particle remains in cell, E_new=4.222, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=20 has weight=0.000000
+K3: Particle remains in cell, E_new=4.650, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=21 has weight=0.000000
+K3: Particle remains in cell, E_new=3.874, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=22 has weight=0.000000
+K3: Particle remains in cell, E_new=4.210, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=5.122, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.107, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.675, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.102, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.102, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.076, w_new=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.105, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.303, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.781, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=7.288, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=7.425, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.564, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=6.816, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=7.629, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=7.525, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=0.105, w_new=0.000000
+K3: Writing particle to psi_out
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 37: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=58 < b_E_trigger=75)
+  DEBUG n_active=1, n_coarse=0
+  Iteration 37: 1 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -969,14 +1075,29 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 7300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K3: Processing active cell 7100 (n_active=1, first_bid=237574)
+K3: lidx=49 has weight=0.000000
+K3: Particle remains in cell, E_new=2.792, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=3.369, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=1.985, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=4.330, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.790, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.244, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 38: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=54 < b_E_trigger=75)
+K1 ACTIVE SET: cell=7101, W_cell=0.000000, needs_fine=true (b_E=58 < b_E_trigger=75)
+  DEBUG n_active=2, n_coarse=0
+  Iteration 38: 2 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -984,14 +1105,27 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 7500 via CoarseList
-    K2 complete
+K3: Processing active cell 7100 (n_active=2, first_bid=221190)
+K3: Particle remains in cell, E_new=1.087, w_new=0.000000
+K3: Writing particle to psi_out
+K3: lidx=81 has weight=0.000000
+K3: Particle remains in cell, E_new=1.290, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=2.183, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: Particle remains in cell, E_new=3.479, w_new=0.000000
+K3: Writing particle to psi_out
+K3: Particle remains in cell, E_new=0.246, w_new=0.000000
+K3: Writing particle to psi_out
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 39: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=39 < b_E_trigger=75)
+K1 ACTIVE SET: cell=7101, W_cell=0.000000, needs_fine=true (b_E=44 < b_E_trigger=75)
+  DEBUG n_active=2, n_coarse=0
+  Iteration 39: 2 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -999,15 +1133,19 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 7700 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K3: Processing active cell 7100 (n_active=2, first_bid=159749)
+K3: Particle remains in cell, E_new=0.351, w_new=0.000000
+K3: Writing particle to psi_out
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 40: 0 active, 1 coarse cells
-    Energy so far: 32.9554 MeV
+K1 ACTIVE SET: cell=7300, W_cell=0.000000, needs_fine=true (b_E=0 < b_E_trigger=75)
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=20 < b_E_trigger=75)
+K1 ACTIVE SET: cell=7101, W_cell=0.000000, needs_fine=true (b_E=36 < b_E_trigger=75)
+  DEBUG n_active=3, n_coarse=0
+  Iteration 40: 3 active, 0 coarse cells
+    Energy so far: 29.7838 MeV
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -1015,14 +1153,18 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 7900 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K3: Processing active cell 7100 (n_active=3, first_bid=81926)
+K3: lidx=117 has weight=0.000000
+K3: Particle remains in cell, E_new=0.355, w_new=0.000000
+K3: Writing particle to psi_out
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 41: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=20 < b_E_trigger=75)
+K1 ACTIVE SET: cell=7300, W_cell=0.000000, needs_fine=true (b_E=0 < b_E_trigger=75)
+  DEBUG n_active=2, n_coarse=0
+  Iteration 41: 2 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -1030,14 +1172,17 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 8100 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K3: Processing active cell 7100 (n_active=2, first_bid=81926)
+K3: lidx=118 has weight=0.000000
+K3: Particle remains in cell, E_new=0.206, w_new=0.000000
+K3: Writing particle to psi_out
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 42: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7100, W_cell=0.000000, needs_fine=true (b_E=11 < b_E_trigger=75)
+  DEBUG n_active=1, n_coarse=0
+  Iteration 42: 1 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -1045,14 +1190,15 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 8300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
+K3: Processing active cell 7100 (n_active=1, first_bid=45062)
+K3: lidx=119 has weight=0.000000
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
+K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 43: 0 active, 1 coarse cells
+K1 ACTIVE SET: cell=7300, W_cell=0.000000, needs_fine=true (b_E=0 < b_E_trigger=75)
+  DEBUG n_active=1, n_coarse=0
+  Iteration 43: 1 active, 0 coarse cells
 clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
 clear_buckets_kernel: Clearing bucket 0
 clear_buckets_kernel: Clearing bucket 1
@@ -1060,657 +1206,33 @@ clear_buckets_kernel: Clearing bucket 2
 clear_buckets_kernel: Clearing bucket 3
 clear_buckets_kernel: Clearing bucket 4
 clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 8500 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 44: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 8700 via CoarseList
-    K2 complete
+K3: Processing active cell 7300 (n_active=1, first_bid=5)
+K3: lidx=3 has weight=0.000000
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
+K3: lidx=7 has weight=0.000000
+K3 BOUNDARY DEBUG [lidx=7]: z_cell=-0.1875, x_cell=-0.1875, half_dz=0.2500, mu_init=0.8995, eta_init=0.4369
+K3 BOUNDARY DEBUG [lidx=7]: step_to_z_plus=0.4864, step_to_z_minus=1000000015047466219876688855040.0000, step_to_x_plus=1.0013, step_to_x_minus=1000000015047466219876688855040.0000
+K3 ENERGY DEBUG [lidx=7]: E=0.105 -> E_new=0.000, dE=0.1047, mean_dE=0.1047
+K3 RANGE DEBUG [lidx=7]: R_current=0.002, step=0.1000, R_after=-0.098, E_from_R_after=0.100
+K3 STEP DEBUG [lidx=7]: step_phys=0.1000, step_boundary=0.4864, actual_step=0.1000
+K3 LUT DEBUG: E_min=0.100, E_max=250.000, N_E=256
+K3 POSITION DEBUG [lidx=7]: x_cell=-0.1875, z_cell=-0.1875 -> x_new=-0.1886, z_new=-0.0981 (half_dx=0.2500, half_dz=0.2500)
+K3 EXIT FACE DEBUG [lidx=7]: exit_face=-1
+K3: Particle remains in cell, E_new=0.000, w_new=0.000000
 K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
 K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
 K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
   Weight audit: error=0 pass=yes
-  Iteration 45: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 8900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 46: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 9100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 47: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 9300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 48: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 9500 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 49: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 9700 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 50: 0 active, 1 coarse cells
-    Energy so far: 32.9554 MeV
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 9900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 51: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 10100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 52: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 10300 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 53: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 10500 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 54: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 10700 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 55: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 10900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 56: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 11100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 57: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 11300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 58: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 11500 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 59: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 11700 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 60: 0 active, 1 coarse cells
-    Energy so far: 32.9554 MeV
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 11900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 61: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 12100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 62: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 12300 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 63: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 12500 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 64: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 12700 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 65: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 12900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 66: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 13100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 67: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 13300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 68: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 13500 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 69: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 13700 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 70: 0 active, 1 coarse cells
-    Energy so far: 32.9554 MeV
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 13900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 71: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 14100 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 72: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 14300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 73: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 14500 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 74: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 14700 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 75: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 14900 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 76: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 15100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 77: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 15300 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 78: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 15500 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 79: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 15700 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 80: 0 active, 1 coarse cells
-    Energy so far: 32.9554 MeV
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 15900 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 81: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 16100 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 82: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 16300 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 83: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 16500 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 84: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 16700 via CoarseList
-    K2 complete
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 85: 0 active, 1 coarse cells
-clear_buckets_kernel: BEFORE clear, bucket 400 slot0_bid=4294967295
-clear_buckets_kernel: Clearing bucket 0
-clear_buckets_kernel: Clearing bucket 1
-clear_buckets_kernel: Clearing bucket 2
-clear_buckets_kernel: Clearing bucket 3
-clear_buckets_kernel: Clearing bucket 4
-clear_buckets_kernel: AFTER clear, bucket 400 slot0_bid=4294967295 (expected=4294967295)
-    Calling K2 with n_coarse=1
-K2: Thread 0 assigned to cell 16900 via CoarseList
-    K2 complete
-K4: Reading from bucket 400 (cell=100, face=0), slot0_bid=4294967295
-K4: Reading from bucket 402 (cell=100, face=2), slot0_bid=4294967295
-K4: Reading from bucket 403 (cell=100, face=3), slot0_bid=4294967295
-  Weight audit: error=0 pass=yes
-  Iteration 86: 0 active, 0 coarse cells
+  Iteration 44: 0 active, 0 coarse cells
   No active cells remaining, transport complete
-K1-K6 pipeline: completed 86 iterations
+K1-K6 pipeline: completed 44 iterations
 GPU K1-K6 pipeline complete.
-DEBUG: Total energy deposited = 32.9554 MeV (expected ~150 MeV)
+DEBUG: Total energy deposited = 29.7838 MeV (expected ~150 MeV)
   Energy deposition extracted
 K1-K6 pipeline wrapper complete.
 GPU transport complete.
 Simulation complete.
-  Bragg Peak: 0 mm depth, 3.41141 Gy
+  Bragg Peak: 2.5 mm depth, 3.85288 Gy
 
 --- Saving Results ---
   2D dose saved to: results/dose_2d.txt

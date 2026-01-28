@@ -170,7 +170,9 @@ __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, 
     }
 
     delta_R_max = delta_R_max * dS_factor;
-    delta_R_max = fminf(delta_R_max, 1.0f);
+    // H5 FIX: Removed 1.0mm cap per SPEC.md:203 which requires delta_R_max = 0.02 * R
+    // At 150 MeV: delta_R_max = 0.02 * 157.7mm = 3.15mm (was limited to 1.0mm)
+    // This 3.15x smaller step size was causing particles to stop at 42mm instead of 158mm
 
     // CRITICAL FIX: Minimum step must allow boundary crossing in 2-3 iterations
     // Cell half-width = 0.25mm, so minimum step should be at least 0.1mm
