@@ -478,6 +478,7 @@ bool run_k3_fine_transport(
     int blocks = (n_active + threads - 1) / threads;
 
     // Call K3_FineTransport kernel
+    // Physics flags: enable all physics for normal pipeline operation
     K3_FineTransport<<<blocks, threads>>>(
         psi_in.block_id,
         psi_in.value,
@@ -489,6 +490,9 @@ bool run_k3_fine_transport(
         d_E_edges,
         config.N_theta, config.N_E,
         config.N_theta_local, config.N_E_local,
+        true,   // enable_straggling (full physics)
+        true,   // enable_nuclear (full physics)
+        true,   // enable_mcs (full physics)
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
         state.d_AbsorbedWeight_nuclear,

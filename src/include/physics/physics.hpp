@@ -20,3 +20,21 @@ struct ComponentState {
     float mu;     // Direction cosine = cos(theta)
     float eta;    // Direction sine = sin(theta)
 };
+
+// Physics process configuration for transport
+// Allows selective enabling/disabling of physics processes for testing
+struct PhysicsConfig {
+    bool enable_straggling = true;   // Energy straggling (Vavilov model)
+    bool enable_nuclear = true;      // Nuclear interactions (ICRU 63)
+    bool enable_mcs = true;          // Multiple Coulomb Scattering (Highland)
+
+    // Convenience helper for energy-loss-only mode (Bethe-Bloch only)
+    static PhysicsConfig energy_loss_only() {
+        return PhysicsConfig{false, false, false};
+    }
+
+    // Convenience helper for full physics (default)
+    static PhysicsConfig full_physics() {
+        return PhysicsConfig{true, true, true};
+    }
+};

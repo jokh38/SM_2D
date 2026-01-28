@@ -140,7 +140,7 @@ __device__ inline float device_compute_energy_after_step(const DeviceRLUT& lut, 
     float R_current = device_lookup_R(lut, E);
     float R_new = R_current - step_length;
 
-    if (R_new <= 0) return 0.0f;
+    if (R_new <= 0) return lut.E_min;  // Return E_min instead of 0 to avoid clamping issues
     return device_lookup_E_inverse(lut, R_new);
 }
 
@@ -162,34 +162,40 @@ __device__ inline float device_compute_energy_deposition(const DeviceRLUT& lut, 
 __device__ inline float device_compute_max_step(const DeviceRLUT& lut, float E, float dx = 1.0f, float dz = 1.0f) {
     float R = device_lookup_R(lut, E);
 
-    // Base: 2% of remaining range
-    float delta_R_max = 0.02f * R;
+    // Base: 1% of remaining range (reduced from 2% for better accuracy)
+    float delta_R_max = 0.01f * R;
 
     // Option D2: Adaptive step size per energy group
     // Each group has a minimum step to ensure particles cross energy bins
     float step_min_group;
 
     if (E < 2.0f) {
-        // [0.1-2 MeV]: 0.1 MeV/bin, use 0.2mm step to cross bins
-        step_min_group = 0.2f;
+        // [0.1-2 MeV]: 0.1 MeV/bin, use 0.1mm step to cross bins
+        step_min_group = 0.1f;
     } else if (E < 20.0f) {
-        // [2-20 MeV]: 0.25 MeV/bin, use 0.5mm step
-        step_min_group = 0.5f;
+        // [2-20 MeV]: 0.25 MeV/bin, use 0.25mm step
+        step_min_group = 0.25f;
     } else if (E < 100.0f) {
-        // [20-100 MeV]: 0.5 MeV/bin, use 1.0mm step
-        step_min_group = 1.0f;
+        // [20-100 MeV]: 0.5 MeV/bin, use 0.5mm step
+        step_min_group = 0.5f;
     } else {
-        // [100-250 MeV]: 1 MeV/bin, use 2.0mm step
-        step_min_group = 2.0f;
+        // [100-250 MeV]: 1 MeV/bin, use 1.0mm step
+        step_min_group = 1.0f;
     }
 
-    // Use the larger of: 2% of range OR group minimum step
+    // Use the larger of: 1% of range OR group minimum step
     delta_R_max = fmaxf(delta_R_max, step_min_group);
 
     // Additional refinement near Bragg peak for accuracy
     if (E < 0.5f) {
         // End of range - use very small steps
-        delta_R_max = fminf(delta_R_max, 0.1f);
+        delta_R_max = fminf(delta_R_max, 0.05f);
+    } else if (E < 5.0f) {
+        // Near Bragg peak - use smaller steps
+        delta_R_max = fminf(delta_R_max, 0.2f);
+    } else if (E < 20.0f) {
+        // Medium energy - use moderate steps
+        delta_R_max = fminf(delta_R_max, 0.5f);
     }
 
     // REMOVED: Artificial cell_limit was causing step size to be limited to 0.125mm (0.25 * 0.5mm)

@@ -119,15 +119,18 @@ __global__ void K2_CoarseTransport(
             float dtheta = (theta_max - theta_min) / N_theta;
             float theta = theta_min + (theta_bin + 0.5f) * dtheta;
 
-            // Option D2: Use actual bin edges for energy (works for both log-spaced and piecewise-uniform)
-            // For log-spaced: this gives midpoint (approx geometric mean)
-            // For piecewise-uniform: this gives exact midpoint
-            float E = 0.5f * (E_edges[E_bin] + E_edges[E_bin + 1]);
+            // CRITICAL: Use the same energy calculation as K3 for consistency
+            // K3 uses lower edge + 20% of half-width to ensure energy actually decreases
+            // K2 must use the same calculation to avoid energy jumps when transitioning
+            float E_lower = E_edges[E_bin];
+            float E_upper = E_edges[E_bin + 1];
+            float E_half_width = (E_upper - E_lower) * 0.5f;
+            float E = E_lower + 0.50f * E_half_width;  // 50% of half-width from lower edge
 
             // H7 DEBUG: Print energy being read from bin
             if (cell % 200 == 100 && (cell / 200) < 5 && weight > 0.01f) {
-                printf("K2 READ: cell=%d, E_bin=%d, b_E=%d, E=%.3f (expected ~150)\n",
-                       cell, E_bin, b_E, E);
+                printf("K2 READ: cell=%d, E_bin=%d, b_E=%d, E_lower=%.3f, E_upper=%.3f, E=%.3f (expected ~150)\n",
+                       cell, E_bin, b_E, E_lower, E_upper, E);
             }
 
             // Cutoff check

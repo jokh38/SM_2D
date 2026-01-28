@@ -92,13 +92,12 @@ void run_k1k6_pipeline_transport(
 
     // Create grids
     // Option D2: Piecewise-uniform energy grid (must match gpu_transport_runner.cpp)
-    // [0.1-2 MeV]: 0.1 MeV/bin (19 bins), [2-20 MeV]: 0.25 MeV/bin (72 bins)
-    // [20-100 MeV]: 0.5 MeV/bin (160 bins), [100-250 MeV]: 1 MeV/bin (150 bins)
+    // Use finer energy resolution at high energies for accurate energy tracking
     std::vector<std::tuple<float, float, float>> energy_groups = {
         {0.1f, 2.0f, 0.1f},      // 19 bins - Bragg peak core
-        {2.0f, 20.0f, 0.25f},    // 72 bins - Bragg peak falloff
-        {20.0f, 100.0f, 0.5f},   // 160 bins - Mid-energy plateau
-        {100.0f, 250.0f, 1.0f}    // 150 bins - High energy
+        {2.0f, 20.0f, 0.2f},     // 90 bins - Bragg peak falloff (finer)
+        {20.0f, 100.0f, 0.25f},  // 320 bins - Mid-energy plateau (finer)
+        {100.0f, 250.0f, 0.25f}   // 600 bins - High energy (MUCH FINER for tracking)
     };
     EnergyGrid e_grid(energy_groups);  // Option D2: piecewise-uniform
     AngularGrid a_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);

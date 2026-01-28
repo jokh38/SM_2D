@@ -54,6 +54,10 @@ __global__ void K3_FineTransport(
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
     int N_theta_local, int N_E_local,
+    // Physics configuration flags (for testing/validation)
+    bool enable_straggling,   // Enable energy straggling (Vavilov)
+    bool enable_nuclear,      // Enable nuclear interactions
+    bool enable_mcs,          // Enable multiple Coulomb scattering
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
@@ -148,11 +152,23 @@ __global__ void K3_FineTransport(
 
             // H6 FIX: Use piecewise-uniform energy grid (Option D2) instead of log-spaced
             // The E_edges array contains the actual bin edges for the piecewise-uniform grid
-            // Use linear interpolation between edges: E = E_lower + frac * (E_upper - E_lower)
-            // For representative value, use bin midpoint: E = (E_lower + E_upper) / 2
+            //
+            // CRITICAL FIX FOR ENERGY TRACKING:
+            // Using the bin midpoint causes energy to "reset" in each iteration because
+            // the phase space only stores which bin a particle is in, not the continuous
+            // energy value. To ensure actual energy loss across iterations, we use the
+            // lower edge PLUS a small fraction of the bin width (20% of half-width).
+            //
+            // This ensures particles actually move to lower bins as they lose energy:
+            //   - Particle in bin [150, 151] uses E ≈ 150.10 for physics (20% offset)
+            //   - Loses 0.24 MeV → E_new ≈ 149.86
+            //   - Gets binned to [149, 150] (since 149.86 < 150)
+            //   - Next iteration uses E ≈ 149.10 for physics
+            //   - Energy actually decreases over time!
             float E_lower = E_edges[E_bin];
             float E_upper = E_edges[E_bin + 1];
-            float E = 0.5f * (E_lower + E_upper);  // Bin midpoint (Option D2 piecewise-uniform)
+            float E_half_width = (E_upper - E_lower) * 0.5f;
+            float E = E_lower + 0.50f * E_half_width;  // 50% of half-width from lower edge
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -219,10 +235,16 @@ __global__ void K3_FineTransport(
             float x_mid = x_cell + eta_init * half_step;
             float z_mid = z_cell + mu_init * half_step;
 
-            // Energy loss with straggling for actual range step
+            // Energy loss with optional straggling for actual range step
             float mean_dE = device_compute_energy_deposition(dlut, E, actual_range_step);
-            float sigma_dE = device_energy_straggling_sigma(E, actual_range_step, 1.0f);
-            float dE = device_sample_energy_loss(mean_dE, sigma_dE, seed);
+            float dE;
+            if (enable_straggling) {
+                float sigma_dE = device_energy_straggling_sigma(E, actual_range_step, 1.0f);
+                dE = device_sample_energy_loss(mean_dE, sigma_dE, seed);
+            } else {
+                // Energy loss only mode: use mean Bethe-Bloch energy loss (no straggling)
+                dE = mean_dE;
+            }
             dE = fminf(dE, E);
 
             float E_new = E - dE;
@@ -239,10 +261,18 @@ __global__ void K3_FineTransport(
                 printf("K3 LUT DEBUG: E_min=%.3f, E_max=%.3f, N_E=%d\n", dlut.E_min, dlut.E_max, dlut.N_E);
             }
 
-            // Nuclear attenuation for actual range step
+            // Nuclear attenuation for actual range step (optional)
             float w_rem, E_rem;
-            float w_new = device_apply_nuclear_attenuation(weight, E, actual_range_step, w_rem, E_rem);
-            edep += E_rem;
+            float w_new;
+            if (enable_nuclear) {
+                w_new = device_apply_nuclear_attenuation(weight, E, actual_range_step, w_rem, E_rem);
+                edep += E_rem;
+            } else {
+                // Energy loss only mode: no nuclear attenuation
+                w_new = weight;
+                w_rem = 0.0f;
+                E_rem = 0.0f;
+            }
 
             // H6 FIX: Variance-based MCS accumulation (simplified implementation)
             // Instead of random scattering at every step, we use a deterministic
@@ -253,27 +283,29 @@ __global__ void K3_FineTransport(
             // and apply 7-point quadrature when threshold exceeded. This simplified
             // version applies a small deterministic correction to maintain forward
             // penetration while preserving scattering moments.
-            float sigma_mcs = device_highland_sigma(E, actual_range_step);
+            float theta_scatter = 0.0f;  // Default: no scattering
+            if (enable_mcs) {
+                float sigma_mcs = device_highland_sigma(E, actual_range_step);
 
-            // H6: At high energies, use reduced scattering to maintain forward penetration
-            // As energy decreases near Bragg peak, allow more scattering
-            float scattering_reduction_factor;
-            if (E > 100.0f) {
-                scattering_reduction_factor = 0.3f;  // Minimal scattering at high energy
-            } else if (E > 50.0f) {
-                scattering_reduction_factor = 0.5f;  // Moderate reduction
-            } else if (E > 20.0f) {
-                scattering_reduction_factor = 0.7f;  // Light reduction
-            } else {
-                scattering_reduction_factor = 1.0f;  // Full scattering near Bragg peak
-            }
+                // H6: At high energies, use reduced scattering to maintain forward penetration
+                // As energy decreases near Bragg peak, allow more scattering
+                float scattering_reduction_factor;
+                if (E > 100.0f) {
+                    scattering_reduction_factor = 0.3f;  // Minimal scattering at high energy
+                } else if (E > 50.0f) {
+                    scattering_reduction_factor = 0.5f;  // Moderate reduction
+                } else if (E > 20.0f) {
+                    scattering_reduction_factor = 0.7f;  // Light reduction
+                } else {
+                    scattering_reduction_factor = 1.0f;  // Full scattering near Bragg peak
+                }
 
-            // Apply reduced scattering: use a small deterministic offset instead of random
-            // This preserves the mean (zero) while reducing lateral variance spread
-            float theta_scatter = 0.0f;  // No random sampling - preserve forward direction
-            // Only apply small random component reduced by factor, to account for residual
-            if (sigma_mcs > 0.0f) {
-                theta_scatter = device_sample_mcs_angle(sigma_mcs * scattering_reduction_factor, seed);
+                // Apply reduced scattering: use a small deterministic offset instead of random
+                // This preserves the mean (zero) while reducing lateral variance spread
+                // Only apply small random component reduced by factor, to account for residual
+                if (sigma_mcs > 0.0f) {
+                    theta_scatter = device_sample_mcs_angle(sigma_mcs * scattering_reduction_factor, seed);
+                }
             }
             float theta_new = theta + theta_scatter;
 
@@ -325,8 +357,12 @@ __global__ void K3_FineTransport(
                 // Write directly to global memory
                 int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
                 DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                // Use bilinear interpolation for improved accuracy
-                device_emit_component_to_bucket_4d_interp(
+                // CRITICAL FIX: Use non-interpolating emission to prevent bucket overflow
+                // Bilinear interpolation splits particles across 4 (theta,E) bins, causing
+                // quadratic growth in unique block IDs that exceeds DEVICE_Kb_out=8 slots.
+                // For energy-loss-only mode (theta~0), nearest neighbor is more accurate
+                // AND prevents weight loss from bucket overflow.
+                device_emit_component_to_bucket_4d(
                     bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
                     theta_edges, E_edges, N_theta, N_E,
                     N_theta_local, N_E_local

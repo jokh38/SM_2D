@@ -29,6 +29,7 @@ struct K3Result {
 
 // P1 FIX: Updated GPU kernel signature with device LUT and bucket support
 // This replaces the stub implementation with full physics transport
+// Physics flags added for selective process enabling (testing/validation)
 __global__ void K3_FineTransport(
     // Inputs
     const uint32_t* __restrict__ block_ids_in,
@@ -44,6 +45,10 @@ __global__ void K3_FineTransport(
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
     int N_theta_local, int N_E_local,
+    // Physics configuration flags (for testing/validation)
+    bool enable_straggling,   // Enable energy straggling (Vavilov)
+    bool enable_nuclear,      // Enable nuclear interactions
+    bool enable_mcs,          // Enable multiple Coulomb scattering
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
