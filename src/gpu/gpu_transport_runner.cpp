@@ -70,21 +70,22 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
 
     // Energy grid: piecewise-uniform (Option D2)
     // Format: {{E_start, E_end, resolution}, ...}
+    // Use finer resolution at high energies for accurate energy tracking
     std::vector<std::tuple<float, float, float>> energy_groups = {
         {0.1f, 2.0f, 0.1f},      // 19 bins - Bragg peak core
-        {2.0f, 20.0f, 0.25f},    // 72 bins - Bragg peak falloff
-        {20.0f, 100.0f, 0.5f},   // 160 bins - Mid-energy plateau
-        {100.0f, 250.0f, 1.0f}    // 150 bins - High energy
+        {2.0f, 20.0f, 0.2f},     // 90 bins - Bragg peak falloff (finer)
+        {20.0f, 100.0f, 0.25f},  // 320 bins - Mid-energy plateau (finer)
+        {100.0f, 250.0f, 0.25f}   // 600 bins - High energy (MUCH FINER for tracking)
     };
     EnergyGrid E_grid(energy_groups);
-    const int N_E = E_grid.N_E;  // Will be 401
+    const int N_E = E_grid.N_E;  // Will be 1029
 
     std::cout << "=== Option D2 Energy Grid ===" << std::endl;
     std::cout << "  N_E = " << N_E << " bins" << std::endl;
     std::cout << "  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)" << std::endl;
-    std::cout << "  [2-20 MeV]: 0.25 MeV/bin (72 bins)" << std::endl;
-    std::cout << "  [20-100 MeV]: 0.5 MeV/bin (160 bins)" << std::endl;
-    std::cout << "  [100-250 MeV]: 1 MeV/bin (150 bins)" << std::endl;
+    std::cout << "  [2-20 MeV]: 0.2 MeV/bin (90 bins)" << std::endl;
+    std::cout << "  [20-100 MeV]: 0.25 MeV/bin (320 bins)" << std::endl;
+    std::cout << "  [100-250 MeV]: 0.25 MeV/bin (600 bins)" << std::endl;
     std::cout << "=============================" << std::endl;
 
     // Generate NIST range LUT using the piecewise-uniform energy grid (Option D2)

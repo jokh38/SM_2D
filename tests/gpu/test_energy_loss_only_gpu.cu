@@ -32,6 +32,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 // ============================================================================
 // Simple Source Injection Kernel (local to test)
@@ -205,11 +206,13 @@ protected:
 
     void SetUp() override {
         // Create grids (use new to avoid copy assignment issues)
+        // Use finer energy resolution at high energies for accurate energy tracking
+        // The 0.25 MeV bin width ensures particles lose energy smoothly across bins
         std::vector<std::tuple<float, float, float>> energy_groups = {
-            {0.1f, 2.0f, 0.1f},
-            {2.0f, 20.0f, 0.25f},
-            {20.0f, 100.0f, 0.5f},
-            {100.0f, 250.0f, 1.0f}
+            {0.1f, 2.0f, 0.1f},    // 19 bins
+            {2.0f, 20.0f, 0.2f},   // 90 bins (was 0.25)
+            {20.0f, 100.0f, 0.25f}, // 320 bins (was 0.5)
+            {100.0f, 250.0f, 0.25f} // 600 bins (was 1.0) - FINER for better tracking
         };
 
         e_grid_ptr.reset(new EnergyGrid(energy_groups));
@@ -458,6 +461,20 @@ TEST_F(EnergyLossOnlyTest, EnergyLossOnly) {
     std::cout << "Total energy deposited: " << total_edep << " MeV" << std::endl;
     std::cout << "Bragg peak cell: " << bragg_cell << " (depth = " << bragg_depth << " mm)" << std::endl;
     std::cout << "Lateral spread (sigma): " << lateral_spread << " mm" << std::endl;
+
+    // Output depth-dose data for plotting
+    std::ofstream dose_file("energy_loss_dose.csv");
+    dose_file << "depth_mm,dose_MeV" << std::endl;
+    for (int iz = 0; iz < Nz; ++iz) {
+        double row_sum = 0.0;
+        for (int ix = 0; ix < Nx; ++ix) {
+            row_sum += h_EdepC[iz * Nx + ix];
+        }
+        double depth = iz * dz;
+        dose_file << depth << "," << row_sum << std::endl;
+    }
+    dose_file.close();
+    std::cout << "Dose data saved to energy_loss_dose.csv" << std::endl;
 
     EXPECT_NEAR(total_edep, E0, 0.1) << "Energy conservation failed";
     EXPECT_NEAR(bragg_depth, 158.0, 10.0) << "Bragg peak position incorrect";

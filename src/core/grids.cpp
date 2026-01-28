@@ -62,9 +62,13 @@ namespace {
                 edges[bin_offset + i] = E_start + i * resolution;
             }
 
-            // Representative energy: midpoint for uniform bins
+            // Representative energy: geometric mean for energy-dependent data
+            // For physics quantities like stopping power that vary exponentially,
+            // the geometric mean provides better interpolation than arithmetic mean.
+            // Note: This is used for LUT generation. Particle tracking in K3 uses
+            // lower edge to ensure energy actually decreases between iterations.
             for (int i = 0; i < n_bins; ++i) {
-                rep[bin_offset + i] = 0.5f * (edges[bin_offset + i] + edges[bin_offset + i + 1]);
+                rep[bin_offset + i] = sqrtf(edges[bin_offset + i] * edges[bin_offset + i + 1]);
             }
 
             bin_offset += n_bins;

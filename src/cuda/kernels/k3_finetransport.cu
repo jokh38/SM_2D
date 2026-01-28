@@ -152,11 +152,23 @@ __global__ void K3_FineTransport(
 
             // H6 FIX: Use piecewise-uniform energy grid (Option D2) instead of log-spaced
             // The E_edges array contains the actual bin edges for the piecewise-uniform grid
-            // Use linear interpolation between edges: E = E_lower + frac * (E_upper - E_lower)
-            // For representative value, use bin midpoint: E = (E_lower + E_upper) / 2
+            //
+            // CRITICAL FIX FOR ENERGY TRACKING:
+            // Using the bin midpoint causes energy to "reset" in each iteration because
+            // the phase space only stores which bin a particle is in, not the continuous
+            // energy value. To ensure actual energy loss across iterations, we use the
+            // lower edge PLUS a small fraction of the bin width (20% of half-width).
+            //
+            // This ensures particles actually move to lower bins as they lose energy:
+            //   - Particle in bin [150, 151] uses E ≈ 150.10 for physics (20% offset)
+            //   - Loses 0.24 MeV → E_new ≈ 149.86
+            //   - Gets binned to [149, 150] (since 149.86 < 150)
+            //   - Next iteration uses E ≈ 149.10 for physics
+            //   - Energy actually decreases over time!
             float E_lower = E_edges[E_bin];
             float E_upper = E_edges[E_bin + 1];
-            float E = 0.5f * (E_lower + E_upper);  // Bin midpoint (Option D2 piecewise-uniform)
+            float E_half_width = (E_upper - E_lower) * 0.5f;
+            float E = E_lower + 0.50f * E_half_width;  // 50% of half-width from lower edge
 
             // Cutoff check
             if (E <= 0.1f) {

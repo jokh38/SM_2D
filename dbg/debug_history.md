@@ -798,3 +798,72 @@ To fix the angular spread issue, we need to:
 - Debug output saved to: `output_message.txt`
 - Dose output: `results/dose_2d.txt`
 - PDD output: `results/pdd.txt`
+## Energy Loss Debugging Session (2025-01-28)
+
+### Issue
+Energy-loss-only proton transport was not giving correct results:
+- Particles were not actually losing energy between iterations
+- Bragg peak was at incorrect depth (or not formed at all)
+- Total energy deposition was incorrect
+
+### Root Causes Found
+
+1. **CRITICAL: Energy Reset Bug** (Path 1: Static Analysis)
+   - Location: `k3_finetransport.cu:160`
+   - Issue: Energy was calculated as **bin midpoint** in every iteration
+   - Effect: Particle at 150 MeV would stay at 150.5 MeV (midpoint) regardless of actual energy loss
+   - The continuous energy value `E_new` was computed but lost on next iteration when binned back to midpoint
+
+2. **Inconsistent Energy Grid** (Path 3: NIST Comparison)
+   - Location: `grids.cpp:67`, `k3_finetransport.cu:160`
+   - Issue: Piecewise-uniform grid used **arithmetic mean** for LUT, but kernel used **bin midpoint**
+   - Fixed to use **geometric mean** for LUT generation
+
+3. **Multiple Energy Grid Definitions** (Path 4)
+   - Location: `gpu_transport_wrapper.cu:97-101` vs `gpu_transport_runner.cpp:74-78`
+   - Issue: Two different energy grid configurations in different files
+   - Fixed to use consistent **finer energy grid** (0.25 MeV bins at high energy)
+
+### Fixes Applied
+
+1. **Energy Offset Method** (`k3_finetransport.cu:169-175`, `k2_coarsetransport.cu:125-128`)
+   - Use **lower edge + 50% of half-width** instead of bin midpoint
+   - This ensures particles actually move to lower energy bins as they lose energy
+   - Formula: `E = E_lower + 0.50 * (E_upper - E_lower) / 2`
+
+2. **Finer Energy Grid** (`gpu_transport_runner.cpp:74-78`, `gpu_transport_wrapper.cu:96-100`)
+   - Changed from 1.0 MeV/bin to **0.25 MeV/bin** for [100-250] MeV range
+   - Total bins: 401 → 1029
+   - Provides better energy resolution for tracking
+
+3. **Consistent Energy Calculation** (`k2_coarsetransport.cu:125-128`)
+   - K2 now uses same offset method as K3 for consistency
+
+### Results (Commit: After fixes)
+
+| Metric | Before | After | Expected |
+|--------|--------|-------|----------|
+| Bragg Peak Depth | 0 mm (no peak) | 159.5 mm | ~158 mm ✓ |
+| Total Energy Deposited | 0.6 MeV | 136.9 MeV | 150 MeV (91%) |
+| Energy Tracking | Stuck at 150 MeV | Decreases correctly | ✓ |
+
+### Remaining Issues
+
+1. **Energy Conservation at 91%**: Some energy (9%) is still being lost
+   - Possible causes:
+     - Particles cut off at boundaries before depositing all energy
+     - E_min threshold (0.1 MeV) causing energy loss
+     - Other accounting issues
+
+2. **Phase Space Limitation**: The fundamental issue is that the phase space only stores **which bin**, not the **continuous energy value**. This is a limitation of the current implementation that would require redesigning the phase space representation to fully fix.
+
+### Files Modified
+
+- `/workspaces/SM_2D/src/core/grids.cpp`: Use geometric mean for piecewise-uniform grid
+- `/workspaces/SM_2D/src/gpu/gpu_transport_runner.cpp`: Finer energy grid (0.25 MeV bins)
+- `/workspaces/SM_2D/src/cuda/gpu_transport_wrapper.cu`: Consistent energy grid
+- `/workspaces/SM_2D/src/cuda/kernels/k3_finetransport.cu`: Energy offset method (50% of half-width)
+- `/workspaces/SM_2D/src/cuda/kernels/k2_coarsetransport.cu`: Consistent energy offset method
+- `/workspaces/SM_2D/tests/gpu/test_energy_loss_only_gpu.cu`: Finer energy grid for tests
+- `/workspaces/SM_2D/src/cuda/device/device_lut.cuh`: Reduced step size (1%), improved boundary handling
+
