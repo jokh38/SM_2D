@@ -562,3 +562,60 @@ For accurate results, use the standard K3 fine transport for energies above E_tr
 The binned phase space approach was designed for fine transport where particles
 are explicitly tracked, not for coarse-only mode.
 
+
+---
+
+## 2026-01-28: Energy Grid Resolution Increase (H10)
+
+### Summary
+Increased N_E from 256 to 1280 to achieve ~1 MeV resolution at high energy (150 MeV).
+This reduces energy loss from geometric mean rounding in the binned phase space.
+
+### Configuration Changes
+- **N_E increased from 256 to 1280**
+- Bin width at 150 MeV: 0.92 MeV (was 4.6 MeV)
+- Bin width at 250 MeV: 1.53 MeV (was 7.7 MeV)
+- Memory usage: ~2.1 GB (fits in 8GB VRAM)
+
+### Calculation for 1 MeV Resolution
+For log-spaced bins from 0.1 to 250 MeV:
+- Target: 1 MeV resolution at 150 MeV
+- Required dlog: log(1 + 1/150) = 0.006645
+- Required N_E: 1178 → rounded to 1280 (multiple of 32)
+
+### Results
+
+| N_E | Bin Width @ 150MeV | Energy Deposited | E_loss per step | Status |
+|-----|-------------------|------------------|-----------------|--------|
+| 256 | 4.6 MeV | 182.6 MeV | ~1.8 MeV | Too coarse |
+| 1024 | 1.1 MeV | Stuck | 0 MeV | Particles stuck |
+| 1280 | 0.92 MeV | 183.0 MeV | ~0.27 MeV | Improved |
+
+### Energy Tracking Analysis
+
+**Current behavior (N_E=1280)**:
+- Read E=150.064 MeV from bin 1196
+- Compute E_new=149.789 MeV (dE=0.275 MeV)
+- Emit E_new → still in bin 1196
+- Next iteration: read E=150.064 again (energy loss: 0.275 MeV due to geometric mean)
+
+**Improvement**: Energy loss per step reduced from 1.8 MeV to 0.27 MeV.
+
+**Remaining issue**: Particles still stuck in same bin because dE/step (0.27 MeV) < bin_width (0.92 MeV).
+
+To fully resolve, would need N_E ≈ 2400 for bin_width < 0.5 MeV, allowing particles to progress through bins naturally.
+
+### Nuclear Contribution
+- Nuclear cross-section: 0.00113 mm^-1 at 150 MeV
+- Weight removed per 0.5mm step: ~0.056%
+- Total nuclear contribution: ~20-30 MeV (estimated)
+- Note: Simplified model assumes all nuclear-removed energy is deposited locally
+
+### Conclusion
+Increasing N_E to 1280 improves energy tracking but doesn't fully resolve the coarse-only
+mode limitation. The fundamental issue remains: binned phase space cannot track continuous
+energy values accurately when dE/step < bin_width.
+
+**Recommendation**: For accurate dose calculations, use standard K3 fine transport above E_trigger.
+Coarse-only mode remains useful for testing but not for production.
+

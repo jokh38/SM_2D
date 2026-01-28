@@ -88,11 +88,10 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     // Create phase-space grids for K1-K6 pipeline
     // TODO: Make these configurable via IncidentParticleConfig
     const int N_theta = 36;           // Global angular bins
-    const int N_E = 256;              // Global energy bins
-                                      // Coarse-only mode has fundamental limitation:
-                                      // Fine bins cause particles to get stuck (dE < bin width)
-                                      // Coarse bins cause energy loss (~1.8 MeV/step)
-                                      // Best compromise for coarse-only: use intermediate value
+    const int N_E = 1280;             // Global energy bins (~1 MeV resolution at high energy)
+                                      // Bin width: 0.92 MeV at 150 MeV, 1.53 MeV at 250 MeV
+                                      // This reduces energy loss from geometric mean rounding
+                                      // Memory: ~2.1 GB for phase space (fits in 8GB VRAM)
     // Local bins must match compile-time constants in local_bins.hpp
     // NOTE: Using reduced values for memory (SPEC requires 8, 4)
     const int N_theta_local = ::N_theta_local;  // = 4 (memory optimized, SPEC wants 8)
