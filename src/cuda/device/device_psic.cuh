@@ -309,43 +309,26 @@ __device__ inline void device_psic_inject_source(
         frac_E = 0.0f;
     }
 
-    // Bilinear interpolation weights
-    float w00 = (1.0f - frac_theta) * (1.0f - frac_E);
-    float w10 = frac_theta * (1.0f - frac_E);
-    float w01 = (1.0f - frac_theta) * frac_E;
-    float w11 = frac_theta * frac_E;
+    // COARSE-ONLY FIX: Use single-bin emission instead of bilinear interpolation
+    // This prevents particle duplication (1 particle -> 1 bin instead of 1 -> 2-4 bins)
+    // Round to nearest bin instead of interpolating across 4 bins
+    if (frac_theta >= 0.5f && theta_bin < N_theta - 1) theta_bin++;
+    if (frac_E >= 0.5f && E_bin < N_E - 1) E_bin++;
 
-    // Emit to 4 neighboring bins with interpolation
-    int theta_offsets[2] = {0, 1};
-    int E_offsets[2] = {0, 1};
-    float weights[4] = {w00, w10, w01, w11};
+    // Emit to single bin with full weight (no interpolation)
+    uint32_t b_theta = theta_bin / N_theta_local;
+    uint32_t b_E = E_bin / N_E_local;
+    uint32_t bid = encode_block(b_theta, b_E);
 
-    for (int ti = 0; ti < 2; ++ti) {
-        for (int ei = 0; ei < 2; ++ei) {
-            int t_bin = theta_bin + theta_offsets[ti];
-            int e_bin = E_bin + E_offsets[ei];
+    int theta_local = theta_bin % N_theta_local;
+    int E_local = E_bin % N_E_local;
 
-            if (t_bin >= N_theta || e_bin >= N_E) continue;
+    uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
 
-            float w = weights[ti * 2 + ei];
-            if (w <= 0.0f) continue;
-
-            // Encode to coarse block and local index
-            uint32_t b_theta = t_bin / N_theta_local;
-            uint32_t b_E = e_bin / N_E_local;
-            uint32_t bid = encode_block(b_theta, b_E);
-
-            int theta_local = t_bin % N_theta_local;
-            int E_local = e_bin % N_E_local;
-
-            uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
-
-            // Find or allocate slot and add weight
-            int slot = device_psic_find_or_allocate_slot(psic, cell, bid);
-            if (slot >= 0) {
-                device_psic_add_weight(psic, cell, slot, lidx, weight * w);
-            }
-        }
+    // Find or allocate slot and add weight
+    int slot = device_psic_find_or_allocate_slot(psic, cell, bid);
+    if (slot >= 0) {
+        device_psic_add_weight(psic, cell, slot, lidx, weight);
     }
 }
 

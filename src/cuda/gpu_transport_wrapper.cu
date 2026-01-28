@@ -75,7 +75,7 @@ void run_k1k6_pipeline_transport(
     // PER BUG FIX: Use larger step size per SPEC.md:203 (2% of range)
     // Previous 0.6 * cell_size = 0.3mm was too small
     // Now use 5mm to allow proper particle penetration
-    config.step_coarse = 5.0f;  // Much larger step for proper penetration
+    config.step_coarse = 0.5f;  // Match cell size (dx=dz=0.5mm) for accurate dose deposition
     config.n_steps_per_cell = 1;        // One step per cell for coarse
 
     // Phase-space dimensions

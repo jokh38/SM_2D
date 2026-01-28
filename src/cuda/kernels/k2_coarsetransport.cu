@@ -89,9 +89,9 @@ __global__ void K2_CoarseTransport(
     int particles_in = 0;
     int particles_out = 0;
 
-    // Coarse step size: PER BUG FIX, use configured step without cell size limit
-    // Previous fminf(dx, dz) limited step to 0.5mm, preventing proper penetration
-    float coarse_step = config.step_coarse;
+    // Coarse step size: limit to cell size for accurate dose deposition
+    // With N_E=1024, finer energy grid reduces binning error
+    float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
 
     // FIX: Use DEVICE_Kb instead of hardcoded 32
     constexpr int Kb = DEVICE_Kb;  // = 8
@@ -216,48 +216,57 @@ __global__ void K2_CoarseTransport(
             z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
 
             if (exit_face >= 0) {
-                // DEBUG: See which particles are crossing boundaries - ALWAYS print for key cells
-                int z_cell_idx = cell / 200;
-                if (cell % 200 == 100 && z_cell_idx < 10) {
-                    printf("K2 CROSS: cell=%d (z=%d), face=%d, E_new=%.3f, w=%.6e, z_old=%.4f, z_new=%.4f\n", cell, z_cell_idx, exit_face, E_new, w_new, z_cell, z_new);
-                }
-                // Calculate sub-cell bins for neighbor
-                float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
-                int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
-
-                float z_offset_neighbor;
-                if (exit_face == 0) {
-                    z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
-                } else if (exit_face == 1) {
-                    z_offset_neighbor = dz * 0.5f - dz * 0.125f;
+                // CRITICAL FIX: Check E_new directly against cutoff BEFORE emitting
+                // Binned phase space causes E to be "reset" to geometric mean,
+                // so particles can never reach E <= 0.1 MeV if we check after binning.
+                if (E_new <= 0.1f) {
+                    // Particle should be absorbed - deposit remaining energy locally
+                    cell_edep += edep + E_new * w_new;  // Remaining energy from step
+                    cell_w_cutoff += w_new;
                 } else {
-                    z_offset_neighbor = z_new - dz * 0.5f;
+                    // DEBUG: See which particles are crossing boundaries - ALWAYS print for key cells
+                    int z_cell_idx = cell / 200;
+                    if (cell % 200 == 100 && z_cell_idx < 10) {
+                        printf("K2 CROSS: cell=%d (z=%d), face=%d, E_new=%.3f, w=%.6e, z_old=%.4f, z_new=%.4f\n", cell, z_cell_idx, exit_face, E_new, w_new, z_cell, z_new);
+                    }
+                    // Calculate sub-cell bins for neighbor
+                    float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                    int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+
+                    float z_offset_neighbor;
+                    if (exit_face == 0) {
+                        z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
+                    } else if (exit_face == 1) {
+                        z_offset_neighbor = dz * 0.5f - dz * 0.125f;
+                    } else {
+                        z_offset_neighbor = z_new - dz * 0.5f;
+                    }
+                    int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
+                    z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+
+                    int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                    DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                    // COARSE-ONLY FIX: Use single-bin emission instead of interpolation
+                    // Interpolation causes exponential particle splitting, leading to
+                    // weights of ~10^-18 after 60 iterations. For coarse transport,
+                    // single-bin emission is sufficient and prevents fragmentation.
+                    device_emit_component_to_bucket_4d(
+                        bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
+                        theta_edges, E_edges, N_theta, N_E,
+                        N_theta_local, N_E_local
+                    );
+
+                    // FIX: Deposit energy in current cell before particle leaves
+                    // Both electronic (dE * weight) and nuclear (E_rem) energy are
+                    // deposited locally in this cell, not carried across boundary.
+                    cell_edep += edep;
+                    cell_w_nuclear += w_rem;
+                    cell_E_nuclear += E_rem;
+
+                    // Account for energy/weight carried out by surviving particle
+                    cell_boundary_weight += w_new;
+                    cell_boundary_energy += E_new * w_new;
                 }
-                int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
-                z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
-
-                int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
-                DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                // COARSE-ONLY FIX: Use single-bin emission instead of interpolation
-                // Interpolation causes exponential particle splitting, leading to
-                // weights of ~10^-18 after 60 iterations. For coarse transport,
-                // single-bin emission is sufficient and prevents fragmentation.
-                device_emit_component_to_bucket_4d(
-                    bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
-                    theta_edges, E_edges, N_theta, N_E,
-                    N_theta_local, N_E_local
-                );
-
-                // FIX: Deposit energy in current cell before particle leaves
-                // Both electronic (dE * weight) and nuclear (E_rem) energy are
-                // deposited locally in this cell, not carried across boundary.
-                cell_edep += edep;
-                cell_w_nuclear += w_rem;
-                cell_E_nuclear += E_rem;
-
-                // Account for energy/weight carried out by surviving particle
-                cell_boundary_weight += w_new;
-                cell_boundary_energy += E_new * w_new;
             } else {
                 // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!
                 // Previously: particles were lost if they didn't cross boundaries

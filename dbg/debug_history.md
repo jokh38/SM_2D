@@ -474,3 +474,91 @@ The particle splitting fix (H8) did NOT change the energy deposition, which mean
 - `src/cuda/kernels/k2_coarsetransport.cu` (H8: single-bin emission)
 - `src/cuda/device/device_physics.cuh` (nuclear restored to original)
 
+
+---
+
+## 2026-01-28: Coarse-Only Mode Investigation (H9)
+
+### Summary
+Investigated coarse-only mode by setting E_trigger=0.05 MeV (below minimum energy 0.1 MeV).
+Found **fundamental limitation** of binned phase space representation that prevents accurate energy tracking.
+
+### Configuration
+- E_trigger = 0.05 MeV (forces b_E_trigger=0, coarse-only transport)
+- N_E = 256 global energy bins (log-spaced, 0.1-250 MeV)
+- step_coarse = 0.5 mm (matches cell size)
+- Single-bin emission (no bilinear interpolation)
+
+### Key Finding: Binning Dilemma
+
+**Problem**: Energy is represented by bin index, not continuous value.
+When reading from bin, we use geometric mean, not the actual energy from previous step.
+
+**Bin width at 150 MeV**:
+- dlog = (log(250) - log(0.1)) / 256 ≈ 0.03
+- Bin width ≈ 4.6 MeV
+
+**Energy loss per step**:
+- dE = 0.274673 MeV for 0.5mm step (verified by test)
+- dE (0.27 MeV) << bin width (4.6 MeV)
+
+**Result**: E_new stays in same bin as E, so next iteration reads same geometric mean again.
+Example:
+- Read E=150.984 from bin 239
+- Compute E_new=150.711 (loss of 0.27 MeV)
+- Emit E_new → still in bin 239
+- Next iteration: read E=150.984 again (energy lost!)
+
+### Attempted Fixes
+
+#### 1. Single-bin emission (SUCCESS for particle duplication)
+- Prevented 1 particle → 2-4 bins splitting
+- Source injection now shows: 1 non-zero bin (was 2+)
+
+#### 2. Increase N_E to 1024 (FAILED)
+- Finer bins (1.1 MeV width) caused different problem
+- Particles got "stuck" - E_new always in same bin
+- Energy stopped decreasing entirely
+
+#### 3. Cutoff check at E_new (PARTIAL SUCCESS)
+- Added check: if (E_new <= 0.1f) absorb particle
+- This prevents particles from continuing past cutoff
+- But doesn't fix the energy tracking issue
+
+### Root Cause Analysis
+
+The binned phase space approach has an inherent tradeoff:
+
+| Bin Width | dE/Step | Result |
+|-----------|---------|--------|
+| > 4.6 MeV | 0.27 MeV | Energy loses ~1.8 MeV/step due to geometric mean rounding |
+| ≈ 1.1 MeV | 0.27 MeV | Particles stuck in same bin, energy doesn't decrease |
+| < 0.27 MeV | 0.27 MeV | Requires N_E > 3500 (memory prohibitive) |
+
+### Conclusion
+
+**Coarse-only mode with binned phase space CANNOT accurately track particle energy.**
+
+The fundamental issue is that energy is not preserved across steps - only the bin index is preserved.
+To fix this, we would need to:
+1. Track actual energy per particle (not just bin index), OR
+2. Use larger steps so dE/step > bin width, OR
+3. Use a different energy representation (e.g., lower bin edge instead of geometric mean)
+
+### Results Summary
+
+| Configuration | Energy Deposited | Bragg Peak Depth | Status |
+|--------------|------------------|------------------|--------|
+| N_E=256, step=0.5mm | 182.643 MeV | 0 mm | Energy not decreasing |
+| N_E=1024, step=0.5mm | Particles stuck | N/A | Energy never decreases |
+| N_E=1024, step=5mm | 151.103 MeV | 15.5 mm | Energy OK, depth wrong |
+
+### Recommendation
+
+**Coarse-only mode is not suitable for production simulations.** It should only be used
+for testing code functionality, not for accurate dose calculations.
+
+For accurate results, use the standard K3 fine transport for energies above E_trigger.
+The binned phase space approach was designed for fine transport where particles
+are explicitly tracked, not for coarse-only mode.
+
