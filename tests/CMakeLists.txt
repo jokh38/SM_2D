@@ -36,6 +36,7 @@ set(TEST_CUDA_FILES
     kernels/test_k3_finetransport.cpp
     perf/test_kernel_profiling.cpp
     perf/test_occupancy.cpp
+    gpu/test_energy_loss_only_gpu.cu
 )
 
 if(CUDA_ENABLED)
@@ -50,6 +51,7 @@ if(CUDA_ENABLED)
         unit/test_cuda_smoke.cpp
         kernels/test_k1_activemask.cpp
         kernels/test_k3_finetransport.cpp
+        gpu/test_energy_loss_only_gpu.cu
         PROPERTIES LANGUAGE CUDA
     )
 

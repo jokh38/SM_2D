@@ -250,6 +250,9 @@ CUDAToolkit_rt_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/librt.a
 //Path to a library.
 CUDA_CUDART:FILEPATH=/usr/local/cuda-12.4/lib64/libcudart.so
 
+//No help, variable specified on the command line.
+CUDA_ENABLED:UNINITIALIZED=ON
+
 //Path to a library.
 CUDA_OpenCL_LIBRARY:FILEPATH=/usr/local/cuda-12.4/targets/x86_64-linux/lib/libOpenCL.so
 
