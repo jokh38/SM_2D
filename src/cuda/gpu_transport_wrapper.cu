@@ -68,13 +68,14 @@ void run_k1k6_pipeline_transport(
     // Particles above 10 MeV use coarse transport (fast, less accurate)
     // Particles below 10 MeV use fine transport (detailed physics near Bragg peak)
     config.E_trigger = 10.0f;          // Particles below 10 MeV use fine transport
-    config.weight_active_min = 1e-6f;   // Minimum weight for active cell
+    config.weight_active_min = 1e-12f;  // FIX: Lowered from 1e-6 to fix transport gap (per debug report)
 
     // Coarse transport settings
-    config.E_coarse_max = 300.0f;       // Up to 300 MeV
-    // FIX: Coarse step related to grid size - 0.6 * min(dx, dz) ensures boundary crossing
-    // Cell size is 0.5mm, so step_coarse = 0.6 * 0.5mm = 0.3mm
-    config.step_coarse = 0.6f * fminf(dx, dz);  // Related to grid size
+    config.E_coarse_max = 300.0f;       // Up to 300 MeV (original value)
+    // PER BUG FIX: Use larger step size per SPEC.md:203 (2% of range)
+    // Previous 0.6 * cell_size = 0.3mm was too small
+    // Now use 5mm to allow proper particle penetration
+    config.step_coarse = 5.0f;  // Much larger step for proper penetration
     config.n_steps_per_cell = 1;        // One step per cell for coarse
 
     // Phase-space dimensions

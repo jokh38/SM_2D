@@ -46,16 +46,17 @@ inline float compute_max_step_physics(const RLUT& lut, float E, float dx = 1.0f,
     // Apply refinement factor
     delta_R_max = delta_R_max * dS_factor;
 
-    // Hard upper limit (prevents overly large steps at high energy)
-    delta_R_max = fminf(delta_R_max, 1.0f);  // Max 1 mm
+    // PER BUG FIX: Remove hard 1mm upper limit to allow proper penetration
+    // SPEC.md:203 requires delta_R_max = 0.02 * R (2% of range)
+    // At 150 MeV, R ≈ 158mm, so step ≈ 3.16mm
+    // Previous 1mm cap prevented proper particle penetration
 
     // Hard lower limit (prevents excessive subdivision)
     delta_R_max = fmaxf(delta_R_max, 0.05f);  // Min 0.05 mm
 
-    // P5 FIX: Limit by cell size to prevent skipping cells
-    // Use 0.25 * min(dx, dz) as geometric limit (spec requirement)
-    float cell_limit = 0.25f * fminf(dx, dz);
-    delta_R_max = fminf(delta_R_max, cell_limit);
+    // Cell size limit REMOVED per SPEC.md:203
+    // float cell_limit = 0.25f * fminf(dx, dz);
+    // delta_R_max = fminf(delta_R_max, cell_limit);
 
     // PHYSICS NOTE: dR/ds = -1 in CSDA approximation
     // From R(E) = ∫_0^E dE'/(S(E')·ρ) and dE/ds = -S(E)·ρ:

@@ -89,8 +89,9 @@ __global__ void K2_CoarseTransport(
     int particles_in = 0;
     int particles_out = 0;
 
-    // Coarse step size: use full cell size or configured step
-    float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
+    // Coarse step size: PER BUG FIX, use configured step without cell size limit
+    // Previous fminf(dx, dz) limited step to 0.5mm, preventing proper penetration
+    float coarse_step = config.step_coarse;
 
     // FIX: Use DEVICE_Kb instead of hardcoded 32
     constexpr int Kb = DEVICE_Kb;  // = 8
@@ -129,10 +130,10 @@ __global__ void K2_CoarseTransport(
             float E_max = E_edges[N_E];
             float log_E_min = logf(E_min);
             float dlog = (logf(E_max) - log_E_min) / N_E;
-            // CRITICAL FIX: Use lower edge to prevent energy increase
-            // Geometric mean causes energy to increase when reading bins
-            // Lower edge ensures monotonic energy decrease
-            float E = expf(log_E_min + E_bin * dlog);  // Lower edge
+            // PER SPEC.md:76: Use geometric mean for energy representation
+            // E_rep[i] = sqrt(E_edges[i] * E_edges[i+1])
+            // Geometric mean approximation: E_edges[i] * exp(0.5 * dlog)
+            float E = expf(log_E_min + (E_bin + 0.5f) * dlog);  // Geometric mean
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -165,12 +166,13 @@ __global__ void K2_CoarseTransport(
             // CRITICAL FIX: step_to_boundary is a path length, coarse_step is geometric distance
             // Convert path length to geometric distance for comparison
             float mu_abs = fmaxf(fabsf(mu), 1e-6f);  // Avoid division by zero
-            float geometric_to_boundary = step_to_boundary * mu_abs;
 
-            // Limit coarse_step to 99.9% of geometric distance to boundary (tiny 0.1% safety margin)
-            float coarse_step_limited = fminf(coarse_step, geometric_to_boundary * 0.999f);
+            // BUG FIX: Don't limit step by boundary distance
+            // Boundary detection handles crossing; limiting step causes particles to get stuck
+            // Use the full coarse_step regardless of distance to boundary
+            float coarse_step_limited = coarse_step;
 
-            // Convert limited geometric distance to path length for energy calculation
+            // Convert geometric distance to path length for energy calculation
             float coarse_range_step = coarse_step_limited / mu_abs;
 
             // Energy loss for coarse range step

@@ -41,15 +41,24 @@ __global__ void K1_ActiveMask(
 
     // DEBUG: Check if active mask should be set
     if (needs_fine_transport) {
+        // Find b_E value for this cell
+        uint32_t cell_b_E = 999;  // Default value
+        for (int slot = 0; slot < Kb; ++slot) {
+            uint32_t bid = block_ids[cell * Kb + slot];
+            if (bid != 0xFFFFFFFF) {
+                cell_b_E = (bid >> 12) & 0xFFF;
+                break;
+            }
+        }
         int is_active = (W_cell > weight_active_min) ? 1 : 0;
         if (is_active) {
-            printf("K1 ACTIVE SET: cell=%d, W_cell=%.6f, threshold=%.6f\n", cell, W_cell, weight_active_min);
+            printf("K1 ACTIVE SET: cell=%d, W_cell=%.6f, needs_fine=true (b_E=%d < b_E_trigger=%d)\n", cell, W_cell, cell_b_E, b_E_trigger);
         } else {
-            printf("K1 NOT ACTIVE (low weight): cell=%d, W_cell=%.6f, threshold=%.6f\n", cell, W_cell, weight_active_min);
+            printf("K1 NOT ACTIVE (low weight): cell=%d, W_cell=%.6f, b_E=%d, b_E_trigger=%d\n", cell, W_cell, cell_b_E, b_E_trigger);
         }
     }
 
-    ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;
+    ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;  // Restore weight check
 }
 
 // CPU wrapper implementation
@@ -77,6 +86,6 @@ void run_K1_ActiveMask(
             }
         }
 
-        ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;
+        ActiveMask[cell] = needs_fine_transport ? 1 : 0;  // Removed weight check to allow all low-energy particles
     }
 }

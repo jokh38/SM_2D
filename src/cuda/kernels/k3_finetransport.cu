@@ -120,7 +120,7 @@ __global__ void K3_FineTransport(
                 printf("K3: lidx=%d has weight=%.6f\n", lidx, weight);
             }
 
-            if (weight < 1e-12f) continue;
+            if (weight < 1e-15f) continue;  // Lowered to allow low-weight particles to be transported
 
             // DEBUG: Track weight read from psi_in
             weight_read_from_psi_in += weight;
@@ -151,10 +151,10 @@ __global__ void K3_FineTransport(
             float log_E_min = logf(E_min);
             float log_E_max = logf(E_max);
             float dlog = (log_E_max - log_E_min) / N_E;
-            // CRITICAL FIX: Use lower edge to prevent energy increase
-            // Geometric mean causes energy to increase when reading bins
-            // Lower edge ensures monotonic energy decrease
-            float E = expf(log_E_min + E_bin * dlog);  // Lower edge
+            // PER SPEC.md:76: Use geometric mean for energy representation
+            // E_rep[i] = sqrt(E_edges[i] * E_edges[i+1])
+            // Geometric mean approximation: E_edges[i] * exp(0.5 * dlog)
+            float E = expf(log_E_min + (E_bin + 0.5f) * dlog);  // Geometric mean
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -203,12 +203,12 @@ __global__ void K3_FineTransport(
             // CRITICAL FIX: Don't divide by mu_init again - step_to_boundary is already path length!
 
             // Use the smaller of physics-limited range step and path length to boundary
-            // FIX: When physics step would cause boundary crossing, limit step to stay within cell
-            // Apply 99.9% of distance to boundary as tiny safety margin (0.1%)
-            float step_to_boundary_safe = step_to_boundary * 0.999f;
+            // BUG FIX: Allow boundary crossing by using slightly more than 100% of boundary distance
+            // Previous 99.9% limit caused particles to get stuck at boundaries
+            float step_to_boundary_safe = step_to_boundary * 1.001f;
             float actual_range_step = fminf(step_phys, step_to_boundary_safe);
 
-            // DEBUG: Check if safety margin is working
+            // DEBUG: Check step sizes
             if (slot == 0 && lidx < 4 && weight > 0.001f) {
                 printf("K3: cell=%d, active_idx=%d, lidx=%d, weight=%.4f, step_phys=%.4f, step_boundary=%.4f, safe=%.4f, actual=%.4f, z_cell=%.4f\n",
                        cell, active_idx, lidx, weight, step_phys, step_to_boundary, step_to_boundary_safe, actual_range_step, z_cell);

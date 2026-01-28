@@ -10,7 +10,7 @@
    - Record the output messages of the code running in `output_message.txt`
    - Do not create another `output_message.txt` for each run. Overwrite it
    - Review the result after each run
-   - If there is any progress or something that needs to be recorded, it should be in the history file (.sisyphus/debug_history.md)
+   - If there is any progress or something that needs to be recorded, it should be in the history file (dbg/debug_history.md)
 
 ## Debugging Workflow
 
