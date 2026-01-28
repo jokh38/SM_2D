@@ -345,8 +345,12 @@ __global__ void K3_FineTransport(
                 // Write directly to global memory
                 int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
                 DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                // Use bilinear interpolation for improved accuracy
-                device_emit_component_to_bucket_4d_interp(
+                // CRITICAL FIX: Use non-interpolating emission to prevent bucket overflow
+                // Bilinear interpolation splits particles across 4 (theta,E) bins, causing
+                // quadratic growth in unique block IDs that exceeds DEVICE_Kb_out=8 slots.
+                // For energy-loss-only mode (theta~0), nearest neighbor is more accurate
+                // AND prevents weight loss from bucket overflow.
+                device_emit_component_to_bucket_4d(
                     bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
                     theta_edges, E_edges, N_theta, N_E,
                     N_theta_local, N_E_local
