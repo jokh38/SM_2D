@@ -29,10 +29,31 @@ const RLUT& get_global_rlut() {
 }
 
 // ============================================================================
+// Physics Constants for K3 Fine Transport
+// ============================================================================
+namespace {
+    // Energy tracking constants
+    constexpr float ENERGY_CUTOFF_MEV = 0.1f;           // Minimum energy for transport [MeV]
+    constexpr float WEIGHT_THRESHOLD = 1e-15f;           // Minimum weight for transport
+    constexpr float ENERGY_OFFSET_RATIO = 0.50f;         // Offset from lower edge (fraction of half-width)
+    constexpr float BOUNDARY_SAFETY_FACTOR = 1.001f;     // Allow slight boundary crossing
+
+    // Scattering reduction factors (to maintain forward penetration)
+    constexpr float SCATTER_REDUCTION_HIGH_E = 0.3f;     // E > 100 MeV
+    constexpr float SCATTER_REDUCTION_MID_HIGH = 0.5f;   // E > 50 MeV
+    constexpr float SCATTER_REDUCTION_MID_LOW = 0.7f;    // E > 20 MeV
+    constexpr float SCATTER_REDUCTION_LOW_E = 1.0f;      // E <= 20 MeV (full scattering)
+
+    // Energy thresholds for scattering reduction
+    constexpr float ENERGY_HIGH_THRESHOLD = 100.0f;     // [MeV]
+    constexpr float ENERGY_MID_HIGH_THRESHOLD = 50.0f;  // [MeV]
+    constexpr float ENERGY_MID_LOW_THRESHOLD = 20.0f;   // [MeV]
+}
+
+// ============================================================================
 // P1 FIX: Full GPU Kernel Implementation
 // ============================================================================
-// Previously: Only a stub with TODO comment
-// Now: Complete implementation with:
+// Complete implementation with:
 //   - Device LUT access
 //   - Full physics (energy loss, straggling, MCS, nuclear)
 //   - Boundary crossing detection
@@ -77,16 +98,6 @@ __global__ void K3_FineTransport(
 
     int cell = ActiveList[active_idx];
 
-    // DEBUG: Print which active cell is being processed
-    if (active_idx == 0) {
-        constexpr int Kb = DEVICE_Kb;
-        uint32_t first_bid = block_ids_in[cell * Kb];
-        printf("K3: Processing active cell %d (n_active=%d, first_bid=%u)\n", cell, n_active, first_bid);
-    }
-
-    // Note: With LOCAL_BINS=128, shared buckets would exceed 48KB limit
-    // Write directly to global memory instead of using shared memory
-
     // Accumulators for this cell
     double cell_edep = 0.0;
     float cell_w_cutoff = 0.0f;
@@ -95,14 +106,6 @@ __global__ void K3_FineTransport(
     float cell_boundary_weight = 0.0f;
     double cell_boundary_energy = 0.0;
 
-    // DEBUG: Track weight flow for this cell
-    float weight_read_from_psi_in = 0.0f;
-    float weight_to_bucket[4] = {0.0f, 0.0f, 0.0f, 0.0f};  // Per face: Z+, Z-, X+, X-
-    float weight_to_psi_out = 0.0f;
-    int particles_to_bucket = 0;
-    int particles_to_psi_out = 0;
-
-    // FIX: Use DEVICE_Kb instead of hardcoded 32
     constexpr int Kb = DEVICE_Kb;  // = 8
 
     // Process all slots in this cell
@@ -119,15 +122,7 @@ __global__ void K3_FineTransport(
             int global_idx = (cell * Kb + slot) * DEVICE_LOCAL_BINS + lidx;
             float weight = values_in[global_idx];
 
-            // DEBUG: Find which bins have particles
-            if (active_idx == 0 && slot == 0 && weight > 1e-12f) {
-                printf("K3: lidx=%d has weight=%.6f\n", lidx, weight);
-            }
-
-            if (weight < 1e-15f) continue;  // Lowered to allow low-weight particles to be transported
-
-            // DEBUG: Track weight read from psi_in
-            weight_read_from_psi_in += weight;
+            if (weight < WEIGHT_THRESHOLD) continue;
 
             // FIX Problem 1: Decode 4D local index (theta_local, E_local, x_sub, z_sub)
             int theta_local, E_local, x_sub, z_sub;
@@ -168,10 +163,10 @@ __global__ void K3_FineTransport(
             float E_lower = E_edges[E_bin];
             float E_upper = E_edges[E_bin + 1];
             float E_half_width = (E_upper - E_lower) * 0.5f;
-            float E = E_lower + 0.50f * E_half_width;  // 50% of half-width from lower edge
+            float E = E_lower + ENERGY_OFFSET_RATIO * E_half_width;
 
             // Cutoff check
-            if (E <= 0.1f) {
+            if (E <= ENERGY_CUTOFF_MEV) {
                 cell_edep += E * weight;
                 cell_w_cutoff += weight;
                 continue;
@@ -200,14 +195,6 @@ __global__ void K3_FineTransport(
                                            fminf(step_to_x_plus, step_to_x_minus));
             step_to_boundary = fmaxf(step_to_boundary, 0.0f);
 
-            // DEBUG: Check boundary calculation
-            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
-                printf("K3 BOUNDARY DEBUG [lidx=%d]: z_cell=%.4f, x_cell=%.4f, half_dz=%.4f, mu_init=%.4f, eta_init=%.4f\n",
-                       lidx, z_cell, x_cell, half_dz, mu_init, eta_init);
-                printf("K3 BOUNDARY DEBUG [lidx=%d]: step_to_z_plus=%.4f, step_to_z_minus=%.4f, step_to_x_plus=%.4f, step_to_x_minus=%.4f\n",
-                       lidx, step_to_z_plus, step_to_z_minus, step_to_x_plus, step_to_x_minus);
-            }
-
             // Compute physics-limited step size (returns range step in mm)
             float step_phys = device_compute_max_step(dlut, E, dx, dz);
 
@@ -219,14 +206,8 @@ __global__ void K3_FineTransport(
             // Use the smaller of physics-limited range step and path length to boundary
             // BUG FIX: Allow boundary crossing by using slightly more than 100% of boundary distance
             // Previous 99.9% limit caused particles to get stuck at boundaries
-            float step_to_boundary_safe = step_to_boundary * 1.001f;
+            float step_to_boundary_safe = step_to_boundary * BOUNDARY_SAFETY_FACTOR;
             float actual_range_step = fminf(step_phys, step_to_boundary_safe);
-
-            // DEBUG: Check step sizes
-            if (slot == 0 && lidx < 4 && weight > 0.001f) {
-                printf("K3: cell=%d, active_idx=%d, lidx=%d, weight=%.4f, step_phys=%.4f, step_boundary=%.4f, safe=%.4f, actual=%.4f, z_cell=%.4f\n",
-                       cell, active_idx, lidx, weight, step_phys, step_to_boundary, step_to_boundary_safe, actual_range_step, z_cell);
-            }
 
             // FIX Problem 2: Mid-point MCS method for better physical accuracy
             // The scattering should occur at the midpoint of the step, not at the start
@@ -250,17 +231,6 @@ __global__ void K3_FineTransport(
             float E_new = E - dE;
             float edep = dE * weight;
 
-            // DEBUG: Trace energy computation - CRITICAL for finding energy increase bug
-            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
-                float R_current = device_lookup_R(dlut, E);
-                float R_after = R_current - actual_range_step;
-                float E_from_R = device_lookup_E_inverse(dlut, R_after);
-                printf("K3 ENERGY DEBUG [lidx=%d]: E=%.3f -> E_new=%.3f, dE=%.4f, mean_dE=%.4f\n", lidx, E, E_new, dE, mean_dE);
-                printf("K3 RANGE DEBUG [lidx=%d]: R_current=%.3f, step=%.4f, R_after=%.3f, E_from_R_after=%.3f\n", lidx, R_current, actual_range_step, R_after, E_from_R);
-                printf("K3 STEP DEBUG [lidx=%d]: step_phys=%.4f, step_boundary=%.4f, actual_step=%.4f\n", lidx, step_phys, step_to_boundary, actual_range_step);
-                printf("K3 LUT DEBUG: E_min=%.3f, E_max=%.3f, N_E=%d\n", dlut.E_min, dlut.E_max, dlut.N_E);
-            }
-
             // Nuclear attenuation for actual range step (optional)
             float w_rem, E_rem;
             float w_new;
@@ -275,34 +245,23 @@ __global__ void K3_FineTransport(
             }
 
             // H6 FIX: Variance-based MCS accumulation (simplified implementation)
-            // Instead of random scattering at every step, we use a deterministic
-            // angular offset based on the RMS scattering angle. This reduces
-            // excessive lateral spread while preserving the correct scattering magnitude.
-            //
-            // Full SPEC v0.8 implementation would track var_accumulated across steps
-            // and apply 7-point quadrature when threshold exceeded. This simplified
-            // version applies a small deterministic correction to maintain forward
-            // penetration while preserving scattering moments.
-            float theta_scatter = 0.0f;  // Default: no scattering
+            // At high energies, use reduced scattering to maintain forward penetration
+            float theta_scatter = 0.0f;
             if (enable_mcs) {
                 float sigma_mcs = device_highland_sigma(E, actual_range_step);
 
-                // H6: At high energies, use reduced scattering to maintain forward penetration
-                // As energy decreases near Bragg peak, allow more scattering
+                // Energy-dependent scattering reduction
                 float scattering_reduction_factor;
-                if (E > 100.0f) {
-                    scattering_reduction_factor = 0.3f;  // Minimal scattering at high energy
-                } else if (E > 50.0f) {
-                    scattering_reduction_factor = 0.5f;  // Moderate reduction
-                } else if (E > 20.0f) {
-                    scattering_reduction_factor = 0.7f;  // Light reduction
+                if (E > ENERGY_HIGH_THRESHOLD) {
+                    scattering_reduction_factor = SCATTER_REDUCTION_HIGH_E;
+                } else if (E > ENERGY_MID_HIGH_THRESHOLD) {
+                    scattering_reduction_factor = SCATTER_REDUCTION_MID_HIGH;
+                } else if (E > ENERGY_MID_LOW_THRESHOLD) {
+                    scattering_reduction_factor = SCATTER_REDUCTION_MID_LOW;
                 } else {
-                    scattering_reduction_factor = 1.0f;  // Full scattering near Bragg peak
+                    scattering_reduction_factor = SCATTER_REDUCTION_LOW_E;
                 }
 
-                // Apply reduced scattering: use a small deterministic offset instead of random
-                // This preserves the mean (zero) while reducing lateral variance spread
-                // Only apply small random component reduced by factor, to account for residual
                 if (sigma_mcs > 0.0f) {
                     theta_scatter = device_sample_mcs_angle(sigma_mcs * scattering_reduction_factor, seed);
                 }
@@ -318,19 +277,8 @@ __global__ void K3_FineTransport(
             float x_new = x_mid + eta_new * half_step;
             float z_new = z_mid + mu_new * half_step;
 
-            // DEBUG: Check final position before boundary detection
-            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
-                printf("K3 POSITION DEBUG [lidx=%d]: x_cell=%.4f, z_cell=%.4f -> x_new=%.4f, z_new=%.4f (half_dx=%.4f, half_dz=%.4f)\n",
-                       lidx, x_cell, z_cell, x_new, z_new, half_dx, half_dz);
-            }
-
             // Check boundary crossing FIRST (using unclamped position)
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
-
-            // DEBUG: Print exit face
-            if (active_idx == 0 && slot == 0 && (lidx == 6 || lidx == 7)) {
-                printf("K3 EXIT FACE DEBUG [lidx=%d]: exit_face=%d\n", lidx, exit_face);
-            }
 
             // THEN clamp position to cell bounds for emission calculations
             x_new = fmaxf(-half_dx, fminf(x_new, half_dx));
@@ -368,10 +316,6 @@ __global__ void K3_FineTransport(
                     N_theta_local, N_E_local
                 );
 
-                // DEBUG: Track weight to bucket
-                weight_to_bucket[exit_face] += w_new;
-                particles_to_bucket++;
-
                 // FIX: Deposit energy in current cell before particle leaves
                 // Both electronic (dE * weight) and nuclear (E_rem) energy are
                 // deposited locally in this cell, not carried across boundary.
@@ -383,11 +327,6 @@ __global__ void K3_FineTransport(
                 cell_boundary_weight += w_new;
                 cell_boundary_energy += E_new * w_new;
             } else {
-                // DEBUG: Check if we reach the else branch
-                if (active_idx == 0) {
-                    printf("K3: Particle remains in cell, E_new=%.3f, w_new=%.6f\n", E_new, w_new);
-                }
-
                 // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!
                 // Previously: particles were lost if they didn't cross boundaries
                 cell_edep += edep;
@@ -395,14 +334,10 @@ __global__ void K3_FineTransport(
                 cell_E_nuclear += E_rem;
 
                 // Cutoff check - don't write to output if below cutoff
-                if (E_new <= 0.1f) {
+                if (E_new <= ENERGY_CUTOFF_MEV) {
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 } else {
-                    // DEBUG
-                    if (active_idx == 0) {
-                        printf("K3: Writing particle to psi_out\n");
-                    }
                     // CRITICAL: Write particle to output phase space so it persists!
                     // Get updated position in centered coordinates
                     x_sub = get_x_sub_bin(x_new, dx);
@@ -463,31 +398,17 @@ __global__ void K3_FineTransport(
                     }
 
                     // Write weight to local bin
-                    if (out_slot >= 0 && E_new > 0.1f) {
+                    if (out_slot >= 0 && E_new > ENERGY_CUTOFF_MEV) {
                         // Compute new local bin index
                         int theta_local_new = theta_bin_new % N_theta_local;
                         int E_local_new = E_bin_new % N_E_local;
                         int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
                         int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
                         atomicAdd(&values_out[global_idx_out], w_new);
-
-                        // DEBUG: Track weight to psi_out
-                        weight_to_psi_out += w_new;
-                        particles_to_psi_out++;
                     }
                 }
             }
         }
-    }
-
-    // DEBUG: Print weight flow summary for this cell
-    if (weight_read_from_psi_in > 0.001f || weight_to_bucket[0] > 0.001f ||
-        weight_to_bucket[1] > 0.001f || weight_to_bucket[2] > 0.001f || weight_to_bucket[3] > 0.001f ||
-        weight_to_psi_out > 0.001f) {
-        printf("K3 SUMMARY cell=%d: read=%.4f, to_bucket[Z+=%.4f,Z-=%.4f,X+=%.4f,X-=%.4f], to_psi_out=%.4f, particles=[bucket=%d,psi_out=%d]\n",
-               cell, weight_read_from_psi_in, weight_to_bucket[0], weight_to_bucket[1],
-               weight_to_bucket[2], weight_to_bucket[3], weight_to_psi_out,
-               particles_to_bucket, particles_to_psi_out);
     }
 
     // Write accumulators to global memory (atomic for thread safety)

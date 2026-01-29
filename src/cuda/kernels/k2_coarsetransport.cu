@@ -81,10 +81,6 @@ __global__ void K2_CoarseTransport(
     float cell_boundary_weight = 0.0f;
     double cell_boundary_energy = 0.0f;
 
-    // DEBUG: Count particles processed in this cell
-    int particles_in = 0;
-    int particles_out = 0;
-
     // Coarse step size: limit to cell size for accurate dose deposition
     // With N_E=1024, finer energy grid reduces binning error
     float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
@@ -103,8 +99,6 @@ __global__ void K2_CoarseTransport(
             int global_idx = (cell * Kb + slot) * DEVICE_LOCAL_BINS + lidx;
             float weight = values_in[global_idx];
             if (weight < 1e-12f) continue;
-
-            particles_in++;  // DEBUG: Count input particle
 
             // Decode 4D local index
             int theta_local, E_local, x_sub, z_sub;
@@ -126,12 +120,6 @@ __global__ void K2_CoarseTransport(
             float E_upper = E_edges[E_bin + 1];
             float E_half_width = (E_upper - E_lower) * 0.5f;
             float E = E_lower + 0.50f * E_half_width;  // 50% of half-width from lower edge
-
-            // H7 DEBUG: Print energy being read from bin
-            if (cell % 200 == 100 && (cell / 200) < 5 && weight > 0.01f) {
-                printf("K2 READ: cell=%d, E_bin=%d, b_E=%d, E_lower=%.3f, E_upper=%.3f, E=%.3f (expected ~150)\n",
-                       cell, E_bin, b_E, E_lower, E_upper, E);
-            }
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -216,11 +204,6 @@ __global__ void K2_CoarseTransport(
                     cell_edep += edep + E_new * w_new;  // Remaining energy from step
                     cell_w_cutoff += w_new;
                 } else {
-                    // DEBUG: See which particles are crossing boundaries - ALWAYS print for key cells
-                    int z_cell_idx = cell / 200;
-                    if (cell % 200 == 100 && z_cell_idx < 10) {
-                        printf("K2 CROSS: cell=%d (z=%d), face=%d, E_new=%.3f, w=%.6e, z_old=%.4f, z_new=%.4f\n", cell, z_cell_idx, exit_face, E_new, w_new, z_cell, z_new);
-                    }
                     // Calculate sub-cell bins for neighbor
                     float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
                     int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
@@ -271,15 +254,6 @@ __global__ void K2_CoarseTransport(
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 } else {
-                    // DEBUG: Track particles at different depths - ALWAYS print for key cells
-                    // cell = z * Nx + x, with Nx = 200
-                    // cell 100: z=0, x=100 (source)
-                    // cell 300: z=1, x=100
-                    // cell 500: z=2, x=100
-                    int z_cell_idx = cell / 200;
-                    if (cell % 200 == 100 && z_cell_idx < 10) {
-                        printf("K2 STAY: cell=%d (z=%d), E=%.3f, w=%.6e, z_pos=%.4f, stay_reason=boundary\n", cell, z_cell_idx, E_new, w_new, z_new);
-                    }
                     // CRITICAL: Write particle to output phase space so it persists!
                     // Get updated position in centered coordinates
                     int x_sub = get_x_sub_bin(x_new, dx);
@@ -295,13 +269,6 @@ __global__ void K2_CoarseTransport(
                     // Option D2: Use binary search with E_edges for piecewise-uniform grid
                     int E_bin_new = device_find_bin_edges(E_edges, N_E, E_new);
                     E_bin_new = fmaxf(0, fminf(E_bin_new, N_E - 1));
-
-                    // DEBUG: Track binning for all low energies
-                    if (E_new < 12.0f) {
-                        uint32_t b_E_new_debug = static_cast<uint32_t>(E_bin_new) / N_E_local;
-                        printf("K2 WRITE LOW: cell=%d, E_new=%.3f, E_bin=%d, b_E=%u\n",
-                               cell, E_new, E_bin_new, b_E_new_debug);
-                    }
 
                     // Compute new block_id
                     uint32_t b_theta_new = static_cast<uint32_t>(theta_bin_new) / N_theta_local;
@@ -338,7 +305,6 @@ __global__ void K2_CoarseTransport(
                         int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
                         int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
                         atomicAdd(&values_out[global_idx_out], w_new);
-                        particles_out++;  // DEBUG: Count output particle
                     }
                 }
             }

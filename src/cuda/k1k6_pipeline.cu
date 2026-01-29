@@ -52,13 +52,7 @@ __global__ void clear_buckets_kernel(
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= num_buckets) return;
 
-    // DEBUG: Print before clearing for bucket 400
-    if (idx == 400) {
-        printf("clear_buckets_kernel: BEFORE clear, bucket %d slot0_bid=%u\n", idx, buckets[idx].block_id[0]);
-    }
-
-    // CRITICAL FIX: Clear the bucket directly instead of using device_bucket_clear
-    // The device function might not be working properly due to caching or other issues
+    // Clear the bucket directly
     DeviceOutflowBucket& bucket = buckets[idx];
     for (int i = 0; i < DEVICE_Kb_out; ++i) {
         bucket.block_id[i] = DEVICE_EMPTY_BLOCK_ID;
@@ -66,17 +60,6 @@ __global__ void clear_buckets_kernel(
         for (int j = 0; j < DEVICE_LOCAL_BINS; ++j) {
             bucket.value[i][j] = 0.0f;
         }
-    }
-
-    // DEBUG: Print after clearing for bucket 400
-    if (idx == 400) {
-        printf("clear_buckets_kernel: AFTER clear, bucket %d slot0_bid=%u (expected=%u)\n",
-               idx, buckets[idx].block_id[0], DEVICE_EMPTY_BLOCK_ID);
-    }
-
-    // DEBUG: Print first few bucket clears
-    if (idx < 5) {
-        printf("clear_buckets_kernel: Clearing bucket %d\n", idx);
     }
 }
 
@@ -96,11 +79,6 @@ __global__ void compact_active_list(
 
     uint32_t is_active = (ActiveMask[cell] == 1) ? 1 : 0;
     s_buffer[threadIdx.x] = is_active;
-
-    // DEBUG: Track active cells
-    if (is_active && cell < 2000) {
-        printf("compact_active: cell=%d, ActiveMask=%d\n", cell, ActiveMask[cell]);
-    }
     __syncthreads();
 
     // Exclusive scan in shared memory
@@ -842,15 +820,43 @@ bool run_k1k6_pipeline_transport(
     std::cout << "K1-K6 pipeline: completed " << iter << " iterations" << std::endl;
     std::cout << "GPU K1-K6 pipeline complete." << std::endl;
 
-    // DEBUG: Check total energy deposition
+    // ========================================================================
+    // Energy Conservation Report
+    // ========================================================================
     int total_cells = config.Nx * config.Nz;
+
+    // Energy deposition
     std::vector<double> h_EdepC(total_cells);
     cudaMemcpy(h_EdepC.data(), state.d_EdepC, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
     double total_edep = 0.0;
     for (int i = 0; i < total_cells; ++i) {
         total_edep += h_EdepC[i];
     }
-    std::cout << "DEBUG: Total energy deposited = " << total_edep << " MeV (expected ~150 MeV)" << std::endl;
+
+    // Boundary loss energy
+    std::vector<double> h_BoundaryLoss_energy(total_cells);
+    cudaMemcpy(h_BoundaryLoss_energy.data(), state.d_BoundaryLoss_energy, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+    double total_boundary_loss_energy = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_boundary_loss_energy += h_BoundaryLoss_energy[i];
+    }
+
+    // Cutoff weight (particles below energy threshold)
+    std::vector<float> h_AbsorbedWeight_cutoff(total_cells);
+    cudaMemcpy(h_AbsorbedWeight_cutoff.data(), state.d_AbsorbedWeight_cutoff, total_cells * sizeof(float), cudaMemcpyDeviceToHost);
+    double total_cutoff_weight = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_cutoff_weight += h_AbsorbedWeight_cutoff[i];
+    }
+
+    double total_accounted = total_edep + total_boundary_loss_energy;
+
+    std::cout << "\n=== Energy Conservation Report ===" << std::endl;
+    std::cout << "  Energy Deposited: " << total_edep << " MeV" << std::endl;
+    std::cout << "  Boundary Loss Energy: " << total_boundary_loss_energy << " MeV" << std::endl;
+    std::cout << "  Cutoff Weight: " << total_cutoff_weight << " (particles below E < 0.1 MeV)" << std::endl;
+    std::cout << "  Total Accounted Energy: " << total_accounted << " MeV" << std::endl;
+    std::cout << "=====================================" << std::endl;
 
     return true;
 }
