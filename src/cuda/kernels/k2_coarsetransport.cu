@@ -238,9 +238,31 @@ __global__ void K2_CoarseTransport(
                     cell_w_nuclear += w_rem;
                     cell_E_nuclear += E_rem;
 
-                    // Account for energy/weight carried out by surviving particle
-                    cell_boundary_weight += w_new;
-                    cell_boundary_energy += E_new * w_new;
+                    // CRITICAL FIX: Only count as boundary loss if particle exits simulation domain
+                    // Check if neighbor cell exists (within grid bounds)
+                    int ix = cell % Nx;
+                    int iz = cell / Nx;
+                    bool neighbor_exists = true;
+                    switch (exit_face) {
+                        case 0:  // +z face
+                            neighbor_exists = (iz + 1 < Nz);
+                            break;
+                        case 1:  // -z face
+                            neighbor_exists = (iz > 0);
+                            break;
+                        case 2:  // +x face
+                            neighbor_exists = (ix + 1 < Nx);
+                            break;
+                        case 3:  // -x face
+                            neighbor_exists = (ix > 0);
+                            break;
+                    }
+
+                    // Only count as boundary loss if particle is leaving simulation domain
+                    if (!neighbor_exists) {
+                        cell_boundary_weight += w_new;
+                        cell_boundary_energy += E_new * w_new;
+                    }
                 }
             } else {
                 // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!

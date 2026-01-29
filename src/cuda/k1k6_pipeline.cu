@@ -849,10 +849,19 @@ bool run_k1k6_pipeline_transport(
         total_cutoff_weight += h_AbsorbedWeight_cutoff[i];
     }
 
-    double total_accounted = total_edep + total_boundary_loss_energy;
+    // Nuclear energy (from inelastic nuclear interactions)
+    std::vector<double> h_AbsorbedEnergy_nuclear(total_cells);
+    cudaMemcpy(h_AbsorbedEnergy_nuclear.data(), state.d_AbsorbedEnergy_nuclear, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+    double total_nuclear_energy = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_nuclear_energy += h_AbsorbedEnergy_nuclear[i];
+    }
+
+    double total_accounted = total_edep + total_boundary_loss_energy + total_nuclear_energy;
 
     std::cout << "\n=== Energy Conservation Report ===" << std::endl;
     std::cout << "  Energy Deposited: " << total_edep << " MeV" << std::endl;
+    std::cout << "  Nuclear Energy Deposited: " << total_nuclear_energy << " MeV" << std::endl;
     std::cout << "  Boundary Loss Energy: " << total_boundary_loss_energy << " MeV" << std::endl;
     std::cout << "  Cutoff Weight: " << total_cutoff_weight << " (particles below E < 0.1 MeV)" << std::endl;
     std::cout << "  Total Accounted Energy: " << total_accounted << " MeV" << std::endl;
