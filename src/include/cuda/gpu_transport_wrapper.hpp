@@ -51,10 +51,17 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper);
  * - K5: Weight audit (conservation check)
  * - K6: Buffer swapping
  *
+ * Supports both pencil beam and Gaussian beam sources.
+ *
  * @param x0, z0 Source position (mm)
  * @param theta0 Source angle (radians)
  * @param E0 Source energy (MeV)
  * @param W_total Total source weight
+ * @param sigma_x Lateral beam spread (mm, 0 for pencil beam)
+ * @param sigma_theta Angular divergence (rad, 0 for pencil beam)
+ * @param sigma_E Energy spread (MeV, 0 for monoenergetic)
+ * @param n_samples Number of samples for Gaussian beam (1 for pencil beam)
+ * @param random_seed RNG seed for reproducibility
  * @param Nx, Nz Spatial grid dimensions
  * @param dx, dz Spatial grid spacing (mm)
  * @param x_min, z_min Grid origin (mm)
@@ -67,6 +74,8 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper);
  */
 void run_k1k6_pipeline_transport(
     float x0, float z0, float theta0, float E0, float W_total,
+    float sigma_x, float sigma_theta, float sigma_E,
+    int n_samples, unsigned int random_seed,
     int Nx, int Nz, float dx, float dz,
     float x_min, float z_min,
     int N_theta, int N_E,

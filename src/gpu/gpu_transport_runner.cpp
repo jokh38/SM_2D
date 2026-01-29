@@ -142,6 +142,11 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
         config.get_angle_rad(),
         config.get_energy_MeV(),
         config.W_total,
+        config.spatial.sigma_x,        // Lateral beam spread
+        config.angular.sigma_theta,    // Angular divergence
+        config.energy.sigma_E,         // Energy spread
+        config.sampling.n_samples,     // Number of samples
+        config.sampling.random_seed,   // RNG seed
         config.grid.Nx, config.grid.Nz,
         config.grid.dx, config.grid.dz,
         x_min, z_min,

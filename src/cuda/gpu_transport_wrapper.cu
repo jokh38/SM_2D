@@ -42,6 +42,9 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper) {
 
 void run_k1k6_pipeline_transport(
     float x0, float z0, float theta0, float E0, float W_total,
+    float sigma_x, float sigma_theta, float sigma_E,  // Gaussian beam parameters
+    int n_samples,                                     // Number of samples
+    unsigned int random_seed,                          // RNG seed
     int Nx, int Nz, float dx, float dz,
     float x_min, float z_min,
     int N_theta, int N_E,
@@ -54,6 +57,14 @@ void run_k1k6_pipeline_transport(
     std::cout << "Running K1-K6 GPU pipeline wrapper..." << std::endl;
     std::cout << "  Grid: " << Nx << " x " << Nz << " cells" << std::endl;
     std::cout << "  Source: (" << x0 << ", " << z0 << ") mm, " << E0 << " MeV" << std::endl;
+
+    // Determine if using Gaussian or pencil beam
+    bool use_gaussian = (n_samples > 1) || (sigma_x > 0) || (sigma_theta > 0);
+    if (use_gaussian) {
+        std::cout << "  Using GAUSSIAN beam: sigma_x=" << sigma_x << " mm, sigma_theta=" << sigma_theta << " rad, n_samples=" << n_samples << std::endl;
+    } else {
+        std::cout << "  Using PENCIL beam (single particle)" << std::endl;
+    }
 
     // Cast from sm_2d::DeviceRLUT to ::DeviceRLUT (same type, different namespace)
     const ::DeviceRLUT& native_dlut = reinterpret_cast<const ::DeviceRLUT&>(dlut);
@@ -163,18 +174,37 @@ void run_k1k6_pipeline_transport(
               << ") at (" << x0 << ", " << z0 << ") mm" << std::endl;
     std::cout << "  Energy: " << E0 << " MeV, Angle: " << theta0 << " rad" << std::endl;
 
-    // Inject source particle into psi_in
-    // Create a simple kernel to inject the source
-    inject_source_kernel<<<1, 1>>>(
-        psi_in,
-        source_cell,
-        theta0, E0, W_total,
-        x_in_cell, z_in_cell,
-        dx, dz,
-        theta_edges, E_edges,
-        N_theta, N_E,
-        N_theta_local, N_E_local
-    );
+    // Inject source particle(s) into psi_in
+    // Use Gaussian sampling if parameters indicate, otherwise pencil beam
+    if (use_gaussian) {
+        // Gaussian beam: launch multiple threads to sample particles
+        int threads = 256;
+        int blocks = (n_samples + threads - 1) / threads;
+
+        inject_gaussian_source_kernel<<<blocks, threads>>>(
+            psi_in,
+            x0, z0, theta0, E0, W_total,
+            sigma_x, sigma_theta, sigma_E,
+            n_samples, random_seed,
+            x_min, z_min,
+            dx, dz, Nx, Nz,
+            theta_edges, E_edges,
+            N_theta, N_E,
+            N_theta_local, N_E_local
+        );
+    } else {
+        // Pencil beam: single particle at center
+        inject_source_kernel<<<1, 1>>>(
+            psi_in,
+            source_cell,
+            theta0, E0, W_total,
+            x_in_cell, z_in_cell,
+            dx, dz,
+            theta_edges, E_edges,
+            N_theta, N_E,
+            N_theta_local, N_E_local
+        );
+    }
 
     cudaDeviceSynchronize();
     cudaError_t err = cudaGetLastError();

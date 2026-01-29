@@ -58,13 +58,31 @@ struct K1K6PipelineConfig {
 // Helper Kernel Declarations
 // ============================================================================
 
-// Inject source particle into PsiC
+// Inject source particle into PsiC (pencil beam - single particle)
 __global__ void inject_source_kernel(
     DevicePsiC psi,
     int source_cell,
     float theta0, float E0, float W_total,
     float x_in_cell, float z_in_cell,
     float dx, float dz,
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+);
+
+// Inject Gaussian beam source into PsiC (multiple sampled particles)
+// Each thread processes one sample from the Gaussian distribution
+__global__ void inject_gaussian_source_kernel(
+    DevicePsiC psi,
+    float x0, float z0,              // Central beam position [mm]
+    float theta0, float E0, float W_total,  // Central angle, energy, total weight
+    float sigma_x, float sigma_theta, float sigma_E,  // Gaussian spreads
+    int n_samples,                    // Number of samples to draw
+    unsigned int random_seed,         // Seed for RNG
+    float x_min, float z_min,         // Grid origin
+    float dx, float dz,               // Cell size
+    int Nx, int Nz,                   // Grid dimensions
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
