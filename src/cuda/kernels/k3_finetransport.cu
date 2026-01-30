@@ -38,10 +38,12 @@ namespace {
     constexpr float ENERGY_OFFSET_RATIO = 0.50f;         // Offset from lower edge (fraction of half-width)
     constexpr float BOUNDARY_SAFETY_FACTOR = 1.001f;     // Allow slight boundary crossing
 
-    // Scattering reduction factors (to maintain forward penetration)
-    constexpr float SCATTER_REDUCTION_HIGH_E = 0.3f;     // E > 100 MeV
-    constexpr float SCATTER_REDUCTION_MID_HIGH = 0.5f;   // E > 50 MeV
-    constexpr float SCATTER_REDUCTION_MID_LOW = 0.7f;    // E > 20 MeV
+    // Scattering reduction factors (TEST: set all to 1.0 for accurate physics)
+    // BUG: Previous values (0.3, 0.5, 0.7) caused lateral spread to be too narrow
+    // FIX: Use 1.0 (no reduction) at all energies for correct Highland formula
+    constexpr float SCATTER_REDUCTION_HIGH_E = 1.0f;     // E > 100 MeV
+    constexpr float SCATTER_REDUCTION_MID_HIGH = 1.0f;   // E > 50 MeV
+    constexpr float SCATTER_REDUCTION_MID_LOW = 1.0f;    // E > 20 MeV
     constexpr float SCATTER_REDUCTION_LOW_E = 1.0f;      // E <= 20 MeV (full scattering)
 
     // Energy thresholds for scattering reduction
