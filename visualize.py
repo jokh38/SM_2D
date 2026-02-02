@@ -228,27 +228,26 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     extent = [x_vals[0], x_vals[-1], z_vals[-1], z_vals[0]]
 
     # ===== First row: 2D dose distributions =====
-    # Top-left: 2D Dose (raw)
+    # Top-left: 2D Dose (raw) - using plasma colormap for better visualization
     ax1 = axes[0, 0]
-    im1 = ax1.imshow(dose_grid, extent=extent, aspect='auto', cmap='hot', origin='upper')
+    im1 = ax1.imshow(dose_grid, extent=extent, aspect='auto', cmap='plasma', origin='upper')
     ax1.set_ylabel('z (mm)', fontsize=11)
     ax1.set_title('2D Dose Distribution', fontsize=12, fontweight='bold')
     plt.colorbar(im1, ax=ax1, label='Dose (Gy)')
 
-    # Top-right: 2D Dose (normalized)
+    # Top-right: 2D Dose with RdYlBu_r colormap (Red-Yellow-Blue reversed)
     ax2 = axes[0, 1]
-    dose_norm = dose_grid / (np.max(dose_grid) + 1e-10)
-    im2 = ax2.imshow(dose_norm, extent=extent, aspect='auto', cmap='hot', origin='upper', vmin=0, vmax=1)
-    ax2.set_title('2D Dose Distribution (Normalized)', fontsize=12, fontweight='bold')
-    plt.colorbar(im2, ax=ax2, label='Normalized Dose')
+    im2 = ax2.imshow(dose_grid, extent=extent, aspect='auto', cmap='RdYlBu_r', origin='upper')
+    ax2.set_title('2D Dose Distribution (Alternative)', fontsize=12, fontweight='bold')
+    plt.colorbar(im2, ax=ax2, label='Dose (Gy)')
 
     # ===== Second row: PDD and shallow x-profile =====
-    # Middle-left: PDD
+    # Middle-left: PDD - using darker color
     ax3 = axes[0, 2]
-    ax3.plot(depths, doses, 'b-', linewidth=2)
-    ax3.axvline(20, color='g', linestyle='--', alpha=0.7, label='Shallow (20mm)')
-    ax3.axvline(peak_depth / 2, color='orange', linestyle='--', alpha=0.7, label=f'Middle ({peak_depth/2:.1f}mm)')
-    ax3.axvline(peak_depth, color='r', linestyle='--', alpha=0.7, label=f'Bragg Peak ({peak_depth:.1f}mm)')
+    ax3.plot(depths, doses, '#1f77b4', linewidth=2.5)  # Dark blue
+    ax3.axvline(20, color='forestgreen', linestyle='--', alpha=0.8, linewidth=1.5, label='Shallow (20mm)')
+    ax3.axvline(peak_depth / 2, color='darkorange', linestyle='--', alpha=0.8, linewidth=1.5, label=f'Middle ({peak_depth/2:.1f}mm)')
+    ax3.axvline(peak_depth, color='crimson', linestyle='--', alpha=0.8, linewidth=1.5, label=f'Bragg Peak ({peak_depth:.1f}mm)')
     # Set ROI limits to exclude near-zero values
     (x_min, x_max), (y_min, y_max) = get_roi_limits(depths, doses)
     ax3.set_xlim(x_min, x_max)
@@ -256,73 +255,76 @@ def plot_combined_panel(depths, doses, x_vals, z_vals, dose_grid,
     ax3.set_xlabel('Depth (mm)', fontsize=10)
     ax3.set_ylabel('Dose (Gy)', fontsize=10)
     ax3.set_title('PDD (Central Axis)', fontsize=11, fontweight='bold')
-    ax3.grid(True, alpha=0.3)
-    ax3.legend(fontsize=8)
+    ax3.grid(True, alpha=0.3, linestyle=':', linewidth=0.8)
+    ax3.legend(fontsize=9, framealpha=0.9)
 
-    # Middle-right: x profile at shallow depth (20 mm) - NORMALIZED
+    # Middle-right: x profile at shallow depth (20 mm) - ABSOLUTE dose
     ax4 = axes[1, 0]
     x_prof, dose_prof, actual_depth = get_x_profile(x_vals, z_vals, dose_grid, 20.0)
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
-        # Normalize profile to maximum
-        dose_prof_norm = dose_prof / (np.max(dose_prof) + 1e-10)
-        ax4.plot(x_prof, dose_prof_norm, 'g-', linewidth=2)
+        # Use absolute dose values
+        ax4.plot(x_prof, dose_prof, 'forestgreen', linewidth=2.5)
+        ax4.fill_between(x_prof, 0, dose_prof, color='forestgreen', alpha=0.2)
         # Set ROI limits to exclude near-zero values
-        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof_norm)
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof, threshold_fraction=0.02)
         ax4.set_xlim(x_min, x_max)
-        ax4.set_ylim(0, 1.05)  # Normalized y-axis
-        sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
+        ax4.set_ylim(bottom=0)
+        max_dose = np.max(dose_prof)
+        sigma_text = f'σ = {sigma:.2f} mm\nMax = {max_dose:.3f} Gy' if sigma else f'Max = {max_dose:.3f} Gy'
         ax4.text(0.05, 0.95, sigma_text, transform=ax4.transAxes,
                 fontsize=10, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        ax4.set_title(f'X Profile @ {actual_depth:.1f}mm (Normalized)', fontsize=11, fontweight='bold')
+                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='forestgreen'))
+        ax4.set_title(f'X Profile @ {actual_depth:.1f}mm', fontsize=11, fontweight='bold')
     ax4.set_xlabel('x (mm)', fontsize=10)
-    ax4.set_ylabel('Normalized Dose', fontsize=10)
-    ax4.grid(True, alpha=0.3)
+    ax4.set_ylabel('Dose (Gy)', fontsize=10)
+    ax4.grid(True, alpha=0.3, linestyle=':', linewidth=0.8)
 
     # ===== Third row: x-profiles at middle and Bragg peak =====
-    # Bottom-middle: x profile at middle depth (bragg peak / 2) - NORMALIZED
+    # Bottom-middle: x profile at middle depth (bragg peak / 2) - ABSOLUTE dose
     ax5 = axes[1, 1]
     middle_depth = peak_depth / 2
     x_prof, dose_prof, actual_depth = get_x_profile(x_vals, z_vals, dose_grid, middle_depth)
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
-        # Normalize profile to maximum
-        dose_prof_norm = dose_prof / (np.max(dose_prof) + 1e-10)
-        ax5.plot(x_prof, dose_prof_norm, 'orange', linewidth=2)
+        # Use absolute dose values
+        ax5.plot(x_prof, dose_prof, 'darkorange', linewidth=2.5)
+        ax5.fill_between(x_prof, 0, dose_prof, color='darkorange', alpha=0.2)
         # Set ROI limits to exclude near-zero values
-        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof_norm)
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof, threshold_fraction=0.02)
         ax5.set_xlim(x_min, x_max)
-        ax5.set_ylim(0, 1.05)  # Normalized y-axis
-        sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
+        ax5.set_ylim(bottom=0)
+        max_dose = np.max(dose_prof)
+        sigma_text = f'σ = {sigma:.2f} mm\nMax = {max_dose:.3f} Gy' if sigma else f'Max = {max_dose:.3f} Gy'
         ax5.text(0.05, 0.95, sigma_text, transform=ax5.transAxes,
                 fontsize=10, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        ax5.set_title(f'X Profile @ {actual_depth:.1f}mm (Normalized)', fontsize=11, fontweight='bold')
+                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='darkorange'))
+        ax5.set_title(f'X Profile @ {actual_depth:.1f}mm', fontsize=11, fontweight='bold')
     ax5.set_xlabel('x (mm)', fontsize=10)
-    ax5.set_ylabel('Normalized Dose', fontsize=10)
-    ax5.grid(True, alpha=0.3)
+    ax5.set_ylabel('Dose (Gy)', fontsize=10)
+    ax5.grid(True, alpha=0.3, linestyle=':', linewidth=0.8)
 
-    # Bottom-right: x profile at bragg peak depth - NORMALIZED
+    # Bottom-right: x profile at bragg peak depth - ABSOLUTE dose
     ax6 = axes[1, 2]
     x_prof, dose_prof, actual_depth = get_x_profile(x_vals, z_vals, dose_grid, peak_depth)
     if x_prof is not None:
         sigma = calculate_gaussian_sigma(x_prof, dose_prof)
-        # Normalize profile to maximum
-        dose_prof_norm = dose_prof / (np.max(dose_prof) + 1e-10)
-        ax6.plot(x_prof, dose_prof_norm, 'r-', linewidth=2)
+        # Use absolute dose values
+        ax6.plot(x_prof, dose_prof, 'crimson', linewidth=2.5)
+        ax6.fill_between(x_prof, 0, dose_prof, color='crimson', alpha=0.2)
         # Set ROI limits to exclude near-zero values
-        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof_norm)
+        (x_min, x_max), (y_min, y_max) = get_roi_limits(x_prof, dose_prof, threshold_fraction=0.02)
         ax6.set_xlim(x_min, x_max)
-        ax6.set_ylim(0, 1.05)  # Normalized y-axis
-        sigma_text = f'σ = {sigma:.2f} mm' if sigma else 'σ = N/A'
+        ax6.set_ylim(bottom=0)
+        max_dose = np.max(dose_prof)
+        sigma_text = f'σ = {sigma:.2f} mm\nMax = {max_dose:.3f} Gy' if sigma else f'Max = {max_dose:.3f} Gy'
         ax6.text(0.05, 0.95, sigma_text, transform=ax6.transAxes,
                 fontsize=10, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        ax6.set_title(f'X Profile @ {actual_depth:.1f}mm (Bragg Peak, Normalized)', fontsize=11, fontweight='bold')
+                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='crimson'))
+        ax6.set_title(f'X Profile @ {actual_depth:.1f}mm (Bragg Peak)', fontsize=11, fontweight='bold')
     ax6.set_xlabel('x (mm)', fontsize=10)
-    ax6.set_ylabel('Normalized Dose', fontsize=10)
-    ax6.grid(True, alpha=0.3)
+    ax6.set_ylabel('Dose (Gy)', fontsize=10)
+    ax6.grid(True, alpha=0.3, linestyle=':', linewidth=0.8)
 
     plt.tight_layout()
     plt.savefig(output_path, dpi=150)
