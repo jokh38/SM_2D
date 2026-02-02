@@ -190,8 +190,6 @@ __global__ void K2_CoarseTransport(
 
             // Calculate MCS scattering angle (RMS)
             float sigma_theta = device_highland_sigma(E, coarse_range_step);
-            // TEST: Amplify scattering by 100x to verify lateral spreading works
-            sigma_theta = sigma_theta * 100.0f;  // TEST: 100x amplification
 
             // PLAN_fix_scattering: DO NOT accumulate theta
             // Theta remains unchanged; lateral spreading is handled by weight distribution
