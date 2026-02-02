@@ -53,6 +53,10 @@ __device__ inline void device_transfer_bucket_to_psi(
     }
 }
 
+// Global counter for debugging bucket transfers
+__device__ int d_transferred_particles = 0;
+__device__ int d_transferred_weight = 0;
+
 __global__ void K4_BucketTransfer(
     const DeviceOutflowBucket* __restrict__ OutflowBuckets,
     float* __restrict__ values_out,
@@ -61,6 +65,13 @@ __global__ void K4_BucketTransfer(
 ) {
     int cell = blockIdx.x * blockDim.x + threadIdx.x;
     if (cell >= Nx * Nz) return;
+
+    // Reset counters (first thread does this)
+    if (cell == 0) {
+        d_transferred_particles = 0;
+        d_transferred_weight = 0;
+    }
+    __syncthreads();
 
     // P3 FIX: Define max slots per cell (must match PsiC structure)
     constexpr int max_slots_per_cell = DEVICE_Kb;  // = 8
@@ -151,10 +162,27 @@ __global__ void K4_BucketTransfer(
                     if (w > 0) {
                         int global_idx = (cell * max_slots_per_cell + out_slot) * DEVICE_LOCAL_BINS + lidx;
                         atomicAdd(&values_out[global_idx], w);
+                        atomicAdd(&d_transferred_weight, 1);  // DEBUG: count transfers
                     }
                 }
+                atomicAdd(&d_transferred_particles, 1);  // DEBUG: count slots transferred
             }
         }
+    }
+
+    // DEBUG: Print transfer stats (first thread in last block)
+    __shared__ int s_transfer_count;
+    if (threadIdx.x == 0) s_transfer_count = 0;
+    __syncthreads();
+    if (cell == 0) {
+        s_transfer_count = d_transferred_particles;
+    }
+    __syncthreads();
+
+    // Only thread 0 of block 0 prints (to avoid multiple prints)
+    if (blockIdx.x == 0 && threadIdx.x == 0 && s_transfer_count > 0) {
+        printf("  K4: Transferred %d particles (weight bins: %d)\n",
+               s_transfer_count, d_transferred_weight);
     }
 }
 

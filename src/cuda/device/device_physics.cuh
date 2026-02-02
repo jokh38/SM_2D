@@ -237,3 +237,89 @@ __device__ inline float device_apply_nuclear_attenuation(
     return w_new;
 }
 
+// ============================================================================
+// Stochastic Interpolation for Lateral Scattering (K2 Coarse Transport)
+// ============================================================================
+// PLAN_fix_scattering: Implement Gaussian-based lateral spreading
+// instead of theta accumulation for proper beam widening
+// ============================================================================
+
+// Approximate Gaussian CDF using error function approximation
+// Returns: P(X <= x) for X ~ N(mu, sigma^2)
+__device__ inline float device_gaussian_cdf(float x, float mu, float sigma) {
+    if (sigma < 1e-10f) return (x >= mu) ? 1.0f : 0.0f;
+
+    float t = (x - mu) / (sigma * 0.70710678f);  // / sqrt(2)
+    float abs_t = fabsf(t);
+    float r;
+
+    // Abramowitz and Stegun approximation for erf
+    if (abs_t < 1.0f) {
+        r = 0.5f * t * (1.0f + abs_t * (0.16666667f + abs_t * (0.04166667f +
+            abs_t * (0.00833333f + abs_t * 0.00142857f))));
+    } else {
+        r = 1.0f - 0.5f * expf(-abs_t * (1.0f + abs_t * (0.5f + abs_t * (0.33333333f +
+            abs_t * 0.25f)))) / sqrtf(2.0f * (float)M_PI);
+    }
+
+    return (t > 0.0f) ? 0.5f + r : 0.5f - r;
+}
+
+// Calculate Gaussian weight distribution for lateral scattering
+// Distributes particle weight across N cells using Gaussian CDF
+//
+// Parameters:
+//   weights[out]:     Array of N weights (sum = 1.0)
+//   x_mean:           Mean lateral position (cell-centered)
+//   sigma_x:          Lateral spread standard deviation (mm)
+//   dx:               Cell size (mm)
+//   N:                Number of cells to spread across (must be even)
+//
+// The distribution covers ±(N/2)*dx around x_mean
+__device__ inline void device_gaussian_spread_weights(
+    float* weights,
+    float x_mean,
+    float sigma_x,
+    float dx,
+    int N
+) {
+    // Clamp sigma_x to avoid division issues
+    sigma_x = fmaxf(sigma_x, 1e-6f);
+
+    // Calculate cell boundaries (N cells cover range from -N/2*dx to +N/2*dx)
+    float x_min = x_mean - (N / 2) * dx;
+
+    // Calculate weights using Gaussian CDF
+    float cdf_prev = device_gaussian_cdf(x_min, x_mean, sigma_x);
+
+    for (int i = 0; i < N; i++) {
+        float x_boundary = x_min + (i + 1) * dx;
+        float cdf_curr = device_gaussian_cdf(x_boundary, x_mean, sigma_x);
+        weights[i] = cdf_curr - cdf_prev;
+        cdf_prev = cdf_curr;
+    }
+
+    // Normalize to ensure sum = 1.0
+    float w_sum = 0.0f;
+    for (int i = 0; i < N; i++) {
+        w_sum += weights[i];
+    }
+
+    if (w_sum > 1e-10f) {
+        for (int i = 0; i < N; i++) {
+            weights[i] /= w_sum;
+        }
+    } else {
+        // If sigma_x is very small, put all weight in center cell
+        for (int i = 0; i < N; i++) {
+            weights[i] = (i == N / 2 - 1) ? 1.0f : 0.0f;
+        }
+    }
+}
+
+// Calculate lateral spread sigma_x from scattering angle
+// sigma_x = sin(sigma_theta) * step
+// For small angles: sin(sigma_theta) ≈ sigma_theta
+__device__ inline float device_lateral_spread_sigma(float sigma_theta, float step) {
+    return sinf(fminf(sigma_theta, 1.57f)) * step;  // sin(theta), theta < pi/2
+}

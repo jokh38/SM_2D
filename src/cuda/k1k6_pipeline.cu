@@ -8,12 +8,185 @@
 #include "device/device_lut.cuh"
 #include "device/device_bucket.cuh"
 #include "device/device_psic.cuh"
+#include "core/local_bins.hpp"  // For decode_local_idx_4d
 #include "cuda/gpu_transport_wrapper.hpp"
 #include <cuda_runtime.h>
 #include <iostream>
 #include <cmath>
+#include <fstream>
+#include <vector>
+#include <iomanip>
 
 namespace sm_2d {
+
+// ============================================================================
+// Debug: Dump non-zero cell information to CSV
+// ============================================================================
+void dump_nonzero_cells_to_csv(
+    const DevicePsiC& psi,
+    int Nx, int Nz, float dx, float dz,
+    int iteration,
+    const char* stage_name,  // "after_K2K3", "after_K4", etc.
+    const float* theta_edges,  // Add theta edges for angle calculation
+    const float* E_edges,      // Add E edges for energy calculation
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+) {
+    int N_cells = Nx * Nz;
+    size_t total_values = N_cells * psi.Kb * LOCAL_BINS;
+
+    // Copy all values from device
+    std::vector<float> h_all_values(total_values);
+    std::vector<uint32_t> h_all_block_ids(N_cells * psi.Kb);
+
+    cudaMemcpy(h_all_values.data(), psi.value, total_values * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_all_block_ids.data(), psi.block_id, N_cells * psi.Kb * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+
+    // Collect non-zero cells with detailed energy/angle info
+    struct CellInfo {
+        int cell;
+        int ix;
+        int iz;
+        float x_center;
+        float z_center;
+        float total_weight;
+        int num_slots;
+        float mean_E;        // Mean energy weighted by weight
+        float mean_theta;    // Mean theta weighted by weight
+        float min_E;         // Minimum energy in cell
+        float max_E;         // Maximum energy in cell
+        float min_theta;     // Minimum theta in cell
+        float max_theta;     // Maximum theta in cell
+    };
+    std::vector<CellInfo> nonzero_cells;
+
+    // Pre-compute theta and E bin centers for lookup
+    std::vector<float> theta_centers(N_theta);
+    std::vector<float> E_centers(N_E);
+    float theta_min = theta_edges[0];
+    float theta_max = theta_edges[N_theta];
+    float dtheta = (theta_max - theta_min) / N_theta;
+    for (int i = 0; i < N_theta; ++i) {
+        theta_centers[i] = theta_min + (i + 0.5f) * dtheta;
+    }
+    for (int i = 0; i < N_E; ++i) {
+        // Use lower edge + 50% of half-width (same as K2/K3)
+        float E_lower = E_edges[i];
+        float E_upper = E_edges[i + 1];
+        float E_half_width = (E_upper - E_lower) * 0.5f;
+        E_centers[i] = E_lower + 0.50f * E_half_width;
+    }
+
+    for (int cell = 0; cell < N_cells; ++cell) {
+        float cell_weight = 0.0f;
+        int num_slots = 0;
+
+        // Weighted sums for mean energy and theta
+        float sum_E_weighted = 0.0f;
+        float sum_theta_weighted = 0.0f;
+        float min_E_cell = 1e30f;
+        float max_E_cell = -1e30f;
+        float min_theta_cell = 1e30f;
+        float max_theta_cell = -1e30f;
+
+        for (int slot = 0; slot < psi.Kb; ++slot) {
+            uint32_t bid = h_all_block_ids[cell * psi.Kb + slot];
+            if (bid == 0xFFFFFFFF) continue;  // EMPTY_BLOCK_ID
+
+            // Decode block ID
+            uint32_t b_theta = bid & 0xFFF;
+            uint32_t b_E = (bid >> 12) & 0xFFF;
+
+            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
+                size_t idx = (cell * psi.Kb + slot) * LOCAL_BINS + lidx;
+                float w = h_all_values[idx];
+                if (w > 1e-12f) {
+                    cell_weight += w;
+                    num_slots++;
+
+                    // Decode local index to get theta_local, E_local
+                    int theta_local, E_local, x_sub, z_sub;
+                    decode_local_idx_4d(lidx, theta_local, E_local, x_sub, z_sub);
+
+                    // Get global bin indices
+                    int theta_bin = b_theta * N_theta_local + theta_local;
+                    int E_bin = b_E * N_E_local + E_local;
+
+                    // Get theta and E values
+                    float theta = theta_centers[theta_bin];
+                    float E = E_centers[E_bin];
+
+                    // Accumulate weighted sums
+                    sum_E_weighted += E * w;
+                    sum_theta_weighted += theta * w;
+
+                    // Track min/max
+                    if (E < min_E_cell) min_E_cell = E;
+                    if (E > max_E_cell) max_E_cell = E;
+                    if (theta < min_theta_cell) min_theta_cell = theta;
+                    if (theta > max_theta_cell) max_theta_cell = theta;
+                }
+            }
+        }
+
+        if (cell_weight > 1e-12f) {
+            int ix = cell % Nx;
+            int iz = cell / Nx;
+            float x_center = (ix + 0.5f) * dx;
+            float z_center = (iz + 0.5f) * dz;
+
+            float mean_E = sum_E_weighted / cell_weight;
+            float mean_theta = sum_theta_weighted / cell_weight;
+
+            nonzero_cells.push_back({
+                cell, ix, iz, x_center, z_center, cell_weight, num_slots,
+                mean_E, mean_theta, min_E_cell, max_E_cell, min_theta_cell, max_theta_cell
+            });
+        }
+    }
+
+    // Create filename: debug_cells_iter_<N>_<stage>.csv
+    char filename[256];
+    snprintf(filename, sizeof(filename), "results/debug_cells_iter_%02d_%s.csv", iteration, stage_name);
+
+    // Write CSV
+    std::ofstream ofs(filename);
+    if (!ofs.is_open()) {
+        std::cerr << "Failed to open " << filename << " for writing" << std::endl;
+        return;
+    }
+
+    // Header with new columns
+    ofs << "cell,ix,iz,x_mm,z_mm,total_weight,num_slots,mean_E_MeV,mean_theta_rad,min_E_MeV,max_E_MeV,min_theta_rad,max_theta_rad\n";
+    ofs << std::fixed << std::setprecision(6);
+
+    for (const auto& info : nonzero_cells) {
+        ofs << info.cell << ","
+            << info.ix << ","
+            << info.iz << ","
+            << info.x_center << ","
+            << info.z_center << ","
+            << info.total_weight << ","
+            << info.num_slots << ","
+            << info.mean_E << ","
+            << info.mean_theta << ","
+            << info.min_E << ","
+            << info.max_E << ","
+            << info.min_theta << ","
+            << info.max_theta << "\n";
+    }
+
+    ofs.close();
+
+    std::cout << "  DEBUG: Wrote " << nonzero_cells.size() << " non-zero cells to "
+              << filename << " (z range: ";
+    if (!nonzero_cells.empty()) {
+        float z_min = nonzero_cells.front().z_center;
+        float z_max = nonzero_cells.back().z_center;
+        std::cout << z_min << " - " << z_max << " mm)";
+    }
+    std::cout << std::endl;
+}
 
 // ============================================================================
 // Helper Kernel Implementations
@@ -748,6 +921,13 @@ bool run_k1k6_pipeline_transport(
                       << state.n_coarse << " coarse cells" << std::endl;
         }
 
+        // DEBUG: Print detailed stats every 10 iterations for coarse-only mode
+        if (iter <= 10 || iter % 50 == 0) {
+            std::cout << "  Iteration " << iter << ": "
+                      << state.n_active << " active, "
+                      << state.n_coarse << " coarse cells" << std::endl;
+        }
+
         // Check if we're done
         if (state.n_active == 0 && state.n_coarse == 0) {
             std::cout << "  Transport complete after " << iter << " iterations" << std::endl;
@@ -798,6 +978,17 @@ bool run_k1k6_pipeline_transport(
 
         // Note: Buckets are cleared at START of next iteration (before K2/K3)
         // This is correct because K4 needs to read the buckets AFTER K2/K3 write to them
+
+        // --------------------------------------------------------------------
+        // DEBUG: Dump non-zero cells after K4 for selected iterations
+        // --------------------------------------------------------------------
+        if (iter <= 10 || iter == 50 || iter == 100 || iter == 150 || iter == 200 || iter == 250) {
+            dump_nonzero_cells_to_csv(*psi_out, config.Nx, config.Nz, config.dx, config.dz,
+                                       iter, "after_K4",
+                                       a_grid.edges.data(), e_grid.edges.data(),
+                                       config.N_theta, config.N_E,
+                                       config.N_theta_local, config.N_E_local);
+        }
 
         // --------------------------------------------------------------------
         // K5: Weight Audit (conservation check)

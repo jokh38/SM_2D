@@ -4,6 +4,11 @@
 #include "core/local_bins.hpp"
 #include "core/block_encoding.hpp"
 
+// Forward declarations for physics functions (defined in device_physics.cuh)
+// Avoid circular dependency by using forward declarations where possible
+extern __device__ float device_gaussian_cdf(float x, float mu, float sigma);
+extern __device__ void device_gaussian_spread_weights(float* weights, float x_mean, float sigma_x, float dx, int N);
+
 // ============================================================================
 // Device Bucket Emission Functions for K3 FineTransport
 // ============================================================================
@@ -694,4 +699,131 @@ __device__ inline int device_get_neighbor(int cell, int face, int Nx, int Nz) {
             return cell - 1;
     }
     return -1;
+}
+
+// ============================================================================
+// Multi-Cell Lateral Spreading Emission (PLAN_fix_scattering)
+// ============================================================================
+// Emits particle weight to multiple neighboring cells using Gaussian
+// lateral spreading instead of theta accumulation.
+//
+// This implements stochastic interpolation for K2 coarse transport:
+// - Weight is distributed across N cells using Gaussian distribution
+// - Each cell receives weight proportional to Gaussian CDF
+// - Thread-safe using atomic operations
+// ============================================================================
+
+// Emit weight with lateral spreading to multiple cells
+// Parameters:
+//   OutflowBuckets: Array of all buckets (accessed via bucket_index)
+//   source_cell:    Current cell index
+//   target_z:       Target z row index (typically source_cell/Nx + 1 for +z direction)
+//   theta:          Scattering angle (NOT accumulated)
+//   E:              Energy
+//   weight:         Total weight to distribute
+//   x_offset:       Lateral position within source cell (centered: [-dx/2, +dx/2])
+//   sigma_x:        Lateral spread standard deviation (mm)
+//   dx:             Cell size (mm)
+//   Nx, Nz:         Grid dimensions
+//   N_spread:       Number of cells to spread across (must be even)
+//   theta_edges, E_edges, N_theta, N_E, N_theta_local, N_E_local: Grid info
+__device__ inline void device_emit_lateral_spread(
+    DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    int source_cell,
+    int target_z,
+    float theta,
+    float E,
+    float weight,
+    float x_offset,            // Lateral position in cell (centered)
+    float sigma_x,             // Lateral spread (mm)
+    float dx,
+    int Nx, int Nz,
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local,
+    int N_spread = 10          // Number of cells to spread across
+) {
+    if (weight <= 0.0f || N_spread <= 0) return;
+
+    // Clamp sigma_x to avoid numerical issues
+    sigma_x = fmaxf(sigma_x, 1e-6f);
+
+    // If sigma_x is very small compared to cell size, just emit to single cell
+    if (sigma_x < dx * 0.1f) {
+        // Single-cell emission (center)
+        int ix_center = source_cell % Nx;
+        int iz_source = source_cell / Nx;
+
+        if (target_z >= 0 && target_z < Nz) {
+            int emit_cell = ix_center + iz_source * Nx;
+            int bucket_idx = device_bucket_index(emit_cell, FACE_Z_PLUS, Nx, Nz);
+            DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+
+            // Use center sub-cell bins
+            int x_sub_center = N_x_sub / 2;  // Center x bin
+            int z_sub_neighbor = 0;  // Bottom of neighbor cell (entering from -z)
+
+            device_emit_component_to_bucket_4d(
+                bucket, theta, E, weight, x_sub_center, z_sub_neighbor,
+                theta_edges, E_edges, N_theta, N_E,
+                N_theta_local, N_E_local
+            );
+        }
+        return;
+    }
+
+    // Calculate Gaussian weight distribution
+    // Fixed-size array for device code
+    constexpr int MAX_SPREAD_CELLS = 10;
+    int N_actual = fminf(N_spread, MAX_SPREAD_CELLS);
+
+    float weights[MAX_SPREAD_CELLS];
+
+    // x_mean is the mean lateral position (x_offset = position within cell)
+    device_gaussian_spread_weights(weights, x_offset, sigma_x, dx, N_actual);
+
+    // Get source cell indices
+    int ix_source = source_cell % Nx;
+    int iz_source = source_cell / Nx;
+
+    // Emit to each target cell with distributed weight
+    int x_offset_start = -(N_actual / 2);  // -5 for N=10
+
+    for (int i = 0; i < N_actual; i++) {
+        float w_frac = weights[i];
+        if (w_frac < 1e-6f) continue;  // Skip negligible weights
+
+        int x_offset = x_offset_start + i;
+        int ix_target = ix_source + x_offset;
+
+        // Boundary check
+        if (ix_target < 0 || ix_target >= Nx) continue;
+        if (target_z < 0 || target_z >= Nz) continue;
+
+        // KEY: To send weight to cell (ix_target, target_z), we emit to the +z bucket
+        // of cell (ix_target, iz_source). K4 will then transfer it to (ix_target, target_z).
+        int emit_cell = ix_target + iz_source * Nx;
+        int bucket_idx = device_bucket_index(emit_cell, FACE_Z_PLUS, Nx, Nz);
+        DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+
+        // Sub-cell bins for entry into neighbor cell
+        int x_sub_target;
+        if (x_offset < 0) {
+            x_sub_target = N_x_sub - 1;  // Rightmost bin (entering from left)
+        } else if (x_offset > 0) {
+            x_sub_target = 0;  // Leftmost bin (entering from right)
+        } else {
+            x_sub_target = N_x_sub / 2;  // Center
+        }
+
+        int z_sub_neighbor = 0;  // Bottom of neighbor cell
+
+        // Emit with distributed weight
+        device_emit_component_to_bucket_4d(
+            bucket, theta, E, weight * w_frac, x_sub_target, z_sub_neighbor,
+            theta_edges, E_edges, N_theta, N_E,
+            N_theta_local, N_E_local
+        );
+    }
 }
