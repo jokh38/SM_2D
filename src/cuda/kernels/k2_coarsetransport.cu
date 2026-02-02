@@ -15,6 +15,13 @@
 #include <stdexcept>
 #include <string>
 
+// ============================================================================
+// Debug Measurements for Weight/Variance Conservation (PLAN_MCS Phase A-5)
+// ============================================================================
+// Set to 1 to enable debug output for weight and variance tracking
+#define DEBUG_MCS_CONSERVATION 0
+// ============================================================================
+
 // Forward declaration for DeviceOutflowBucket (defined in device_bucket.cuh)
 // This is already included via device_bucket.cuh
 
@@ -229,6 +236,19 @@ __global__ void K2_CoarseTransport(
                         // Multi-cell emission with lateral spreading
                         int iz_target = (cell / Nx) + 1;  // +z neighbor
 
+                        // Calculate sigma-based spread radius (k=3 sigma covers 99.7% of Gaussian)
+                        float k_sigma = 3.0f;
+                        float radius_sigma = sigma_x / dx;
+                        int spread_radius = static_cast<int>(ceilf(radius_sigma * k_sigma));
+
+                        // Safety clamps for spread radius
+                        spread_radius = fmaxf(spread_radius, 1);  // Minimum radius 1
+                        int max_radius = fminf(Nx / 2, 50);       // Upper clamp
+                        spread_radius = fminf(spread_radius, max_radius);
+
+                        // Ensure even number for symmetric spreading
+                        if (spread_radius % 2 != 0) spread_radius++;
+
                         device_emit_lateral_spread(
                             OutflowBuckets, cell, iz_target,
                             theta_new, E_new, w_new,
@@ -236,7 +256,7 @@ __global__ void K2_CoarseTransport(
                             sigma_x, dx, Nx, Nz,
                             theta_edges, E_edges,
                             N_theta, N_E, N_theta_local, N_E_local,
-                            10  // Spread across 10 cells
+                            spread_radius  // Sigma-based radius (replaces fixed 10)
                         );
                     } else {
                         // Single-cell emission for other faces or when sigma_x is negligible

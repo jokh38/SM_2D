@@ -14,29 +14,25 @@
 // ============================================================================
 
 // ============================================================================
-// MCS 2D Projection Correction (Physical Analysis Applied)
+// MCS Highland Formula (PDG 2024)
 // ============================================================================
 // This simulation uses a 2D geometry (x-z plane).
-// The Highland formula gives the 3D scattering angle sigma_3D.
 //
-// PHYSICS CORRECTION (2026-01):
-// For 3D isotropic scattering projected onto a 2D plane:
-//   - The azimuthal angle φ is uniformly distributed in [0, 2π]
-//   - Projected variance: σ_2D² = σ_3D² / 2 (variance splits equally)
-//   - Therefore: σ_2D = σ_3D / √2 ≈ 0.707 × σ_3D
+// PHYSICS CORRECTION (2026-02):
+// The Highland formula θ₀ IS defined as the RMS "projected" scattering
+// angle for one plane (PDG 2024). No additional 2D correction is needed
+// for x-z plane simulation.
 //
-// PREVIOUS ERROR: Used 2/π ≈ 0.637 based on E[|cos(φ)|], but this applies
-// to displacement not angle. For variance-based lateral spread, 1/√2 is correct.
-//
-// FIXED: Now uses 1/√2 for proper 2D projection variance
+// REMOVED: DEVICE_MCS_2D_CORRECTION was incorrectly applied. The Highland
+// formula already returns the plane-projected angle, not 3D angle.
 // ============================================================================
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-// 1/√2 ≈ 0.70710678 (precomputed for constexpr compatibility)
-constexpr float DEVICE_MCS_2D_CORRECTION = 0.70710678f;
+// DEPRECATED: 1/√2 correction removed - Highland theta_0 IS the projected RMS
+// constexpr float DEVICE_MCS_2D_CORRECTION = 0.70710678f;  // DEPRECATED (2026-02)
 
 // Physics constants
 constexpr float DEVICE_m_p_MeV = 938.272f;      // Proton rest mass [MeV/c²]
@@ -50,7 +46,7 @@ constexpr float DEVICE_Z_A_water = 0.555f;      // Z/A for water
 // ============================================================================
 
 // Highland formula for MCS scattering angle sigma [radians]
-// P2 FIX: Now applies 2D projection correction (2/π)
+// Returns the plane-projected RMS angle (PDG 2024 definition)
 __device__ inline float device_highland_sigma(float E_MeV, float ds, float X0 = DEVICE_X0_water) {
     constexpr float z = 1.0f;  // Proton charge
 
@@ -69,9 +65,9 @@ __device__ inline float device_highland_sigma(float E_MeV, float ds, float X0 = 
     float bracket = 1.0f + 0.038f * ln_t;
     bracket = fmaxf(bracket, 0.25f);
 
-    // P2 FIX: Apply 2D projection correction
-    float sigma_3d = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
-    return sigma_3d * DEVICE_MCS_2D_CORRECTION;
+    // Highland sigma already IS the projected angle RMS (PDG 2024)
+    float sigma = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    return sigma;
 }
 
 // Sample Gaussian scattering angle using Box-Muller transform
@@ -318,8 +314,14 @@ __device__ inline void device_gaussian_spread_weights(
 }
 
 // Calculate lateral spread sigma_x from scattering angle
-// sigma_x = sin(sigma_theta) * step
-// For small angles: sin(sigma_theta) ≈ sigma_theta
+// Applies sqrt(3) correction for continuous scattering distributed within step
+//
+// For continuous scattering over a step of length ds:
+// - If scattering occurs at the beginning: sigma_x = sigma_theta * ds
+// - If scattering is uniformly distributed: sigma_x = sigma_theta * ds / sqrt(3)
+//
+// The /sqrt(3) factor accounts for the variance of uniform distribution
 __device__ inline float device_lateral_spread_sigma(float sigma_theta, float step) {
-    return sinf(fminf(sigma_theta, 1.57f)) * step;  // sin(theta), theta < pi/2
+    float sin_theta = sinf(fminf(sigma_theta, 1.57f));  // sin(theta), theta < pi/2
+    return sin_theta * step / 1.7320508f;  // Divide by sqrt(3) for continuous scattering
 }

@@ -1,0 +1,4 @@
+BASELINE RESULTS (2026-02-02)
+================================
+Bragg Peak: 144.5 mm, 4.74321 Gy
+Source dose: results/baseline/dose_before.txt
