@@ -25,25 +25,21 @@ constexpr float X0_water = 360.8f;  // Radiation length of water [mm]
 namespace { const float m_p_MeV = 938.272f; }
 
 // ============================================================================
-// MCS 2D Projection Correction (Physical Analysis Applied)
+// MCS Highland Formula (PDG 2024)
 // ============================================================================
 // This simulation uses a 2D geometry (x-z plane).
-// The Highland formula gives the 3D scattering angle sigma_3D.
 //
-// PHYSICS CORRECTION (2026-01):
-// For 3D isotropic scattering projected onto a 2D plane:
-//   - The azimuthal angle φ is uniformly distributed in [0, 2π]
-//   - Projected variance: σ_2D² = σ_3D² / 2 (variance splits equally)
-//   - Therefore: σ_2D = σ_3D / √2 ≈ 0.707 × σ_3D
+// PHYSICS CORRECTION (2026-02):
+// The Highland formula θ₀ IS defined as the RMS "projected" scattering
+// angle for one plane (PDG 2024). No additional 2D correction is needed
+// for x-z plane simulation.
 //
-// PREVIOUS ERROR: Used 2/π ≈ 0.637 based on E[|cos(φ)|], but this applies
-// to displacement not angle. For variance-based lateral spread, 1/√2 is correct.
-//
-// FIXED: Now uses 1/√2 for proper 2D projection variance
+// REMOVED: MCS_2D_CORRECTION was incorrectly applied. The Highland
+// formula already returns the plane-projected angle, not 3D angle.
 // ============================================================================
 
-// 1/√2 ≈ 0.70710678 (precomputed for constexpr compatibility)
-constexpr float MCS_2D_CORRECTION = 0.70710678f;
+// DEPRECATED: 1/√2 correction removed - Highland theta_0 IS the projected RMS
+// constexpr float MCS_2D_CORRECTION = 0.70710678f;  // DEPRECATED (2026-02)
 
 // Highland formula for multiple Coulomb scattering (PDG 2024)
 // Returns sigma_theta [radians] for 2D simulation (x-z plane)
@@ -57,6 +53,9 @@ constexpr float MCS_2D_CORRECTION = 0.70710678f;
 //   X_0 = radiation length [mm] (360.8 mm for water)
 //
 // Valid for: 1e-5 < t < 100 where t = x/X_0
+//
+// NOTE: The Highland formula already returns the plane-projected RMS angle,
+// not the 3D angle. No additional 2D correction is needed.
 __host__ __device__ inline float highland_sigma(float E_MeV, float ds, float X0 = 360.8f) {
     constexpr float z = 1.0f;  // Proton charge
 
@@ -75,9 +74,9 @@ __host__ __device__ inline float highland_sigma(float E_MeV, float ds, float X0 
     // PDG 2024 recommends bracket ≥ 0.25 (was 0.5)
     bracket = fmaxf(bracket, 0.25f);  // PDG 2024 recommendation
 
-    // P2 FIX: Apply 2D projection correction
-    float sigma_3d = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
-    return sigma_3d * MCS_2D_CORRECTION;
+    // Highland sigma already IS the projected angle RMS (PDG 2024)
+    float sigma = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    return sigma;
 }
 
 // 7-point Gaussian quadrature weights for angular splitting

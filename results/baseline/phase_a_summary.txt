@@ -1,0 +1,44 @@
+PHASE A (HOTFIX) COMPLETION SUMMARY
+====================================
+Date: 2026-02-02
+
+BASELINE RESULTS:
+  Bragg Peak: 144.5 mm, 4.74321 Gy
+  Max dose: 319.5 Gy
+
+PHASE A RESULTS:
+  Bragg Peak: 144.5 mm, 4.74321 Gy  
+  Max dose: 319.5 Gy
+  Difference: IDENTICAL (within floating point precision)
+
+CHANGES APPLIED:
+1. ✅ Removed 1/√2 correction from device_physics.cuh (GPU)
+2. ✅ Removed 1/√2 correction from highland.hpp (CPU)
+3. ✅ Added /√3 correction to device_lateral_spread_sigma
+4. ✅ Changed spread radius from fixed 10 to sigma-based (k=3σ)
+5. ✅ Added DEBUG_MCS_CONSERVATION macro for future debugging
+
+PHYSICS CHANGES VERIFICATION:
+  Highland theta0 (150 MeV, 1mm):
+    OLD (with 1/√2): 1.407 mrad
+    NEW (no 1/√2):   1.990 mrad  (×√2 = 1.414x larger) ✓
+
+  Lateral spread sigma_x (0.5mm step):
+    OLD: 0.000703 mm
+    NEW: 0.000574 mm  (×0.816 = /√2 × /√3) ✓
+
+WHY RESULTS ARE IDENTICAL:
+  - Single-step sigma_x (0.0006mm) < threshold (0.005mm)
+  - Multi-cell spreading not triggered for this configuration
+  - Single-cell emission path is used for most particles
+  - Changes will be more significant in Phase B (moment accumulation)
+
+FILES MODIFIED:
+  - src/cuda/device/device_physics.cuh
+  - src/include/physics/highland.hpp
+  - src/cuda/kernels/k2_coarsetransport.cu
+
+NEXT STEPS (Phase B):
+  - Implement Fermi-Eyges moment tracking (A=⟨θ²⟩, B=⟨xθ⟩, C=⟨x²⟩)
+  - Use accumulated sigma_x = sqrt(C) instead of per-step calculation
+  - Expected: σₓ ∝ z^(3/2) scaling

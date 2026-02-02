@@ -14,29 +14,25 @@
 // ============================================================================
 
 // ============================================================================
-// MCS 2D Projection Correction (Physical Analysis Applied)
+// MCS Highland Formula (PDG 2024)
 // ============================================================================
 // This simulation uses a 2D geometry (x-z plane).
-// The Highland formula gives the 3D scattering angle sigma_3D.
 //
-// PHYSICS CORRECTION (2026-01):
-// For 3D isotropic scattering projected onto a 2D plane:
-//   - The azimuthal angle φ is uniformly distributed in [0, 2π]
-//   - Projected variance: σ_2D² = σ_3D² / 2 (variance splits equally)
-//   - Therefore: σ_2D = σ_3D / √2 ≈ 0.707 × σ_3D
+// PHYSICS CORRECTION (2026-02):
+// The Highland formula θ₀ IS defined as the RMS "projected" scattering
+// angle for one plane (PDG 2024). No additional 2D correction is needed
+// for x-z plane simulation.
 //
-// PREVIOUS ERROR: Used 2/π ≈ 0.637 based on E[|cos(φ)|], but this applies
-// to displacement not angle. For variance-based lateral spread, 1/√2 is correct.
-//
-// FIXED: Now uses 1/√2 for proper 2D projection variance
+// REMOVED: DEVICE_MCS_2D_CORRECTION was incorrectly applied. The Highland
+// formula already returns the plane-projected angle, not 3D angle.
 // ============================================================================
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-// 1/√2 ≈ 0.70710678 (precomputed for constexpr compatibility)
-constexpr float DEVICE_MCS_2D_CORRECTION = 0.70710678f;
+// DEPRECATED: 1/√2 correction removed - Highland theta_0 IS the projected RMS
+// constexpr float DEVICE_MCS_2D_CORRECTION = 0.70710678f;  // DEPRECATED (2026-02)
 
 // Physics constants
 constexpr float DEVICE_m_p_MeV = 938.272f;      // Proton rest mass [MeV/c²]
@@ -50,7 +46,7 @@ constexpr float DEVICE_Z_A_water = 0.555f;      // Z/A for water
 // ============================================================================
 
 // Highland formula for MCS scattering angle sigma [radians]
-// P2 FIX: Now applies 2D projection correction (2/π)
+// Returns the plane-projected RMS angle (PDG 2024 definition)
 __device__ inline float device_highland_sigma(float E_MeV, float ds, float X0 = DEVICE_X0_water) {
     constexpr float z = 1.0f;  // Proton charge
 
@@ -69,9 +65,9 @@ __device__ inline float device_highland_sigma(float E_MeV, float ds, float X0 = 
     float bracket = 1.0f + 0.038f * ln_t;
     bracket = fmaxf(bracket, 0.25f);
 
-    // P2 FIX: Apply 2D projection correction
-    float sigma_3d = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
-    return sigma_3d * DEVICE_MCS_2D_CORRECTION;
+    // Highland sigma already IS the projected angle RMS (PDG 2024)
+    float sigma = (13.6f * z / (beta * p_MeV)) * sqrtf(t) * bracket;
+    return sigma;
 }
 
 // Sample Gaussian scattering angle using Box-Muller transform
@@ -237,3 +233,162 @@ __device__ inline float device_apply_nuclear_attenuation(
     return w_new;
 }
 
+// ============================================================================
+// Stochastic Interpolation for Lateral Scattering (K2 Coarse Transport)
+// ============================================================================
+// PLAN_fix_scattering: Implement Gaussian-based lateral spreading
+// instead of theta accumulation for proper beam widening
+// ============================================================================
+
+// Approximate Gaussian CDF using error function approximation
+// Returns: P(X <= x) for X ~ N(mu, sigma^2)
+__device__ inline float device_gaussian_cdf(float x, float mu, float sigma) {
+    if (sigma < 1e-10f) return (x >= mu) ? 1.0f : 0.0f;
+
+    float t = (x - mu) / (sigma * 0.70710678f);  // / sqrt(2)
+    float abs_t = fabsf(t);
+    float r;
+
+    // Abramowitz and Stegun approximation for erf
+    if (abs_t < 1.0f) {
+        r = 0.5f * t * (1.0f + abs_t * (0.16666667f + abs_t * (0.04166667f +
+            abs_t * (0.00833333f + abs_t * 0.00142857f))));
+    } else {
+        r = 1.0f - 0.5f * expf(-abs_t * (1.0f + abs_t * (0.5f + abs_t * (0.33333333f +
+            abs_t * 0.25f)))) / sqrtf(2.0f * (float)M_PI);
+    }
+
+    return (t > 0.0f) ? 0.5f + r : 0.5f - r;
+}
+
+// Calculate Gaussian weight distribution for lateral scattering
+// Distributes particle weight across N cells using Gaussian CDF
+//
+// Parameters:
+//   weights[out]:     Array of N weights (sum = 1.0)
+//   x_mean:           Mean lateral position (cell-centered)
+//   sigma_x:          Lateral spread standard deviation (mm)
+//   dx:               Cell size (mm)
+//   N:                Number of cells to spread across (must be even)
+//
+// The distribution covers ±(N/2)*dx around x_mean
+__device__ inline void device_gaussian_spread_weights(
+    float* weights,
+    float x_mean,
+    float sigma_x,
+    float dx,
+    int N
+) {
+    // Clamp sigma_x to avoid division issues
+    sigma_x = fmaxf(sigma_x, 1e-6f);
+
+    // Calculate cell boundaries (N cells cover range from -N/2*dx to +N/2*dx)
+    float x_min = x_mean - (N / 2) * dx;
+
+    // Calculate weights using Gaussian CDF
+    float cdf_prev = device_gaussian_cdf(x_min, x_mean, sigma_x);
+
+    for (int i = 0; i < N; i++) {
+        float x_boundary = x_min + (i + 1) * dx;
+        float cdf_curr = device_gaussian_cdf(x_boundary, x_mean, sigma_x);
+        weights[i] = cdf_curr - cdf_prev;
+        cdf_prev = cdf_curr;
+    }
+
+    // Normalize to ensure sum = 1.0
+    float w_sum = 0.0f;
+    for (int i = 0; i < N; i++) {
+        w_sum += weights[i];
+    }
+
+    if (w_sum > 1e-10f) {
+        for (int i = 0; i < N; i++) {
+            weights[i] /= w_sum;
+        }
+    } else {
+        // If sigma_x is very small, put all weight in center cell
+        for (int i = 0; i < N; i++) {
+            weights[i] = (i == N / 2 - 1) ? 1.0f : 0.0f;
+        }
+    }
+}
+
+// Calculate lateral spread sigma_x from scattering angle
+// Applies sqrt(3) correction for continuous scattering distributed within step
+//
+// For continuous scattering over a step of length ds:
+// - If scattering occurs at the beginning: sigma_x = sigma_theta * ds
+// - If scattering is uniformly distributed: sigma_x = sigma_theta * ds / sqrt(3)
+//
+// The /sqrt(3) factor accounts for the variance of uniform distribution
+__device__ inline float device_lateral_spread_sigma(float sigma_theta, float step) {
+    float sin_theta = sinf(fminf(sigma_theta, 1.57f));  // sin(theta), theta < pi/2
+    return sin_theta * step / 1.7320508f;  // Divide by sqrt(3) for continuous scattering
+}
+
+// ============================================================================
+// Fermi-Eyges Moment Tracking (Phase B - PLAN_MCS)
+// ============================================================================
+// Implements moment-based lateral spreading for correct O(z^(3/2)) scaling
+//
+// Moments tracked:
+//   A = ⟨θ²⟩  : Angular variance
+//   B = ⟨xθ⟩  : Position-angle covariance
+//   C = ⟨x²⟩  : Position variance (lateral spread squared)
+//
+// Reference: Fermi-Eyges theory of multiple Coulomb scattering
+// ============================================================================
+
+// Calculate scattering power T = θ₀²/ds [rad²/mm]
+// This is the rate of increase of angular variance per unit path length
+__device__ inline float device_scattering_power_T(float E_MeV, float ds, float X0 = DEVICE_X0_water) {
+    // Highland theta0 at step energy
+    float theta0 = device_highland_sigma(E_MeV, ds, X0);
+
+    // Guard against ds too small
+    if (ds < 1e-6f) return 0.0f;
+
+    // Scattering power: T = θ₀² / ds
+    float T = theta0 * theta0 / ds;
+    return T;
+}
+
+// Fermi-Eyges moment evolution for one step
+// Updates A, B, C moments based on scattering power T and step size ds
+//
+// Input:  A, B, C (old moments), T (scattering power), ds (step size)
+// Output: A, B, C (updated moments)
+//
+// Equations (from Fermi-Eyges theory):
+//   d⟨θ²⟩/dz = T           → A_new = A_old + T*ds
+//   d⟨xθ⟩/dz = ⟨θ²⟩        → B_new = B_old + A_old*ds + 0.5*T*ds²
+//   d⟨x²⟩/dz = 2⟨xθ⟩       → C_new = C_old + 2*B_old*ds + A_old*ds² + (1/3)*T*ds³
+__device__ inline void device_fermi_eyges_step(
+    float& A, float& B, float& C,  // Moments (in/out)
+    float T, float ds               // Scattering power, step size
+) {
+    // Store old values for sequential update
+    float A_old = A;
+    float B_old = B;
+
+    // Update moments (Fermi-Eyges evolution equations)
+    A = A_old + T * ds;                                              // ⟨θ²⟩ increases by T*ds
+    B = B_old + A_old * ds + 0.5f * T * ds * ds;                    // ⟨xθ⟩ increases
+    C = C + 2.0f * B_old * ds + A_old * ds * ds + (1.0f / 3.0f) * T * ds * ds * ds;  // ⟨x²⟩ increases
+
+    // Ensure moments remain non-negative
+    A = fmaxf(A, 0.0f);
+    C = fmaxf(C, 0.0f);
+}
+
+// Calculate accumulated lateral spread sigma_x from Fermi-Eyges C moment
+// Returns: sigma_x = sqrt(⟨x²⟩) = sqrt(C)
+__device__ inline float device_accumulated_sigma_x(float moment_C) {
+    return sqrtf(fmaxf(moment_C, 0.0f));
+}
+
+// Calculate accumulated angular spread sigma_theta from Fermi-Eyges A moment
+// Returns: sigma_theta = sqrt(⟨θ²⟩) = sqrt(A)
+__device__ inline float device_accumulated_sigma_theta(float moment_A) {
+    return sqrtf(fmaxf(moment_A, 0.0f));
+}

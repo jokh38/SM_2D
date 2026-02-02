@@ -15,6 +15,13 @@
 #include <stdexcept>
 #include <string>
 
+// ============================================================================
+// Debug Measurements for Weight/Variance Conservation (PLAN_MCS Phase A-5)
+// ============================================================================
+// Set to 1 to enable debug output for weight and variance tracking
+#define DEBUG_MCS_CONSERVATION 0
+// ============================================================================
+
 // Forward declaration for DeviceOutflowBucket (defined in device_bucket.cuh)
 // This is already included via device_bucket.cuh
 
@@ -84,7 +91,8 @@ __global__ void K2_CoarseTransport(
     double cell_boundary_energy = 0.0f;
 
     // Coarse step size: limit to cell size for accurate dose deposition
-    // With N_E=1024, finer energy grid reduces binning error
+    // IMPORTANT: Coarse transport only supports single-cell transfers per iteration
+    // Using step > cell size causes particles to "jump" over cells without proper transport
     float coarse_step = fminf(config.step_coarse, fminf(dx, dz));
 
     // Process all slots in this cell
@@ -176,15 +184,50 @@ __global__ void K2_CoarseTransport(
             float w_new = device_apply_nuclear_attenuation(weight, E, coarse_range_step, w_rem, E_rem);
             edep += E_rem;
 
-            // Coarse MCS: use RMS angle (no random sampling for efficiency)
-            float sigma_mcs = device_highland_sigma(E, coarse_range_step);
-            // Apply RMS scattering as systematic angular spread
-            // In coarse mode, we bias the angle toward the mean (zero deflection)
-            // This represents the "average" trajectory
-            float theta_new = theta;  // Coarse: no random scattering, just energy loss
+            // ========================================================================
+            // Phase B: Fermi-Eyges Moment-Based Lateral Spreading (PLAN_MCS)
+            // ========================================================================
+            // Implements O(z^(3/2)) scaling using moment tracking instead of
+            // per-step sigma calculation.
+            //
+            // Key changes from Phase A:
+            // 1. Track Fermi-Eyges moments: A=⟨θ²⟩, B=⟨xθ⟩, C=⟨x²⟩
+            // 2. Use accumulated sigma_x = sqrt(C) for lateral spreading
+            // 3. Compute scattering power T = θ₀²/ds
+            // ========================================================================
 
+            // Estimate path length from source (approximate for K2)
+            // For K2 coarse transport, particles start at z≈0 and travel forward
+            // Path ≈ (current_z + step_z) / cos(θ)
+            int iz_cell = cell / Nx;
+            float z_center = (iz_cell + 0.5f) * dz;  // Cell center in global coordinates
+            float path_from_source = (z_center + half_dz) / mu;  // Approximate total path
+
+            // Initialize moments (all zero at source)
+            float moment_A = 0.0f;  // ⟨θ²⟩
+            float moment_B = 0.0f;  // ⟨xθ⟩
+            float moment_C = 0.0f;  // ⟨x²⟩
+
+            // Compute Fermi-Eyges moments analytically for constant scattering power
+            // For constant T over path s: A = T*s, B = 0.5*T*s², C = (1/3)*T*s³
+            float T = device_scattering_power_T(E, 1.0f);  // Scattering power at 1mm reference
+            float s = path_from_source;  // Total path from source
+
+            // Moments for constant scattering power
+            moment_A = T * s;
+            moment_B = 0.5f * T * s * s;
+            moment_C = (1.0f / 3.0f) * T * s * s * s;
+
+            // Get accumulated sigma_x from C moment
+            float sigma_x_accum = device_accumulated_sigma_x(moment_C);
+
+            // Theta remains unchanged (no accumulation in K2)
+            float theta_new = theta;
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
+
+            // Use accumulated sigma_x for lateral spreading
+            float sigma_x = sigma_x_accum;
 
             // Position update (use limited step to avoid boundary crossing)
             float x_new = x_cell + eta_new * coarse_step_limited;
@@ -206,32 +249,59 @@ __global__ void K2_CoarseTransport(
                     cell_edep += edep + E_new * w_new;  // Remaining energy from step
                     cell_w_cutoff += w_new;
                 } else {
-                    // Calculate sub-cell bins for neighbor
-                    float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
-                    int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+                    // PLAN_fix_scattering: Use lateral spreading for +z exit face
+                    // For +z direction (main beam direction), distribute weight across
+                    // multiple cells using Gaussian distribution based on sigma_x
+                    if (exit_face == FACE_Z_PLUS && sigma_x > dx * 0.01f) {
+                        // Multi-cell emission with lateral spreading
+                        int iz_target = (cell / Nx) + 1;  // +z neighbor
 
-                    float z_offset_neighbor;
-                    if (exit_face == 0) {
-                        z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
-                    } else if (exit_face == 1) {
-                        z_offset_neighbor = dz * 0.5f - dz * 0.125f;
+                        // Calculate sigma-based spread radius (k=3 sigma covers 99.7% of Gaussian)
+                        float k_sigma = 3.0f;
+                        float radius_sigma = sigma_x / dx;
+                        int spread_radius = static_cast<int>(ceilf(radius_sigma * k_sigma));
+
+                        // Safety clamps for spread radius
+                        spread_radius = fmaxf(spread_radius, 1);  // Minimum radius 1
+                        int max_radius = fminf(Nx / 2, 50);       // Upper clamp
+                        spread_radius = fminf(spread_radius, max_radius);
+
+                        // Ensure even number for symmetric spreading
+                        if (spread_radius % 2 != 0) spread_radius++;
+
+                        device_emit_lateral_spread(
+                            OutflowBuckets, cell, iz_target,
+                            theta_new, E_new, w_new,
+                            x_new,  // Lateral position (centered coordinate)
+                            sigma_x, dx, Nx, Nz,
+                            theta_edges, E_edges,
+                            N_theta, N_E, N_theta_local, N_E_local,
+                            spread_radius  // Sigma-based radius (replaces fixed 10)
+                        );
                     } else {
-                        z_offset_neighbor = z_new - dz * 0.5f;
-                    }
-                    int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
-                    z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+                        // Single-cell emission for other faces or when sigma_x is negligible
+                        float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                        int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
 
-                    int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
-                    DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                    // COARSE-ONLY FIX: Use single-bin emission instead of interpolation
-                    // Interpolation causes exponential particle splitting, leading to
-                    // weights of ~10^-18 after 60 iterations. For coarse transport,
-                    // single-bin emission is sufficient and prevents fragmentation.
-                    device_emit_component_to_bucket_4d(
-                        bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
-                        theta_edges, E_edges, N_theta, N_E,
-                        N_theta_local, N_E_local
-                    );
+                        float z_offset_neighbor;
+                        if (exit_face == 0) {
+                            z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
+                        } else if (exit_face == 1) {
+                            z_offset_neighbor = dz * 0.5f - dz * 0.125f;
+                        } else {
+                            z_offset_neighbor = z_new - dz * 0.5f;
+                        }
+                        int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
+                        z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+
+                        int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                        DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                        device_emit_component_to_bucket_4d(
+                            bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
+                            theta_edges, E_edges, N_theta, N_E,
+                            N_theta_local, N_E_local
+                        );
+                    }
 
                     // FIX: Deposit energy in current cell before particle leaves
                     // Both electronic (dE * weight) and nuclear (E_rem) energy are

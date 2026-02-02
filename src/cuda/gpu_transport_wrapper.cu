@@ -9,11 +9,92 @@
 #include <memory>
 #include <vector>
 #include <tuple>
+#include <fstream>
+#include <iomanip>
 
 // Bring CUDA types into sm_2d namespace for compatibility
 using ::DeviceLUTWrapper;
 
 namespace sm_2d {
+
+// ============================================================================
+// Debug: Dump non-zero cell information to CSV (initial state)
+// ============================================================================
+static void dump_initial_cells_to_csv(
+    const DevicePsiC& psi,
+    int Nx, int Nz, float dx, float dz
+) {
+    int N_cells = Nx * Nz;
+    size_t total_values = N_cells * psi.Kb * LOCAL_BINS;
+
+    // Copy all values from device
+    std::vector<float> h_all_values(total_values);
+    std::vector<uint32_t> h_all_block_ids(N_cells * psi.Kb);
+
+    cudaMemcpy(h_all_values.data(), psi.value, total_values * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_all_block_ids.data(), psi.block_id, N_cells * psi.Kb * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+
+    // Collect non-zero cells
+    struct CellInfo {
+        int cell;
+        int ix;
+        int iz;
+        float x_center;
+        float z_center;
+        float total_weight;
+    };
+    std::vector<CellInfo> nonzero_cells;
+
+    for (int cell = 0; cell < N_cells; ++cell) {
+        float cell_weight = 0.0f;
+
+        for (int slot = 0; slot < psi.Kb; ++slot) {
+            uint32_t bid = h_all_block_ids[cell * psi.Kb + slot];
+            if (bid == 0xFFFFFFFF) continue;
+
+            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
+                size_t idx = (cell * psi.Kb + slot) * LOCAL_BINS + lidx;
+                float w = h_all_values[idx];
+                if (w > 1e-12f) {
+                    cell_weight += w;
+                }
+            }
+        }
+
+        if (cell_weight > 1e-12f) {
+            int ix = cell % Nx;
+            int iz = cell / Nx;
+            float x_center = (ix + 0.5f) * dx;
+            float z_center = (iz + 0.5f) * dz;
+
+            nonzero_cells.push_back({cell, ix, iz, x_center, z_center, cell_weight});
+        }
+    }
+
+    // Write CSV
+    std::ofstream ofs("results/debug_cells_iter_00_initial.csv");
+    if (!ofs.is_open()) {
+        std::cerr << "Failed to open debug_cells_iter_00_initial.csv for writing" << std::endl;
+        return;
+    }
+
+    ofs << "cell,ix,iz,x_mm,z_mm,total_weight\n";
+    ofs << std::fixed << std::setprecision(6);
+
+    for (const auto& info : nonzero_cells) {
+        ofs << info.cell << ","
+            << info.ix << ","
+            << info.iz << ","
+            << info.x_center << ","
+            << info.z_center << ","
+            << info.total_weight << "\n";
+    }
+
+    ofs.close();
+    std::cout << "  DEBUG: Wrote " << nonzero_cells.size() << " initial non-zero cells to debug_cells_iter_00_initial.csv" << std::endl;
+}
+
+// ============================================================================
 
 // Implementation of DeviceLUTWrapper (PIMPL pattern for CUDA types)
 class DeviceLUTWrapperImpl {
@@ -75,12 +156,9 @@ void run_k1k6_pipeline_transport(
     config.dz = dz;
 
     // Energy thresholds
-    // H6 FIX: Use E_trigger = 300 MeV (above max particle energy) to force ALL particles
-    // to use K3 fine transport, which tracks continuous energy values properly.
-    // Coarse-only mode (K2) has fundamental limitation with binned phase space:
-    // particles cannot track energy loss when dE/step < bin_width.
-    // K3 fine transport solves this by using continuous energy values.
-    config.E_trigger = 300.0f;         // Above max energy (250 MeV) → ALL particles use K3
+    // TEST: Use E_trigger = 0.01 MeV (below cutoff) to force ALL particles to use K2 coarse transport
+    // This tests coarse grid functionality. Expect lower accuracy but correct operation.
+    config.E_trigger = 0.01f;          // Below cutoff (0.1 MeV) → ALL particles use K2 Coarse
     config.weight_active_min = 1e-12f;  // FIX: Lowered from 1e-6 to fix transport gap (per debug report)
 
     // Coarse transport settings
@@ -201,6 +279,9 @@ void run_k1k6_pipeline_transport(
     std::cout << "  Source injection verification:" << std::endl;
     std::cout << "    Total weight: " << total_weight << " (expected: " << W_total << ")" << std::endl;
     std::cout << "    Non-zero cells: " << nonzero_cells << " / " << psi_in.N_cells << std::endl;
+
+    // DEBUG: Dump initial cell state
+    dump_initial_cells_to_csv(psi_in, Nx, Nz, dx, dz);
 
     // ========================================================================
     // STEP 4: Run Main Pipeline
