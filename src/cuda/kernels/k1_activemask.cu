@@ -1,7 +1,7 @@
 #include "kernels/k1_activemask.cuh"
-#include "core/block_encoding.hpp"
+#include "core/block_encoding.hpp"  // For EMPTY_BLOCK_ID
 #include "core/local_bins.hpp"  // For LOCAL_BINS
-#include "device/device_psic.cuh"  // For DEVICE_Kb
+#include "device/device_psic.cuh"  // For DEVICE_Kb, DEVICE_EMPTY_BLOCK_ID
 
 __global__ void K1_ActiveMask(
     const uint32_t* __restrict__ block_ids,
@@ -26,7 +26,7 @@ __global__ void K1_ActiveMask(
 
     for (int slot = 0; slot < Kb; ++slot) {
         uint32_t bid = block_ids[cell * Kb + slot];
-        if (bid == 0xFFFFFFFF) continue;
+        if (bid == EMPTY_BLOCK_ID) continue;
 
         uint32_t b_E = (bid >> 12) & 0xFFF;
         // P4 FIX: Now uses the b_E_trigger parameter instead of hardcoded 20
@@ -54,15 +54,17 @@ void run_K1_ActiveMask(
         float W_cell = 0;
         bool needs_fine_transport = false;
 
-        for (int slot = 0; slot < 32; ++slot) {
+        // Use psi.Kb (host-side slot count) instead of hardcoded value
+        for (int slot = 0; slot < psi.Kb; ++slot) {
             uint32_t bid = psi.block_id[cell][slot];
-            if (bid == 0xFFFFFFFF) continue;
+            if (bid == EMPTY_BLOCK_ID) continue;
 
             uint32_t b_E = (bid >> 12) & 0xFFF;
             // P4 FIX: Now uses the b_E_trigger parameter instead of hardcoded 20
             if (b_E < static_cast<uint32_t>(b_E_trigger)) needs_fine_transport = true;
 
-            for (int lidx = 0; lidx < 32; ++lidx) {
+            // Use LOCAL_BINS constant instead of hardcoded value
+            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
                 W_cell += psi.value[cell][slot][lidx];
             }
         }

@@ -15,17 +15,13 @@
 // ============================================================================
 // Global LUT instance for CPU transport (initialized on first use)
 // ============================================================================
-static std::mutex rlut_mutex;
-static RLUT* global_rlut = nullptr;
-static bool rlut_initialized = false;
-
+// Uses C++11 "magic static" pattern:
+// - Thread-safe initialization (guaranteed by C++11 standard)
+// - Automatic cleanup on program exit
+// - No manual memory management required
 const RLUT& get_global_rlut() {
-    std::lock_guard<std::mutex> lock(rlut_mutex);
-    if (!rlut_initialized) {
-        global_rlut = new RLUT(GenerateRLUT(0.1f, 300.0f, 256));
-        rlut_initialized = true;
-    }
-    return *global_rlut;
+    static const RLUT rlut = GenerateRLUT(0.1f, 300.0f, 256);
+    return rlut;
 }
 
 // ============================================================================

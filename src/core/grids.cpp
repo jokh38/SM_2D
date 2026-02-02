@@ -81,22 +81,18 @@ namespace {
     }
 }
 
-EnergyGrid::EnergyGrid(const std::vector<std::tuple<float, float, float>>& groups)
-    : EnergyGrid(0.1f, 250.0f, 1)  // Dummy values, will be replaced
-{
+// Factory function for piecewise-uniform grid
+// This avoids const_cast by constructing the object with computed values
+EnergyGrid EnergyGrid::CreatePiecewise(const std::vector<std::tuple<float, float, float>>& groups) {
     // Create the piecewise grid data
     auto result = create_piecewise_grid(groups);
 
-    // Now we need to copy the data to this object
-    // Since N_E, E_min, E_max are const, we need to cast away const
-    // This is safe because we're in the constructor
-    const_cast<int&>(N_E) = result.N_E;
-    const_cast<float&>(E_min) = result.E_min;
-    const_cast<float&>(E_max) = result.E_max;
-    is_piecewise = true;
-
-    edges = std::move(result.edges);
-    rep = std::move(result.rep);
+    // Construct and return the object with correct values
+    EnergyGrid grid(result.E_min, result.E_max, result.N_E);
+    grid.edges = std::move(result.edges);
+    grid.rep = std::move(result.rep);
+    grid.is_piecewise = true;
+    return grid;
 }
 
 int EnergyGrid::FindBin(float E) const {

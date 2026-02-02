@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <mutex>
 #include <cmath>
+#include <stdexcept>
+#include <string>
 
 // Forward declaration for DeviceOutflowBucket (defined in device_bucket.cuh)
 // This is already included via device_bucket.cuh
@@ -366,6 +368,7 @@ void run_K2_CoarseTransport(
 
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
-        // Error handling would go here
+        throw std::runtime_error("K2_CoarseTransport kernel failed: " +
+                                std::string(cudaGetErrorString(err)));
     }
 }

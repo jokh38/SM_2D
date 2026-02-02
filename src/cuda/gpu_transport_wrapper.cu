@@ -108,7 +108,7 @@ void run_k1k6_pipeline_transport(
         {20.0f, 100.0f, 0.25f},  // 320 bins - Mid-energy plateau (finer)
         {100.0f, 250.0f, 0.25f}   // 600 bins - High energy (MUCH FINER for tracking)
     };
-    EnergyGrid e_grid(energy_groups);  // Option D2: piecewise-uniform
+    EnergyGrid e_grid = EnergyGrid::CreatePiecewise(energy_groups);  // Option D2: piecewise-uniform
     AngularGrid a_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
 
     // ========================================================================

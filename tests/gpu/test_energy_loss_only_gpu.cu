@@ -215,7 +215,7 @@ protected:
             {100.0f, 250.0f, 0.25f} // 600 bins (was 1.0) - FINER for better tracking
         };
 
-        e_grid_ptr.reset(new EnergyGrid(energy_groups));
+        e_grid_ptr.reset(new EnergyGrid(EnergyGrid::CreatePiecewise(energy_groups)));
         N_E = e_grid_ptr->N_E;
         a_grid_ptr.reset(new AngularGrid(-M_PI/2.0f, M_PI/2.0f, N_theta));
 

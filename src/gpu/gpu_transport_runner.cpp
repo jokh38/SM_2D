@@ -77,7 +77,7 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
         {20.0f, 100.0f, 0.25f},  // 320 bins - Mid-energy plateau (finer)
         {100.0f, 250.0f, 0.25f}   // 600 bins - High energy (MUCH FINER for tracking)
     };
-    EnergyGrid E_grid(energy_groups);
+    EnergyGrid E_grid = EnergyGrid::CreatePiecewise(energy_groups);
     const int N_E = E_grid.N_E;  // Will be 1029
 
     std::cout << "=== Option D2 Energy Grid ===" << std::endl;

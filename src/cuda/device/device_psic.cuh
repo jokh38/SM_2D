@@ -2,6 +2,7 @@
 #include <cuda_runtime.h>
 #include <cstdint>
 #include <iostream>
+#include <vector>
 #include "core/local_bins.hpp"
 #include "core/block_encoding.hpp"
 
@@ -525,9 +526,9 @@ __host__ inline float device_psic_sum_global(const DevicePsiC& psic) {
         psic, d_partial
     );
 
-    // Copy partial results to host
-    float* h_partial = new float[n_blocks];
-    cudaMemcpy(h_partial, d_partial, n_blocks * sizeof(float), cudaMemcpyDeviceToHost);
+    // Copy partial results to host using std::vector for automatic cleanup
+    std::vector<float> h_partial(n_blocks);
+    cudaMemcpy(h_partial.data(), d_partial, n_blocks * sizeof(float), cudaMemcpyDeviceToHost);
     cudaFree(d_partial);
 
     // Final reduction on host
@@ -535,7 +536,6 @@ __host__ inline float device_psic_sum_global(const DevicePsiC& psic) {
     for (int i = 0; i < n_blocks; ++i) {
         total += h_partial[i];
     }
-    delete[] h_partial;
 
     return total;
 }
