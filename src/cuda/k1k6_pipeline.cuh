@@ -59,8 +59,11 @@ struct K1K6PipelineConfig {
 // ============================================================================
 
 // Inject source particle into PsiC with angular and spatial distribution
-// sigma_theta > 0: Distribute source across multiple angles (Gaussian)
-// sigma_x > 0: Distribute source across multiple lateral positions/cells (Gaussian)
+// sigma_theta > 0: Distribute source across multiple angles (Gauss-Hermite quadrature)
+// sigma_x > 0: Distribute source across ALL cells within beam width (continuous Gaussian)
+//               - Each cell receives weight proportional to Gaussian PDF at cell center
+//               - Coverage: ±4 sigma_x (99.99% of distribution)
+//               - Weights are normalized so sum = 1.0
 __global__ void inject_source_kernel(
     DevicePsiC psi,
     int Nx, int Nz, float dx, float dz, float x_min, float z_min,  // Grid info for multi-cell injection

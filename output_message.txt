@@ -59,1159 +59,2873 @@ Pipeline state allocation successful
   Source: (0, 0) mm
   Energy: 150 MeV, Angle: 0 rad
   Source injection verification:
-    Total weight: 2.0449 (expected: 1)
-    Non-zero cells: 7 / 128000
+    Total weight: 1.0001 (expected: 1)
+    Non-zero cells: 97 / 128000
 Running K1-K6 GPU pipeline...
   Grid: 200 x 640 cells
   Phase-space: 36 x 1029 global bins
   Energy threshold: 300 MeV (b_E_trigger=514)
   Min weight: 1e-12
 Starting main transport loop...
-compact_active write: cell=131, idx=6, threadIdx.x=131
-compact_active write: cell=100, idx=3, threadIdx.x=100
-compact_active write: cell=109, idx=4, threadIdx.x=109
-compact_active write: cell=120, idx=5, threadIdx.x=120
-compact_active write: cell=68, idx=0, threadIdx.x=68
-compact_active write: cell=79, idx=1, threadIdx.x=79
-compact_active write: cell=90, idx=2, threadIdx.x=90
-  DEBUG n_active=7, n_coarse=0
-  Iteration 1: 7 active, 0 coarse cells
-    psi_in: weight=2.0449, nonzero_bins=7
+compact_active write: cell=128, idx=76, threadIdx.x=128
+compact_active write: cell=129, idx=77, threadIdx.x=129
+compact_active write: cell=130, idx=78, threadIdx.x=130
+compact_active write: cell=131, idx=79, threadIdx.x=131
+compact_active write: cell=132, idx=80, threadIdx.x=132
+compact_active write: cell=133, idx=81, threadIdx.x=133
+compact_active write: cell=134, idx=82, threadIdx.x=134
+compact_active write: cell=135, idx=83, threadIdx.x=135
+compact_active write: cell=136, idx=84, threadIdx.x=136
+compact_active write: cell=137, idx=85, threadIdx.x=137
+compact_active write: cell=138, idx=86, threadIdx.x=138
+compact_active write: cell=139, idx=87, threadIdx.x=139
+compact_active write: cell=140, idx=88, threadIdx.x=140
+compact_active write: cell=141, idx=89, threadIdx.x=141
+compact_active write: cell=142, idx=90, threadIdx.x=142
+compact_active write: cell=143, idx=91, threadIdx.x=143
+compact_active write: cell=144, idx=92, threadIdx.x=144
+compact_active write: cell=145, idx=93, threadIdx.x=145
+compact_active write: cell=146, idx=94, threadIdx.x=146
+compact_active write: cell=147, idx=95, threadIdx.x=147
+compact_active write: cell=148, idx=96, threadIdx.x=148
+compact_active write: cell=52, idx=0, threadIdx.x=52
+compact_active write: cell=53, idx=1, threadIdx.x=53
+compact_active write: cell=54, idx=2, threadIdx.x=54
+compact_active write: cell=55, idx=3, threadIdx.x=55
+compact_active write: cell=56, idx=4, threadIdx.x=56
+compact_active write: cell=57, idx=5, threadIdx.x=57
+compact_active write: cell=58, idx=6, threadIdx.x=58
+compact_active write: cell=59, idx=7, threadIdx.x=59
+compact_active write: cell=60, idx=8, threadIdx.x=60
+compact_active write: cell=61, idx=9, threadIdx.x=61
+compact_active write: cell=62, idx=10, threadIdx.x=62
+compact_active write: cell=63, idx=11, threadIdx.x=63
+compact_active write: cell=64, idx=12, threadIdx.x=64
+compact_active write: cell=65, idx=13, threadIdx.x=65
+compact_active write: cell=66, idx=14, threadIdx.x=66
+compact_active write: cell=67, idx=15, threadIdx.x=67
+compact_active write: cell=68, idx=16, threadIdx.x=68
+compact_active write: cell=69, idx=17, threadIdx.x=69
+compact_active write: cell=70, idx=18, threadIdx.x=70
+compact_active write: cell=71, idx=19, threadIdx.x=71
+compact_active write: cell=72, idx=20, threadIdx.x=72
+compact_active write: cell=73, idx=21, threadIdx.x=73
+compact_active write: cell=74, idx=22, threadIdx.x=74
+compact_active write: cell=75, idx=23, threadIdx.x=75
+compact_active write: cell=76, idx=24, threadIdx.x=76
+compact_active write: cell=77, idx=25, threadIdx.x=77
+compact_active write: cell=78, idx=26, threadIdx.x=78
+compact_active write: cell=79, idx=27, threadIdx.x=79
+compact_active write: cell=80, idx=28, threadIdx.x=80
+compact_active write: cell=81, idx=29, threadIdx.x=81
+compact_active write: cell=82, idx=30, threadIdx.x=82
+compact_active write: cell=83, idx=31, threadIdx.x=83
+compact_active write: cell=84, idx=32, threadIdx.x=84
+compact_active write: cell=85, idx=33, threadIdx.x=85
+compact_active write: cell=86, idx=34, threadIdx.x=86
+compact_active write: cell=87, idx=35, threadIdx.x=87
+compact_active write: cell=88, idx=36, threadIdx.x=88
+compact_active write: cell=89, idx=37, threadIdx.x=89
+compact_active write: cell=90, idx=38, threadIdx.x=90
+compact_active write: cell=91, idx=39, threadIdx.x=91
+compact_active write: cell=92, idx=40, threadIdx.x=92
+compact_active write: cell=93, idx=41, threadIdx.x=93
+compact_active write: cell=94, idx=42, threadIdx.x=94
+compact_active write: cell=95, idx=43, threadIdx.x=95
+compact_active write: cell=96, idx=44, threadIdx.x=96
+compact_active write: cell=97, idx=45, threadIdx.x=97
+compact_active write: cell=98, idx=46, threadIdx.x=98
+compact_active write: cell=99, idx=47, threadIdx.x=99
+compact_active write: cell=100, idx=48, threadIdx.x=100
+compact_active write: cell=101, idx=49, threadIdx.x=101
+compact_active write: cell=102, idx=50, threadIdx.x=102
+compact_active write: cell=103, idx=51, threadIdx.x=103
+compact_active write: cell=104, idx=52, threadIdx.x=104
+compact_active write: cell=105, idx=53, threadIdx.x=105
+compact_active write: cell=106, idx=54, threadIdx.x=106
+compact_active write: cell=107, idx=55, threadIdx.x=107
+compact_active write: cell=108, idx=56, threadIdx.x=108
+compact_active write: cell=109, idx=57, threadIdx.x=109
+compact_active write: cell=110, idx=58, threadIdx.x=110
+compact_active write: cell=111, idx=59, threadIdx.x=111
+compact_active write: cell=112, idx=60, threadIdx.x=112
+compact_active write: cell=113, idx=61, threadIdx.x=113
+compact_active write: cell=114, idx=62, threadIdx.x=114
+compact_active write: cell=115, idx=63, threadIdx.x=115
+compact_active write: cell=116, idx=64, threadIdx.x=116
+compact_active write: cell=117, idx=65, threadIdx.x=117
+compact_active write: cell=118, idx=66, threadIdx.x=118
+compact_active write: cell=119, idx=67, threadIdx.x=119
+compact_active write: cell=120, idx=68, threadIdx.x=120
+compact_active write: cell=121, idx=69, threadIdx.x=121
+compact_active write: cell=122, idx=70, threadIdx.x=122
+compact_active write: cell=123, idx=71, threadIdx.x=123
+compact_active write: cell=124, idx=72, threadIdx.x=124
+compact_active write: cell=125, idx=73, threadIdx.x=125
+compact_active write: cell=126, idx=74, threadIdx.x=126
+compact_active write: cell=127, idx=75, threadIdx.x=127
+  DEBUG n_active=97, n_coarse=0
+  Iteration 1: 97 active, 0 coarse cells
+    psi_in: weight=1.0001, nonzero_bins=97
     psi_out before K4: weight=0, nonzero_bins=0
-    psi_out AFTER K4: weight=2.04389, nonzero_bins=7
+    psi_out AFTER K4: weight=0.999605, nonzero_bins=97
   Weight audit: error=0 pass=yes
-compact_active write: cell=320, idx=0, threadIdx.x=64
-compact_active write: cell=331, idx=1, threadIdx.x=75
-compact_active write: cell=290, idx=4, threadIdx.x=34
-compact_active write: cell=300, idx=5, threadIdx.x=44
-compact_active write: cell=309, idx=6, threadIdx.x=53
-compact_active write: cell=268, idx=2, threadIdx.x=12
-compact_active write: cell=279, idx=3, threadIdx.x=23
-  DEBUG n_active=7, n_coarse=0
-  Iteration 2: 7 active, 0 coarse cells
-    psi_in: weight=2.04389, nonzero_bins=7
+compact_active write (thread 0): cell=256, idx=36
+compact_active write: cell=252, idx=0, threadIdx.x=252
+compact_active write: cell=253, idx=1, threadIdx.x=253
+compact_active write: cell=254, idx=2, threadIdx.x=254
+compact_active write: cell=255, idx=3, threadIdx.x=255
+compact_active write: cell=320, idx=37, threadIdx.x=64
+compact_active write: cell=321, idx=38, threadIdx.x=65
+compact_active write: cell=322, idx=39, threadIdx.x=66
+compact_active write: cell=323, idx=40, threadIdx.x=67
+compact_active write: cell=324, idx=41, threadIdx.x=68
+compact_active write: cell=325, idx=42, threadIdx.x=69
+compact_active write: cell=326, idx=43, threadIdx.x=70
+compact_active write: cell=327, idx=44, threadIdx.x=71
+compact_active write: cell=328, idx=45, threadIdx.x=72
+compact_active write: cell=329, idx=46, threadIdx.x=73
+compact_active write: cell=330, idx=47, threadIdx.x=74
+compact_active write: cell=331, idx=48, threadIdx.x=75
+compact_active write: cell=332, idx=49, threadIdx.x=76
+compact_active write: cell=333, idx=50, threadIdx.x=77
+compact_active write: cell=334, idx=51, threadIdx.x=78
+compact_active write: cell=335, idx=52, threadIdx.x=79
+compact_active write: cell=336, idx=53, threadIdx.x=80
+compact_active write: cell=337, idx=54, threadIdx.x=81
+compact_active write: cell=338, idx=55, threadIdx.x=82
+compact_active write: cell=339, idx=56, threadIdx.x=83
+compact_active write: cell=340, idx=57, threadIdx.x=84
+compact_active write: cell=341, idx=58, threadIdx.x=85
+compact_active write: cell=342, idx=59, threadIdx.x=86
+compact_active write: cell=343, idx=60, threadIdx.x=87
+compact_active write: cell=344, idx=61, threadIdx.x=88
+compact_active write: cell=345, idx=62, threadIdx.x=89
+compact_active write: cell=346, idx=63, threadIdx.x=90
+compact_active write: cell=347, idx=64, threadIdx.x=91
+compact_active write: cell=348, idx=65, threadIdx.x=92
+compact_active write: cell=288, idx=4, threadIdx.x=32
+compact_active write: cell=289, idx=5, threadIdx.x=33
+compact_active write: cell=290, idx=6, threadIdx.x=34
+compact_active write: cell=291, idx=7, threadIdx.x=35
+compact_active write: cell=292, idx=8, threadIdx.x=36
+compact_active write: cell=293, idx=9, threadIdx.x=37
+compact_active write: cell=294, idx=10, threadIdx.x=38
+compact_active write: cell=295, idx=11, threadIdx.x=39
+compact_active write: cell=296, idx=12, threadIdx.x=40
+compact_active write: cell=297, idx=13, threadIdx.x=41
+compact_active write: cell=298, idx=14, threadIdx.x=42
+compact_active write: cell=299, idx=15, threadIdx.x=43
+compact_active write: cell=300, idx=16, threadIdx.x=44
+compact_active write: cell=301, idx=17, threadIdx.x=45
+compact_active write: cell=302, idx=18, threadIdx.x=46
+compact_active write: cell=303, idx=19, threadIdx.x=47
+compact_active write: cell=304, idx=20, threadIdx.x=48
+compact_active write: cell=305, idx=21, threadIdx.x=49
+compact_active write: cell=306, idx=22, threadIdx.x=50
+compact_active write: cell=307, idx=23, threadIdx.x=51
+compact_active write: cell=308, idx=24, threadIdx.x=52
+compact_active write: cell=309, idx=25, threadIdx.x=53
+compact_active write: cell=310, idx=26, threadIdx.x=54
+compact_active write: cell=311, idx=27, threadIdx.x=55
+compact_active write: cell=312, idx=28, threadIdx.x=56
+compact_active write: cell=313, idx=29, threadIdx.x=57
+compact_active write: cell=314, idx=30, threadIdx.x=58
+compact_active write: cell=315, idx=31, threadIdx.x=59
+compact_active write: cell=316, idx=32, threadIdx.x=60
+compact_active write: cell=317, idx=33, threadIdx.x=61
+compact_active write: cell=318, idx=34, threadIdx.x=62
+compact_active write: cell=319, idx=35, threadIdx.x=63
+compact_active write: cell=257, idx=66, threadIdx.x=1
+compact_active write: cell=258, idx=67, threadIdx.x=2
+compact_active write: cell=259, idx=68, threadIdx.x=3
+compact_active write: cell=260, idx=69, threadIdx.x=4
+compact_active write: cell=261, idx=70, threadIdx.x=5
+compact_active write: cell=262, idx=71, threadIdx.x=6
+compact_active write: cell=263, idx=72, threadIdx.x=7
+compact_active write: cell=264, idx=73, threadIdx.x=8
+compact_active write: cell=265, idx=74, threadIdx.x=9
+compact_active write: cell=266, idx=75, threadIdx.x=10
+compact_active write: cell=267, idx=76, threadIdx.x=11
+compact_active write: cell=268, idx=77, threadIdx.x=12
+compact_active write: cell=269, idx=78, threadIdx.x=13
+compact_active write: cell=270, idx=79, threadIdx.x=14
+compact_active write: cell=271, idx=80, threadIdx.x=15
+compact_active write: cell=272, idx=81, threadIdx.x=16
+compact_active write: cell=273, idx=82, threadIdx.x=17
+compact_active write: cell=274, idx=83, threadIdx.x=18
+compact_active write: cell=275, idx=84, threadIdx.x=19
+compact_active write: cell=276, idx=85, threadIdx.x=20
+compact_active write: cell=277, idx=86, threadIdx.x=21
+compact_active write: cell=278, idx=87, threadIdx.x=22
+compact_active write: cell=279, idx=88, threadIdx.x=23
+compact_active write: cell=280, idx=89, threadIdx.x=24
+compact_active write: cell=281, idx=90, threadIdx.x=25
+compact_active write: cell=282, idx=91, threadIdx.x=26
+compact_active write: cell=283, idx=92, threadIdx.x=27
+compact_active write: cell=284, idx=93, threadIdx.x=28
+compact_active write: cell=285, idx=94, threadIdx.x=29
+compact_active write: cell=286, idx=95, threadIdx.x=30
+compact_active write: cell=287, idx=96, threadIdx.x=31
+  DEBUG n_active=97, n_coarse=0
+  Iteration 2: 97 active, 0 coarse cells
+    psi_in: weight=0.999605, nonzero_bins=97
     psi_out before K4: weight=0, nonzero_bins=0
-    psi_out AFTER K4: weight=2.04288, nonzero_bins=7
+    psi_out AFTER K4: weight=0.99911, nonzero_bins=97
   Weight audit: error=0 pass=yes
-compact_active write: cell=520, idx=0, threadIdx.x=8
-compact_active write: cell=531, idx=1, threadIdx.x=19
-compact_active write: cell=490, idx=4, threadIdx.x=234
-compact_active write: cell=500, idx=5, threadIdx.x=244
-compact_active write: cell=509, idx=6, threadIdx.x=253
-compact_active write: cell=468, idx=2, threadIdx.x=212
-compact_active write: cell=479, idx=3, threadIdx.x=223
-  DEBUG n_active=7, n_coarse=0
-  Iteration 3: 7 active, 0 coarse cells
-    psi_in: weight=2.04288, nonzero_bins=7
+compact_active write (thread 0): cell=512, idx=5
+compact_active write: cell=544, idx=0, threadIdx.x=32
+compact_active write: cell=545, idx=1, threadIdx.x=33
+compact_active write: cell=546, idx=2, threadIdx.x=34
+compact_active write: cell=547, idx=3, threadIdx.x=35
+compact_active write: cell=548, idx=4, threadIdx.x=36
+compact_active write: cell=452, idx=38, threadIdx.x=196
+compact_active write: cell=453, idx=39, threadIdx.x=197
+compact_active write: cell=454, idx=40, threadIdx.x=198
+compact_active write: cell=455, idx=41, threadIdx.x=199
+compact_active write: cell=456, idx=42, threadIdx.x=200
+compact_active write: cell=457, idx=43, threadIdx.x=201
+compact_active write: cell=458, idx=44, threadIdx.x=202
+compact_active write: cell=459, idx=45, threadIdx.x=203
+compact_active write: cell=460, idx=46, threadIdx.x=204
+compact_active write: cell=461, idx=47, threadIdx.x=205
+compact_active write: cell=462, idx=48, threadIdx.x=206
+compact_active write: cell=463, idx=49, threadIdx.x=207
+compact_active write: cell=464, idx=50, threadIdx.x=208
+compact_active write: cell=465, idx=51, threadIdx.x=209
+compact_active write: cell=466, idx=52, threadIdx.x=210
+compact_active write: cell=467, idx=53, threadIdx.x=211
+compact_active write: cell=468, idx=54, threadIdx.x=212
+compact_active write: cell=469, idx=55, threadIdx.x=213
+compact_active write: cell=470, idx=56, threadIdx.x=214
+compact_active write: cell=471, idx=57, threadIdx.x=215
+compact_active write: cell=472, idx=58, threadIdx.x=216
+compact_active write: cell=473, idx=59, threadIdx.x=217
+compact_active write: cell=474, idx=60, threadIdx.x=218
+compact_active write: cell=475, idx=61, threadIdx.x=219
+compact_active write: cell=476, idx=62, threadIdx.x=220
+compact_active write: cell=477, idx=63, threadIdx.x=221
+compact_active write: cell=478, idx=64, threadIdx.x=222
+compact_active write: cell=479, idx=65, threadIdx.x=223
+compact_active write: cell=480, idx=6, threadIdx.x=224
+compact_active write: cell=481, idx=7, threadIdx.x=225
+compact_active write: cell=482, idx=8, threadIdx.x=226
+compact_active write: cell=483, idx=9, threadIdx.x=227
+compact_active write: cell=484, idx=10, threadIdx.x=228
+compact_active write: cell=485, idx=11, threadIdx.x=229
+compact_active write: cell=486, idx=12, threadIdx.x=230
+compact_active write: cell=487, idx=13, threadIdx.x=231
+compact_active write: cell=488, idx=14, threadIdx.x=232
+compact_active write: cell=489, idx=15, threadIdx.x=233
+compact_active write: cell=490, idx=16, threadIdx.x=234
+compact_active write: cell=491, idx=17, threadIdx.x=235
+compact_active write: cell=492, idx=18, threadIdx.x=236
+compact_active write: cell=493, idx=19, threadIdx.x=237
+compact_active write: cell=494, idx=20, threadIdx.x=238
+compact_active write: cell=495, idx=21, threadIdx.x=239
+compact_active write: cell=496, idx=22, threadIdx.x=240
+compact_active write: cell=497, idx=23, threadIdx.x=241
+compact_active write: cell=498, idx=24, threadIdx.x=242
+compact_active write: cell=499, idx=25, threadIdx.x=243
+compact_active write: cell=500, idx=26, threadIdx.x=244
+compact_active write: cell=501, idx=27, threadIdx.x=245
+compact_active write: cell=502, idx=28, threadIdx.x=246
+compact_active write: cell=503, idx=29, threadIdx.x=247
+compact_active write: cell=504, idx=30, threadIdx.x=248
+compact_active write: cell=505, idx=31, threadIdx.x=249
+compact_active write: cell=506, idx=32, threadIdx.x=250
+compact_active write: cell=507, idx=33, threadIdx.x=251
+compact_active write: cell=508, idx=34, threadIdx.x=252
+compact_active write: cell=509, idx=35, threadIdx.x=253
+compact_active write: cell=510, idx=36, threadIdx.x=254
+compact_active write: cell=511, idx=37, threadIdx.x=255
+compact_active write: cell=513, idx=66, threadIdx.x=1
+compact_active write: cell=514, idx=67, threadIdx.x=2
+compact_active write: cell=515, idx=68, threadIdx.x=3
+compact_active write: cell=516, idx=69, threadIdx.x=4
+compact_active write: cell=517, idx=70, threadIdx.x=5
+compact_active write: cell=518, idx=71, threadIdx.x=6
+compact_active write: cell=519, idx=72, threadIdx.x=7
+compact_active write: cell=520, idx=73, threadIdx.x=8
+compact_active write: cell=521, idx=74, threadIdx.x=9
+compact_active write: cell=522, idx=75, threadIdx.x=10
+compact_active write: cell=523, idx=76, threadIdx.x=11
+compact_active write: cell=524, idx=77, threadIdx.x=12
+compact_active write: cell=525, idx=78, threadIdx.x=13
+compact_active write: cell=526, idx=79, threadIdx.x=14
+compact_active write: cell=527, idx=80, threadIdx.x=15
+compact_active write: cell=528, idx=81, threadIdx.x=16
+compact_active write: cell=529, idx=82, threadIdx.x=17
+compact_active write: cell=530, idx=83, threadIdx.x=18
+compact_active write: cell=531, idx=84, threadIdx.x=19
+compact_active write: cell=532, idx=85, threadIdx.x=20
+compact_active write: cell=533, idx=86, threadIdx.x=21
+compact_active write: cell=534, idx=87, threadIdx.x=22
+compact_active write: cell=535, idx=88, threadIdx.x=23
+compact_active write: cell=536, idx=89, threadIdx.x=24
+compact_active write: cell=537, idx=90, threadIdx.x=25
+compact_active write: cell=538, idx=91, threadIdx.x=26
+compact_active write: cell=539, idx=92, threadIdx.x=27
+compact_active write: cell=540, idx=93, threadIdx.x=28
+compact_active write: cell=541, idx=94, threadIdx.x=29
+compact_active write: cell=542, idx=95, threadIdx.x=30
+compact_active write: cell=543, idx=96, threadIdx.x=31
+  DEBUG n_active=97, n_coarse=0
+  Iteration 3: 97 active, 0 coarse cells
+    psi_in: weight=0.99911, nonzero_bins=97
     psi_out before K4: weight=0, nonzero_bins=0
-    psi_out AFTER K4: weight=2.04186, nonzero_bins=7
+    psi_out AFTER K4: weight=0.998615, nonzero_bins=97
   Weight audit: error=0 pass=yes
-compact_active write: cell=668, idx=0, threadIdx.x=156
-compact_active write: cell=709, idx=4, threadIdx.x=197
-compact_active write: cell=720, idx=5, threadIdx.x=208
-compact_active write: cell=731, idx=6, threadIdx.x=219
-compact_active write: cell=679, idx=1, threadIdx.x=167
-compact_active write: cell=690, idx=2, threadIdx.x=178
-compact_active write: cell=700, idx=3, threadIdx.x=188
-  DEBUG n_active=7, n_coarse=0
-  Iteration 4: 7 active, 0 coarse cells
-    psi_in: weight=2.04186, nonzero_bins=7
+compact_active write: cell=736, idx=64, threadIdx.x=224
+compact_active write: cell=737, idx=65, threadIdx.x=225
+compact_active write: cell=738, idx=66, threadIdx.x=226
+compact_active write: cell=739, idx=67, threadIdx.x=227
+compact_active write: cell=740, idx=68, threadIdx.x=228
+compact_active write: cell=741, idx=69, threadIdx.x=229
+compact_active write: cell=742, idx=70, threadIdx.x=230
+compact_active write: cell=743, idx=71, threadIdx.x=231
+compact_active write: cell=744, idx=72, threadIdx.x=232
+compact_active write: cell=745, idx=73, threadIdx.x=233
+compact_active write: cell=746, idx=74, threadIdx.x=234
+compact_active write: cell=747, idx=75, threadIdx.x=235
+compact_active write: cell=748, idx=76, threadIdx.x=236
+compact_active write: cell=652, idx=77, threadIdx.x=140
+compact_active write: cell=653, idx=78, threadIdx.x=141
+compact_active write: cell=654, idx=79, threadIdx.x=142
+compact_active write: cell=655, idx=80, threadIdx.x=143
+compact_active write: cell=656, idx=81, threadIdx.x=144
+compact_active write: cell=657, idx=82, threadIdx.x=145
+compact_active write: cell=658, idx=83, threadIdx.x=146
+compact_active write: cell=659, idx=84, threadIdx.x=147
+compact_active write: cell=660, idx=85, threadIdx.x=148
+compact_active write: cell=661, idx=86, threadIdx.x=149
+compact_active write: cell=662, idx=87, threadIdx.x=150
+compact_active write: cell=663, idx=88, threadIdx.x=151
+compact_active write: cell=664, idx=89, threadIdx.x=152
+compact_active write: cell=665, idx=90, threadIdx.x=153
+compact_active write: cell=666, idx=91, threadIdx.x=154
+compact_active write: cell=667, idx=92, threadIdx.x=155
+compact_active write: cell=668, idx=93, threadIdx.x=156
+compact_active write: cell=669, idx=94, threadIdx.x=157
+compact_active write: cell=670, idx=95, threadIdx.x=158
+compact_active write: cell=671, idx=96, threadIdx.x=159
+compact_active write: cell=672, idx=0, threadIdx.x=160
+compact_active write: cell=673, idx=1, threadIdx.x=161
+compact_active write: cell=674, idx=2, threadIdx.x=162
+compact_active write: cell=675, idx=3, threadIdx.x=163
+compact_active write: cell=676, idx=4, threadIdx.x=164
+compact_active write: cell=677, idx=5, threadIdx.x=165
+compact_active write: cell=678, idx=6, threadIdx.x=166
+compact_active write: cell=679, idx=7, threadIdx.x=167
+compact_active write: cell=680, idx=8, threadIdx.x=168
+compact_active write: cell=681, idx=9, threadIdx.x=169
+compact_active write: cell=682, idx=10, threadIdx.x=170
+compact_active write: cell=683, idx=11, threadIdx.x=171
+compact_active write: cell=684, idx=12, threadIdx.x=172
+compact_active write: cell=685, idx=13, threadIdx.x=173
+compact_active write: cell=686, idx=14, threadIdx.x=174
+compact_active write: cell=687, idx=15, threadIdx.x=175
+compact_active write: cell=688, idx=16, threadIdx.x=176
+compact_active write: cell=689, idx=17, threadIdx.x=177
+compact_active write: cell=690, idx=18, threadIdx.x=178
+compact_active write: cell=691, idx=19, threadIdx.x=179
+compact_active write: cell=692, idx=20, threadIdx.x=180
+compact_active write: cell=693, idx=21, threadIdx.x=181
+compact_active write: cell=694, idx=22, threadIdx.x=182
+compact_active write: cell=695, idx=23, threadIdx.x=183
+compact_active write: cell=696, idx=24, threadIdx.x=184
+compact_active write: cell=697, idx=25, threadIdx.x=185
+compact_active write: cell=698, idx=26, threadIdx.x=186
+compact_active write: cell=699, idx=27, threadIdx.x=187
+compact_active write: cell=700, idx=28, threadIdx.x=188
+compact_active write: cell=701, idx=29, threadIdx.x=189
+compact_active write: cell=702, idx=30, threadIdx.x=190
+compact_active write: cell=703, idx=31, threadIdx.x=191
+compact_active write: cell=704, idx=32, threadIdx.x=192
+compact_active write: cell=705, idx=33, threadIdx.x=193
+compact_active write: cell=706, idx=34, threadIdx.x=194
+compact_active write: cell=707, idx=35, threadIdx.x=195
+compact_active write: cell=708, idx=36, threadIdx.x=196
+compact_active write: cell=709, idx=37, threadIdx.x=197
+compact_active write: cell=710, idx=38, threadIdx.x=198
+compact_active write: cell=711, idx=39, threadIdx.x=199
+compact_active write: cell=712, idx=40, threadIdx.x=200
+compact_active write: cell=713, idx=41, threadIdx.x=201
+compact_active write: cell=714, idx=42, threadIdx.x=202
+compact_active write: cell=715, idx=43, threadIdx.x=203
+compact_active write: cell=716, idx=44, threadIdx.x=204
+compact_active write: cell=717, idx=45, threadIdx.x=205
+compact_active write: cell=718, idx=46, threadIdx.x=206
+compact_active write: cell=719, idx=47, threadIdx.x=207
+compact_active write: cell=720, idx=48, threadIdx.x=208
+compact_active write: cell=721, idx=49, threadIdx.x=209
+compact_active write: cell=722, idx=50, threadIdx.x=210
+compact_active write: cell=723, idx=51, threadIdx.x=211
+compact_active write: cell=724, idx=52, threadIdx.x=212
+compact_active write: cell=725, idx=53, threadIdx.x=213
+compact_active write: cell=726, idx=54, threadIdx.x=214
+compact_active write: cell=727, idx=55, threadIdx.x=215
+compact_active write: cell=728, idx=56, threadIdx.x=216
+compact_active write: cell=729, idx=57, threadIdx.x=217
+compact_active write: cell=730, idx=58, threadIdx.x=218
+compact_active write: cell=731, idx=59, threadIdx.x=219
+compact_active write: cell=732, idx=60, threadIdx.x=220
+compact_active write: cell=733, idx=61, threadIdx.x=221
+compact_active write: cell=734, idx=62, threadIdx.x=222
+compact_active write: cell=735, idx=63, threadIdx.x=223
+  DEBUG n_active=97, n_coarse=0
+  Iteration 4: 97 active, 0 coarse cells
+    psi_in: weight=0.998615, nonzero_bins=97
     psi_out before K4: weight=0, nonzero_bins=0
-    psi_out AFTER K4: weight=2.04085, nonzero_bins=7
+    psi_out AFTER K4: weight=0.99812, nonzero_bins=97
   Weight audit: error=0 pass=yes
-compact_active write: cell=931, idx=6, threadIdx.x=163
-compact_active write: cell=900, idx=3, threadIdx.x=132
-compact_active write: cell=909, idx=4, threadIdx.x=141
-compact_active write: cell=920, idx=5, threadIdx.x=152
-compact_active write: cell=868, idx=0, threadIdx.x=100
-compact_active write: cell=879, idx=1, threadIdx.x=111
-compact_active write: cell=890, idx=2, threadIdx.x=122
-  DEBUG n_active=7, n_coarse=0
-  Iteration 5: 7 active, 0 coarse cells
-    psi_in: weight=2.04085, nonzero_bins=7
+compact_active write: cell=928, idx=76, threadIdx.x=160
+compact_active write: cell=929, idx=77, threadIdx.x=161
+compact_active write: cell=930, idx=78, threadIdx.x=162
+compact_active write: cell=931, idx=79, threadIdx.x=163
+compact_active write: cell=932, idx=80, threadIdx.x=164
+compact_active write: cell=933, idx=81, threadIdx.x=165
+compact_active write: cell=934, idx=82, threadIdx.x=166
+compact_active write: cell=935, idx=83, threadIdx.x=167
+compact_active write: cell=936, idx=84, threadIdx.x=168
+compact_active write: cell=937, idx=85, threadIdx.x=169
+compact_active write: cell=938, idx=86, threadIdx.x=170
+compact_active write: cell=939, idx=87, threadIdx.x=171
+compact_active write: cell=940, idx=88, threadIdx.x=172
+compact_active write: cell=941, idx=89, threadIdx.x=173
+compact_active write: cell=942, idx=90, threadIdx.x=174
+compact_active write: cell=943, idx=91, threadIdx.x=175
+compact_active write: cell=944, idx=92, threadIdx.x=176
+compact_active write: cell=945, idx=93, threadIdx.x=177
+compact_active write: cell=946, idx=94, threadIdx.x=178
+compact_active write: cell=947, idx=95, threadIdx.x=179
+compact_active write: cell=948, idx=96, threadIdx.x=180
+compact_active write: cell=852, idx=64, threadIdx.x=84
+compact_active write: cell=853, idx=65, threadIdx.x=85
+compact_active write: cell=854, idx=66, threadIdx.x=86
+compact_active write: cell=855, idx=67, threadIdx.x=87
+compact_active write: cell=856, idx=68, threadIdx.x=88
+compact_active write: cell=857, idx=69, threadIdx.x=89
+compact_active write: cell=858, idx=70, threadIdx.x=90
+compact_active write: cell=859, idx=71, threadIdx.x=91
+compact_active write: cell=860, idx=72, threadIdx.x=92
+compact_active write: cell=861, idx=73, threadIdx.x=93
+compact_active write: cell=862, idx=74, threadIdx.x=94
+compact_active write: cell=863, idx=75, threadIdx.x=95
+compact_active write: cell=864, idx=0, threadIdx.x=96
+compact_active write: cell=865, idx=1, threadIdx.x=97
+compact_active write: cell=866, idx=2, threadIdx.x=98
+compact_active write: cell=867, idx=3, threadIdx.x=99
+compact_active write: cell=868, idx=4, threadIdx.x=100
+compact_active write: cell=869, idx=5, threadIdx.x=101
+compact_active write: cell=870, idx=6, threadIdx.x=102
+compact_active write: cell=871, idx=7, threadIdx.x=103
+compact_active write: cell=872, idx=8, threadIdx.x=104
+compact_active write: cell=873, idx=9, threadIdx.x=105
+compact_active write: cell=874, idx=10, threadIdx.x=106
+compact_active write: cell=875, idx=11, threadIdx.x=107
+compact_active write: cell=876, idx=12, threadIdx.x=108
+compact_active write: cell=877, idx=13, threadIdx.x=109
+compact_active write: cell=878, idx=14, threadIdx.x=110
+compact_active write: cell=879, idx=15, threadIdx.x=111
+compact_active write: cell=880, idx=16, threadIdx.x=112
+compact_active write: cell=881, idx=17, threadIdx.x=113
+compact_active write: cell=882, idx=18, threadIdx.x=114
+compact_active write: cell=883, idx=19, threadIdx.x=115
+compact_active write: cell=884, idx=20, threadIdx.x=116
+compact_active write: cell=885, idx=21, threadIdx.x=117
+compact_active write: cell=886, idx=22, threadIdx.x=118
+compact_active write: cell=887, idx=23, threadIdx.x=119
+compact_active write: cell=888, idx=24, threadIdx.x=120
+compact_active write: cell=889, idx=25, threadIdx.x=121
+compact_active write: cell=890, idx=26, threadIdx.x=122
+compact_active write: cell=891, idx=27, threadIdx.x=123
+compact_active write: cell=892, idx=28, threadIdx.x=124
+compact_active write: cell=893, idx=29, threadIdx.x=125
+compact_active write: cell=894, idx=30, threadIdx.x=126
+compact_active write: cell=895, idx=31, threadIdx.x=127
+compact_active write: cell=896, idx=32, threadIdx.x=128
+compact_active write: cell=897, idx=33, threadIdx.x=129
+compact_active write: cell=898, idx=34, threadIdx.x=130
+compact_active write: cell=899, idx=35, threadIdx.x=131
+compact_active write: cell=900, idx=36, threadIdx.x=132
+compact_active write: cell=901, idx=37, threadIdx.x=133
+compact_active write: cell=902, idx=38, threadIdx.x=134
+compact_active write: cell=903, idx=39, threadIdx.x=135
+compact_active write: cell=904, idx=40, threadIdx.x=136
+compact_active write: cell=905, idx=41, threadIdx.x=137
+compact_active write: cell=906, idx=42, threadIdx.x=138
+compact_active write: cell=907, idx=43, threadIdx.x=139
+compact_active write: cell=908, idx=44, threadIdx.x=140
+compact_active write: cell=909, idx=45, threadIdx.x=141
+compact_active write: cell=910, idx=46, threadIdx.x=142
+compact_active write: cell=911, idx=47, threadIdx.x=143
+compact_active write: cell=912, idx=48, threadIdx.x=144
+compact_active write: cell=913, idx=49, threadIdx.x=145
+compact_active write: cell=914, idx=50, threadIdx.x=146
+compact_active write: cell=915, idx=51, threadIdx.x=147
+compact_active write: cell=916, idx=52, threadIdx.x=148
+compact_active write: cell=917, idx=53, threadIdx.x=149
+compact_active write: cell=918, idx=54, threadIdx.x=150
+compact_active write: cell=919, idx=55, threadIdx.x=151
+compact_active write: cell=920, idx=56, threadIdx.x=152
+compact_active write: cell=921, idx=57, threadIdx.x=153
+compact_active write: cell=922, idx=58, threadIdx.x=154
+compact_active write: cell=923, idx=59, threadIdx.x=155
+compact_active write: cell=924, idx=60, threadIdx.x=156
+compact_active write: cell=925, idx=61, threadIdx.x=157
+compact_active write: cell=926, idx=62, threadIdx.x=158
+compact_active write: cell=927, idx=63, threadIdx.x=159
+  DEBUG n_active=97, n_coarse=0
+  Iteration 5: 97 active, 0 coarse cells
+    psi_in: weight=0.99812, nonzero_bins=97
     psi_out before K4: weight=0, nonzero_bins=0
-    psi_out AFTER K4: weight=2.03984, nonzero_bins=7
-  Weight audit: error=0 pass=yes
-compact_active write: cell=1120, idx=5, threadIdx.x=96
-compact_active write: cell=1131, idx=6, threadIdx.x=107
-compact_active write: cell=1090, idx=2, threadIdx.x=66
-compact_active write: cell=1100, idx=3, threadIdx.x=76
-compact_active write: cell=1109, idx=4, threadIdx.x=85
-compact_active write: cell=1068, idx=0, threadIdx.x=44
-compact_active write: cell=1079, idx=1, threadIdx.x=55
-  DEBUG n_active=7, n_coarse=0
-  Iteration 6: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-compact_active write: cell=1320, idx=2, threadIdx.x=40
-compact_active write: cell=1331, idx=3, threadIdx.x=51
-compact_active write: cell=1290, idx=4, threadIdx.x=10
-compact_active write: cell=1300, idx=5, threadIdx.x=20
-compact_active write: cell=1309, idx=6, threadIdx.x=29
-compact_active write: cell=1268, idx=0, threadIdx.x=244
-compact_active write: cell=1279, idx=1, threadIdx.x=255
-  DEBUG n_active=7, n_coarse=0
-  Iteration 7: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-compact_active write: cell=1468, idx=0, threadIdx.x=188
-compact_active write: cell=1509, idx=4, threadIdx.x=229
-compact_active write: cell=1520, idx=5, threadIdx.x=240
-compact_active write: cell=1531, idx=6, threadIdx.x=251
-compact_active write: cell=1479, idx=1, threadIdx.x=199
-compact_active write: cell=1490, idx=2, threadIdx.x=210
-compact_active write: cell=1500, idx=3, threadIdx.x=220
-  DEBUG n_active=7, n_coarse=0
-  Iteration 8: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-compact_active write: cell=1731, idx=0, threadIdx.x=195
-compact_active write: cell=1700, idx=1, threadIdx.x=164
-compact_active write: cell=1709, idx=2, threadIdx.x=173
-compact_active write: cell=1720, idx=3, threadIdx.x=184
-compact_active write: cell=1668, idx=4, threadIdx.x=132
-compact_active write: cell=1679, idx=5, threadIdx.x=143
-compact_active write: cell=1690, idx=6, threadIdx.x=154
-  DEBUG n_active=7, n_coarse=0
-  Iteration 9: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-compact_active write: cell=1920, idx=3, threadIdx.x=128
-compact_active write: cell=1931, idx=4, threadIdx.x=139
-compact_active write: cell=1890, idx=0, threadIdx.x=98
-compact_active write: cell=1900, idx=1, threadIdx.x=108
-compact_active write: cell=1909, idx=2, threadIdx.x=117
-compact_active write: cell=1868, idx=5, threadIdx.x=76
-compact_active write: cell=1879, idx=6, threadIdx.x=87
-  DEBUG n_active=7, n_coarse=0
-  Iteration 10: 7 active, 0 coarse cells
-    Energy so far: 5.8097 MeV
+    psi_out AFTER K4: weight=0.997626, nonzero_bins=97
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1052, idx=0, threadIdx.x=28
+compact_active write: cell=1053, idx=1, threadIdx.x=29
+compact_active write: cell=1054, idx=2, threadIdx.x=30
+compact_active write: cell=1055, idx=3, threadIdx.x=31
+compact_active write: cell=1120, idx=68, threadIdx.x=96
+compact_active write: cell=1121, idx=69, threadIdx.x=97
+compact_active write: cell=1122, idx=70, threadIdx.x=98
+compact_active write: cell=1123, idx=71, threadIdx.x=99
+compact_active write: cell=1124, idx=72, threadIdx.x=100
+compact_active write: cell=1125, idx=73, threadIdx.x=101
+compact_active write: cell=1126, idx=74, threadIdx.x=102
+compact_active write: cell=1127, idx=75, threadIdx.x=103
+compact_active write: cell=1128, idx=76, threadIdx.x=104
+compact_active write: cell=1129, idx=77, threadIdx.x=105
+compact_active write: cell=1130, idx=78, threadIdx.x=106
+compact_active write: cell=1131, idx=79, threadIdx.x=107
+compact_active write: cell=1132, idx=80, threadIdx.x=108
+compact_active write: cell=1133, idx=81, threadIdx.x=109
+compact_active write: cell=1134, idx=82, threadIdx.x=110
+compact_active write: cell=1135, idx=83, threadIdx.x=111
+compact_active write: cell=1136, idx=84, threadIdx.x=112
+compact_active write: cell=1137, idx=85, threadIdx.x=113
+compact_active write: cell=1138, idx=86, threadIdx.x=114
+compact_active write: cell=1139, idx=87, threadIdx.x=115
+compact_active write: cell=1140, idx=88, threadIdx.x=116
+compact_active write: cell=1141, idx=89, threadIdx.x=117
+compact_active write: cell=1142, idx=90, threadIdx.x=118
+compact_active write: cell=1143, idx=91, threadIdx.x=119
+compact_active write: cell=1144, idx=92, threadIdx.x=120
+compact_active write: cell=1145, idx=93, threadIdx.x=121
+compact_active write: cell=1146, idx=94, threadIdx.x=122
+compact_active write: cell=1147, idx=95, threadIdx.x=123
+compact_active write: cell=1148, idx=96, threadIdx.x=124
+compact_active write: cell=1088, idx=36, threadIdx.x=64
+compact_active write: cell=1089, idx=37, threadIdx.x=65
+compact_active write: cell=1090, idx=38, threadIdx.x=66
+compact_active write: cell=1091, idx=39, threadIdx.x=67
+compact_active write: cell=1092, idx=40, threadIdx.x=68
+compact_active write: cell=1093, idx=41, threadIdx.x=69
+compact_active write: cell=1094, idx=42, threadIdx.x=70
+compact_active write: cell=1095, idx=43, threadIdx.x=71
+compact_active write: cell=1096, idx=44, threadIdx.x=72
+compact_active write: cell=1097, idx=45, threadIdx.x=73
+compact_active write: cell=1098, idx=46, threadIdx.x=74
+compact_active write: cell=1099, idx=47, threadIdx.x=75
+compact_active write: cell=1100, idx=48, threadIdx.x=76
+compact_active write: cell=1101, idx=49, threadIdx.x=77
+compact_active write: cell=1102, idx=50, threadIdx.x=78
+compact_active write: cell=1103, idx=51, threadIdx.x=79
+compact_active write: cell=1104, idx=52, threadIdx.x=80
+compact_active write: cell=1105, idx=53, threadIdx.x=81
+compact_active write: cell=1106, idx=54, threadIdx.x=82
+compact_active write: cell=1107, idx=55, threadIdx.x=83
+compact_active write: cell=1108, idx=56, threadIdx.x=84
+compact_active write: cell=1109, idx=57, threadIdx.x=85
+compact_active write: cell=1110, idx=58, threadIdx.x=86
+compact_active write: cell=1111, idx=59, threadIdx.x=87
+compact_active write: cell=1112, idx=60, threadIdx.x=88
+compact_active write: cell=1113, idx=61, threadIdx.x=89
+compact_active write: cell=1114, idx=62, threadIdx.x=90
+compact_active write: cell=1115, idx=63, threadIdx.x=91
+compact_active write: cell=1116, idx=64, threadIdx.x=92
+compact_active write: cell=1117, idx=65, threadIdx.x=93
+compact_active write: cell=1118, idx=66, threadIdx.x=94
+compact_active write: cell=1119, idx=67, threadIdx.x=95
+compact_active write: cell=1056, idx=4, threadIdx.x=32
+compact_active write: cell=1057, idx=5, threadIdx.x=33
+compact_active write: cell=1058, idx=6, threadIdx.x=34
+compact_active write: cell=1059, idx=7, threadIdx.x=35
+compact_active write: cell=1060, idx=8, threadIdx.x=36
+compact_active write: cell=1061, idx=9, threadIdx.x=37
+compact_active write: cell=1062, idx=10, threadIdx.x=38
+compact_active write: cell=1063, idx=11, threadIdx.x=39
+compact_active write: cell=1064, idx=12, threadIdx.x=40
+compact_active write: cell=1065, idx=13, threadIdx.x=41
+compact_active write: cell=1066, idx=14, threadIdx.x=42
+compact_active write: cell=1067, idx=15, threadIdx.x=43
+compact_active write: cell=1068, idx=16, threadIdx.x=44
+compact_active write: cell=1069, idx=17, threadIdx.x=45
+compact_active write: cell=1070, idx=18, threadIdx.x=46
+compact_active write: cell=1071, idx=19, threadIdx.x=47
+compact_active write: cell=1072, idx=20, threadIdx.x=48
+compact_active write: cell=1073, idx=21, threadIdx.x=49
+compact_active write: cell=1074, idx=22, threadIdx.x=50
+compact_active write: cell=1075, idx=23, threadIdx.x=51
+compact_active write: cell=1076, idx=24, threadIdx.x=52
+compact_active write: cell=1077, idx=25, threadIdx.x=53
+compact_active write: cell=1078, idx=26, threadIdx.x=54
+compact_active write: cell=1079, idx=27, threadIdx.x=55
+compact_active write: cell=1080, idx=28, threadIdx.x=56
+compact_active write: cell=1081, idx=29, threadIdx.x=57
+compact_active write: cell=1082, idx=30, threadIdx.x=58
+compact_active write: cell=1083, idx=31, threadIdx.x=59
+compact_active write: cell=1084, idx=32, threadIdx.x=60
+compact_active write: cell=1085, idx=33, threadIdx.x=61
+compact_active write: cell=1086, idx=34, threadIdx.x=62
+compact_active write: cell=1087, idx=35, threadIdx.x=63
+  DEBUG n_active=97, n_coarse=0
+  Iteration 6: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write (thread 0): cell=1280, idx=65
+compact_active write: cell=1344, idx=60, threadIdx.x=64
+compact_active write: cell=1345, idx=61, threadIdx.x=65
+compact_active write: cell=1346, idx=62, threadIdx.x=66
+compact_active write: cell=1347, idx=63, threadIdx.x=67
+compact_active write: cell=1348, idx=64, threadIdx.x=68
+compact_active write: cell=1252, idx=0, threadIdx.x=228
+compact_active write: cell=1253, idx=1, threadIdx.x=229
+compact_active write: cell=1254, idx=2, threadIdx.x=230
+compact_active write: cell=1255, idx=3, threadIdx.x=231
+compact_active write: cell=1256, idx=4, threadIdx.x=232
+compact_active write: cell=1257, idx=5, threadIdx.x=233
+compact_active write: cell=1258, idx=6, threadIdx.x=234
+compact_active write: cell=1259, idx=7, threadIdx.x=235
+compact_active write: cell=1260, idx=8, threadIdx.x=236
+compact_active write: cell=1261, idx=9, threadIdx.x=237
+compact_active write: cell=1262, idx=10, threadIdx.x=238
+compact_active write: cell=1263, idx=11, threadIdx.x=239
+compact_active write: cell=1264, idx=12, threadIdx.x=240
+compact_active write: cell=1265, idx=13, threadIdx.x=241
+compact_active write: cell=1266, idx=14, threadIdx.x=242
+compact_active write: cell=1267, idx=15, threadIdx.x=243
+compact_active write: cell=1268, idx=16, threadIdx.x=244
+compact_active write: cell=1269, idx=17, threadIdx.x=245
+compact_active write: cell=1270, idx=18, threadIdx.x=246
+compact_active write: cell=1271, idx=19, threadIdx.x=247
+compact_active write: cell=1272, idx=20, threadIdx.x=248
+compact_active write: cell=1273, idx=21, threadIdx.x=249
+compact_active write: cell=1274, idx=22, threadIdx.x=250
+compact_active write: cell=1275, idx=23, threadIdx.x=251
+compact_active write: cell=1276, idx=24, threadIdx.x=252
+compact_active write: cell=1277, idx=25, threadIdx.x=253
+compact_active write: cell=1278, idx=26, threadIdx.x=254
+compact_active write: cell=1279, idx=27, threadIdx.x=255
+compact_active write: cell=1312, idx=28, threadIdx.x=32
+compact_active write: cell=1313, idx=29, threadIdx.x=33
+compact_active write: cell=1314, idx=30, threadIdx.x=34
+compact_active write: cell=1315, idx=31, threadIdx.x=35
+compact_active write: cell=1316, idx=32, threadIdx.x=36
+compact_active write: cell=1317, idx=33, threadIdx.x=37
+compact_active write: cell=1318, idx=34, threadIdx.x=38
+compact_active write: cell=1319, idx=35, threadIdx.x=39
+compact_active write: cell=1320, idx=36, threadIdx.x=40
+compact_active write: cell=1321, idx=37, threadIdx.x=41
+compact_active write: cell=1322, idx=38, threadIdx.x=42
+compact_active write: cell=1323, idx=39, threadIdx.x=43
+compact_active write: cell=1324, idx=40, threadIdx.x=44
+compact_active write: cell=1325, idx=41, threadIdx.x=45
+compact_active write: cell=1326, idx=42, threadIdx.x=46
+compact_active write: cell=1327, idx=43, threadIdx.x=47
+compact_active write: cell=1328, idx=44, threadIdx.x=48
+compact_active write: cell=1329, idx=45, threadIdx.x=49
+compact_active write: cell=1330, idx=46, threadIdx.x=50
+compact_active write: cell=1331, idx=47, threadIdx.x=51
+compact_active write: cell=1332, idx=48, threadIdx.x=52
+compact_active write: cell=1333, idx=49, threadIdx.x=53
+compact_active write: cell=1334, idx=50, threadIdx.x=54
+compact_active write: cell=1335, idx=51, threadIdx.x=55
+compact_active write: cell=1336, idx=52, threadIdx.x=56
+compact_active write: cell=1337, idx=53, threadIdx.x=57
+compact_active write: cell=1338, idx=54, threadIdx.x=58
+compact_active write: cell=1339, idx=55, threadIdx.x=59
+compact_active write: cell=1340, idx=56, threadIdx.x=60
+compact_active write: cell=1341, idx=57, threadIdx.x=61
+compact_active write: cell=1342, idx=58, threadIdx.x=62
+compact_active write: cell=1343, idx=59, threadIdx.x=63
+compact_active write: cell=1281, idx=66, threadIdx.x=1
+compact_active write: cell=1282, idx=67, threadIdx.x=2
+compact_active write: cell=1283, idx=68, threadIdx.x=3
+compact_active write: cell=1284, idx=69, threadIdx.x=4
+compact_active write: cell=1285, idx=70, threadIdx.x=5
+compact_active write: cell=1286, idx=71, threadIdx.x=6
+compact_active write: cell=1287, idx=72, threadIdx.x=7
+compact_active write: cell=1288, idx=73, threadIdx.x=8
+compact_active write: cell=1289, idx=74, threadIdx.x=9
+compact_active write: cell=1290, idx=75, threadIdx.x=10
+compact_active write: cell=1291, idx=76, threadIdx.x=11
+compact_active write: cell=1292, idx=77, threadIdx.x=12
+compact_active write: cell=1293, idx=78, threadIdx.x=13
+compact_active write: cell=1294, idx=79, threadIdx.x=14
+compact_active write: cell=1295, idx=80, threadIdx.x=15
+compact_active write: cell=1296, idx=81, threadIdx.x=16
+compact_active write: cell=1297, idx=82, threadIdx.x=17
+compact_active write: cell=1298, idx=83, threadIdx.x=18
+compact_active write: cell=1299, idx=84, threadIdx.x=19
+compact_active write: cell=1300, idx=85, threadIdx.x=20
+compact_active write: cell=1301, idx=86, threadIdx.x=21
+compact_active write: cell=1302, idx=87, threadIdx.x=22
+compact_active write: cell=1303, idx=88, threadIdx.x=23
+compact_active write: cell=1304, idx=89, threadIdx.x=24
+compact_active write: cell=1305, idx=90, threadIdx.x=25
+compact_active write: cell=1306, idx=91, threadIdx.x=26
+compact_active write: cell=1307, idx=92, threadIdx.x=27
+compact_active write: cell=1308, idx=93, threadIdx.x=28
+compact_active write: cell=1309, idx=94, threadIdx.x=29
+compact_active write: cell=1310, idx=95, threadIdx.x=30
+compact_active write: cell=1311, idx=96, threadIdx.x=31
+  DEBUG n_active=97, n_coarse=0
+  Iteration 7: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1537, idx=0, threadIdx.x=1
+compact_active write: cell=1538, idx=1, threadIdx.x=2
+compact_active write: cell=1539, idx=2, threadIdx.x=3
+compact_active write: cell=1540, idx=3, threadIdx.x=4
+compact_active write: cell=1541, idx=4, threadIdx.x=5
+compact_active write: cell=1542, idx=5, threadIdx.x=6
+compact_active write: cell=1543, idx=6, threadIdx.x=7
+compact_active write: cell=1544, idx=7, threadIdx.x=8
+compact_active write: cell=1545, idx=8, threadIdx.x=9
+compact_active write: cell=1546, idx=9, threadIdx.x=10
+compact_active write: cell=1547, idx=10, threadIdx.x=11
+compact_active write: cell=1548, idx=11, threadIdx.x=12
+compact_active write: cell=1452, idx=76, threadIdx.x=172
+compact_active write: cell=1453, idx=77, threadIdx.x=173
+compact_active write: cell=1454, idx=78, threadIdx.x=174
+compact_active write: cell=1455, idx=79, threadIdx.x=175
+compact_active write: cell=1456, idx=80, threadIdx.x=176
+compact_active write: cell=1457, idx=81, threadIdx.x=177
+compact_active write: cell=1458, idx=82, threadIdx.x=178
+compact_active write: cell=1459, idx=83, threadIdx.x=179
+compact_active write: cell=1460, idx=84, threadIdx.x=180
+compact_active write: cell=1461, idx=85, threadIdx.x=181
+compact_active write: cell=1462, idx=86, threadIdx.x=182
+compact_active write: cell=1463, idx=87, threadIdx.x=183
+compact_active write: cell=1464, idx=88, threadIdx.x=184
+compact_active write: cell=1465, idx=89, threadIdx.x=185
+compact_active write: cell=1466, idx=90, threadIdx.x=186
+compact_active write: cell=1467, idx=91, threadIdx.x=187
+compact_active write: cell=1468, idx=92, threadIdx.x=188
+compact_active write: cell=1469, idx=93, threadIdx.x=189
+compact_active write: cell=1470, idx=94, threadIdx.x=190
+compact_active write: cell=1471, idx=95, threadIdx.x=191
+compact_active write: cell=1472, idx=12, threadIdx.x=192
+compact_active write: cell=1473, idx=13, threadIdx.x=193
+compact_active write: cell=1474, idx=14, threadIdx.x=194
+compact_active write: cell=1475, idx=15, threadIdx.x=195
+compact_active write: cell=1476, idx=16, threadIdx.x=196
+compact_active write: cell=1477, idx=17, threadIdx.x=197
+compact_active write: cell=1478, idx=18, threadIdx.x=198
+compact_active write: cell=1479, idx=19, threadIdx.x=199
+compact_active write: cell=1480, idx=20, threadIdx.x=200
+compact_active write: cell=1481, idx=21, threadIdx.x=201
+compact_active write: cell=1482, idx=22, threadIdx.x=202
+compact_active write: cell=1483, idx=23, threadIdx.x=203
+compact_active write: cell=1484, idx=24, threadIdx.x=204
+compact_active write: cell=1485, idx=25, threadIdx.x=205
+compact_active write: cell=1486, idx=26, threadIdx.x=206
+compact_active write: cell=1487, idx=27, threadIdx.x=207
+compact_active write: cell=1488, idx=28, threadIdx.x=208
+compact_active write: cell=1489, idx=29, threadIdx.x=209
+compact_active write: cell=1490, idx=30, threadIdx.x=210
+compact_active write: cell=1491, idx=31, threadIdx.x=211
+compact_active write: cell=1492, idx=32, threadIdx.x=212
+compact_active write: cell=1493, idx=33, threadIdx.x=213
+compact_active write: cell=1494, idx=34, threadIdx.x=214
+compact_active write: cell=1495, idx=35, threadIdx.x=215
+compact_active write: cell=1496, idx=36, threadIdx.x=216
+compact_active write: cell=1497, idx=37, threadIdx.x=217
+compact_active write: cell=1498, idx=38, threadIdx.x=218
+compact_active write: cell=1499, idx=39, threadIdx.x=219
+compact_active write: cell=1500, idx=40, threadIdx.x=220
+compact_active write: cell=1501, idx=41, threadIdx.x=221
+compact_active write: cell=1502, idx=42, threadIdx.x=222
+compact_active write: cell=1503, idx=43, threadIdx.x=223
+compact_active write: cell=1504, idx=44, threadIdx.x=224
+compact_active write: cell=1505, idx=45, threadIdx.x=225
+compact_active write: cell=1506, idx=46, threadIdx.x=226
+compact_active write: cell=1507, idx=47, threadIdx.x=227
+compact_active write: cell=1508, idx=48, threadIdx.x=228
+compact_active write: cell=1509, idx=49, threadIdx.x=229
+compact_active write: cell=1510, idx=50, threadIdx.x=230
+compact_active write: cell=1511, idx=51, threadIdx.x=231
+compact_active write: cell=1512, idx=52, threadIdx.x=232
+compact_active write: cell=1513, idx=53, threadIdx.x=233
+compact_active write: cell=1514, idx=54, threadIdx.x=234
+compact_active write: cell=1515, idx=55, threadIdx.x=235
+compact_active write: cell=1516, idx=56, threadIdx.x=236
+compact_active write: cell=1517, idx=57, threadIdx.x=237
+compact_active write: cell=1518, idx=58, threadIdx.x=238
+compact_active write: cell=1519, idx=59, threadIdx.x=239
+compact_active write: cell=1520, idx=60, threadIdx.x=240
+compact_active write: cell=1521, idx=61, threadIdx.x=241
+compact_active write: cell=1522, idx=62, threadIdx.x=242
+compact_active write: cell=1523, idx=63, threadIdx.x=243
+compact_active write: cell=1524, idx=64, threadIdx.x=244
+compact_active write: cell=1525, idx=65, threadIdx.x=245
+compact_active write: cell=1526, idx=66, threadIdx.x=246
+compact_active write: cell=1527, idx=67, threadIdx.x=247
+compact_active write: cell=1528, idx=68, threadIdx.x=248
+compact_active write: cell=1529, idx=69, threadIdx.x=249
+compact_active write: cell=1530, idx=70, threadIdx.x=250
+compact_active write: cell=1531, idx=71, threadIdx.x=251
+compact_active write: cell=1532, idx=72, threadIdx.x=252
+compact_active write: cell=1533, idx=73, threadIdx.x=253
+compact_active write: cell=1534, idx=74, threadIdx.x=254
+compact_active write: cell=1535, idx=75, threadIdx.x=255
+compact_active write (thread 0): cell=1536, idx=96
+  DEBUG n_active=97, n_coarse=0
+  Iteration 8: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1728, idx=76, threadIdx.x=192
+compact_active write: cell=1729, idx=77, threadIdx.x=193
+compact_active write: cell=1730, idx=78, threadIdx.x=194
+compact_active write: cell=1731, idx=79, threadIdx.x=195
+compact_active write: cell=1732, idx=80, threadIdx.x=196
+compact_active write: cell=1733, idx=81, threadIdx.x=197
+compact_active write: cell=1734, idx=82, threadIdx.x=198
+compact_active write: cell=1735, idx=83, threadIdx.x=199
+compact_active write: cell=1736, idx=84, threadIdx.x=200
+compact_active write: cell=1737, idx=85, threadIdx.x=201
+compact_active write: cell=1738, idx=86, threadIdx.x=202
+compact_active write: cell=1739, idx=87, threadIdx.x=203
+compact_active write: cell=1740, idx=88, threadIdx.x=204
+compact_active write: cell=1741, idx=89, threadIdx.x=205
+compact_active write: cell=1742, idx=90, threadIdx.x=206
+compact_active write: cell=1743, idx=91, threadIdx.x=207
+compact_active write: cell=1744, idx=92, threadIdx.x=208
+compact_active write: cell=1745, idx=93, threadIdx.x=209
+compact_active write: cell=1746, idx=94, threadIdx.x=210
+compact_active write: cell=1747, idx=95, threadIdx.x=211
+compact_active write: cell=1748, idx=96, threadIdx.x=212
+compact_active write: cell=1652, idx=0, threadIdx.x=116
+compact_active write: cell=1653, idx=1, threadIdx.x=117
+compact_active write: cell=1654, idx=2, threadIdx.x=118
+compact_active write: cell=1655, idx=3, threadIdx.x=119
+compact_active write: cell=1656, idx=4, threadIdx.x=120
+compact_active write: cell=1657, idx=5, threadIdx.x=121
+compact_active write: cell=1658, idx=6, threadIdx.x=122
+compact_active write: cell=1659, idx=7, threadIdx.x=123
+compact_active write: cell=1660, idx=8, threadIdx.x=124
+compact_active write: cell=1661, idx=9, threadIdx.x=125
+compact_active write: cell=1662, idx=10, threadIdx.x=126
+compact_active write: cell=1663, idx=11, threadIdx.x=127
+compact_active write: cell=1664, idx=12, threadIdx.x=128
+compact_active write: cell=1665, idx=13, threadIdx.x=129
+compact_active write: cell=1666, idx=14, threadIdx.x=130
+compact_active write: cell=1667, idx=15, threadIdx.x=131
+compact_active write: cell=1668, idx=16, threadIdx.x=132
+compact_active write: cell=1669, idx=17, threadIdx.x=133
+compact_active write: cell=1670, idx=18, threadIdx.x=134
+compact_active write: cell=1671, idx=19, threadIdx.x=135
+compact_active write: cell=1672, idx=20, threadIdx.x=136
+compact_active write: cell=1673, idx=21, threadIdx.x=137
+compact_active write: cell=1674, idx=22, threadIdx.x=138
+compact_active write: cell=1675, idx=23, threadIdx.x=139
+compact_active write: cell=1676, idx=24, threadIdx.x=140
+compact_active write: cell=1677, idx=25, threadIdx.x=141
+compact_active write: cell=1678, idx=26, threadIdx.x=142
+compact_active write: cell=1679, idx=27, threadIdx.x=143
+compact_active write: cell=1680, idx=28, threadIdx.x=144
+compact_active write: cell=1681, idx=29, threadIdx.x=145
+compact_active write: cell=1682, idx=30, threadIdx.x=146
+compact_active write: cell=1683, idx=31, threadIdx.x=147
+compact_active write: cell=1684, idx=32, threadIdx.x=148
+compact_active write: cell=1685, idx=33, threadIdx.x=149
+compact_active write: cell=1686, idx=34, threadIdx.x=150
+compact_active write: cell=1687, idx=35, threadIdx.x=151
+compact_active write: cell=1688, idx=36, threadIdx.x=152
+compact_active write: cell=1689, idx=37, threadIdx.x=153
+compact_active write: cell=1690, idx=38, threadIdx.x=154
+compact_active write: cell=1691, idx=39, threadIdx.x=155
+compact_active write: cell=1692, idx=40, threadIdx.x=156
+compact_active write: cell=1693, idx=41, threadIdx.x=157
+compact_active write: cell=1694, idx=42, threadIdx.x=158
+compact_active write: cell=1695, idx=43, threadIdx.x=159
+compact_active write: cell=1696, idx=44, threadIdx.x=160
+compact_active write: cell=1697, idx=45, threadIdx.x=161
+compact_active write: cell=1698, idx=46, threadIdx.x=162
+compact_active write: cell=1699, idx=47, threadIdx.x=163
+compact_active write: cell=1700, idx=48, threadIdx.x=164
+compact_active write: cell=1701, idx=49, threadIdx.x=165
+compact_active write: cell=1702, idx=50, threadIdx.x=166
+compact_active write: cell=1703, idx=51, threadIdx.x=167
+compact_active write: cell=1704, idx=52, threadIdx.x=168
+compact_active write: cell=1705, idx=53, threadIdx.x=169
+compact_active write: cell=1706, idx=54, threadIdx.x=170
+compact_active write: cell=1707, idx=55, threadIdx.x=171
+compact_active write: cell=1708, idx=56, threadIdx.x=172
+compact_active write: cell=1709, idx=57, threadIdx.x=173
+compact_active write: cell=1710, idx=58, threadIdx.x=174
+compact_active write: cell=1711, idx=59, threadIdx.x=175
+compact_active write: cell=1712, idx=60, threadIdx.x=176
+compact_active write: cell=1713, idx=61, threadIdx.x=177
+compact_active write: cell=1714, idx=62, threadIdx.x=178
+compact_active write: cell=1715, idx=63, threadIdx.x=179
+compact_active write: cell=1716, idx=64, threadIdx.x=180
+compact_active write: cell=1717, idx=65, threadIdx.x=181
+compact_active write: cell=1718, idx=66, threadIdx.x=182
+compact_active write: cell=1719, idx=67, threadIdx.x=183
+compact_active write: cell=1720, idx=68, threadIdx.x=184
+compact_active write: cell=1721, idx=69, threadIdx.x=185
+compact_active write: cell=1722, idx=70, threadIdx.x=186
+compact_active write: cell=1723, idx=71, threadIdx.x=187
+compact_active write: cell=1724, idx=72, threadIdx.x=188
+compact_active write: cell=1725, idx=73, threadIdx.x=189
+compact_active write: cell=1726, idx=74, threadIdx.x=190
+compact_active write: cell=1727, idx=75, threadIdx.x=191
+  DEBUG n_active=97, n_coarse=0
+  Iteration 9: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1852, idx=0, threadIdx.x=60
+compact_active write: cell=1853, idx=1, threadIdx.x=61
+compact_active write: cell=1854, idx=2, threadIdx.x=62
+compact_active write: cell=1855, idx=3, threadIdx.x=63
+compact_active write: cell=1920, idx=68, threadIdx.x=128
+compact_active write: cell=1921, idx=69, threadIdx.x=129
+compact_active write: cell=1922, idx=70, threadIdx.x=130
+compact_active write: cell=1923, idx=71, threadIdx.x=131
+compact_active write: cell=1924, idx=72, threadIdx.x=132
+compact_active write: cell=1925, idx=73, threadIdx.x=133
+compact_active write: cell=1926, idx=74, threadIdx.x=134
+compact_active write: cell=1927, idx=75, threadIdx.x=135
+compact_active write: cell=1928, idx=76, threadIdx.x=136
+compact_active write: cell=1929, idx=77, threadIdx.x=137
+compact_active write: cell=1930, idx=78, threadIdx.x=138
+compact_active write: cell=1931, idx=79, threadIdx.x=139
+compact_active write: cell=1932, idx=80, threadIdx.x=140
+compact_active write: cell=1933, idx=81, threadIdx.x=141
+compact_active write: cell=1934, idx=82, threadIdx.x=142
+compact_active write: cell=1935, idx=83, threadIdx.x=143
+compact_active write: cell=1936, idx=84, threadIdx.x=144
+compact_active write: cell=1937, idx=85, threadIdx.x=145
+compact_active write: cell=1938, idx=86, threadIdx.x=146
+compact_active write: cell=1939, idx=87, threadIdx.x=147
+compact_active write: cell=1940, idx=88, threadIdx.x=148
+compact_active write: cell=1941, idx=89, threadIdx.x=149
+compact_active write: cell=1942, idx=90, threadIdx.x=150
+compact_active write: cell=1943, idx=91, threadIdx.x=151
+compact_active write: cell=1944, idx=92, threadIdx.x=152
+compact_active write: cell=1945, idx=93, threadIdx.x=153
+compact_active write: cell=1946, idx=94, threadIdx.x=154
+compact_active write: cell=1947, idx=95, threadIdx.x=155
+compact_active write: cell=1948, idx=96, threadIdx.x=156
+compact_active write: cell=1888, idx=36, threadIdx.x=96
+compact_active write: cell=1889, idx=37, threadIdx.x=97
+compact_active write: cell=1890, idx=38, threadIdx.x=98
+compact_active write: cell=1891, idx=39, threadIdx.x=99
+compact_active write: cell=1892, idx=40, threadIdx.x=100
+compact_active write: cell=1893, idx=41, threadIdx.x=101
+compact_active write: cell=1894, idx=42, threadIdx.x=102
+compact_active write: cell=1895, idx=43, threadIdx.x=103
+compact_active write: cell=1896, idx=44, threadIdx.x=104
+compact_active write: cell=1897, idx=45, threadIdx.x=105
+compact_active write: cell=1898, idx=46, threadIdx.x=106
+compact_active write: cell=1899, idx=47, threadIdx.x=107
+compact_active write: cell=1900, idx=48, threadIdx.x=108
+compact_active write: cell=1901, idx=49, threadIdx.x=109
+compact_active write: cell=1902, idx=50, threadIdx.x=110
+compact_active write: cell=1903, idx=51, threadIdx.x=111
+compact_active write: cell=1904, idx=52, threadIdx.x=112
+compact_active write: cell=1905, idx=53, threadIdx.x=113
+compact_active write: cell=1906, idx=54, threadIdx.x=114
+compact_active write: cell=1907, idx=55, threadIdx.x=115
+compact_active write: cell=1908, idx=56, threadIdx.x=116
+compact_active write: cell=1909, idx=57, threadIdx.x=117
+compact_active write: cell=1910, idx=58, threadIdx.x=118
+compact_active write: cell=1911, idx=59, threadIdx.x=119
+compact_active write: cell=1912, idx=60, threadIdx.x=120
+compact_active write: cell=1913, idx=61, threadIdx.x=121
+compact_active write: cell=1914, idx=62, threadIdx.x=122
+compact_active write: cell=1915, idx=63, threadIdx.x=123
+compact_active write: cell=1916, idx=64, threadIdx.x=124
+compact_active write: cell=1917, idx=65, threadIdx.x=125
+compact_active write: cell=1918, idx=66, threadIdx.x=126
+compact_active write: cell=1919, idx=67, threadIdx.x=127
+compact_active write: cell=1856, idx=4, threadIdx.x=64
+compact_active write: cell=1857, idx=5, threadIdx.x=65
+compact_active write: cell=1858, idx=6, threadIdx.x=66
+compact_active write: cell=1859, idx=7, threadIdx.x=67
+compact_active write: cell=1860, idx=8, threadIdx.x=68
+compact_active write: cell=1861, idx=9, threadIdx.x=69
+compact_active write: cell=1862, idx=10, threadIdx.x=70
+compact_active write: cell=1863, idx=11, threadIdx.x=71
+compact_active write: cell=1864, idx=12, threadIdx.x=72
+compact_active write: cell=1865, idx=13, threadIdx.x=73
+compact_active write: cell=1866, idx=14, threadIdx.x=74
+compact_active write: cell=1867, idx=15, threadIdx.x=75
+compact_active write: cell=1868, idx=16, threadIdx.x=76
+compact_active write: cell=1869, idx=17, threadIdx.x=77
+compact_active write: cell=1870, idx=18, threadIdx.x=78
+compact_active write: cell=1871, idx=19, threadIdx.x=79
+compact_active write: cell=1872, idx=20, threadIdx.x=80
+compact_active write: cell=1873, idx=21, threadIdx.x=81
+compact_active write: cell=1874, idx=22, threadIdx.x=82
+compact_active write: cell=1875, idx=23, threadIdx.x=83
+compact_active write: cell=1876, idx=24, threadIdx.x=84
+compact_active write: cell=1877, idx=25, threadIdx.x=85
+compact_active write: cell=1878, idx=26, threadIdx.x=86
+compact_active write: cell=1879, idx=27, threadIdx.x=87
+compact_active write: cell=1880, idx=28, threadIdx.x=88
+compact_active write: cell=1881, idx=29, threadIdx.x=89
+compact_active write: cell=1882, idx=30, threadIdx.x=90
+compact_active write: cell=1883, idx=31, threadIdx.x=91
+compact_active write: cell=1884, idx=32, threadIdx.x=92
+compact_active write: cell=1885, idx=33, threadIdx.x=93
+compact_active write: cell=1886, idx=34, threadIdx.x=94
+compact_active write: cell=1887, idx=35, threadIdx.x=95
+  DEBUG n_active=97, n_coarse=0
+  Iteration 10: 97 active, 0 coarse cells
+    Energy so far: 2.80706 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 11: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 12: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 13: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 14: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 15: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 16: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 17: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 18: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 19: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 20: 97 active, 0 coarse cells
+    Energy so far: 5.91509 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 21: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 22: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 23: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 24: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 25: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 26: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 27: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 28: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 29: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 30: 97 active, 0 coarse cells
+    Energy so far: 9.05272 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 31: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 32: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 33: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 34: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 35: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 36: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 37: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 38: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 39: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 40: 97 active, 0 coarse cells
+    Energy so far: 12.1917 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 41: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 42: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 43: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 44: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 45: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 46: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 47: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 48: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 49: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 50: 97 active, 0 coarse cells
+    Energy so far: 15.3191 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 51: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 52: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 53: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 54: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 55: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 56: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 57: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 58: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 59: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 60: 97 active, 0 coarse cells
+    Energy so far: 18.4846 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 61: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 62: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 63: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 64: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 65: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 66: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 67: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 68: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 69: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 70: 97 active, 0 coarse cells
+    Energy so far: 21.6456 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 71: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 72: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 73: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 74: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 75: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 76: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 77: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 78: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 79: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 80: 97 active, 0 coarse cells
+    Energy so far: 24.8164 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 81: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 82: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 83: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 84: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 85: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 86: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 87: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 88: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 89: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 90: 97 active, 0 coarse cells
+    Energy so far: 28.0318 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 91: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 92: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 93: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 94: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 95: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 96: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 97: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 98: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 99: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 100: 97 active, 0 coarse cells
+    Energy so far: 31.2476 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 101: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 102: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 103: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 104: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 105: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 106: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 107: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 108: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 109: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 110: 97 active, 0 coarse cells
+    Energy so far: 34.4882 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 111: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 112: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 113: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 114: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 115: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 116: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 117: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 118: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 119: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 120: 97 active, 0 coarse cells
+    Energy so far: 37.7496 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 121: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 122: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 123: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 124: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 125: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 126: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 127: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 128: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 129: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 130: 97 active, 0 coarse cells
+    Energy so far: 40.991 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 131: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 132: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 133: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 134: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 135: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 136: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 137: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 138: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 139: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 140: 97 active, 0 coarse cells
+    Energy so far: 44.2749 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 141: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 142: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 143: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 144: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 145: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 146: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 147: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 148: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 149: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 150: 97 active, 0 coarse cells
+    Energy so far: 47.6214 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 151: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 152: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 153: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 154: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 155: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 156: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 157: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 158: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 159: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 160: 97 active, 0 coarse cells
+    Energy so far: 50.9997 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 161: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 162: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 163: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 164: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 165: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 166: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 167: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 168: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 169: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 170: 97 active, 0 coarse cells
+    Energy so far: 54.4144 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 171: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 172: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 173: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 174: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 175: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 176: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 177: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 178: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 179: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 180: 97 active, 0 coarse cells
+    Energy so far: 57.8593 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 181: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 182: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 183: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 184: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 185: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 186: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 187: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 188: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 189: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 190: 97 active, 0 coarse cells
+    Energy so far: 61.3311 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 191: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 192: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 193: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 194: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 195: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 196: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 197: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 198: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 199: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 200: 97 active, 0 coarse cells
+    Energy so far: 64.8736 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 201: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 202: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 203: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 204: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 205: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 206: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 207: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 208: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 209: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 210: 97 active, 0 coarse cells
+    Energy so far: 68.5347 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 211: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 212: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 213: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 214: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 215: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 216: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 217: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 218: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 219: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 220: 97 active, 0 coarse cells
+    Energy so far: 72.2899 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 221: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 222: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 223: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 224: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 225: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 226: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 227: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 228: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 229: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 230: 97 active, 0 coarse cells
+    Energy so far: 76.1699 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 231: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 232: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 233: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 234: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 235: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 236: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 237: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 238: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 239: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 240: 97 active, 0 coarse cells
+    Energy so far: 80.1619 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 241: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 242: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 243: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 244: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 245: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 246: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 247: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 248: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 249: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 250: 97 active, 0 coarse cells
+    Energy so far: 84.3114 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 251: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 252: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 253: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 254: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 255: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 256: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 257: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 258: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 259: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 260: 97 active, 0 coarse cells
+    Energy so far: 88.6785 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 261: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 262: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 263: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 264: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 265: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 266: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 267: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 268: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 269: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 270: 97 active, 0 coarse cells
+    Energy so far: 93.3132 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 271: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 272: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 273: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 274: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 275: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 276: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 277: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 278: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 279: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 280: 97 active, 0 coarse cells
+    Energy so far: 98.2762 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 281: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 282: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 283: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 284: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 285: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 286: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 287: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 288: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 289: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 290: 97 active, 0 coarse cells
+    Energy so far: 103.727 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 291: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 292: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 293: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 294: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 295: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 296: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 297: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 298: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 299: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 300: 97 active, 0 coarse cells
+    Energy so far: 110.002 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 301: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 302: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 303: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 304: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 305: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 306: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 307: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 308: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 309: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 310: 97 active, 0 coarse cells
+    Energy so far: 117.386 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 311: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 312: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 313: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 314: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 315: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=97, n_coarse=0
+  Iteration 316: 97 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 317: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=96, n_coarse=0
+  Iteration 318: 96 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 319: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=96, n_coarse=0
+  Iteration 320: 96 active, 0 coarse cells
+    Energy so far: 124.443 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 321: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=96, n_coarse=0
+  Iteration 322: 96 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 323: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=95, n_coarse=0
+  Iteration 324: 95 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=92, n_coarse=0
+  Iteration 325: 92 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=92, n_coarse=0
+  Iteration 326: 92 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=90, n_coarse=0
+  Iteration 327: 90 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=87, n_coarse=0
+  Iteration 328: 87 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=80, n_coarse=0
+  Iteration 329: 80 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=73, n_coarse=0
+  Iteration 330: 73 active, 0 coarse cells
+    Energy so far: 133.09 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=66, n_coarse=0
+  Iteration 331: 66 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=61, n_coarse=0
+  Iteration 332: 61 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=49, n_coarse=0
+  Iteration 333: 49 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=37, n_coarse=0
+  Iteration 334: 37 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=31, n_coarse=0
+  Iteration 335: 31 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=27, n_coarse=0
+  Iteration 336: 27 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=25, n_coarse=0
+  Iteration 337: 25 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=22, n_coarse=0
+  Iteration 338: 22 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=16, n_coarse=0
+  Iteration 339: 16 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=12, n_coarse=0
+  Iteration 340: 12 active, 0 coarse cells
+    Energy so far: 136.623 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=10, n_coarse=0
+  Iteration 341: 10 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=10, n_coarse=0
+  Iteration 342: 10 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=10, n_coarse=0
+  Iteration 343: 10 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 344: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 345: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 346: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 347: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 348: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 349: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 350: 9 active, 0 coarse cells
+    Energy so far: 136.643 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=9, n_coarse=0
+  Iteration 351: 9 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 352: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 353: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 354: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 355: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 356: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 357: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 358: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 359: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 360: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 361: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 362: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 363: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 364: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 365: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 366: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 367: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 368: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 369: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 370: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 371: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 372: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 373: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 374: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 375: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 376: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 377: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 378: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 379: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 380: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 381: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 382: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 383: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 384: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 385: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 386: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 387: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 388: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 389: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 390: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 391: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 392: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 393: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 394: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 395: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 396: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 397: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 398: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 399: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 400: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 401: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 402: 8 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=8, n_coarse=0
+  Iteration 403: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 11: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 404: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 12: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 405: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 13: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 406: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 14: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 407: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 15: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 408: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 16: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 409: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 17: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 410: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 18: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 411: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 19: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 412: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 20: 7 active, 0 coarse cells
-    Energy so far: 12.271 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 413: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 21: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 414: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 22: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 415: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 23: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 416: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 24: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 417: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 25: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 418: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 26: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 419: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 27: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 420: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 28: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 421: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 29: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 422: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 30: 7 active, 0 coarse cells
-    Energy so far: 18.8209 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 423: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 31: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 424: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 32: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 425: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 33: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 426: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 34: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 427: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 35: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 428: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 36: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 429: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 37: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 430: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 38: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 431: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 39: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 432: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 40: 7 active, 0 coarse cells
-    Energy so far: 25.1241 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 433: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 41: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 434: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 42: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 435: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 43: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 436: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 44: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 437: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 45: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 438: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 46: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 439: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 47: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 440: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 48: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 441: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 49: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 442: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 50: 7 active, 0 coarse cells
-    Energy so far: 31.5166 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 443: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 51: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 444: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 52: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 445: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 53: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 446: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 54: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 447: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 55: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 448: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 56: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 449: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 57: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 450: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 58: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 451: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 59: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 452: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 60: 7 active, 0 coarse cells
-    Energy so far: 37.9968 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 453: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 61: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 454: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 62: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 455: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 63: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 456: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 64: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 457: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 65: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 458: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 66: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 459: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 67: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 460: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 68: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 461: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 69: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 462: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 70: 7 active, 0 coarse cells
-    Energy so far: 44.4394 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 463: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 71: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 464: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 72: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 465: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 73: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 466: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 74: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 467: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 75: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 468: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 76: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 469: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 77: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 470: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 78: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 471: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 79: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 472: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 80: 7 active, 0 coarse cells
-    Energy so far: 50.8997 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 473: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 81: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 474: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 82: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 475: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 83: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 476: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 84: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 477: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 85: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 478: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 86: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 479: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 87: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 480: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 88: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 481: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 89: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 482: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 90: 7 active, 0 coarse cells
-    Energy so far: 57.4264 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 483: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 91: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 484: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 92: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 485: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 93: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 486: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 94: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 487: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 95: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 488: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 96: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 489: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 97: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 490: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 98: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 491: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 99: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 492: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 100: 7 active, 0 coarse cells
-    Energy so far: 64.0108 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 493: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 101: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 494: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 102: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 495: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 103: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 496: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 104: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 497: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 105: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 498: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 106: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 499: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 107: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 500: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 108: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 501: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 109: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 502: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 110: 7 active, 0 coarse cells
-    Energy so far: 70.5888 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 503: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 111: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 504: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 112: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 505: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 113: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 506: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 114: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 507: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 115: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 508: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 116: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 509: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 117: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 510: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 118: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 511: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 119: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 512: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 120: 7 active, 0 coarse cells
-    Energy so far: 77.1786 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 513: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 121: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 514: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 122: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 515: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 123: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 516: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 124: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 517: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 125: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 518: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 126: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 519: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 127: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 520: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 128: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 521: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 129: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 522: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 130: 7 active, 0 coarse cells
-    Energy so far: 83.7726 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 523: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 131: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 524: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 132: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 525: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 133: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 526: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 134: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 527: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 135: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 528: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 136: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 529: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 137: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 530: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 138: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 531: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 139: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 532: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 140: 7 active, 0 coarse cells
-    Energy so far: 90.5424 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 533: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 141: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 534: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 142: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 535: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 143: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 536: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 144: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 537: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 145: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 538: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 146: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 539: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 147: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 540: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 148: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 541: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 149: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 542: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 150: 7 active, 0 coarse cells
-    Energy so far: 97.4788 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 543: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 151: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 544: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 152: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 545: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 153: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 546: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 154: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 547: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 155: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 548: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 156: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 549: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 157: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 550: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 158: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 551: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 159: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 552: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 160: 7 active, 0 coarse cells
-    Energy so far: 104.39 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 553: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 161: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 554: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 162: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 555: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 163: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 556: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 164: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 557: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 165: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 558: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 166: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 559: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 167: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 560: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 168: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 561: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 169: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 562: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 170: 7 active, 0 coarse cells
-    Energy so far: 111.326 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 563: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 171: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 564: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 172: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 565: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 173: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 566: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 174: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 567: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 175: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 568: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 176: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 569: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 177: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 570: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 178: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 571: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 179: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 572: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 180: 7 active, 0 coarse cells
-    Energy so far: 118.446 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 573: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 181: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 574: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 182: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 575: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 183: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 576: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 184: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 577: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 185: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 578: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 186: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 579: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 187: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 580: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 188: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 581: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 189: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 582: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 190: 7 active, 0 coarse cells
-    Energy so far: 125.265 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 583: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 191: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 584: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 192: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 585: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 193: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 586: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 194: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 587: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 195: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 588: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 196: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 589: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 197: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 590: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 198: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 591: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 199: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 592: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 200: 7 active, 0 coarse cells
-    Energy so far: 132.521 MeV
+  DEBUG n_active=8, n_coarse=0
+  Iteration 593: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 201: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 594: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 202: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 595: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 203: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 596: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 204: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 597: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 205: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 598: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 206: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 599: 8 active, 0 coarse cells
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 207: 7 active, 0 coarse cells
+  DEBUG n_active=8, n_coarse=0
+  Iteration 600: 8 active, 0 coarse cells
+    Energy so far: 136.644 MeV
   Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 208: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 209: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 210: 7 active, 0 coarse cells
-    Energy so far: 140.109 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 211: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 212: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 213: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 214: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 215: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 216: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 217: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 218: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 219: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 220: 7 active, 0 coarse cells
-    Energy so far: 147.762 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 221: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 222: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 223: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 224: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 225: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 226: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 227: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 228: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 229: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 230: 7 active, 0 coarse cells
-    Energy so far: 155.809 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 231: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 232: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 233: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 234: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 235: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 236: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 237: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 238: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 239: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 240: 7 active, 0 coarse cells
-    Energy so far: 164.001 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 241: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 242: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 243: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 244: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 245: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 246: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 247: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 248: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 249: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 250: 7 active, 0 coarse cells
-    Energy so far: 172.371 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 251: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 252: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 253: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 254: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 255: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 256: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 257: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 258: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 259: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 260: 7 active, 0 coarse cells
-    Energy so far: 181.417 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 261: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 262: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 263: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 264: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 265: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 266: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 267: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 268: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 269: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 270: 7 active, 0 coarse cells
-    Energy so far: 191.062 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 271: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 272: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 273: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 274: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 275: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 276: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 277: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 278: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 279: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 280: 7 active, 0 coarse cells
-    Energy so far: 201.284 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 281: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 282: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 283: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 284: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 285: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 286: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 287: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 288: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 289: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 290: 7 active, 0 coarse cells
-    Energy so far: 212.611 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 291: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 292: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 293: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 294: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 295: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 296: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 297: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 298: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 299: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 300: 7 active, 0 coarse cells
-    Energy so far: 224.822 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 301: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 302: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 303: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 304: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 305: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 306: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 307: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 308: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 309: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 310: 7 active, 0 coarse cells
-    Energy so far: 240.63 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 311: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 312: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 313: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 314: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 315: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 316: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 317: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 318: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 319: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 320: 7 active, 0 coarse cells
-    Energy so far: 253.848 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 321: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 322: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 323: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 324: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 325: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 326: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 327: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 328: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=7, n_coarse=0
-  Iteration 329: 7 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=6, n_coarse=0
-  Iteration 330: 6 active, 0 coarse cells
-    Energy so far: 274.545 MeV
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=5, n_coarse=0
-  Iteration 331: 5 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=3, n_coarse=0
-  Iteration 332: 3 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=2, n_coarse=0
-  Iteration 333: 2 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=1, n_coarse=0
-  Iteration 334: 1 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=1, n_coarse=0
-  Iteration 335: 1 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=1, n_coarse=0
-  Iteration 336: 1 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  DEBUG n_active=1, n_coarse=0
-  Iteration 337: 1 active, 0 coarse cells
-  Weight audit: error=0 pass=yes
-  Iteration 338: 0 active, 0 coarse cells
-  No active cells remaining, transport complete
-K1-K6 pipeline: completed 338 iterations
+K1-K6 pipeline: completed 600 iterations
 GPU K1-K6 pipeline complete.
 
 === Energy Conservation Report ===
-  Energy Deposited: 278.87 MeV
-  Boundary Loss Energy: 59308.8 MeV
-  Cutoff Weight: 1.72519 (particles below E < 0.1 MeV)
-  Total Accounted Energy: 59587.7 MeV
+  Energy Deposited: 136.644 MeV
+  Boundary Loss Energy: 29132.7 MeV
+  Cutoff Weight: 0.709603 (particles below E < 0.1 MeV)
+  Total Accounted Energy: 29269.3 MeV
 =====================================
   Energy deposition extracted
 K1-K6 pipeline wrapper complete.
 GPU transport complete.
 Simulation complete.
-  Bragg Peak: 159.5 mm depth, 3.95177 Gy
+  Bragg Peak: 158.5 mm depth, 1.52831 Gy
 
 --- Saving Results ---
   2D dose saved to: results/dose_2d.txt

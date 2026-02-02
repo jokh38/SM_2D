@@ -362,7 +362,8 @@ def create_comparison_plots(x_m, z_m, dose_m_2d, pdd_m,
 
     # 2. SM_2D 2D dose
     ax2 = plt.subplot(3, 4, 2)
-    extent_s = [x_s[0], x_s[-1], 0, z_s[0]]
+    # SM_2D z increases from 0 (surface) to max depth, use z_s[-1] for extent
+    extent_s = [x_s[0], x_s[-1], 0, z_s[-1]]
     im2 = ax2.imshow(dose_s_2d, extent=extent_s, aspect='auto', cmap='hot', origin='upper')
     ax2.set_ylabel('Depth (mm)')
     ax2.set_xlabel('X (mm)')

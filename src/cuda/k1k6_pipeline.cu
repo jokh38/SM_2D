@@ -20,7 +20,7 @@ namespace sm_2d {
 // ============================================================================
 
 // Source particle injection kernel with angular and spatial distribution
-// Distributes source across multiple cells when sigma_x is large
+// Distributes source across ALL cells within the beam width using proper Gaussian distribution
 __global__ void inject_source_kernel(
     DevicePsiC psi,
     int Nx, int Nz, float dx, float dz, float x_min, float z_min,
@@ -33,31 +33,29 @@ __global__ void inject_source_kernel(
     int N_theta, int N_E,
     int N_theta_local, int N_E_local
 ) {
-    // Number of samples for angular and spatial distribution
-    const int N_theta_samples = 7;   // Quadrature points for angular spread
-    const int N_x_samples = 7;       // Quadrature points for spatial spread
+    // Number of samples for angular distribution (Gauss-Hermite still used for angular)
+    const int N_theta_samples = 7;
 
-    // Gaussian quadrature weights and abscissas (approximate for [-3, 3])
-    // Using 7-point Gauss-Hermite-like weights scaled for practical use
+    // Gauss-Hermite quadrature for angular spread only
     __constant__ static float gh_abscissas[7] = {-2.65f, -1.67f, -0.82f, 0.0f, 0.82f, 1.67f, 2.65f};
     __constant__ static float gh_weights[7] = {0.015f, 0.11f, 0.35f, 0.48f, 0.35f, 0.11f, 0.015f};
 
-    // Determine if we need distributed sampling
-    bool use_angular_spread = (sigma_theta > 0.0001f);  // Threshold for meaningful spread
-    bool use_spatial_spread = (sigma_x > 0.01f);        // Threshold for meaningful spread
+    // Normalized GH weights (sum = 1.0 for proper probability distribution)
+    __constant__ static float gh_weights_norm[7] = {0.0105f, 0.0769f, 0.2448f, 0.3357f, 0.2448f, 0.0769f, 0.0105f};
 
+    // Determine if we need distributed sampling
+    bool use_angular_spread = (sigma_theta > 0.0001f);
+    bool use_spatial_spread = (sigma_x > 0.01f);
+
+    // Pencil beam case: single cell injection
     if (!use_angular_spread && !use_spatial_spread) {
-        // Simple pencil beam - single injection at source cell
-        // Convert source position to cell coordinates
         float x_rel = x0 - x_min;
         float z_rel = z0 - z_min;
         int source_cell_x = static_cast<int>(x_rel / dx);
         int source_cell_z = static_cast<int>(z_rel / dz);
-        // Clamp to valid range
         source_cell_x = (source_cell_x < 0) ? 0 : (source_cell_x >= Nx) ? Nx - 1 : source_cell_x;
         source_cell_z = (source_cell_z < 0) ? 0 : (source_cell_z >= Nz) ? Nz - 1 : source_cell_z;
         int source_cell = source_cell_z * Nx + source_cell_x;
-        // Position within cell
         float x_in_cell = x_rel - source_cell_x * dx;
         float z_in_cell = z_rel - source_cell_z * dz;
 
@@ -70,55 +68,83 @@ __global__ void inject_source_kernel(
         return;
     }
 
-    // Distributed source injection
+    // =========================================================================
+    // CONTINUOUS GAUSSIAN DISTRIBUTION FOR SPATIAL SPREAD
+    // =========================================================================
+    // Distribute source weight across ALL cells within ±4 sigma_x of beam center
+    // Each cell receives weight proportional to Gaussian PDF at cell center
+
+    // Calculate cell range that contains significant Gaussian weight (±4 sigma)
+    const float N_sigma = 4.0f;  // Cover 99.99% of Gaussian distribution
+    float x_min_beam = x0 - N_sigma * sigma_x;
+    float x_max_beam = x0 + N_sigma * sigma_x;
+
+    // Convert to cell indices
+    int ix_start = static_cast<int>((x_min_beam - x_min) / dx);
+    int ix_end = static_cast<int>((x_max_beam - x_min) / dx) + 1;
+
+    // Clamp to valid grid range
+    ix_start = (ix_start < 0) ? 0 : ix_start;
+    ix_end = (ix_end > Nx) ? Nx : ix_end;
+
+    // Pre-compute Gaussian normalization factor
+    const float sqrt_2pi = 2.50662827463f;  // sqrt(2*pi)
+    const float norm_factor = 1.0f / (sigma_x * sqrt_2pi);
+
+    // Angular spread configuration
     int theta_start = (use_angular_spread) ? 0 : 0;
     int theta_end = (use_angular_spread) ? N_theta_samples : 1;
-    int x_start = (use_spatial_spread) ? 0 : 0;
-    int x_end = (use_spatial_spread) ? N_x_samples : 1;
 
+    // First pass: compute total spatial weight for normalization
+    // (This ensures weight sums to exactly 1.0 regardless of grid coverage)
+    float total_spatial_weight = 0.0f;
+    for (int ix = ix_start; ix < ix_end; ++ix) {
+        float x_center = x_min + (ix + 0.5f) * dx;  // Cell center position
+        float dx_from_beam = x_center - x0;
+        float gaussian = expf(-0.5f * dx_from_beam * dx_from_beam / (sigma_x * sigma_x));
+        total_spatial_weight += gaussian * dx;  // Integral approximation
+    }
+
+    // Avoid division by zero
+    if (total_spatial_weight <= 0.0f) total_spatial_weight = 1.0f;
+
+    // Angular distribution loop (GH quadrature for angular)
     for (int it = theta_start; it < theta_end; ++it) {
-        for (int ix = x_start; ix < x_end; ++ix) {
-            // Sample angle
-            float theta = theta0;
-            float w_theta = 1.0f;
-            if (use_angular_spread) {
-                theta = theta0 + gh_abscissas[it] * sigma_theta;
-                w_theta = gh_weights[it];
-            }
+        float theta = theta0;
+        float w_theta = 1.0f;
+        if (use_angular_spread) {
+            theta = theta0 + gh_abscissas[it] * sigma_theta;
+            w_theta = gh_weights_norm[it];  // Use normalized weights
+        }
 
-            // Sample global position
-            float x_global = x0;
-            float w_x = 1.0f;
-            if (use_spatial_spread) {
-                x_global = x0 + gh_abscissas[ix] * sigma_x;
-                w_x = gh_weights[ix];
-            }
+        // Spatial distribution: loop over ALL cells in beam width
+        for (int ix = ix_start; ix < ix_end; ++ix) {
+            // Cell center in global coordinates
+            float x_center = x_min + (ix + 0.5f) * dx;
+            float dx_from_beam = x_center - x0;
 
-            // Convert global position to cell coordinates
-            float x_rel = x_global - x_min;
+            // Gaussian weight for this cell
+            float gaussian = expf(-0.5f * dx_from_beam * dx_from_beam / (sigma_x * sigma_x));
+
+            // Normalize weight so sum over all cells = 1.0
+            float w_x = (gaussian * dx) / total_spatial_weight;
+
+            // Z coordinate (always at z0 for source plane)
             float z_rel = z0 - z_min;
-
-            int cell_x = static_cast<int>(x_rel / dx);
             int cell_z = static_cast<int>(z_rel / dz);
-
-            // Clamp to valid range
-            cell_x = (cell_x < 0) ? 0 : (cell_x >= Nx) ? Nx - 1 : cell_x;
             cell_z = (cell_z < 0) ? 0 : (cell_z >= Nz) ? Nz - 1 : cell_z;
 
-            int cell = cell_z * Nx + cell_x;
+            int cell = cell_z * Nx + ix;
 
-            // Position within cell
-            float x_in_cell = x_rel - cell_x * dx;
+            // Position within cell (use cell center for uniform distribution)
+            float x_in_cell = dx * 0.5f;  // Center of cell in x
             float z_in_cell = z_rel - cell_z * dz;
-
-            // Clamp position to cell bounds
-            x_in_cell = fmaxf(0.0f, fminf(x_in_cell, dx));
             z_in_cell = fmaxf(0.0f, fminf(z_in_cell, dz));
 
-            // Combined weight for this sample
+            // Combined weight
             float w_sample = W_total * w_theta * w_x;
 
-            // Inject this sample into the appropriate cell
+            // Inject this sample
             device_psic_inject_source(
                 psi, cell, theta, E0, w_sample,
                 x_in_cell, z_in_cell, dx, dz,
