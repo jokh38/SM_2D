@@ -58,13 +58,16 @@ struct K1K6PipelineConfig {
 // Helper Kernel Declarations
 // ============================================================================
 
-// Inject source particle into PsiC
+// Inject source particle into PsiC with angular and spatial distribution
+// sigma_theta > 0: Distribute source across multiple angles (Gaussian)
+// sigma_x > 0: Distribute source across multiple lateral positions/cells (Gaussian)
 __global__ void inject_source_kernel(
     DevicePsiC psi,
-    int source_cell,
-    float theta0, float E0, float W_total,
-    float x_in_cell, float z_in_cell,
-    float dx, float dz,
+    int Nx, int Nz, float dx, float dz, float x_min, float z_min,  // Grid info for multi-cell injection
+    float x0, float z0,           // Global source position (mm)
+    float theta0, float sigma_theta,
+    float E0, float W_total,
+    float sigma_x,
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,

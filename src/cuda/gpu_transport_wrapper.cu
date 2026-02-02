@@ -41,7 +41,8 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper) {
 }
 
 void run_k1k6_pipeline_transport(
-    float x0, float z0, float theta0, float E0, float W_total,
+    float x0, float z0, float theta0, float sigma_theta, float sigma_x,
+    float E0, float W_total,
     int Nx, int Nz, float dx, float dz,
     float x_min, float z_min,
     int N_theta, int N_E,
@@ -54,6 +55,14 @@ void run_k1k6_pipeline_transport(
     std::cout << "Running K1-K6 GPU pipeline wrapper..." << std::endl;
     std::cout << "  Grid: " << Nx << " x " << Nz << " cells" << std::endl;
     std::cout << "  Source: (" << x0 << ", " << z0 << ") mm, " << E0 << " MeV" << std::endl;
+
+    // Log beam parameters
+    if (sigma_theta > 0.0001f) {
+        std::cout << "  Angular divergence: " << sigma_theta << " rad" << std::endl;
+    }
+    if (sigma_x > 0.01f) {
+        std::cout << "  Spatial beam width (sigma_x): " << sigma_x << " mm" << std::endl;
+    }
 
     // Cast from sm_2d::DeviceRLUT to ::DeviceRLUT (same type, different namespace)
     const ::DeviceRLUT& native_dlut = reinterpret_cast<const ::DeviceRLUT&>(dlut);
@@ -142,35 +151,18 @@ void run_k1k6_pipeline_transport(
     // STEP 3: Inject Source Particle
     // ========================================================================
 
-    // Convert source position to cell coordinates
-    float x_rel = x0 - x_min;
-    float z_rel = z0 - z_min;
-
-    int source_cell_x = static_cast<int>(x_rel / dx);
-    int source_cell_z = static_cast<int>(z_rel / dz);
-    int source_cell = source_cell_z * Nx + source_cell_x;
-
-    // Clamp to valid range
-    source_cell_x = (source_cell_x < 0) ? 0 : (source_cell_x >= Nx) ? Nx - 1 : source_cell_x;
-    source_cell_z = (source_cell_z < 0) ? 0 : (source_cell_z >= Nz) ? Nz - 1 : source_cell_z;
-    source_cell = source_cell_z * Nx + source_cell_x;
-
-    // Position within cell
-    float x_in_cell = x_rel - source_cell_x * dx;
-    float z_in_cell = z_rel - source_cell_z * dz;
-
-    std::cout << "  Source: cell (" << source_cell_x << ", " << source_cell_z
-              << ") at (" << x0 << ", " << z0 << ") mm" << std::endl;
+    std::cout << "  Source: (" << x0 << ", " << z0 << ") mm" << std::endl;
     std::cout << "  Energy: " << E0 << " MeV, Angle: " << theta0 << " rad" << std::endl;
 
-    // Inject source particle into psi_in
-    // Create a simple kernel to inject the source
+    // Inject source particle into psi_in with angular and spatial distribution
+    // The kernel now handles multi-cell distribution internally
     inject_source_kernel<<<1, 1>>>(
         psi_in,
-        source_cell,
-        theta0, E0, W_total,
-        x_in_cell, z_in_cell,
-        dx, dz,
+        Nx, Nz, dx, dz, x_min, z_min,
+        x0, z0,
+        theta0, sigma_theta,
+        E0, W_total,
+        sigma_x,
         theta_edges, E_edges,
         N_theta, N_E,
         N_theta_local, N_E_local
@@ -186,24 +178,29 @@ void run_k1k6_pipeline_transport(
         return;
     }
 
-    // Verify source injection by summing weights in source cell
-    size_t source_cell_slots = psi_in.Kb * LOCAL_BINS;
-    std::vector<float> h_source_values(source_cell_slots);
-    size_t source_offset = source_cell * psi_in.Kb * LOCAL_BINS;
-    cudaMemcpy(h_source_values.data(), psi_in.value + source_offset,
-               source_cell_slots * sizeof(float), cudaMemcpyDeviceToHost);
+    // Verify source injection - sum weights across all cells
+    std::vector<float> h_all_values(psi_in.N_cells * psi_in.Kb * LOCAL_BINS);
+    cudaMemcpy(h_all_values.data(), psi_in.value,
+               psi_in.N_cells * psi_in.Kb * LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
 
     float total_weight = 0.0f;
-    int nonzero_count = 0;
-    for (size_t i = 0; i < source_cell_slots; ++i) {
-        if (h_source_values[i] > 0.0f) {
-            total_weight += h_source_values[i];
-            nonzero_count++;
+    int nonzero_cells = 0;
+    for (int cell = 0; cell < psi_in.N_cells; ++cell) {
+        float cell_weight = 0.0f;
+        for (size_t i = 0; i < psi_in.Kb * LOCAL_BINS; ++i) {
+            size_t idx = cell * psi_in.Kb * LOCAL_BINS + i;
+            if (h_all_values[idx] > 0.0f) {
+                cell_weight += h_all_values[idx];
+            }
+        }
+        if (cell_weight > 0.0f) {
+            nonzero_cells++;
+            total_weight += cell_weight;
         }
     }
     std::cout << "  Source injection verification:" << std::endl;
-    std::cout << "    Total weight in source cell: " << total_weight << " (expected: " << W_total << ")" << std::endl;
-    std::cout << "    Non-zero bins: " << nonzero_count << " / " << source_cell_slots << std::endl;
+    std::cout << "    Total weight: " << total_weight << " (expected: " << W_total << ")" << std::endl;
+    std::cout << "    Non-zero cells: " << nonzero_cells << " / " << psi_in.N_cells << std::endl;
 
     // ========================================================================
     // STEP 4: Run Main Pipeline

@@ -1,0 +1,1220 @@
+========================================
+SM_2D: Proton Therapy Simulation
+========================================
+Loading configuration from: sim.ini
+=== Incident Particle Configuration ===
+Particle Type: proton
+Beam Profile: gaussian
+Energy: 150 MeV (sigma = 1 MeV)
+Position: (0, 0) mm
+Angle: 0 rad (sigma = 0.001 rad)
+Weight: 1
+Samples: 1000
+
+Grid: 200 x 640 (dx=0.5mm, dz=0.5mm)
+Output Dir: results
+======================================
+
+--- Running Simulation ---
+Using GPU transport (Vavilov energy straggling)
+=== Option D2 Energy Grid ===
+  N_E = 1029 bins
+  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)
+  [2-20 MeV]: 0.2 MeV/bin (90 bins)
+  [20-100 MeV]: 0.25 MeV/bin (320 bins)
+  [100-250 MeV]: 0.25 MeV/bin (600 bins)
+=============================
+=== LUT Verification ===
+  R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
+  R(150 MeV) = 157.7 mm (expected ~158)
+  R(250 MeV) = -nan mm (max range in LUT)
+  S(150 MeV) = 5.443 MeV*cm^2/g
+  Energy loss test: E=150 -> E_new=148.918, dE=1.0824 MeV (step=2mm)
+=======================
+Running K1-K6 GPU pipeline transport...
+  GPU: NVIDIA GeForce RTX 2080
+  Energy: 150 MeV
+  Phase-space: 36 x 1029 bins
+Running K1-K6 GPU pipeline wrapper...
+  Grid: 200 x 640 cells
+  Source: (0, 0) mm, 150 MeV
+  Angular divergence: 0.001 rad
+  Spatial beam width (sigma_x): 6 mm
+DevicePsiC allocation:
+  Grid: 200x640 = 128000 cells
+  Kb: 8, LOCAL_BINS: 128
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 524288000 bytes (500 MB)
+  total per PsiC: 503.906 MB
+DevicePsiC allocation successful
+DevicePsiC allocation:
+  Grid: 200x640 = 128000 cells
+  Kb: 8, LOCAL_BINS: 128
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 524288000 bytes (500 MB)
+  total per PsiC: 503.906 MB
+DevicePsiC allocation successful
+Allocating pipeline state for 200x640 (128000 cells)
+Pipeline state allocation successful
+  Source: (0, 0) mm
+  Energy: 150 MeV, Angle: 0 rad
+  Source injection verification:
+    Total weight: 2.0449 (expected: 1)
+    Non-zero cells: 7 / 128000
+Running K1-K6 GPU pipeline...
+  Grid: 200 x 640 cells
+  Phase-space: 36 x 1029 global bins
+  Energy threshold: 300 MeV (b_E_trigger=514)
+  Min weight: 1e-12
+Starting main transport loop...
+compact_active write: cell=131, idx=6, threadIdx.x=131
+compact_active write: cell=100, idx=3, threadIdx.x=100
+compact_active write: cell=109, idx=4, threadIdx.x=109
+compact_active write: cell=120, idx=5, threadIdx.x=120
+compact_active write: cell=68, idx=0, threadIdx.x=68
+compact_active write: cell=79, idx=1, threadIdx.x=79
+compact_active write: cell=90, idx=2, threadIdx.x=90
+  DEBUG n_active=7, n_coarse=0
+  Iteration 1: 7 active, 0 coarse cells
+    psi_in: weight=2.0449, nonzero_bins=7
+    psi_out before K4: weight=0, nonzero_bins=0
+    psi_out AFTER K4: weight=2.04389, nonzero_bins=7
+  Weight audit: error=0 pass=yes
+compact_active write: cell=320, idx=0, threadIdx.x=64
+compact_active write: cell=331, idx=1, threadIdx.x=75
+compact_active write: cell=290, idx=4, threadIdx.x=34
+compact_active write: cell=300, idx=5, threadIdx.x=44
+compact_active write: cell=309, idx=6, threadIdx.x=53
+compact_active write: cell=268, idx=2, threadIdx.x=12
+compact_active write: cell=279, idx=3, threadIdx.x=23
+  DEBUG n_active=7, n_coarse=0
+  Iteration 2: 7 active, 0 coarse cells
+    psi_in: weight=2.04389, nonzero_bins=7
+    psi_out before K4: weight=0, nonzero_bins=0
+    psi_out AFTER K4: weight=2.04288, nonzero_bins=7
+  Weight audit: error=0 pass=yes
+compact_active write: cell=520, idx=0, threadIdx.x=8
+compact_active write: cell=531, idx=1, threadIdx.x=19
+compact_active write: cell=490, idx=4, threadIdx.x=234
+compact_active write: cell=500, idx=5, threadIdx.x=244
+compact_active write: cell=509, idx=6, threadIdx.x=253
+compact_active write: cell=468, idx=2, threadIdx.x=212
+compact_active write: cell=479, idx=3, threadIdx.x=223
+  DEBUG n_active=7, n_coarse=0
+  Iteration 3: 7 active, 0 coarse cells
+    psi_in: weight=2.04288, nonzero_bins=7
+    psi_out before K4: weight=0, nonzero_bins=0
+    psi_out AFTER K4: weight=2.04186, nonzero_bins=7
+  Weight audit: error=0 pass=yes
+compact_active write: cell=668, idx=0, threadIdx.x=156
+compact_active write: cell=709, idx=4, threadIdx.x=197
+compact_active write: cell=720, idx=5, threadIdx.x=208
+compact_active write: cell=731, idx=6, threadIdx.x=219
+compact_active write: cell=679, idx=1, threadIdx.x=167
+compact_active write: cell=690, idx=2, threadIdx.x=178
+compact_active write: cell=700, idx=3, threadIdx.x=188
+  DEBUG n_active=7, n_coarse=0
+  Iteration 4: 7 active, 0 coarse cells
+    psi_in: weight=2.04186, nonzero_bins=7
+    psi_out before K4: weight=0, nonzero_bins=0
+    psi_out AFTER K4: weight=2.04085, nonzero_bins=7
+  Weight audit: error=0 pass=yes
+compact_active write: cell=931, idx=6, threadIdx.x=163
+compact_active write: cell=900, idx=3, threadIdx.x=132
+compact_active write: cell=909, idx=4, threadIdx.x=141
+compact_active write: cell=920, idx=5, threadIdx.x=152
+compact_active write: cell=868, idx=0, threadIdx.x=100
+compact_active write: cell=879, idx=1, threadIdx.x=111
+compact_active write: cell=890, idx=2, threadIdx.x=122
+  DEBUG n_active=7, n_coarse=0
+  Iteration 5: 7 active, 0 coarse cells
+    psi_in: weight=2.04085, nonzero_bins=7
+    psi_out before K4: weight=0, nonzero_bins=0
+    psi_out AFTER K4: weight=2.03984, nonzero_bins=7
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1120, idx=5, threadIdx.x=96
+compact_active write: cell=1131, idx=6, threadIdx.x=107
+compact_active write: cell=1090, idx=2, threadIdx.x=66
+compact_active write: cell=1100, idx=3, threadIdx.x=76
+compact_active write: cell=1109, idx=4, threadIdx.x=85
+compact_active write: cell=1068, idx=0, threadIdx.x=44
+compact_active write: cell=1079, idx=1, threadIdx.x=55
+  DEBUG n_active=7, n_coarse=0
+  Iteration 6: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1320, idx=2, threadIdx.x=40
+compact_active write: cell=1331, idx=3, threadIdx.x=51
+compact_active write: cell=1290, idx=4, threadIdx.x=10
+compact_active write: cell=1300, idx=5, threadIdx.x=20
+compact_active write: cell=1309, idx=6, threadIdx.x=29
+compact_active write: cell=1268, idx=0, threadIdx.x=244
+compact_active write: cell=1279, idx=1, threadIdx.x=255
+  DEBUG n_active=7, n_coarse=0
+  Iteration 7: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1468, idx=0, threadIdx.x=188
+compact_active write: cell=1509, idx=4, threadIdx.x=229
+compact_active write: cell=1520, idx=5, threadIdx.x=240
+compact_active write: cell=1531, idx=6, threadIdx.x=251
+compact_active write: cell=1479, idx=1, threadIdx.x=199
+compact_active write: cell=1490, idx=2, threadIdx.x=210
+compact_active write: cell=1500, idx=3, threadIdx.x=220
+  DEBUG n_active=7, n_coarse=0
+  Iteration 8: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1731, idx=0, threadIdx.x=195
+compact_active write: cell=1700, idx=1, threadIdx.x=164
+compact_active write: cell=1709, idx=2, threadIdx.x=173
+compact_active write: cell=1720, idx=3, threadIdx.x=184
+compact_active write: cell=1668, idx=4, threadIdx.x=132
+compact_active write: cell=1679, idx=5, threadIdx.x=143
+compact_active write: cell=1690, idx=6, threadIdx.x=154
+  DEBUG n_active=7, n_coarse=0
+  Iteration 9: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+compact_active write: cell=1920, idx=3, threadIdx.x=128
+compact_active write: cell=1931, idx=4, threadIdx.x=139
+compact_active write: cell=1890, idx=0, threadIdx.x=98
+compact_active write: cell=1900, idx=1, threadIdx.x=108
+compact_active write: cell=1909, idx=2, threadIdx.x=117
+compact_active write: cell=1868, idx=5, threadIdx.x=76
+compact_active write: cell=1879, idx=6, threadIdx.x=87
+  DEBUG n_active=7, n_coarse=0
+  Iteration 10: 7 active, 0 coarse cells
+    Energy so far: 5.8097 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 11: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 12: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 13: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 14: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 15: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 16: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 17: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 18: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 19: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 20: 7 active, 0 coarse cells
+    Energy so far: 12.271 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 21: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 22: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 23: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 24: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 25: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 26: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 27: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 28: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 29: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 30: 7 active, 0 coarse cells
+    Energy so far: 18.8209 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 31: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 32: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 33: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 34: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 35: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 36: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 37: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 38: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 39: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 40: 7 active, 0 coarse cells
+    Energy so far: 25.1241 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 41: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 42: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 43: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 44: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 45: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 46: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 47: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 48: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 49: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 50: 7 active, 0 coarse cells
+    Energy so far: 31.5166 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 51: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 52: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 53: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 54: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 55: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 56: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 57: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 58: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 59: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 60: 7 active, 0 coarse cells
+    Energy so far: 37.9968 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 61: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 62: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 63: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 64: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 65: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 66: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 67: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 68: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 69: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 70: 7 active, 0 coarse cells
+    Energy so far: 44.4394 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 71: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 72: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 73: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 74: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 75: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 76: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 77: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 78: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 79: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 80: 7 active, 0 coarse cells
+    Energy so far: 50.8997 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 81: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 82: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 83: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 84: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 85: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 86: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 87: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 88: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 89: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 90: 7 active, 0 coarse cells
+    Energy so far: 57.4264 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 91: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 92: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 93: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 94: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 95: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 96: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 97: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 98: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 99: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 100: 7 active, 0 coarse cells
+    Energy so far: 64.0108 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 101: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 102: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 103: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 104: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 105: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 106: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 107: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 108: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 109: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 110: 7 active, 0 coarse cells
+    Energy so far: 70.5888 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 111: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 112: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 113: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 114: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 115: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 116: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 117: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 118: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 119: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 120: 7 active, 0 coarse cells
+    Energy so far: 77.1786 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 121: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 122: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 123: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 124: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 125: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 126: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 127: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 128: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 129: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 130: 7 active, 0 coarse cells
+    Energy so far: 83.7726 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 131: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 132: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 133: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 134: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 135: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 136: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 137: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 138: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 139: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 140: 7 active, 0 coarse cells
+    Energy so far: 90.5424 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 141: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 142: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 143: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 144: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 145: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 146: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 147: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 148: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 149: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 150: 7 active, 0 coarse cells
+    Energy so far: 97.4788 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 151: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 152: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 153: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 154: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 155: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 156: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 157: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 158: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 159: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 160: 7 active, 0 coarse cells
+    Energy so far: 104.39 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 161: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 162: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 163: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 164: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 165: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 166: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 167: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 168: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 169: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 170: 7 active, 0 coarse cells
+    Energy so far: 111.326 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 171: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 172: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 173: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 174: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 175: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 176: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 177: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 178: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 179: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 180: 7 active, 0 coarse cells
+    Energy so far: 118.446 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 181: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 182: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 183: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 184: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 185: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 186: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 187: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 188: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 189: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 190: 7 active, 0 coarse cells
+    Energy so far: 125.265 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 191: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 192: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 193: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 194: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 195: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 196: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 197: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 198: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 199: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 200: 7 active, 0 coarse cells
+    Energy so far: 132.521 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 201: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 202: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 203: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 204: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 205: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 206: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 207: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 208: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 209: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 210: 7 active, 0 coarse cells
+    Energy so far: 140.109 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 211: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 212: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 213: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 214: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 215: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 216: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 217: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 218: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 219: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 220: 7 active, 0 coarse cells
+    Energy so far: 147.762 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 221: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 222: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 223: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 224: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 225: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 226: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 227: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 228: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 229: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 230: 7 active, 0 coarse cells
+    Energy so far: 155.809 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 231: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 232: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 233: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 234: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 235: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 236: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 237: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 238: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 239: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 240: 7 active, 0 coarse cells
+    Energy so far: 164.001 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 241: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 242: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 243: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 244: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 245: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 246: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 247: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 248: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 249: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 250: 7 active, 0 coarse cells
+    Energy so far: 172.371 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 251: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 252: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 253: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 254: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 255: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 256: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 257: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 258: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 259: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 260: 7 active, 0 coarse cells
+    Energy so far: 181.417 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 261: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 262: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 263: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 264: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 265: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 266: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 267: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 268: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 269: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 270: 7 active, 0 coarse cells
+    Energy so far: 191.062 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 271: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 272: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 273: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 274: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 275: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 276: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 277: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 278: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 279: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 280: 7 active, 0 coarse cells
+    Energy so far: 201.284 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 281: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 282: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 283: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 284: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 285: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 286: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 287: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 288: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 289: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 290: 7 active, 0 coarse cells
+    Energy so far: 212.611 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 291: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 292: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 293: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 294: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 295: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 296: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 297: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 298: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 299: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 300: 7 active, 0 coarse cells
+    Energy so far: 224.822 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 301: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 302: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 303: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 304: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 305: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 306: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 307: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 308: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 309: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 310: 7 active, 0 coarse cells
+    Energy so far: 240.63 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 311: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 312: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 313: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 314: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 315: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 316: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 317: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 318: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 319: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 320: 7 active, 0 coarse cells
+    Energy so far: 253.848 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 321: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 322: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 323: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 324: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 325: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 326: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 327: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 328: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=7, n_coarse=0
+  Iteration 329: 7 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=6, n_coarse=0
+  Iteration 330: 6 active, 0 coarse cells
+    Energy so far: 274.545 MeV
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=5, n_coarse=0
+  Iteration 331: 5 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=3, n_coarse=0
+  Iteration 332: 3 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=2, n_coarse=0
+  Iteration 333: 2 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=1, n_coarse=0
+  Iteration 334: 1 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=1, n_coarse=0
+  Iteration 335: 1 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=1, n_coarse=0
+  Iteration 336: 1 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  DEBUG n_active=1, n_coarse=0
+  Iteration 337: 1 active, 0 coarse cells
+  Weight audit: error=0 pass=yes
+  Iteration 338: 0 active, 0 coarse cells
+  No active cells remaining, transport complete
+K1-K6 pipeline: completed 338 iterations
+GPU K1-K6 pipeline complete.
+
+=== Energy Conservation Report ===
+  Energy Deposited: 278.87 MeV
+  Boundary Loss Energy: 59308.8 MeV
+  Cutoff Weight: 1.72519 (particles below E < 0.1 MeV)
+  Total Accounted Energy: 59587.7 MeV
+=====================================
+  Energy deposition extracted
+K1-K6 pipeline wrapper complete.
+GPU transport complete.
+Simulation complete.
+  Bragg Peak: 159.5 mm depth, 3.95177 Gy
+
+--- Saving Results ---
+  2D dose saved to: results/dose_2d.txt
+  PDD saved to: results/pdd.txt
+
+=== Simulation Complete ===

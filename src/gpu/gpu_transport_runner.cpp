@@ -135,11 +135,13 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     std::cout << "  Energy: " << config.get_energy_MeV() << " MeV" << std::endl;
     std::cout << "  Phase-space: " << N_theta << " x " << N_E << " bins" << std::endl;
 
-    // Run K1-K6 pipeline transport
+    // Run K1-K6 pipeline transport with angular divergence and spatial spread
     run_k1k6_pipeline_transport(
         config.get_position_x_mm(),
         config.get_position_z_mm(),
         config.get_angle_rad(),
+        config.angular.sigma_theta,  // Angular divergence from config
+        config.spatial.sigma_x,       // Spatial beam width from config
         config.get_energy_MeV(),
         config.W_total,
         config.grid.Nx, config.grid.Nz,

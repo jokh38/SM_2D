@@ -19,29 +19,114 @@ namespace sm_2d {
 // Helper Kernel Implementations
 // ============================================================================
 
-// Source particle injection kernel
+// Source particle injection kernel with angular and spatial distribution
+// Distributes source across multiple cells when sigma_x is large
 __global__ void inject_source_kernel(
     DevicePsiC psi,
-    int source_cell,
-    float theta0, float E0, float W_total,
-    float x_in_cell, float z_in_cell,
-    float dx, float dz,
+    int Nx, int Nz, float dx, float dz, float x_min, float z_min,
+    float x0, float z0,
+    float theta0, float sigma_theta,
+    float E0, float W_total,
+    float sigma_x,
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
     int N_theta_local, int N_E_local
 ) {
-    // Only one thread needed for source injection
-    device_psic_inject_source(
-        psi,
-        source_cell,
-        theta0, E0, W_total,
-        x_in_cell, z_in_cell,
-        dx, dz,
-        theta_edges, E_edges,
-        N_theta, N_E,
-        N_theta_local, N_E_local
-    );
+    // Number of samples for angular and spatial distribution
+    const int N_theta_samples = 7;   // Quadrature points for angular spread
+    const int N_x_samples = 7;       // Quadrature points for spatial spread
+
+    // Gaussian quadrature weights and abscissas (approximate for [-3, 3])
+    // Using 7-point Gauss-Hermite-like weights scaled for practical use
+    __constant__ static float gh_abscissas[7] = {-2.65f, -1.67f, -0.82f, 0.0f, 0.82f, 1.67f, 2.65f};
+    __constant__ static float gh_weights[7] = {0.015f, 0.11f, 0.35f, 0.48f, 0.35f, 0.11f, 0.015f};
+
+    // Determine if we need distributed sampling
+    bool use_angular_spread = (sigma_theta > 0.0001f);  // Threshold for meaningful spread
+    bool use_spatial_spread = (sigma_x > 0.01f);        // Threshold for meaningful spread
+
+    if (!use_angular_spread && !use_spatial_spread) {
+        // Simple pencil beam - single injection at source cell
+        // Convert source position to cell coordinates
+        float x_rel = x0 - x_min;
+        float z_rel = z0 - z_min;
+        int source_cell_x = static_cast<int>(x_rel / dx);
+        int source_cell_z = static_cast<int>(z_rel / dz);
+        // Clamp to valid range
+        source_cell_x = (source_cell_x < 0) ? 0 : (source_cell_x >= Nx) ? Nx - 1 : source_cell_x;
+        source_cell_z = (source_cell_z < 0) ? 0 : (source_cell_z >= Nz) ? Nz - 1 : source_cell_z;
+        int source_cell = source_cell_z * Nx + source_cell_x;
+        // Position within cell
+        float x_in_cell = x_rel - source_cell_x * dx;
+        float z_in_cell = z_rel - source_cell_z * dz;
+
+        device_psic_inject_source(
+            psi, source_cell, theta0, E0, W_total,
+            x_in_cell, z_in_cell, dx, dz,
+            theta_edges, E_edges, N_theta, N_E,
+            N_theta_local, N_E_local
+        );
+        return;
+    }
+
+    // Distributed source injection
+    int theta_start = (use_angular_spread) ? 0 : 0;
+    int theta_end = (use_angular_spread) ? N_theta_samples : 1;
+    int x_start = (use_spatial_spread) ? 0 : 0;
+    int x_end = (use_spatial_spread) ? N_x_samples : 1;
+
+    for (int it = theta_start; it < theta_end; ++it) {
+        for (int ix = x_start; ix < x_end; ++ix) {
+            // Sample angle
+            float theta = theta0;
+            float w_theta = 1.0f;
+            if (use_angular_spread) {
+                theta = theta0 + gh_abscissas[it] * sigma_theta;
+                w_theta = gh_weights[it];
+            }
+
+            // Sample global position
+            float x_global = x0;
+            float w_x = 1.0f;
+            if (use_spatial_spread) {
+                x_global = x0 + gh_abscissas[ix] * sigma_x;
+                w_x = gh_weights[ix];
+            }
+
+            // Convert global position to cell coordinates
+            float x_rel = x_global - x_min;
+            float z_rel = z0 - z_min;
+
+            int cell_x = static_cast<int>(x_rel / dx);
+            int cell_z = static_cast<int>(z_rel / dz);
+
+            // Clamp to valid range
+            cell_x = (cell_x < 0) ? 0 : (cell_x >= Nx) ? Nx - 1 : cell_x;
+            cell_z = (cell_z < 0) ? 0 : (cell_z >= Nz) ? Nz - 1 : cell_z;
+
+            int cell = cell_z * Nx + cell_x;
+
+            // Position within cell
+            float x_in_cell = x_rel - cell_x * dx;
+            float z_in_cell = z_rel - cell_z * dz;
+
+            // Clamp position to cell bounds
+            x_in_cell = fmaxf(0.0f, fminf(x_in_cell, dx));
+            z_in_cell = fmaxf(0.0f, fminf(z_in_cell, dz));
+
+            // Combined weight for this sample
+            float w_sample = W_total * w_theta * w_x;
+
+            // Inject this sample into the appropriate cell
+            device_psic_inject_source(
+                psi, cell, theta, E0, w_sample,
+                x_in_cell, z_in_cell, dx, dz,
+                theta_edges, E_edges, N_theta, N_E,
+                N_theta_local, N_E_local
+            );
+        }
+    }
 }
 
 // Clear all outflow buckets

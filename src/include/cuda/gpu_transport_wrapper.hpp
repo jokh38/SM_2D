@@ -52,7 +52,9 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper);
  * - K6: Buffer swapping
  *
  * @param x0, z0 Source position (mm)
- * @param theta0 Source angle (radians)
+ * @param theta0 Source central angle (radians)
+ * @param sigma_theta Angular divergence (radians, 0 = pencil beam)
+ * @param sigma_x Spatial beam width (mm, 0 = pencil beam)
  * @param E0 Source energy (MeV)
  * @param W_total Total source weight
  * @param Nx, Nz Spatial grid dimensions
@@ -66,7 +68,8 @@ bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper);
  * @param edep Output energy deposition grid [Nz][Nx]
  */
 void run_k1k6_pipeline_transport(
-    float x0, float z0, float theta0, float E0, float W_total,
+    float x0, float z0, float theta0, float sigma_theta, float sigma_x,
+    float E0, float W_total,
     int Nx, int Nz, float dx, float dz,
     float x_min, float z_min,
     int N_theta, int N_E,
