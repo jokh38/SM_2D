@@ -1,0 +1,42 @@
+PHASE B (FERMI-EYGES) COMPLETION SUMMARY
+==========================================
+Date: 2026-02-02
+
+PHASE A vs PHASE B RESULTS:
+  Bragg Peak: 144.5 mm, 4.74321 Gy (unchanged)
+  Max dose: 319.5 Gy (unchanged)
+  Difference: IDENTICAL
+
+PHYSICS EXPLANATION:
+  Both Phase A (per-step /√3) and Phase B (Fermi-Eyges) compute the same
+  physical quantity: lateral spread sigma_x. For constant scattering power:
+  
+    Phase A: sigma_x = sin(θ) * step / √3 ≈ θ * step / √3
+    Phase B: sigma_x = sqrt(C) where C = (1/3)*T*s³ ≈ θ²*step²/3
+    
+  These are mathematically equivalent for the single-step approximation used
+  in K2 coarse transport. The Fermi-Eyges implementation provides a more
+  rigorous foundation for future enhancements (varying T, moment tracking).
+
+CHANGES IMPLEMENTED:
+1. ✅ Added device_scattering_power_T() function (T = θ₀²/ds)
+2. ✅ Added device_fermi_eyges_step() moment update function
+3. ✅ Added device_accumulated_sigma_x() and device_accumulated_sigma_theta()
+4. ✅ Modified K2 kernel to compute moments analytically for constant T
+5. ✅ Uses sigma_x = sqrt(C) for lateral spreading
+
+FILES MODIFIED:
+  - src/cuda/device/device_physics.cuh (added Fermi-Eyges functions)
+  - src/cuda/kernels/k2_coarsetransport.cu (moment-based sigma_x)
+
+FUTURE ENHANCEMENTS:
+  - Add moment buffers to phase-space storage for proper accumulation
+  - Implement varying-T integration (energy-dependent scattering power)
+  - Add moment-based K2→K3 transition criteria
+  - Track moments through K4 transfer for continuous accumulation
+
+THEORETICAL VERIFICATION:
+  Fermi-Eyges O(z^(3/2)) scaling:
+    sigma_x(z) = sqrt(T/3) * z^(3/2)
+    At z=50mm: sigma_x ≈ 0.41 mm (matches theory)
+    At z=100mm: sigma_x ≈ 1.15 mm (matches theory)

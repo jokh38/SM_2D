@@ -325,3 +325,70 @@ __device__ inline float device_lateral_spread_sigma(float sigma_theta, float ste
     float sin_theta = sinf(fminf(sigma_theta, 1.57f));  // sin(theta), theta < pi/2
     return sin_theta * step / 1.7320508f;  // Divide by sqrt(3) for continuous scattering
 }
+
+// ============================================================================
+// Fermi-Eyges Moment Tracking (Phase B - PLAN_MCS)
+// ============================================================================
+// Implements moment-based lateral spreading for correct O(z^(3/2)) scaling
+//
+// Moments tracked:
+//   A = ⟨θ²⟩  : Angular variance
+//   B = ⟨xθ⟩  : Position-angle covariance
+//   C = ⟨x²⟩  : Position variance (lateral spread squared)
+//
+// Reference: Fermi-Eyges theory of multiple Coulomb scattering
+// ============================================================================
+
+// Calculate scattering power T = θ₀²/ds [rad²/mm]
+// This is the rate of increase of angular variance per unit path length
+__device__ inline float device_scattering_power_T(float E_MeV, float ds, float X0 = DEVICE_X0_water) {
+    // Highland theta0 at step energy
+    float theta0 = device_highland_sigma(E_MeV, ds, X0);
+
+    // Guard against ds too small
+    if (ds < 1e-6f) return 0.0f;
+
+    // Scattering power: T = θ₀² / ds
+    float T = theta0 * theta0 / ds;
+    return T;
+}
+
+// Fermi-Eyges moment evolution for one step
+// Updates A, B, C moments based on scattering power T and step size ds
+//
+// Input:  A, B, C (old moments), T (scattering power), ds (step size)
+// Output: A, B, C (updated moments)
+//
+// Equations (from Fermi-Eyges theory):
+//   d⟨θ²⟩/dz = T           → A_new = A_old + T*ds
+//   d⟨xθ⟩/dz = ⟨θ²⟩        → B_new = B_old + A_old*ds + 0.5*T*ds²
+//   d⟨x²⟩/dz = 2⟨xθ⟩       → C_new = C_old + 2*B_old*ds + A_old*ds² + (1/3)*T*ds³
+__device__ inline void device_fermi_eyges_step(
+    float& A, float& B, float& C,  // Moments (in/out)
+    float T, float ds               // Scattering power, step size
+) {
+    // Store old values for sequential update
+    float A_old = A;
+    float B_old = B;
+
+    // Update moments (Fermi-Eyges evolution equations)
+    A = A_old + T * ds;                                              // ⟨θ²⟩ increases by T*ds
+    B = B_old + A_old * ds + 0.5f * T * ds * ds;                    // ⟨xθ⟩ increases
+    C = C + 2.0f * B_old * ds + A_old * ds * ds + (1.0f / 3.0f) * T * ds * ds * ds;  // ⟨x²⟩ increases
+
+    // Ensure moments remain non-negative
+    A = fmaxf(A, 0.0f);
+    C = fmaxf(C, 0.0f);
+}
+
+// Calculate accumulated lateral spread sigma_x from Fermi-Eyges C moment
+// Returns: sigma_x = sqrt(⟨x²⟩) = sqrt(C)
+__device__ inline float device_accumulated_sigma_x(float moment_C) {
+    return sqrtf(fmaxf(moment_C, 0.0f));
+}
+
+// Calculate accumulated angular spread sigma_theta from Fermi-Eyges A moment
+// Returns: sigma_theta = sqrt(⟨θ²⟩) = sqrt(A)
+__device__ inline float device_accumulated_sigma_theta(float moment_A) {
+    return sqrtf(fmaxf(moment_A, 0.0f));
+}

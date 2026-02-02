@@ -184,30 +184,50 @@ __global__ void K2_CoarseTransport(
             float w_new = device_apply_nuclear_attenuation(weight, E, coarse_range_step, w_rem, E_rem);
             edep += E_rem;
 
-            // PLAN_fix_scattering: Stochastic Interpolation for Lateral Spreading
             // ========================================================================
-            // Instead of accumulating theta (which causes beam shifting),
-            // we use Gaussian weight distribution across multiple cells for lateral spreading.
+            // Phase B: Fermi-Eyges Moment-Based Lateral Spreading (PLAN_MCS)
+            // ========================================================================
+            // Implements O(z^(3/2)) scaling using moment tracking instead of
+            // per-step sigma calculation.
             //
-            // Key changes from previous implementation:
-            // 1. Theta is NOT accumulated: theta_new = theta (not theta + theta_scatter)
-            // 2. Lateral spread is calculated: sigma_x = sin(sigma_theta) * step
-            // 3. Weight is distributed across multiple cells using Gaussian CDF
+            // Key changes from Phase A:
+            // 1. Track Fermi-Eyges moments: A=⟨θ²⟩, B=⟨xθ⟩, C=⟨x²⟩
+            // 2. Use accumulated sigma_x = sqrt(C) for lateral spreading
+            // 3. Compute scattering power T = θ₀²/ds
             // ========================================================================
 
-            // Calculate MCS scattering angle (RMS)
-            float sigma_theta = device_highland_sigma(E, coarse_range_step);
+            // Estimate path length from source (approximate for K2)
+            // For K2 coarse transport, particles start at z≈0 and travel forward
+            // Path ≈ (current_z + step_z) / cos(θ)
+            int iz_cell = cell / Nx;
+            float z_center = (iz_cell + 0.5f) * dz;  // Cell center in global coordinates
+            float path_from_source = (z_center + half_dz) / mu;  // Approximate total path
 
-            // PLAN_fix_scattering: DO NOT accumulate theta
-            // Theta remains unchanged; lateral spreading is handled by weight distribution
-            float theta_new = theta;  // No theta accumulation!
+            // Initialize moments (all zero at source)
+            float moment_A = 0.0f;  // ⟨θ²⟩
+            float moment_B = 0.0f;  // ⟨xθ⟩
+            float moment_C = 0.0f;  // ⟨x²⟩
 
+            // Compute Fermi-Eyges moments analytically for constant scattering power
+            // For constant T over path s: A = T*s, B = 0.5*T*s², C = (1/3)*T*s³
+            float T = device_scattering_power_T(E, 1.0f);  // Scattering power at 1mm reference
+            float s = path_from_source;  // Total path from source
+
+            // Moments for constant scattering power
+            moment_A = T * s;
+            moment_B = 0.5f * T * s * s;
+            moment_C = (1.0f / 3.0f) * T * s * s * s;
+
+            // Get accumulated sigma_x from C moment
+            float sigma_x_accum = device_accumulated_sigma_x(moment_C);
+
+            // Theta remains unchanged (no accumulation in K2)
+            float theta_new = theta;
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
 
-            // Calculate lateral spread sigma_x from scattering angle
-            // sigma_x represents the standard deviation of lateral displacement
-            float sigma_x = device_lateral_spread_sigma(sigma_theta, coarse_step_limited);
+            // Use accumulated sigma_x for lateral spreading
+            float sigma_x = sigma_x_accum;
 
             // Position update (use limited step to avoid boundary crossing)
             float x_new = x_cell + eta_new * coarse_step_limited;
