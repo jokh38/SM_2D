@@ -185,49 +185,18 @@ __global__ void K2_CoarseTransport(
             edep += E_rem;
 
             // ========================================================================
-            // Phase B: Fermi-Eyges Moment-Based Lateral Spreading (PLAN_MCS)
+            // Phase A: Simple Per-Step Sigma (No Lateral Spreading in K2)
             // ========================================================================
-            // Implements O(z^(3/2)) scaling using moment tracking instead of
-            // per-step sigma calculation.
+            // Lateral spreading requires tracking particle state across iterations
+            // to avoid exponential growth in cell count. Disabled for now.
             //
-            // Key changes from Phase A:
-            // 1. Track Fermi-Eyges moments: A=⟨θ²⟩, B=⟨xθ⟩, C=⟨x²⟩
-            // 2. Use accumulated sigma_x = sqrt(C) for lateral spreading
-            // 3. Compute scattering power T = θ₀²/ds
+            // TODO: Implement proper lateral spreading in K3 or with state tracking
             // ========================================================================
 
-            // Estimate path length from source (approximate for K2)
-            // For K2 coarse transport, particles start at z≈0 and travel forward
-            // Path ≈ (current_z + step_z) / cos(θ)
-            int iz_cell = cell / Nx;
-            float z_center = (iz_cell + 0.5f) * dz;  // Cell center in global coordinates
-            float path_from_source = (z_center + half_dz) / mu;  // Approximate total path
-
-            // Initialize moments (all zero at source)
-            float moment_A = 0.0f;  // ⟨θ²⟩
-            float moment_B = 0.0f;  // ⟨xθ⟩
-            float moment_C = 0.0f;  // ⟨x²⟩
-
-            // Compute Fermi-Eyges moments analytically for constant scattering power
-            // For constant T over path s: A = T*s, B = 0.5*T*s², C = (1/3)*T*s³
-            float T = device_scattering_power_T(E, 1.0f);  // Scattering power at 1mm reference
-            float s = path_from_source;  // Total path from source
-
-            // Moments for constant scattering power
-            moment_A = T * s;
-            moment_B = 0.5f * T * s * s;
-            moment_C = (1.0f / 3.0f) * T * s * s * s;
-
-            // Get accumulated sigma_x from C moment
-            float sigma_x_accum = device_accumulated_sigma_x(moment_C);
-
-            // Theta remains unchanged (no accumulation in K2)
+            // Theta remains unchanged (no random sampling in K2)
             float theta_new = theta;
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
-
-            // Use accumulated sigma_x for lateral spreading
-            float sigma_x = sigma_x_accum;
 
             // Position update (use limited step to avoid boundary crossing)
             float x_new = x_cell + eta_new * coarse_step_limited;
@@ -249,37 +218,21 @@ __global__ void K2_CoarseTransport(
                     cell_edep += edep + E_new * w_new;  // Remaining energy from step
                     cell_w_cutoff += w_new;
                 } else {
-                    // PLAN_fix_scattering: Use lateral spreading for +z exit face
-                    // For +z direction (main beam direction), distribute weight across
-                    // multiple cells using Gaussian distribution based on sigma_x
-                    if (exit_face == FACE_Z_PLUS && sigma_x > dx * 0.01f) {
-                        // Multi-cell emission with lateral spreading
-                        int iz_target = (cell / Nx) + 1;  // +z neighbor
-
-                        // Calculate sigma-based spread radius (k=3 sigma covers 99.7% of Gaussian)
-                        float k_sigma = 3.0f;
-                        float radius_sigma = sigma_x / dx;
-                        int spread_radius = static_cast<int>(ceilf(radius_sigma * k_sigma));
-
-                        // Safety clamps for spread radius
-                        spread_radius = fmaxf(spread_radius, 1);  // Minimum radius 1
-                        int max_radius = fminf(Nx / 2, 50);       // Upper clamp
-                        spread_radius = fminf(spread_radius, max_radius);
-
-                        // Ensure even number for symmetric spreading
-                        if (spread_radius % 2 != 0) spread_radius++;
-
-                        device_emit_lateral_spread(
-                            OutflowBuckets, cell, iz_target,
-                            theta_new, E_new, w_new,
-                            x_new,  // Lateral position (centered coordinate)
-                            sigma_x, dx, Nx, Nz,
-                            theta_edges, E_edges,
-                            N_theta, N_E, N_theta_local, N_E_local,
-                            spread_radius  // Sigma-based radius (replaces fixed 10)
+                    // Single-cell emission (lateral spreading disabled)
+                    if (exit_face == FACE_Z_PLUS) {
+                        // Forward emission
+                        float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                        int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+                        int z_sub_neighbor = 0;
+                        int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                        DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                        device_emit_component_to_bucket_4d(
+                            bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
+                            theta_edges, E_edges, N_theta, N_E,
+                            N_theta_local, N_E_local
                         );
                     } else {
-                        // Single-cell emission for other faces or when sigma_x is negligible
+                        // Other faces - handle normally
                         float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
                         int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
 

@@ -484,6 +484,9 @@ SM_2D_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 SM_2D_SOURCE_DIR:STATIC=/workspaces/SM_2D
 
+//No help, variable specified on the command line.
+USE_GPU:UNINITIALIZED=ON
+
 
 ########################
 # INTERNAL cache entries
