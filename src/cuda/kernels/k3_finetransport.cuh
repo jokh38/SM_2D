@@ -30,6 +30,10 @@ struct K3Result {
 // P1 FIX: Updated GPU kernel signature with device LUT and bucket support
 // This replaces the stub implementation with full physics transport
 // Physics flags added for selective process enabling (testing/validation)
+//
+// NOTE: This is NOT a Monte Carlo code!
+// Lateral spreading is implemented deterministically using Gaussian weight
+// distribution across cells, not random sampling of scattering angles.
 __global__ void K3_FineTransport(
     // Inputs
     const uint32_t* __restrict__ block_ids_in,
@@ -48,7 +52,7 @@ __global__ void K3_FineTransport(
     // Physics configuration flags (for testing/validation)
     bool enable_straggling,   // Enable energy straggling (Vavilov)
     bool enable_nuclear,      // Enable nuclear interactions
-    bool enable_mcs,          // Enable multiple Coulomb scattering
+    // Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,

@@ -727,6 +727,7 @@ bool run_k3_fine_transport(
 
     // Call K3_FineTransport kernel
     // Physics flags: enable all physics for normal pipeline operation
+    // NOTE: Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
     K3_FineTransport<<<blocks, threads>>>(
         psi_in.block_id,
         psi_in.value,
@@ -740,7 +741,6 @@ bool run_k3_fine_transport(
         config.N_theta_local, config.N_E_local,
         true,   // enable_straggling (full physics)
         true,   // enable_nuclear (full physics)
-        true,   // enable_mcs (full physics)
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
         state.d_AbsorbedWeight_nuclear,

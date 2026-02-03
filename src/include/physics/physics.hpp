@@ -23,18 +23,23 @@ struct ComponentState {
 
 // Physics process configuration for transport
 // Allows selective enabling/disabling of physics processes for testing
+//
+// IMPORTANT: This is NOT a Monte Carlo code!
+// Lateral spreading is ALWAYS enabled (deterministic, using Gaussian weight distribution)
+// The enable_mcs flag has been removed - lateral spreading cannot be disabled.
 struct PhysicsConfig {
     bool enable_straggling = true;   // Energy straggling (Vavilov model)
     bool enable_nuclear = true;      // Nuclear interactions (ICRU 63)
-    bool enable_mcs = true;          // Multiple Coulomb Scattering (Highland)
+    // Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
 
     // Convenience helper for energy-loss-only mode (Bethe-Bloch only)
+    // NOTE: Lateral spreading is still applied even in this mode
     static PhysicsConfig energy_loss_only() {
-        return PhysicsConfig{false, false, false};
+        return PhysicsConfig{false, false};
     }
 
     // Convenience helper for full physics (default)
     static PhysicsConfig full_physics() {
-        return PhysicsConfig{true, true, true};
+        return PhysicsConfig{true, true};
     }
 };

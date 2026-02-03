@@ -27,6 +27,11 @@ const RLUT& get_global_rlut() {
 // ============================================================================
 // Physics Constants for K3 Fine Transport
 // ============================================================================
+// IMPORTANT: This is NOT a Monte Carlo code!
+// This is a deterministic phase-space transport code using binned representation.
+// Lateral spreading is handled by Gaussian weight distribution across cells,
+// NOT by random sampling of scattering angles for individual particles.
+// ============================================================================
 namespace {
     // Energy tracking constants
     constexpr float ENERGY_CUTOFF_MEV = 0.1f;           // Minimum energy for transport [MeV]
@@ -34,18 +39,9 @@ namespace {
     constexpr float ENERGY_OFFSET_RATIO = 0.50f;         // Offset from lower edge (fraction of half-width)
     constexpr float BOUNDARY_SAFETY_FACTOR = 1.001f;     // Allow slight boundary crossing
 
-    // Scattering reduction factors - DISABLED for full lateral scattering (debug/test)
-    // Original clinical values: HIGH_E=0.3, MID_HIGH=0.5, MID_LOW=0.7
-    // Set all to 1.0 to observe true MCS lateral spreading
-    constexpr float SCATTER_REDUCTION_HIGH_E = 1.0f;     // E > 100 MeV (full scattering)
-    constexpr float SCATTER_REDUCTION_MID_HIGH = 1.0f;   // E > 50 MeV (full scattering)
-    constexpr float SCATTER_REDUCTION_MID_LOW = 1.0f;    // E > 20 MeV (full scattering)
-    constexpr float SCATTER_REDUCTION_LOW_E = 1.0f;      // E <= 20 MeV (full scattering)
-
-    // Energy thresholds for scattering reduction
-    constexpr float ENERGY_HIGH_THRESHOLD = 100.0f;     // [MeV]
-    constexpr float ENERGY_MID_HIGH_THRESHOLD = 50.0f;  // [MeV]
-    constexpr float ENERGY_MID_LOW_THRESHOLD = 20.0f;   // [MeV]
+    // Lateral spreading configuration
+    constexpr int LATERAL_SPREAD_CELLS = 6;              // Number of cells for lateral distribution (±3 cells)
+    constexpr float LATERAL_SPREAD_MIN_SIGMA = 0.01f;    // Minimum sigma for spread [mm]
 }
 
 // ============================================================================
@@ -76,7 +72,7 @@ __global__ void K3_FineTransport(
     // Physics configuration flags (for testing/validation)
     bool enable_straggling,   // Enable energy straggling (Vavilov)
     bool enable_nuclear,      // Enable nuclear interactions
-    bool enable_mcs,          // Enable multiple Coulomb scattering
+    // NOTE: Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
@@ -134,14 +130,8 @@ __global__ void K3_FineTransport(
             float theta_max = theta_edges[N_theta];
             float dtheta = (theta_max - theta_min) / N_theta;
 
-            // FIX Problem 3: Intra-bin sampling for angle distribution
-            // Instead of using bin center, sample uniformly within bin
-            // This preserves the variance that would otherwise be lost
-            unsigned seed = static_cast<unsigned>(
-                (cell * 7 + slot * 13 + lidx * 17) ^ 0x5DEECE66DL
-            );
-            float theta_frac = (seed & 0xFFFF) / 65536.0f;  // [0, 1)
-            float theta = theta_edges[theta_bin] + theta_frac * dtheta;
+            // Use bin center (deterministic, not Monte Carlo sampling)
+            float theta = theta_edges[theta_bin] + 0.5f * dtheta;
 
             // H6 FIX: Use piecewise-uniform energy grid (Option D2) instead of log-spaced
             // The E_edges array contains the actual bin edges for the piecewise-uniform grid
@@ -207,8 +197,8 @@ __global__ void K3_FineTransport(
             float step_to_boundary_safe = step_to_boundary * BOUNDARY_SAFETY_FACTOR;
             float actual_range_step = fminf(step_phys, step_to_boundary_safe);
 
-            // FIX Problem 2: Mid-point MCS method for better physical accuracy
-            // The scattering should occur at the midpoint of the step, not at the start
+            // FIX Problem 2: Mid-point method for energy deposition
+            // Energy loss should occur along the entire step path
             // Use the range step directly as the distance traveled (path length = distance along trajectory)
             float half_step = actual_range_step * 0.5f;
             float x_mid = x_cell + eta_init * half_step;
@@ -218,6 +208,10 @@ __global__ void K3_FineTransport(
             float mean_dE = device_compute_energy_deposition(dlut, E, actual_range_step);
             float dE;
             if (enable_straggling) {
+                // Use deterministic seed based on phase space coordinates (not random)
+                unsigned seed = static_cast<unsigned>(
+                    (cell * 7 + slot * 13 + lidx * 17) ^ 0x5DEECE66DL
+                );
                 float sigma_dE = device_energy_straggling_sigma(E, actual_range_step, 1.0f);
                 dE = device_sample_energy_loss(mean_dE, sigma_dE, seed);
             } else {
@@ -242,38 +236,35 @@ __global__ void K3_FineTransport(
                 E_rem = 0.0f;
             }
 
-            // H6 FIX: Variance-based MCS accumulation (simplified implementation)
-            // At high energies, use reduced scattering to maintain forward penetration
-            float theta_scatter = 0.0f;
-            if (enable_mcs) {
-                float sigma_mcs = device_highland_sigma(E, actual_range_step);
+            // ========================================================================
+            // DETERMINISTIC LATERAL SPREADING (NOT Monte Carlo)
+            // ========================================================================
+            // This code implements deterministic lateral spreading using Gaussian
+            // weight distribution across cells, NOT random sampling of scattering angles.
+            //
+            // The lateral spread is calculated from the Highland scattering angle formula:
+            //   sigma_theta = Highland_sigma(E, step)
+            //   sigma_x = sigma_theta * step / sqrt(3)
+            //
+            // Weight is distributed across neighboring cells using Gaussian CDF.
+            // This is deterministic and reproducible, not Monte Carlo.
+            // ========================================================================
 
-                // Energy-dependent scattering reduction
-                float scattering_reduction_factor;
-                if (E > ENERGY_HIGH_THRESHOLD) {
-                    scattering_reduction_factor = SCATTER_REDUCTION_HIGH_E;
-                } else if (E > ENERGY_MID_HIGH_THRESHOLD) {
-                    scattering_reduction_factor = SCATTER_REDUCTION_MID_HIGH;
-                } else if (E > ENERGY_MID_LOW_THRESHOLD) {
-                    scattering_reduction_factor = SCATTER_REDUCTION_MID_LOW;
-                } else {
-                    scattering_reduction_factor = SCATTER_REDUCTION_LOW_E;
-                }
+            // Calculate lateral spread sigma from Highland formula
+            float sigma_theta = device_highland_sigma(E, actual_range_step);
+            float sigma_x = device_lateral_spread_sigma(sigma_theta, actual_range_step);
+            sigma_x = fmaxf(sigma_x, LATERAL_SPREAD_MIN_SIGMA);
 
-                if (sigma_mcs > 0.0f) {
-                    theta_scatter = device_sample_mcs_angle(sigma_mcs * scattering_reduction_factor, seed);
-                }
-            }
-            float theta_new = theta + theta_scatter;
+            // For deterministic transport, keep direction unchanged (theta_new = theta)
+            // Lateral spreading is handled by weight distribution across cells
+            float theta_new = theta;
+            float mu_new = mu_init;
+            float eta_new = eta_init;
 
-            // Second half: move with new scattered direction
-            float mu_new = cosf(theta_new);
-            float eta_new = sinf(theta_new);
-            // Note: cos²θ + sin²θ = 1, so normalization is unnecessary
-
-            // Complete position update: from midpoint with new direction
-            float x_new = x_mid + eta_new * half_step;
-            float z_new = z_mid + mu_new * half_step;
+            // Complete position update: move along original direction
+            // Lateral spreading will be applied via weight distribution to output
+            float x_new = x_cell + eta_new * actual_range_step;
+            float z_new = z_cell + mu_new * actual_range_step;
 
             // Check boundary crossing FIRST (using unclamped position)
             int exit_face = device_determine_exit_face(x_cell, z_cell, x_new, z_new, dx, dz);
@@ -336,10 +327,13 @@ __global__ void K3_FineTransport(
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 } else {
-                    // CRITICAL: Write particle to output phase space so it persists!
-                    // Get updated position in centered coordinates
-                    x_sub = get_x_sub_bin(x_new, dx);
-                    z_sub = get_z_sub_bin(z_new, dz);
+                    // ========================================================================
+                    // DETERMINISTIC LATERAL SPREADING: Gaussian weight distribution
+                    // ========================================================================
+                    // The particle weight is distributed across x positions using a Gaussian
+                    // distribution with sigma_x calculated from the Highland formula.
+                    // This is NOT Monte Carlo - it's a deterministic weight distribution.
+                    // ========================================================================
 
                     // Find theta and E bins for new energy/angle
                     float theta_min = theta_edges[0];
@@ -395,14 +389,80 @@ __global__ void K3_FineTransport(
                         }
                     }
 
-                    // Write weight to local bin
+                    // ====================================================================
+                    // Apply Gaussian lateral spreading within the cell
+                    // ====================================================================
+                    // Distribute weight across x_sub bins using Gaussian distribution
+                    // The spread is limited to the current cell (inter-cell spreading
+                    // would require bucket emission which is handled in exit_face case)
+                    // ====================================================================
+
                     if (out_slot >= 0 && E_new > ENERGY_CUTOFF_MEV) {
-                        // Compute new local bin index
-                        int theta_local_new = theta_bin_new % N_theta_local;
-                        int E_local_new = E_bin_new % N_E_local;
-                        int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
-                        int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
-                        atomicAdd(&values_out[global_idx_out], w_new);
+                        // Number of x_sub bins to spread across (centered at current x_sub)
+                        constexpr int N_x_spread = 4;  // Spread across ±2 x_sub bins
+
+                        // Calculate weights for each x_sub bin using Gaussian CDF
+                        float weights[N_x_spread];
+                        float x_center = x_new;  // Center of Gaussian
+
+                        device_gaussian_spread_weights(weights, x_center, sigma_x, dx, N_x_spread);
+
+                        // Get cell coordinates for calculating neighbor x positions
+                        int ix = cell % Nx;
+                        int iz = cell / Nx;
+
+                        // Distribute weight across x_sub bins
+                        for (int i = 0; i < N_x_spread; ++i) {
+                            float w_frac = weights[i];
+                            if (w_frac < 1e-10f) continue;  // Skip negligible weights
+
+                            float w_spread = w_new * w_frac;
+
+                            // Calculate x position for this weight fraction
+                            // x_center is at [-dx/2, +dx/2], we need to map to x_sub bins
+                            // The i-th weight corresponds to x_position = x_center - (N/2)*dx + i*dx
+                            float x_pos = x_center - (N_x_spread / 2) * dx + (i + 0.5f) * dx;
+                            int x_sub_spread = get_x_sub_bin(x_pos, dx);
+
+                            // Clamp to valid range
+                            x_sub_spread = fmaxf(0, fminf(x_sub_spread, 3));
+
+                            // Determine if this x position maps to a different cell
+                            int target_cell = cell;
+                            int x_sub_target = x_sub_spread;
+                            int z_sub_target = get_z_sub_bin(z_new, dz);
+
+                            // Check if x_spread crosses cell boundary
+                            if (x_pos < -half_dx) {
+                                // Left neighbor cell
+                                if (ix > 0) {
+                                    target_cell = cell - 1;
+                                    x_sub_target = 3;  // Rightmost sub-bin of left neighbor
+                                }
+                            } else if (x_pos > half_dx) {
+                                // Right neighbor cell
+                                if (ix < Nx - 1) {
+                                    target_cell = cell + 1;
+                                    x_sub_target = 0;  // Leftmost sub-bin of right neighbor
+                                }
+                            }
+
+                            // Compute new local bin index
+                            int theta_local_new = theta_bin_new % N_theta_local;
+                            int E_local_new = E_bin_new % N_E_local;
+                            int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub_target, z_sub_target);
+
+                            if (target_cell == cell) {
+                                // Same cell: write to output phase space
+                                int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
+                                atomicAdd(&values_out[global_idx_out], w_spread);
+                            } else {
+                                // Different cell: deposit locally as energy (simplified)
+                                // A full implementation would use bucket emission for inter-cell transfer
+                                cell_edep += E_new * w_spread;
+                                cell_w_cutoff += w_spread;
+                            }
+                        }
                     }
                 }
             }

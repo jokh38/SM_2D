@@ -184,17 +184,19 @@ __global__ void K2_CoarseTransport(
             edep += E_rem;
 
             // ========================================================================
-            // K2 Coarse Transport: Simple Energy Loss (No Lateral Spreading)
+            // K2 Coarse Transport: Energy Loss with Deterministic Lateral Spreading
             // ========================================================================
-            // K2 handles only energy deposition for high-energy particles.
-            // Lateral scattering is handled by K3 fine transport using Monte Carlo.
-            //
-            // Reason: K2 uses binned phase space which cannot track per-particle
-            // accumulated moments across iterations. Attempting to do so causes
-            // all particles to have the same (zero) moment state.
+            // This is NOT a Monte Carlo code!
+            // K2 uses deterministic Gaussian weight distribution for lateral spreading,
+            // just like K3. The lateral spread is calculated from the Highland formula.
             // ========================================================================
 
-            // Theta remains unchanged (no scattering in K2)
+            // Calculate lateral spread sigma from Highland formula (deterministic)
+            float sigma_theta = device_highland_sigma(E, coarse_range_step);
+            float sigma_x = device_lateral_spread_sigma(sigma_theta, coarse_range_step);
+            sigma_x = fmaxf(sigma_x, 0.01f);  // Minimum sigma to avoid numerical issues
+
+            // Theta remains unchanged (direction doesn't change, weight spreads instead)
             float theta_new = theta;
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
@@ -220,10 +222,10 @@ __global__ void K2_CoarseTransport(
                     cell_w_cutoff += w_new;
                 } else {
                     // ====================================================================
-                    // Single-cell emission (K2: no lateral spreading)
+                    // Single-cell emission (K2: deterministic lateral spreading)
                     // ====================================================================
-                    // All exit faces use simple single-cell emission.
-                    // Lateral scattering is handled by K3 fine transport.
+                    // For boundary crossing, use simple emission. Lateral spreading
+                    // is applied when particles remain in the cell (see else block).
                     // ====================================================================
 
                     float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
@@ -269,10 +271,13 @@ __global__ void K2_CoarseTransport(
                     cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
                 } else {
-                    // CRITICAL: Write particle to output phase space so it persists!
-                    // Get updated position in centered coordinates
-                    int x_sub = get_x_sub_bin(x_new, dx);
-                    int z_sub = get_z_sub_bin(z_new, dz);
+                    // ========================================================================
+                    // DETERMINISTIC LATERAL SPREADING: Gaussian weight distribution
+                    // ========================================================================
+                    // The particle weight is distributed across x positions using a Gaussian
+                    // distribution with sigma_x calculated from the Highland formula.
+                    // This is NOT Monte Carlo - it's a deterministic weight distribution.
+                    // ========================================================================
 
                     // Find theta and E bins for new energy/angle
                     float theta_min = theta_edges[0];
@@ -312,14 +317,74 @@ __global__ void K2_CoarseTransport(
                         }
                     }
 
-                    // Write weight to local bin
+                    // ====================================================================
+                    // Apply Gaussian lateral spreading within the cell
+                    // ====================================================================
+                    // Distribute weight across x_sub bins using Gaussian distribution
+                    // ====================================================================
+
                     if (out_slot >= 0 && E_new > 0.1f) {
-                        // Compute new local bin index
-                        int theta_local_new = theta_bin_new % N_theta_local;
-                        int E_local_new = E_bin_new % N_E_local;
-                        int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
-                        int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
-                        atomicAdd(&values_out[global_idx_out], w_new);
+                        // Number of x_sub bins to spread across (centered at current x_sub)
+                        constexpr int N_x_spread = 4;  // Spread across ±2 x_sub bins
+
+                        // Calculate weights for each x_sub bin using Gaussian CDF
+                        float weights[N_x_spread];
+                        float x_center = x_new;  // Center of Gaussian
+
+                        device_gaussian_spread_weights(weights, x_center, sigma_x, dx, N_x_spread);
+
+                        // Get cell coordinates for calculating neighbor x positions
+                        int ix = cell % Nx;
+
+                        // Distribute weight across x_sub bins
+                        for (int i = 0; i < N_x_spread; ++i) {
+                            float w_frac = weights[i];
+                            if (w_frac < 1e-10f) continue;  // Skip negligible weights
+
+                            float w_spread = w_new * w_frac;
+
+                            // Calculate x position for this weight fraction
+                            float x_pos = x_center - (N_x_spread / 2) * dx + (i + 0.5f) * dx;
+                            int x_sub_spread = get_x_sub_bin(x_pos, dx);
+
+                            // Clamp to valid range
+                            x_sub_spread = fmaxf(0, fminf(x_sub_spread, 3));
+
+                            // Determine if this x position maps to a different cell
+                            int target_cell = cell;
+                            int x_sub_target = x_sub_spread;
+                            int z_sub_target = get_z_sub_bin(z_new, dz);
+
+                            // Check if x_spread crosses cell boundary
+                            if (x_pos < -half_dx) {
+                                // Left neighbor cell
+                                if (ix > 0) {
+                                    target_cell = cell - 1;
+                                    x_sub_target = 3;  // Rightmost sub-bin of left neighbor
+                                }
+                            } else if (x_pos > half_dx) {
+                                // Right neighbor cell
+                                if (ix < Nx - 1) {
+                                    target_cell = cell + 1;
+                                    x_sub_target = 0;  // Leftmost sub-bin of right neighbor
+                                }
+                            }
+
+                            // Compute new local bin index
+                            int theta_local_new = theta_bin_new % N_theta_local;
+                            int E_local_new = E_bin_new % N_E_local;
+                            int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub_target, z_sub_target);
+
+                            if (target_cell == cell) {
+                                // Same cell: write to output phase space
+                                int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
+                                atomicAdd(&values_out[global_idx_out], w_spread);
+                            } else {
+                                // Different cell: deposit locally as energy (simplified)
+                                cell_edep += E_new * w_spread;
+                                cell_w_cutoff += w_spread;
+                            }
+                        }
                     }
                 }
             }
