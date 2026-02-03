@@ -35,10 +35,23 @@ enum DeviceFace {
 
 // Device-accessible OutflowBucket structure
 // Matches CPU OutflowBucket layout for direct memory transfer
+//
+// PLAN_MCS Phase B-1: Added Fermi-Eyges moment tracking for O(z^(3/2)) lateral spreading
+// These moments track the evolution of angular and position variances:
+//   moment_A = ⟨θ²⟩ : Angular variance (scattering angle squared)
+//   moment_B = ⟨xθ⟩ : Position-angle covariance
+//   moment_C = ⟨x²⟩ : Position variance (lateral spread squared)
+//
+// Reference: Fermi-Eyges theory of multiple Coulomb scattering
 struct DeviceOutflowBucket {
     uint32_t block_id[DEVICE_Kb_out];
     uint16_t local_count[DEVICE_Kb_out];
     float value[DEVICE_Kb_out][DEVICE_LOCAL_BINS];
+
+    // Fermi-Eyges moments for lateral spreading (Phase B)
+    float moment_A;  // ⟨θ²⟩ - Angular variance [rad²]
+    float moment_B;  // ⟨xθ⟩ - Position-angle covariance [mm·rad]
+    float moment_C;  // ⟨x²⟩ - Position variance [mm²]
 };
 
 // Find or allocate a slot in the bucket for a given block ID
@@ -627,6 +640,7 @@ __device__ inline float device_get_neighbor_x_offset(
 }
 
 // Clear a bucket (set all values to empty/zero)
+// PLAN_MCS Phase B-1: Also initialize Fermi-Eyges moments to zero
 __device__ inline void device_bucket_clear(DeviceOutflowBucket& bucket) {
     int idx = threadIdx.x + blockDim.x * threadIdx.y + blockDim.x * blockDim.y * threadIdx.z;
     int stride = blockDim.x * blockDim.y * blockDim.z;
@@ -637,6 +651,13 @@ __device__ inline void device_bucket_clear(DeviceOutflowBucket& bucket) {
         for (int j = 0; j < DEVICE_LOCAL_BINS; ++j) {
             bucket.value[i][j] = 0.0f;
         }
+    }
+
+    // Initialize Fermi-Eyges moments (single thread)
+    if (idx == 0) {
+        bucket.moment_A = 0.0f;
+        bucket.moment_B = 0.0f;
+        bucket.moment_C = 0.0f;
     }
 }
 

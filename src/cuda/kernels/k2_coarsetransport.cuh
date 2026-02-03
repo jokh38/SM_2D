@@ -53,6 +53,13 @@ __global__ void K2_CoarseTransport(
     // CRITICAL FIX: Output phase space for particles remaining in cell
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out
+#if DEBUG_MCS_CONSERVATION
+    // Phase A-5: Debug outputs for conservation tracking
+    , float* __restrict__ debug_weight_in
+    , float* __restrict__ debug_weight_out
+    , float* __restrict__ debug_variance_in
+    , float* __restrict__ debug_variance_out
+#endif
 );
 
 // CPU wrapper declaration
@@ -78,4 +85,10 @@ void run_K2_CoarseTransport(
     struct DeviceOutflowBucket* OutflowBuckets,
     uint32_t* block_ids_out,
     float* values_out
+#if DEBUG_MCS_CONSERVATION
+    , float* debug_weight_in
+    , float* debug_weight_out
+    , float* debug_variance_in
+    , float* debug_variance_out
+#endif
 );
