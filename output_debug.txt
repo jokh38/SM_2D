@@ -1,0 +1,414 @@
+========================================
+SM_2D: Proton Therapy Simulation
+========================================
+Loading configuration from: sim.ini
+=== Incident Particle Configuration ===
+Particle Type: proton
+Beam Profile: gaussian
+Energy: 150 MeV (sigma = 1 MeV)
+Position: (0, 0) mm
+Angle: 0 rad (sigma = 0.001 rad)
+Weight: 1
+Samples: 1000
+
+Grid: 200 x 640 (dx=0.5mm, dz=0.5mm)
+Output Dir: results
+======================================
+
+--- Running Simulation ---
+Using GPU transport (Vavilov energy straggling)
+=== Option D2 Energy Grid ===
+  N_E = 1029 bins
+  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)
+  [2-20 MeV]: 0.2 MeV/bin (90 bins)
+  [20-100 MeV]: 0.25 MeV/bin (320 bins)
+  [100-250 MeV]: 0.25 MeV/bin (600 bins)
+=============================
+=== LUT Verification ===
+  R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
+  R(150 MeV) = 157.7 mm (expected ~158)
+  R(250 MeV) = -nan mm (max range in LUT)
+  S(150 MeV) = 5.443 MeV*cm^2/g
+  Energy loss test: E=150 -> E_new=148.918, dE=1.0824 MeV (step=2mm)
+=======================
+Running K1-K6 GPU pipeline transport...
+  GPU: NVIDIA GeForce RTX 2080
+  Energy: 150 MeV
+  Phase-space: 36 x 1029 bins
+Running K1-K6 GPU pipeline wrapper...
+  Grid: 200 x 640 cells
+  Source: (0, 0) mm, 150 MeV
+  Angular divergence: 0.001 rad
+  Spatial beam width (sigma_x): 6 mm
+DevicePsiC allocation:
+  Grid: 200x640 = 128000 cells
+  Kb: 8, LOCAL_BINS: 128
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 524288000 bytes (500 MB)
+  total per PsiC: 503.906 MB
+DevicePsiC allocation successful
+DevicePsiC allocation:
+  Grid: 200x640 = 128000 cells
+  Kb: 8, LOCAL_BINS: 128
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 524288000 bytes (500 MB)
+  total per PsiC: 503.906 MB
+DevicePsiC allocation successful
+  Source: (0, 0) mm
+  Energy: 150 MeV, Angle: 0 rad
+  Source injection verification:
+    Total weight: 1.0001 (expected: 1)
+    Non-zero cells: 97 / 128000
+  DEBUG: Wrote 97 initial non-zero cells to debug_cells_iter_00_initial.csv
+=== E_trigger Configuration ===
+E_trigger = 1000 MeV
+E_bin for E_trigger = 1028
+N_E_local = 2
+b_E_trigger = 514
+=== 150 MeV Particle ===
+E_bin_150 = 629
+b_E_150 = 314
+Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
+==============================
+  Iteration 1: 97 active, 0 coarse cells
+  Iteration 1: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_01_after_K4.csv (z range: 0.75 - 0.75 mm)
+  Iteration 2: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_02_after_K4.csv (z range: 1.25 - 1.25 mm)
+  Iteration 3: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_03_after_K4.csv (z range: 1.75 - 1.75 mm)
+  Iteration 4: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_04_after_K4.csv (z range: 2.25 - 2.25 mm)
+  Iteration 5: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_05_after_K4.csv (z range: 2.75 - 2.75 mm)
+  Iteration 6: 97 active, 0 coarse cells
+  K4: Transferred 92 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_06_after_K4.csv (z range: 3.25 - 3.25 mm)
+  Iteration 7: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_07_after_K4.csv (z range: 3.75 - 3.75 mm)
+  Iteration 8: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_08_after_K4.csv (z range: 4.25 - 4.25 mm)
+  Iteration 9: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_09_after_K4.csv (z range: 4.75 - 4.75 mm)
+  Iteration 10: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_10_after_K4.csv (z range: 5.25 - 5.25 mm)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 77 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 68 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 93 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 69 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 96)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 96)
+  K4: Transferred 76 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  Iteration 50: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_50_after_K4.csv (z range: 24.25 - 25.25 mm)
+  Iteration 51: 97 active, 0 coarse cells
+  K4: Transferred 84 particles (weight bins: 97)
+  K4: Transferred 33 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 76 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 65 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 97)
+  K4: Transferred 36 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 84 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 65 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 76 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 76 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 68 particles (weight bins: 97)
+  K4: Transferred 65 particles (weight bins: 97)
+  K4: Transferred 78 particles (weight bins: 97)
+  K4: Transferred 76 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 65 particles (weight bins: 97)
+  K4: Transferred 84 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 84 particles (weight bins: 97)
+  K4: Transferred 86 particles (weight bins: 97)
+  K4: Transferred 68 particles (weight bins: 97)
+  K4: Transferred 93 particles (weight bins: 95)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 78 particles (weight bins: 97)
+  K4: Transferred 67 particles (weight bins: 94)
+  K4: Transferred 9 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 96)
+  K4: Transferred 38 particles (weight bins: 97)
+  K4: Transferred 67 particles (weight bins: 97)
+  K4: Transferred 79 particles (weight bins: 97)
+  Iteration 100: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_100_after_K4.csv (z range: 48.75 - 50.25 mm)
+  Iteration 101: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 79 particles (weight bins: 97)
+  K4: Transferred 95 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 87 particles (weight bins: 97)
+  K4: Transferred 40 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 40 particles (weight bins: 97)
+  K4: Transferred 67 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 97)
+  K4: Transferred 41 particles (weight bins: 97)
+  K4: Transferred 54 particles (weight bins: 97)
+  K4: Transferred 4 particles (weight bins: 97)
+  K4: Transferred 7 particles (weight bins: 97)
+  K4: Transferred 7 particles (weight bins: 97)
+  K4: Transferred 1 particles (weight bins: 97)
+  K4: Transferred 4 particles (weight bins: 97)
+  K4: Transferred 4 particles (weight bins: 97)
+  K4: Transferred 8 particles (weight bins: 96)
+  K4: Transferred 2 particles (weight bins: 96)
+  K4: Transferred 38 particles (weight bins: 96)
+  K4: Transferred 96 particles (weight bins: 97)
+  K4: Transferred 95 particles (weight bins: 97)
+  K4: Transferred 36 particles (weight bins: 97)
+  K4: Transferred 33 particles (weight bins: 96)
+  K4: Transferred 2 particles (weight bins: 96)
+  K4: Transferred 20 particles (weight bins: 95)
+  K4: Transferred 5 particles (weight bins: 92)
+  K4: Transferred 39 particles (weight bins: 96)
+  K4: Transferred 36 particles (weight bins: 95)
+  K4: Transferred 3 particles (weight bins: 89)
+  K4: Transferred 70 particles (weight bins: 97)
+  K4: Transferred 69 particles (weight bins: 94)
+  K4: Transferred 42 particles (weight bins: 97)
+  K4: Transferred 9 particles (weight bins: 95)
+  K4: Transferred 44 particles (weight bins: 97)
+  K4: Transferred 94 particles (weight bins: 95)
+  K4: Transferred 64 particles (weight bins: 96)
+  K4: Transferred 65 particles (weight bins: 96)
+  K4: Transferred 74 particles (weight bins: 96)
+  Iteration 150: 97 active, 0 coarse cells
+  K4: Transferred 64 particles (weight bins: 95)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_150_after_K4.csv (z range: 69.25 - 75.25 mm)
+  Iteration 151: 97 active, 0 coarse cells
+  K4: Transferred 8 particles (weight bins: 97)
+  K4: Transferred 9 particles (weight bins: 95)
+  K4: Transferred 9 particles (weight bins: 97)
+  K4: Transferred 66 particles (weight bins: 96)
+  K4: Transferred 70 particles (weight bins: 97)
+  K4: Transferred 11 particles (weight bins: 96)
+  K4: Transferred 63 particles (weight bins: 97)
+  K4: Transferred 7 particles (weight bins: 97)
+  K4: Transferred 9 particles (weight bins: 96)
+  K4: Transferred 52 particles (weight bins: 97)
+  K4: Transferred 95 particles (weight bins: 96)
+  K4: Transferred 68 particles (weight bins: 96)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 97)
+  K4: Transferred 76 particles (weight bins: 97)
+  K4: Transferred 96 particles (weight bins: 97)
+  K4: Transferred 17 particles (weight bins: 97)
+  K4: Transferred 7 particles (weight bins: 96)
+  K4: Transferred 42 particles (weight bins: 97)
+  K4: Transferred 91 particles (weight bins: 96)
+  K4: Transferred 8 particles (weight bins: 96)
+  K4: Transferred 7 particles (weight bins: 94)
+  K4: Transferred 9 particles (weight bins: 93)
+  K4: Transferred 62 particles (weight bins: 96)
+  K4: Transferred 27 particles (weight bins: 94)
+  K4: Transferred 18 particles (weight bins: 90)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 10 particles (weight bins: 92)
+  K4: Transferred 1 particles (weight bins: 92)
+  K4: Transferred 8 particles (weight bins: 95)
+  K4: Transferred 5 particles (weight bins: 94)
+  K4: Transferred 60 particles (weight bins: 90)
+  K4: Transferred 46 particles (weight bins: 96)
+  K4: Transferred 16 particles (weight bins: 85)
+  K4: Transferred 4 particles (weight bins: 90)
+  K4: Transferred 12 particles (weight bins: 95)
+  K4: Transferred 85 particles (weight bins: 96)
+  K4: Transferred 83 particles (weight bins: 89)
+  K4: Transferred 77 particles (weight bins: 96)
+  K4: Transferred 16 particles (weight bins: 92)
+  K4: Transferred 90 particles (weight bins: 90)
+  K4: Transferred 92 particles (weight bins: 95)
+  K4: Transferred 18 particles (weight bins: 92)
+  K4: Transferred 15 particles (weight bins: 91)
+  K4: Transferred 12 particles (weight bins: 93)
+  K4: Transferred 64 particles (weight bins: 94)
+  K4: Transferred 9 particles (weight bins: 89)
+  K4: Transferred 13 particles (weight bins: 95)
+  K4: Transferred 20 particles (weight bins: 94)
+  Iteration 200: 97 active, 0 coarse cells
+  K4: Transferred 55 particles (weight bins: 93)
+  DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_200_after_K4.csv (z range: 83.25 - 100.25 mm)
+  Iteration 201: 97 active, 0 coarse cells
+  K4: Transferred 41 particles (weight bins: 92)
+  K4: Transferred 19 particles (weight bins: 93)
+  K4: Transferred 43 particles (weight bins: 95)
+  K4: Transferred 91 particles (weight bins: 91)
+  K4: Transferred 67 particles (weight bins: 96)
+  K4: Transferred 90 particles (weight bins: 92)
+  K4: Transferred 68 particles (weight bins: 95)
+  K4: Transferred 17 particles (weight bins: 93)
+  K4: Transferred 18 particles (weight bins: 97)
+  K4: Transferred 43 particles (weight bins: 92)
+  K4: Transferred 46 particles (weight bins: 97)
+  K4: Transferred 15 particles (weight bins: 94)
+  K4: Transferred 92 particles (weight bins: 94)
+  K4: Transferred 2 particles (weight bins: 95)
+  K4: Transferred 43 particles (weight bins: 96)
+  K4: Transferred 37 particles (weight bins: 93)
+  K4: Transferred 24 particles (weight bins: 97)
+  K4: Transferred 93 particles (weight bins: 94)
+  K4: Transferred 90 particles (weight bins: 96)
+  K4: Transferred 7 particles (weight bins: 94)
+  K4: Transferred 90 particles (weight bins: 94)
+  K4: Transferred 59 particles (weight bins: 92)
+  K4: Transferred 67 particles (weight bins: 94)
+  K4: Transferred 81 particles (weight bins: 95)
+  K4: Transferred 36 particles (weight bins: 90)
+  K4: Transferred 21 particles (weight bins: 94)
+  K4: Transferred 17 particles (weight bins: 96)
+  K4: Transferred 19 particles (weight bins: 92)
+  K4: Transferred 91 particles (weight bins: 94)
+  K4: Transferred 22 particles (weight bins: 95)
+  K4: Transferred 12 particles (weight bins: 84)
+  K4: Transferred 12 particles (weight bins: 94)
+  K4: Transferred 70 particles (weight bins: 95)
+  K4: Transferred 6 particles (weight bins: 85)
+  K4: Transferred 16 particles (weight bins: 66)
+  K4: Transferred 9 particles (weight bins: 94)
+  K4: Transferred 48 particles (weight bins: 90)
+  K4: Transferred 13 particles (weight bins: 21)
+  K4: Transferred 7 particles (weight bins: 26)
+  K4: Transferred 8 particles (weight bins: 9)
+  K4: Transferred 6 particles (weight bins: 42)
+  K4: Transferred 7 particles (weight bins: 16)
+  K4: Transferred 4 particles (weight bins: 12)
+  K4: Transferred 7 particles (weight bins: 15)
+  K4: Transferred 10 particles (weight bins: 14)
+  K4: Transferred 7 particles (weight bins: 11)
+  K4: Transferred 8 particles (weight bins: 14)
+  K4: Transferred 5 particles (weight bins: 10)
+  K4: Transferred 3 particles (weight bins: 13)
+  Iteration 250: 96 active, 0 coarse cells
+  K4: Transferred 3 particles (weight bins: 8)
+  DEBUG: Wrote 96 non-zero cells to results/debug_cells_iter_250_after_K4.csv (z range: 98.75 - 125.25 mm)
+  Iteration 251: 96 active, 0 coarse cells
+  K4: Transferred 1 particles (weight bins: 6)
+  K4: Transferred 4 particles (weight bins: 7)
+  K4: Transferred 3 particles (weight bins: 7)
+  K4: Transferred 3 particles (weight bins: 7)
+  K4: Transferred 2 particles (weight bins: 6)
+  K4: Transferred 4 particles (weight bins: 5)
+  K4: Transferred 3 particles (weight bins: 6)
+  K4: Transferred 5 particles (weight bins: 6)
+  K4: Transferred 2 particles (weight bins: 3)
+  K4: Transferred 2 particles (weight bins: 5)
+  K4: Transferred 3 particles (weight bins: 5)
+  K4: Transferred 1 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 3)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 4)
+  K4: Transferred 2 particles (weight bins: 3)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 3)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 1 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 3)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 2)
+  K4: Transferred 2 particles (weight bins: 3)
+  K4: Transferred 1 particles (weight bins: 2)
+  K4: Transferred 1 particles (weight bins: 1)
+  K4: Transferred 1 particles (weight bins: 1)
+  Iteration 300: 96 active, 0 coarse cells
+  Iteration 301: 96 active, 0 coarse cells
+  K4: Transferred 1 particles (weight bins: 1)
+  K4: Transferred 1 particles (weight bins: 1)
+  K4: Transferred 1 particles (weight bins: 1)
+  K4: Transferred 1 particles (weight bins: 1)
+  Iteration 350: 13 active, 0 coarse cells
+  Iteration 351: 12 active, 0 coarse cells
+  Iteration 400: 7 active, 0 coarse cells
+  Iteration 401: 7 active, 0 coarse cells
+  Iteration 450: 7 active, 0 coarse cells
+  Iteration 451: 7 active, 0 coarse cells
+  Iteration 500: 7 active, 0 coarse cells
+  Iteration 501: 7 active, 0 coarse cells
+  Iteration 550: 7 active, 0 coarse cells
+  Iteration 551: 7 active, 0 coarse cells
+  Iteration 600: 7 active, 0 coarse cells
+K1-K6 pipeline: completed 600 iterations
+  Energy deposited: 136.59 MeV, boundary loss: 29068.5 MeV
+  Energy deposition extracted
+K1-K6 pipeline wrapper complete.
+GPU transport complete.
+Simulation complete.
+  Bragg Peak: 158 mm depth, 1.26041 Gy
+
+--- Saving Results ---
+  2D dose saved to: results/dose_2d.txt
+  PDD saved to: results/pdd.txt
+
+=== Simulation Complete ===

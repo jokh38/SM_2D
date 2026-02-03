@@ -34,10 +34,12 @@ namespace {
     constexpr float ENERGY_OFFSET_RATIO = 0.50f;         // Offset from lower edge (fraction of half-width)
     constexpr float BOUNDARY_SAFETY_FACTOR = 1.001f;     // Allow slight boundary crossing
 
-    // Scattering reduction factors (to maintain forward penetration)
-    constexpr float SCATTER_REDUCTION_HIGH_E = 0.3f;     // E > 100 MeV
-    constexpr float SCATTER_REDUCTION_MID_HIGH = 0.5f;   // E > 50 MeV
-    constexpr float SCATTER_REDUCTION_MID_LOW = 0.7f;    // E > 20 MeV
+    // Scattering reduction factors - DISABLED for full lateral scattering (debug/test)
+    // Original clinical values: HIGH_E=0.3, MID_HIGH=0.5, MID_LOW=0.7
+    // Set all to 1.0 to observe true MCS lateral spreading
+    constexpr float SCATTER_REDUCTION_HIGH_E = 1.0f;     // E > 100 MeV (full scattering)
+    constexpr float SCATTER_REDUCTION_MID_HIGH = 1.0f;   // E > 50 MeV (full scattering)
+    constexpr float SCATTER_REDUCTION_MID_LOW = 1.0f;    // E > 20 MeV (full scattering)
     constexpr float SCATTER_REDUCTION_LOW_E = 1.0f;      // E <= 20 MeV (full scattering)
 
     // Energy thresholds for scattering reduction

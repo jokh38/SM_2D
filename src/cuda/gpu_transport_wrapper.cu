@@ -156,10 +156,10 @@ void run_k1k6_pipeline_transport(
     config.dz = dz;
 
     // Energy thresholds
-    // TEST: Use E_trigger = 0.01 MeV (below cutoff) to force ALL particles to use K2 coarse transport
-    // This tests coarse grid functionality. Expect lower accuracy but correct operation.
-    config.E_trigger = 0.01f;          // Below cutoff (0.1 MeV) → ALL particles use K2 Coarse
-    config.weight_active_min = 1e-12f;  // FIX: Lowered from 1e-6 to fix transport gap (per debug report)
+    // TEST: Use very high E_trigger to force ALL particles to use K3 fine transport
+    // This enables lateral scattering from the beginning
+    config.E_trigger = 1000.0f;        // K3 for E < 1000 MeV (essentially all particles)
+    config.weight_active_min = 1e-12f;  // Lowered from 1e-6 to fix transport gap
 
     // Coarse transport settings
     config.E_coarse_max = 300.0f;       // Up to 300 MeV (original value)

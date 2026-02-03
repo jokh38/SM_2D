@@ -15,50 +15,25 @@
 #include <stdexcept>
 #include <string>
 
-// ============================================================================
-// Debug Measurements for Weight/Variance Conservation (PLAN_MCS Phase A-5)
-// ============================================================================
-// Set to 1 to enable debug output for weight and variance tracking
-#define DEBUG_MCS_CONSERVATION 0
-// ============================================================================
-
-// PLAN_MCS Configuration Constants
-// Sigma-based spread radius calculation (Phase A-4)
-constexpr float K_SIGMA_SPREAD = 3.0f;  // Cover ±3σ (99.7% of Gaussian)
-constexpr int MIN_SPREAD_RADIUS = 1;    // Minimum radius (cells)
-constexpr int MAX_SPREAD_RADIUS = 50;   // Maximum radius to limit exponential growth
-
-// PLAN_MCS Phase B-5: Moment-based K2 to K3 transition criteria
-// These thresholds define when particles should transfer from coarse (K2) to fine (K3) transport
-//
-// K2 remains valid when:
-//   1. sqrt(A) < THETA_K2_MAX           : Angular spread is small
-//   2. sqrt(C)/dx < SIGMA_X_MAX_BINS    : Lateral spread fits in reasonable bins
-//   3. sqrt(A) * step < SMALL_ANGLE_MAX : Small-angle approximation valid
-//
-// If any condition is violated, particle should be flagged for K3 transfer
-//
-// NOTE: The actual transfer is managed by ActiveMask on the host side.
-// This kernel calculates moments but does not directly perform K2->K3 transfers.
-// Future enhancement: Transfer moment_A, moment_B, moment_C to K3 state.
-//
-constexpr float THETA_K2_MAX = 0.02f;      // 20 mrad threshold for angular spread
-constexpr float SIGMA_X_MAX_BINS = 3.0f;   // Maximum sigma_x in bin widths
-constexpr float SMALL_ANGLE_MAX = 0.1f;    // Small-angle approximation limit
-
 // Forward declaration for DeviceOutflowBucket (defined in device_bucket.cuh)
 // This is already included via device_bucket.cuh
 
 // ============================================================================
-// FIX Problem 4: Coarse Transport Implementation
+// K2 Coarse Transport: Simple Energy Loss (No Lateral Spreading)
 // ============================================================================
 // Purpose: Handle high-energy particles where ActiveMask=0
 //
 // Physics:
 // - Energy loss with stopping power (dE/dx)
-// - Simplified MCS: use mean scattering angle (no random sampling)
 // - Nuclear attenuation (same as fine transport)
 // - Larger step sizes for efficiency
+// - NO lateral scattering (delegated to K3 fine transport)
+//
+// Reason for not implementing lateral spreading in K2:
+// - K2 uses binned phase space which cannot track per-particle state
+// - Attempting to track Fermi-Eyges moments fails because moments are
+//   reset to 0 at each iteration (no per-particle accumulation)
+// - K3 handles lateral scattering properly using Monte Carlo methods
 //
 // Flow: K2 → K4 (bucket transfer)
 // ============================================================================
@@ -93,13 +68,6 @@ __global__ void K2_CoarseTransport(
     // CRITICAL FIX: Output phase space for particles remaining in cell
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out
-#if DEBUG_MCS_CONSERVATION
-    // Debug outputs for conservation tracking (Phase A-5)
-    , float* __restrict__ debug_weight_in
-    , float* __restrict__ debug_weight_out
-    , float* __restrict__ debug_variance_in
-    , float* __restrict__ debug_variance_out
-#endif
 ) {
     // Thread ID maps to coarse cell index
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -121,14 +89,6 @@ __global__ void K2_CoarseTransport(
     float cell_boundary_weight = 0.0f;
     double cell_boundary_energy = 0.0f;
 
-#if DEBUG_MCS_CONSERVATION
-    // Debug accumulators for Phase A-5: weight and variance conservation
-    float debug_w_in = 0.0f;
-    float debug_w_out = 0.0f;
-    float debug_var_in = 0.0f;  // ⟨x²⟩ variance before transport
-    float debug_var_out = 0.0f;  // ⟨x²⟩ variance after transport
-#endif
-
     // Coarse step size: limit to cell size for accurate dose deposition
     // IMPORTANT: Coarse transport only supports single-cell transfers per iteration
     // Using step > cell size causes particles to "jump" over cells without proper transport
@@ -148,14 +108,6 @@ __global__ void K2_CoarseTransport(
             int global_idx = (cell * Kb + slot) * DEVICE_LOCAL_BINS + lidx;
             float weight = values_in[global_idx];
             if (weight < 1e-12f) continue;
-
-#if DEBUG_MCS_CONSERVATION
-            // Track input weight for conservation check (Phase A-5)
-            debug_w_in += weight;
-            // Initial x² variance (before transport) - centered in cell
-            float x_in_variance = x_offset * x_offset;
-            debug_var_in += weight * x_in_variance;
-#endif
 
             // Decode 4D local index
             int theta_local, E_local, x_sub, z_sub;
@@ -232,56 +184,17 @@ __global__ void K2_CoarseTransport(
             edep += E_rem;
 
             // ========================================================================
-            // PLAN_MCS Phase A & B: Fermi-Eyges Moment Tracking + Lateral Spreading
+            // K2 Coarse Transport: Simple Energy Loss (No Lateral Spreading)
             // ========================================================================
-            // IMPLEMENTATION (A-4, B-1, B-4):
-            // 1. Track Fermi-Eyges moments (A, B, C) for each particle
-            // 2. Use accumulated C moment for sigma_x = sqrt(C) (B-4)
-            // 3. Calculate sigma-based spread radius to limit exponential growth (A-4)
-            // 4. Apply lateral spreading with calculated radius
+            // K2 handles only energy deposition for high-energy particles.
+            // Lateral scattering is handled by K3 fine transport using Monte Carlo.
+            //
+            // Reason: K2 uses binned phase space which cannot track per-particle
+            // accumulated moments across iterations. Attempting to do so causes
+            // all particles to have the same (zero) moment state.
             // ========================================================================
 
-            // Initialize Fermi-Eyges moments for this particle
-            // Note: In a full implementation, these would be accumulated across iterations
-            // For K2 coarse transport, we calculate per-step moments
-            float moment_A = 0.0f;  // ⟨θ²⟩ - Angular variance
-            float moment_B = 0.0f;  // ⟨xθ⟩ - Position-angle covariance
-            float moment_C = 0.0f;  // ⟨x²⟩ - Position variance
-
-            // Calculate scattering power T for this step
-            float T = device_scattering_power_T(E, coarse_step_limited);
-
-            // Update Fermi-Eyges moments for this step
-            device_fermi_eyges_step(moment_A, moment_B, moment_C, T, coarse_step_limited);
-
-            // Calculate sigma_x from accumulated C moment (B-4)
-            float sigma_x = device_accumulated_sigma_x(moment_C);
-
-            // PLAN_MCS Phase B-5: Check moment-based K2->K3 transition criteria
-            // K2 validity check using accumulated moments
-            float sqrt_A = device_accumulated_sigma_theta(moment_A);
-            float sigma_x_bins = sigma_x / dx;
-
-            // K2 remains valid only if all conditions are met
-            bool k2_valid =
-                (sqrt_A < THETA_K2_MAX) &&              // Angular spread < 20 mrad
-                (sigma_x_bins < SIGMA_X_MAX_BINS) &&    // Lateral spread fits in bins
-                (sqrt_A * coarse_step_limited < SMALL_ANGLE_MAX);  // Small-angle valid
-
-            // Note: If k2_valid is false, particle should be flagged for K3 transfer
-            // This is handled externally by ActiveMask, not within this kernel
-
-            // Calculate sigma-based spread radius (A-4)
-            // radius = k_sigma * (sigma_x / dx), clamped to [MIN, MAX]
-            float radius_sigma = sigma_x / dx;
-            int spread_radius = static_cast<int>(ceilf(K_SIGMA_SPREAD * radius_sigma));
-            spread_radius = max(spread_radius, MIN_SPREAD_RADIUS);
-            spread_radius = min(spread_radius, min(MAX_SPREAD_RADIUS, Nx / 2));
-
-            // Ensure even number for symmetric spreading
-            if (spread_radius % 2 != 0) spread_radius++;
-
-            // Theta remains unchanged (no random sampling in K2)
+            // Theta remains unchanged (no scattering in K2)
             float theta_new = theta;
             float mu_new = cosf(theta_new);
             float eta_new = sinf(theta_new);
@@ -307,65 +220,35 @@ __global__ void K2_CoarseTransport(
                     cell_w_cutoff += w_new;
                 } else {
                     // ====================================================================
-                    // PLAN_MCS Phase A-4: Sigma-Based Lateral Spreading
+                    // Single-cell emission (K2: no lateral spreading)
                     // ====================================================================
-                    // Use sigma-based radius for lateral spreading:
-                    // - Calculate sigma_x from Fermi-Eyges C moment
-                    // - Determine spread radius: R = k_sigma * (sigma_x / dx)
-                    // - Clamp R to [MIN_SPREAD_RADIUS, MAX_SPREAD_RADIUS]
-                    // - Use lateral spreading only for +z direction (primary beam)
+                    // All exit faces use simple single-cell emission.
+                    // Lateral scattering is handled by K3 fine transport.
                     // ====================================================================
 
-                    if (exit_face == FACE_Z_PLUS) {
-                        // Forward emission with lateral spreading
-                        int iz_source = cell / Nx;
-                        int target_z = iz_source + 1;
+                    float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                    int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
 
-                        // Use lateral spreading with sigma-based radius
-                        device_emit_lateral_spread(
-                            OutflowBuckets,
-                            cell,
-                            target_z,
-                            theta_new,
-                            E_new,
-                            w_new,
-                            x_new,  // Lateral position in cell-centered coordinates
-                            sigma_x,
-                            dx,
-                            Nx, Nz,
-                            theta_edges, E_edges,
-                            N_theta, N_E,
-                            N_theta_local, N_E_local,
-                            spread_radius  // Sigma-based radius
-                        );
+                    float z_offset_neighbor;
+                    if (exit_face == FACE_Z_MINUS) {
+                        z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
+                    } else if (exit_face == FACE_Z_PLUS) {
+                        z_offset_neighbor = dz * 0.5f - dz * 0.125f;
                     } else {
-                        // Other faces - single-cell emission (no lateral spreading)
-                        float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
-                        int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
-
-                        float z_offset_neighbor;
-                        if (exit_face == FACE_Z_MINUS) {
-                            z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
-                        } else if (exit_face == FACE_Z_PLUS) {
-                            z_offset_neighbor = dz * 0.5f - dz * 0.125f;
-                        } else {
-                            z_offset_neighbor = z_new - dz * 0.5f;
-                        }
-                        int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
-                        z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
-
-                        int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
-                        DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                        device_emit_component_to_bucket_4d(
-                            bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
-                            theta_edges, E_edges, N_theta, N_E,
-                            N_theta_local, N_E_local
-                        );
+                        z_offset_neighbor = z_new - dz * 0.5f;
                     }
+                    int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
+                    z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
 
-                    // FIX: Deposit energy in current cell before particle leaves
-                    // Both electronic (dE * weight) and nuclear (E_rem) energy are
-                    // deposited locally in this cell, not carried across boundary.
+                    int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                    DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                    device_emit_component_to_bucket_4d(
+                        bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
+                        theta_edges, E_edges, N_theta, N_E,
+                        N_theta_local, N_E_local
+                    );
+
+                    // Deposit energy in current cell before particle leaves
                     cell_edep += edep;
                     cell_w_nuclear += w_rem;
                     cell_E_nuclear += E_rem;
@@ -373,14 +256,6 @@ __global__ void K2_CoarseTransport(
                     // Account for energy/weight carried out by surviving particle
                     cell_boundary_weight += w_new;
                     cell_boundary_energy += E_new * w_new;
-
-#if DEBUG_MCS_CONSERVATION
-                    // Track output variance for particles leaving cell (Phase A-5)
-                    debug_w_out += w_new;
-                    // x² variance after transport includes lateral spreading (sigma_x)
-                    float x_out_variance = moment_C;  // ⟨x²⟩ from Fermi-Eyges
-                    debug_var_out += w_new * x_out_variance;
-#endif
                 }
             } else {
                 // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!
@@ -445,13 +320,6 @@ __global__ void K2_CoarseTransport(
                         int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub, z_sub);
                         int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
                         atomicAdd(&values_out[global_idx_out], w_new);
-
-#if DEBUG_MCS_CONSERVATION
-                        // Track output variance for particles remaining in cell (Phase A-5)
-                        debug_w_out += w_new;
-                        float x_out_variance = moment_C;  // ⟨x²⟩ from Fermi-Eyges
-                        debug_var_out += w_new * x_out_variance;
-#endif
                     }
                 }
             }
@@ -465,14 +333,6 @@ __global__ void K2_CoarseTransport(
     atomicAdd(&AbsorbedEnergy_nuclear[cell], cell_E_nuclear);
     atomicAdd(&BoundaryLoss_weight[cell], cell_boundary_weight);
     atomicAdd(&BoundaryLoss_energy[cell], cell_boundary_energy);
-
-#if DEBUG_MCS_CONSERVATION
-    // Write debug accumulators for conservation tracking (Phase A-5)
-    if (debug_weight_in) atomicAdd(&debug_weight_in[cell], debug_w_in);
-    if (debug_weight_out) atomicAdd(&debug_weight_out[cell], debug_w_out);
-    if (debug_variance_in) atomicAdd(&debug_variance_in[cell], debug_var_in);
-    if (debug_variance_out) atomicAdd(&debug_variance_out[cell], debug_var_out);
-#endif
 }
 
 // ============================================================================
@@ -501,12 +361,6 @@ void run_K2_CoarseTransport(
     DeviceOutflowBucket* OutflowBuckets,
     uint32_t* block_ids_out,
     float* values_out
-#if DEBUG_MCS_CONSERVATION
-    , float* debug_weight_in
-    , float* debug_weight_out
-    , float* debug_variance_in
-    , float* debug_variance_out
-#endif
 ) {
     // Launch kernel
     int threads_per_block = 256;
@@ -523,12 +377,6 @@ void run_K2_CoarseTransport(
         BoundaryLoss_weight, BoundaryLoss_energy,
         OutflowBuckets,
         block_ids_out, values_out
-#if DEBUG_MCS_CONSERVATION
-        , debug_weight_in
-        , debug_weight_out
-        , debug_variance_in
-        , debug_variance_out
-#endif
     );
 
     cudaError_t err = cudaGetLastError();

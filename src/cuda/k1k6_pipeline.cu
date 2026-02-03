@@ -850,6 +850,22 @@ bool run_k1k6_pipeline_transport(
     // Compute b_E_trigger from E_trigger
     int b_E_trigger = compute_b_E_trigger(config.E_trigger, e_grid, config.N_E_local);
 
+    // DEBUG: Print b_E_trigger calculation
+    std::cout << "=== E_trigger Configuration ===" << std::endl;
+    std::cout << "E_trigger = " << config.E_trigger << " MeV" << std::endl;
+    std::cout << "E_bin for E_trigger = " << e_grid.FindBin(config.E_trigger) << std::endl;
+    std::cout << "N_E_local = " << config.N_E_local << std::endl;
+    std::cout << "b_E_trigger = " << b_E_trigger << std::endl;
+
+    // Sample b_E for 150 MeV
+    int E_bin_150 = e_grid.FindBin(150.0f);
+    int b_E_150 = E_bin_150 / config.N_E_local;
+    std::cout << "=== 150 MeV Particle ===" << std::endl;
+    std::cout << "E_bin_150 = " << E_bin_150 << std::endl;
+    std::cout << "b_E_150 = " << b_E_150 << std::endl;
+    std::cout << "Condition: b_E_150 < b_E_trigger → " << b_E_150 << " < " << b_E_trigger << " = " << (b_E_150 < b_E_trigger ? "TRUE (K3 active)" : "FALSE (K2 coarse)") << std::endl;
+    std::cout << "==============================" << std::endl;
+
     // Reset pipeline state
     reset_pipeline_state(state, config.Nx, config.Nz);
 

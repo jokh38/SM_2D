@@ -5,12 +5,18 @@
 // ============================================================================
 // K2_CoarseTransport Kernel Header
 // ============================================================================
-// FIX Problem 4: Implement coarse transport for high-energy particles
+// K2: Simple Energy Loss for High-Energy Particles (No Lateral Spreading)
 //
 // Purpose: Handle transport for cells where ActiveMask=0 (high energy region)
-// - Uses larger step sizes (fewer MCS calculations)
-// - Simplified physics: energy loss + simplified angular spreading
-// - Transfers to fine transport when energy drops below threshold
+// - Uses larger step sizes (fewer calculations)
+// - Simplified physics: energy loss only
+// - NO lateral scattering (delegated to K3 fine transport)
+//
+// Reason for not implementing lateral spreading in K2:
+// - K2 uses binned phase space which cannot track per-particle state
+// - Attempting to track Fermi-Eyges moments fails because moments are
+//   reset to 0 at each iteration (no per-particle accumulation)
+// - K3 handles lateral scattering properly using Monte Carlo methods
 // ============================================================================
 
 struct K2Config {
@@ -28,7 +34,7 @@ __global__ void K2_CoarseTransport(
     const uint32_t* __restrict__ block_ids_in,
     const float* __restrict__ values_in,
     const uint8_t* __restrict__ ActiveMask,  // 0 = needs coarse transport
-    const uint32_t* __restrict__ CoarseList,  // CRITICAL FIX: List of cells needing coarse transport
+    const uint32_t* __restrict__ CoarseList,  // List of cells needing coarse transport
     // Grid
     int Nx, int Nz, float dx, float dz,
     int n_coarse,  // Number of cells needing coarse transport
@@ -48,18 +54,11 @@ __global__ void K2_CoarseTransport(
     double* __restrict__ AbsorbedEnergy_nuclear,
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
-    // Outflow buckets (same structure as K3)
+    // Outflow buckets
     struct DeviceOutflowBucket* __restrict__ OutflowBuckets,
-    // CRITICAL FIX: Output phase space for particles remaining in cell
+    // Output phase space for particles remaining in cell
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out
-#if DEBUG_MCS_CONSERVATION
-    // Phase A-5: Debug outputs for conservation tracking
-    , float* __restrict__ debug_weight_in
-    , float* __restrict__ debug_weight_out
-    , float* __restrict__ debug_variance_in
-    , float* __restrict__ debug_variance_out
-#endif
 );
 
 // CPU wrapper declaration
@@ -67,7 +66,7 @@ void run_K2_CoarseTransport(
     const uint32_t* block_ids_in,
     const float* values_in,
     const uint8_t* ActiveMask,
-    const uint32_t* CoarseList,  // CRITICAL FIX: List of cells needing coarse transport
+    const uint32_t* CoarseList,  // List of cells needing coarse transport
     int Nx, int Nz, float dx, float dz,
     int n_coarse,
     DeviceRLUT dlut,
@@ -85,10 +84,4 @@ void run_K2_CoarseTransport(
     struct DeviceOutflowBucket* OutflowBuckets,
     uint32_t* block_ids_out,
     float* values_out
-#if DEBUG_MCS_CONSERVATION
-    , float* debug_weight_in
-    , float* debug_weight_out
-    , float* debug_variance_in
-    , float* debug_variance_out
-#endif
 );
