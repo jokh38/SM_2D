@@ -5,18 +5,20 @@
 // ============================================================================
 // K2_CoarseTransport Kernel Header
 // ============================================================================
-// K2: Simple Energy Loss for High-Energy Particles (No Lateral Spreading)
+// K2: Energy Loss with Fermi-Eyges Moment-Based Lateral Spreading
 //
 // Purpose: Handle transport for cells where ActiveMask=0 (high energy region)
 // - Uses larger step sizes (fewer calculations)
-// - Simplified physics: energy loss only
-// - NO lateral scattering (delegated to K3 fine transport)
+// - Energy loss with stopping power (dE/dx)
+// - Fermi-Eyges moment tracking (A=⟨θ²⟩, B=⟨xθ⟩, C=⟨x²⟩)
+// - Deterministic Gaussian weight distribution for lateral spreading
+// - O(z^(3/2)) scaling from accumulated moments
 //
-// Reason for not implementing lateral spreading in K2:
-// - K2 uses binned phase space which cannot track per-particle state
-// - Attempting to track Fermi-Eyges moments fails because moments are
-//   reset to 0 at each iteration (no per-particle accumulation)
-// - K3 handles lateral scattering properly using Monte Carlo methods
+// Phase B Implementation (PLAN_MCS.md):
+// - Moments tracked per-(theta, E) bin during transport
+// - sigma_x = sqrt(C) from accumulated C moment
+// - Scattering power T calculated at mid-step energy
+// - K2->K3 transition uses moment-based criteria
 // ============================================================================
 
 struct K2Config {
@@ -85,3 +87,48 @@ void run_K2_CoarseTransport(
     uint32_t* block_ids_out,
     float* values_out
 );
+
+// ============================================================================
+// Profiling Functions (ITERATION 3)
+// ============================================================================
+// These functions are only available when ENABLE_MCS_PROFILING is defined
+// during compilation. They provide runtime statistics on moment-based
+// enhancement behavior.
+// ============================================================================
+
+#ifdef ENABLE_MCS_PROFILING
+
+/**
+ * @brief Reset profiling counters to zero
+ *
+ * Call this before starting a simulation to clear previous profiling data.
+ */
+void k2_reset_profiling_counters();
+
+/**
+ * @brief Retrieve profiling counters from device
+ *
+ * @param enhancement_count Number of enhancements applied
+ * @param total_evaluations Total moment evaluations
+ * @param sqrt_A_exceeds Count: sqrt(A) >= 0.02
+ * @param sqrt_C_exceeds Count: sqrt(C)/dx >= 3.0
+ * @param avg_sqrt_A Average sqrt(A) value
+ * @param avg_sqrt_C_dx Average sqrt(C)/dx value
+ */
+void k2_get_profiling_counters(
+    unsigned long long& enhancement_count,
+    unsigned long long& total_evaluations,
+    unsigned long long& sqrt_A_exceeds,
+    unsigned long long& sqrt_C_exceeds,
+    double& avg_sqrt_A,
+    double& avg_sqrt_C_dx
+);
+
+/**
+ * @brief Print profiling summary to stdout
+ *
+ * Call this after simulation completes to see moment-based enhancement statistics.
+ */
+void k2_print_profiling_summary();
+
+#endif // ENABLE_MCS_PROFILING

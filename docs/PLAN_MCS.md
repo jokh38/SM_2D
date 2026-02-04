@@ -414,7 +414,7 @@ if (sigma_theta > 0.02f) {  // 20 mrad threshold
 }
 ```
 
-**Recommended Moment-Based Criteria**:
+**Recommended Moment-Based Criteria** (IMPLEMENTED - Iteration 2):
 ```cpp
 float sqrt_A = sqrtf(fmaxf(moment_A, 0.0f));
 float sqrt_C_over_dx = sqrtf(fmaxf(moment_C, 0.0f)) / dx;
@@ -425,9 +425,14 @@ bool k2_valid =
     (sqrt_A * coarse_range_step < 0.1f);   // Small-angle approximation valid
 
 if (!k2_valid) {
-    // Transfer to K3 fine transport
+    // Transfer to K3 fine transport (ARCHITECTURAL LIMITATION)
+    // Alternative: Enhance spreading within K2 to approximate K3
+    sigma_x *= 2.0f;  // Implemented in Iteration 2
 }
 ```
+
+**Implementation Note (Iteration 2)**:
+Due to architectural constraints where K1 pre-filters cells before K2 calculates moments, the moment-based criteria is implemented as a **spreading enhancement** within K2 rather than a K3 transfer. When moments exceed thresholds, K2 applies 2x wider spreading to approximate K3 behavior.
 
 ### 2.6 B-6: Phase B Test Suite
 

@@ -392,3 +392,91 @@ __device__ inline float device_accumulated_sigma_x(float moment_C) {
 __device__ inline float device_accumulated_sigma_theta(float moment_A) {
     return sqrtf(fmaxf(moment_A, 0.0f));
 }
+
+// ============================================================================
+// Hybrid Moment Tracking (Phase B - PLAN_MCS2)
+// ============================================================================
+// Combines analytic Fermi-Eyges theory with accumulated moments for
+// robust O(z^(3/2)) lateral spreading at all depths.
+//
+// Key insight: At shallow depths, accumulated tracking is noisy.
+// At deep depths, pure theory diverges from reality.
+// Solution: Use max(accumulated, analytic) with energy correction.
+// ============================================================================
+
+// Read accumulated C moment for a given (z_cell, E_bin)
+__device__ inline float device_read_moment_C(int iz, int E_bin, int N_E, const float* __restrict__ d_C_array) {
+    int idx = iz * N_E + E_bin;
+    return d_C_array[idx];
+}
+
+// Update accumulated C moment after a transport step
+__device__ inline void device_update_moment_C(
+    int iz, int E_bin, int N_E, float* __restrict__ d_C_array, float C_add
+) {
+    int idx = iz * N_E + E_bin;
+    atomicAdd(&d_C_array[idx], C_add);
+}
+
+// Calculate C_add contribution from one transport step
+// C_add = T * ds³ / 3  (from Fermi-Eyges theory)
+__device__ inline float device_compute_C_add(float T, float ds) {
+    return T * ds * ds * ds / 3.0f;
+}
+
+// Get sigma_x from hybrid moment tracking
+// Combines accumulated moments with analytic theory
+__device__ inline float device_hybrid_sigma_x(
+    float z_depth_mm,
+    float E_MeV,
+    int iz,
+    int E_bin,
+    int N_E,
+    const float* __restrict__ d_C_array
+) {
+    // Read accumulated moment C
+    float C = device_read_moment_C(iz, E_bin, N_E, d_C_array);
+
+    // Calculate analytic C from depth using Fermi-Eyges
+    // For thin target: sigma_x ≈ theta_0 * z / sqrt(3)
+    float theta_0 = device_highland_sigma(E_MeV, z_depth_mm);
+    float sigma_x_analytic = theta_0 * z_depth_mm / 1.7320508f;  // / sqrt(3)
+    float C_analytic = sigma_x_analytic * sigma_x_analytic;
+
+    // Energy correction factor (accounts for increased scattering at low energy)
+    // As energy decreases, scattering increases: correction > 1
+    float z_cm = z_depth_mm / 10.0f;
+    float energy_correction = 1.0f + 0.1f * z_cm / fmaxf(E_MeV, 1.0f);
+    C_analytic *= energy_correction * energy_correction;
+
+    // Use maximum of accumulated and analytic for robust spreading
+    // - Accumulated: accurate at shallow depths (low noise)
+    // - Analytic: accurate at deep depths (prevents underestimation)
+    float C_effective = fmaxf(C, C_analytic);
+
+    return sqrtf(fmaxf(C_effective, 0.0f));
+}
+
+// Alternative hybrid sigma_x using analytic as fallback
+// Uses accumulated moment when available, falls back to analytic formula
+__device__ inline float device_hybrid_sigma_x_fallback(
+    float z_depth_mm,
+    float E_MeV,
+    float C_accumulated,
+    float min_threshold_C2
+) {
+    // Analytic sigma_x from Fermi-Eyges theory
+    float theta_0 = device_highland_sigma(E_MeV, z_depth_mm);
+    float sigma_x_analytic = theta_0 * z_depth_mm / 1.7320508f;
+
+    // Accumulated sigma_x
+    float sigma_x_accum = sqrtf(fmaxf(C_accumulated, 0.0f));
+
+    // Use analytic if accumulated is below threshold (too noisy)
+    if (C_accumulated < min_threshold_C2) {
+        return sigma_x_analytic;
+    }
+
+    // Otherwise use accumulated
+    return sigma_x_accum;
+}
