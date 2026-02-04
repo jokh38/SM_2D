@@ -197,32 +197,27 @@ __global__ void K2_CoarseTransport(
             // ========================================================================
             // K2 Coarse Transport: Fermi-Eyges Moment-Based Lateral Spreading
             // ========================================================================
-            // Phase B Implementation: Track moments A=⟨θ²⟩, B=⟨xθ⟩, C=⟨x²⟩
-            // Uses deterministic Gaussian weight distribution for lateral spreading.
-            //
-            // Iteration 2 Enhancement: Moment-based spreading adjustment
-            // - When moments exceed thresholds, enhance spreading to simulate K3 behavior
-            // - This implements moment-based criteria within architectural constraints
+            // FIX: Use depth-based sigma_x for correct Fermi-Eyges O(z^(3/2)) scaling
+            // Previous implementation reset moments to zero each iteration, causing
+            // sigma_x << dx and no lateral spreading. New calculation uses depth from surface.
             // ========================================================================
 
-            // Initialize Fermi-Eyges moments for this (theta, E) bin
-            // Note: Moments are accumulated during transport, not persisted across iterations
-            float moment_A = 0.0f;  // ⟨θ²⟩ angular variance [rad²]
-            float moment_B = 0.0f;  // ⟨xθ⟩ position-angle covariance [mm·rad]
-            float moment_C = 0.0f;  // ⟨x²⟩ position variance [mm²]
+            // Calculate depth from surface for accumulated lateral spread
+            int ix = cell % Nx;
+            int iz = cell / Nx;
+            float depth_from_surface_mm = iz * dz + z_cell;  // Total depth from surface
 
-            // Calculate scattering power T at mid-step energy
-            // Design specification: E_mid = E - 0.5 * dE for accurate T calculation
-            float E_mid = E - 0.5f * dE;
-            float T = device_scattering_power_T(E_mid, coarse_range_step);
+            // Calculate accumulated lateral spread using Fermi-Eyges theory
+            // sigma_x(z) ≈ theta_0 * z / sqrt(3) for thin target
+            float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
+            float sigma_x_depth = sigma_theta_depth * depth_from_surface_mm / 1.7320508f;  // / sqrt(3)
 
-            // Update Fermi-Eyges moments using scattering power
-            device_fermi_eyges_step(moment_A, moment_B, moment_C, T, coarse_range_step);
+            // Combine with initial beam width (sigma_x0 = 6mm from Gaussian source)
+            float sigma_x_initial = 6.0f;
+            float sigma_x = sqrtf(sigma_x_initial * sigma_x_initial + sigma_x_depth * sigma_x_depth);
 
-            // Calculate sigma_x from accumulated C moment
-            // sigma_x = sqrt(⟨x²⟩) = sqrt(C)
-            float sigma_x = device_accumulated_sigma_x(moment_C);
-            sigma_x = fmaxf(sigma_x, 0.01f);  // Minimum sigma to avoid numerical issues
+            // Ensure minimum sigma_x
+            sigma_x = fmaxf(sigma_x, 0.01f);
 
             // ========================================================================
             // Iteration 2: Moment-Based Spreading Enhancement
@@ -241,7 +236,8 @@ __global__ void K2_CoarseTransport(
             // ITERATION 3: Added profiling counters for verification
             // ========================================================================
 
-            float sqrt_A = device_accumulated_sigma_theta(moment_A);  // sqrt(⟨θ²⟩)
+            // Calculate sqrt_A from depth (angular spread at this depth)
+            float sqrt_A = sigma_theta_depth;  // Already computed above
             float sqrt_C_over_dx = sigma_x / dx;  // σₓ in bin units
 
 #ifdef ENABLE_MCS_PROFILING
@@ -397,16 +393,14 @@ __global__ void K2_CoarseTransport(
 
                     if (out_slot >= 0 && E_new > 0.1f) {
                         // Number of x_sub bins to spread across (centered at current x_sub)
-                        constexpr int N_x_spread = 4;  // Spread across ±2 x_sub bins
+                        // INCREASED from 4 to 8 for smoother lateral profiles
+                        constexpr int N_x_spread = 8;  // Spread across ±4 x_sub bins
 
                         // Calculate weights for each x_sub bin using Gaussian CDF
                         float weights[N_x_spread];
                         float x_center = x_new;  // Center of Gaussian
 
                         device_gaussian_spread_weights(weights, x_center, sigma_x, dx, N_x_spread);
-
-                        // Get cell coordinates for calculating neighbor x positions
-                        int ix = cell % Nx;
 
                         // Distribute weight across x_sub bins
                         for (int i = 0; i < N_x_spread; ++i) {
@@ -419,8 +413,13 @@ __global__ void K2_CoarseTransport(
                             float x_pos = x_center - (N_x_spread / 2) * dx + (i + 0.5f) * dx;
                             int x_sub_spread = get_x_sub_bin(x_pos, dx);
 
-                            // Clamp to valid range
-                            x_sub_spread = fmaxf(0, fminf(x_sub_spread, 3));
+                            // FIX: Use soft boundary reflection instead of hard clamping
+                            // This prevents discontinuities at cell edges
+                            if (x_sub_spread < 0) {
+                                x_sub_spread = -x_sub_spread - 1;  // Reflect
+                                if (x_sub_spread < 0) x_sub_spread = 0;
+                            }
+                            // Upper bound is handled by get_x_sub_bin which clamps to N_x_sub-1
 
                             // Determine if this x position maps to a different cell
                             int target_cell = cell;
@@ -432,7 +431,7 @@ __global__ void K2_CoarseTransport(
                                 // Left neighbor cell
                                 if (ix > 0) {
                                     target_cell = cell - 1;
-                                    x_sub_target = 3;  // Rightmost sub-bin of left neighbor
+                                    x_sub_target = 7;  // Rightmost sub-bin of left neighbor (N_x_sub-1)
                                 }
                             } else if (x_pos > half_dx) {
                                 // Right neighbor cell

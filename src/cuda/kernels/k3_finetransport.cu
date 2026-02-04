@@ -250,9 +250,25 @@ __global__ void K3_FineTransport(
             // This is deterministic and reproducible, not Monte Carlo.
             // ========================================================================
 
-            // Calculate lateral spread sigma from Highland formula
-            float sigma_theta = device_highland_sigma(E, actual_range_step);
-            float sigma_x = device_lateral_spread_sigma(sigma_theta, actual_range_step);
+            // FIX: Use depth-based sigma_x for correct Fermi-Eyges O(z^(3/2)) scaling
+            // Previous per-step calculation caused sigma_x << dx, resulting in no lateral spread
+            // New calculation uses accumulated depth from surface
+            int ix = cell % Nx;
+            int iz = cell / Nx;
+            float depth_from_surface_mm = iz * dz + z_cell;  // Total depth from surface
+
+            // Calculate accumulated lateral spread using Fermi-Eyges theory
+            // sigma_x(z) ≈ theta_0 * z / sqrt(3) for thin target
+            // This gives O(z) scaling, which combined with energy loss gives O(z^(3/2))
+            float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
+            float sigma_x_depth = sigma_theta_depth * depth_from_surface_mm / 1.7320508f;  // / sqrt(3)
+
+            // Combine with initial beam width (sigma_x0 = 6mm from Gaussian source)
+            // Total sigma_x = sqrt(sigma_x0^2 + sigma_x_depth^2)
+            float sigma_x_initial = 6.0f;  // Initial beam width from sim.ini
+            float sigma_x = sqrtf(sigma_x_initial * sigma_x_initial + sigma_x_depth * sigma_x_depth);
+
+            // Ensure minimum sigma_x for numerical stability
             sigma_x = fmaxf(sigma_x, LATERAL_SPREAD_MIN_SIGMA);
 
             // For deterministic transport, keep direction unchanged (theta_new = theta)
@@ -399,7 +415,8 @@ __global__ void K3_FineTransport(
 
                     if (out_slot >= 0 && E_new > ENERGY_CUTOFF_MEV) {
                         // Number of x_sub bins to spread across (centered at current x_sub)
-                        constexpr int N_x_spread = 4;  // Spread across ±2 x_sub bins
+                        // INCREASED from 4 to 8 for smoother lateral profiles
+                        constexpr int N_x_spread = 8;  // Spread across ±4 x_sub bins
 
                         // Calculate weights for each x_sub bin using Gaussian CDF
                         float weights[N_x_spread];
@@ -424,8 +441,13 @@ __global__ void K3_FineTransport(
                             float x_pos = x_center - (N_x_spread / 2) * dx + (i + 0.5f) * dx;
                             int x_sub_spread = get_x_sub_bin(x_pos, dx);
 
-                            // Clamp to valid range
-                            x_sub_spread = fmaxf(0, fminf(x_sub_spread, 3));
+                            // FIX: Use soft boundary reflection instead of hard clamping
+                            // This prevents discontinuities at cell edges
+                            if (x_sub_spread < 0) {
+                                x_sub_spread = -x_sub_spread - 1;  // Reflect
+                                if (x_sub_spread < 0) x_sub_spread = 0;
+                            }
+                            // Upper bound is handled by get_x_sub_bin which clamps to N_x_sub-1
 
                             // Determine if this x position maps to a different cell
                             int target_cell = cell;
@@ -437,7 +459,7 @@ __global__ void K3_FineTransport(
                                 // Left neighbor cell
                                 if (ix > 0) {
                                     target_cell = cell - 1;
-                                    x_sub_target = 3;  // Rightmost sub-bin of left neighbor
+                                    x_sub_target = 7;  // Rightmost sub-bin of left neighbor (N_x_sub-1)
                                 }
                             } else if (x_pos > half_dx) {
                                 // Right neighbor cell

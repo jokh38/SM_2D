@@ -18,9 +18,9 @@
 // To fit in 8GB VRAM, using reduced values (memory optimization)
 constexpr int N_theta_local = 4;   // Angular sub-bins per block
 constexpr int N_E_local = 2;       // Energy sub-bins per block
-constexpr int N_x_sub = 4;        // Sub-cell x position bins per cell
+constexpr int N_x_sub = 8;        // Sub-cell x position bins per cell (INCREASED for smoother profiles)
 constexpr int N_z_sub = 4;        // Sub-cell z position bins per cell
-constexpr int LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub;  // = 4*2*4*4 = 128
+constexpr int LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub;  // = 4*2*8*4 = 256
 
 // ============================================================================
 // 4D Local Index Encoding (theta_local, E_local, x_sub, z_sub)
@@ -71,14 +71,16 @@ __host__ __device__ inline void decode_local_idx_3d(
 // ============================================================================
 // x_offset <-> x_sub conversion
 // Sub-cell x range: [-dx/2, +dx/2] divided into N_x_sub equal bins
-// bin 0: [-dx/2, -dx/4), bin 1: [-dx/4, 0), bin 2: [0, +dx/4), bin 3: [+dx/4, +dx/2)
-// Bin centers: -3/8*dx, -1/8*dx, +1/8*dx, +3/8*dx
+// For N_x_sub = 8:
+//   bin 0: [-dx/2, -3dx/8), bin 1: [-3dx/8, -dx/4), bin 2: [-dx/4, -dx/8), bin 3: [-dx/8, 0)
+//   bin 4: [0, +dx/8), bin 5: [+dx/8, +dx/4), bin 6: [+dx/4, +3dx/8), bin 7: [+3dx/8, +dx/2)
+// Bin centers: -7/16*dx, -5/16*dx, -3/16*dx, -1/16*dx, +1/16*dx, +3/16*dx, +5/16*dx, +7/16*dx
 // ============================================================================
 
 __host__ __device__ inline float get_x_offset_from_bin(int x_sub, float dx) {
     // Return bin center offset from cell center
-    // bin 0 -> -0.375*dx, bin 1 -> -0.125*dx, bin 2 -> +0.125*dx, bin 3 -> +0.375*dx
-    return dx * (-0.375f + 0.25f * x_sub);
+    // For N_x_sub = 8: bin centers at -7/16, -5/16, -3/16, -1/16, +1/16, +3/16, +5/16, +7/16 of dx
+    return dx * (-0.4375f + 0.125f * x_sub);
 }
 
 __host__ __device__ inline int get_x_sub_bin(float x_offset, float dx) {

@@ -1,13 +1,9 @@
 {
-  "sessionCount": 24,
+  "sessionCount": 26,
   "lastSession": {
-    "startedAt": "2026-02-04T01:20:00.000Z",
+    "startedAt": "2026-02-04T01:34:52.531Z",
     "platform": "claude",
-    "level": "Dynamic",
-    "activeFeature": "mcs2-phase-b",
-    "phase": "completed",
-    "matchRate": 88,
-    "iteration": 3
+    "level": "Starter"
   },
   "pdca": {
     "mcs2-phase-b": {
