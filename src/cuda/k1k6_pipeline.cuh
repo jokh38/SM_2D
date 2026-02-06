@@ -61,12 +61,7 @@ struct K1K6PipelineConfig {
 // Helper Kernel Declarations
 // ============================================================================
 
-// Inject source particle into PsiC with angular and spatial distribution
-// sigma_theta > 0: Distribute source across multiple angles (Gauss-Hermite quadrature)
-// sigma_x > 0: Distribute source across ALL cells within beam width (continuous Gaussian)
-//               - Each cell receives weight proportional to Gaussian PDF at cell center
-//               - Coverage: ±4 sigma_x (99.99% of distribution)
-//               - Weights are normalized so sum = 1.0
+// Inject source particle into PsiC (pencil beam - single particle)
 __global__ void inject_source_kernel(
     DevicePsiC psi,
     int Nx, int Nz, float dx, float dz, float x_min, float z_min,  // Grid info for multi-cell injection
@@ -74,6 +69,24 @@ __global__ void inject_source_kernel(
     float theta0, float sigma_theta,
     float E0, float W_total,
     float sigma_x,
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+);
+
+// Inject Gaussian beam source into PsiC (multiple sampled particles)
+// Each thread processes one sample from the Gaussian distribution
+__global__ void inject_gaussian_source_kernel(
+    DevicePsiC psi,
+    float x0, float z0,              // Central beam position [mm]
+    float theta0, float E0, float W_total,  // Central angle, energy, total weight
+    float sigma_x, float sigma_theta, float sigma_E,  // Gaussian spreads
+    int n_samples,                    // Number of samples to draw
+    unsigned int random_seed,         // Seed for RNG
+    float x_min, float z_min,         // Grid origin
+    float dx, float dz,               // Cell size
+    int Nx, int Nz,                   // Grid dimensions
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
@@ -270,6 +283,7 @@ bool run_k5_weight_audit(
     const DevicePsiC& psi_out,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
+    const float* d_BoundaryLoss_weight,
     AuditReport* d_report,
     int Nx, int Nz
 );
@@ -299,7 +313,8 @@ void reset_pipeline_state(
 
 // Copy audit report from device to host
 AuditReport get_audit_report(
-    const K1K6PipelineState& state
+    const K1K6PipelineState& state,
+    int Nx, int Nz
 );
 
 // Compute b_E_trigger from E_trigger

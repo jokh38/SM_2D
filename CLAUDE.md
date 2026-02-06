@@ -12,84 +12,62 @@
    - Review the result after each run
    - If there is any progress or something that needs to be recorded, it should be in the history file (dbg/debug_history.md)
 
+4. **Compare with Validation Data**:
+   - After the code running, **compare the result with validation_data/**
+   - Use the reference data in `validation_data/` to verify correctness
+
 ## Debugging Workflow
 
-4. **Issue-Based Debugging**:
+5. **Issue-Based Debugging**:
    - Analyze debug messages from the code to identify issues
    - If root cause is unclear, add debug messages to the **previous step** of the code logic
    - Iterate backward through the code flow to trace the source of the problem
 
-5. **Track Debugging History**:
+6. **Track Debugging History**:
    - Create a todo list for debugging tasks
    - **Update todo list and history for each trial**
    - Record debugging history with **commit hashes** to distinguish between attempts
    - Document what was tried and what the outcome was
    - This accumulated history will help identify the real problem pattern
 
-6. **Avoid Infinite Loops**:
+7. **Avoid Infinite Loops**:
    - If you repeat the same step more than **three times** without progress, **try another method**
    - Do not get stuck in the same debugging cycle
 
+8. **Isolate and Test One-by-One**:
+   - If you find any issue, **consolidate the reason and test it by creating a test file to point out one reason only**
+   - For example, if debug message shows energy deposition is matched for energy loss of traveling particle, create a test code to check **one CUDA kernel only**
+   - If there are suspicious CUDA kernels, **check them one-by-one**
+   - After identifying issues, **fix them one-by-one** to see the result
+   - This isolates variables and helps pinpoint the exact source of the problem
+
 ## Code Verification
 
-7. **Use AST for Code Structure**:
+9. **Use AST for Code Structure**:
    - Use AST (Abstract Syntax Tree) to identify the correct calling structure of the codebase
    - **Do not use non-existing module names or file names**
    - Before revising code, **verify the file/function/module actually exists**
 
-8. **Check SPEC.md**:
-   - **CRITICAL: Always verify SPEC.md BEFORE implementing changes**
-   - Most bugs (77%) come from SPEC-deviation, not logic errors
-   - Check energy binning formula, step size limits, MCS implementation against SPEC
+10. **Check SPEC.md**:
+   - Check SPEC.md and compare the code
    - The spec should be reflected in the code
 
-## Known Recurring Patterns (from claude-mem analysis)
+## Validation
 
-### Pattern A: Energy Grid/Binning Issues (Most Frequent)
-- **Problem**: Mixing log-spaced vs piecewise-uniform grid formulas
-- **Files Affected**: `k2_coarsetransport.cu`, `k3_finetransport.cu`, `grids.cpp`, `gpu_transport_wrapper.cu`
-- **Fix Applied**: Use consistent `E = 0.5 * (E_edges[E_bin] + E_edges[E_bin + 1])` for piecewise-uniform
-- **Key Lesson**: ALL files must use same energy grid definition
+11. **Comparison with MOQUI Validation Data**:
+    - Run `python3 compare_with_validation.py` after simulation to compare with MOQUI Monte Carlo
+    - Validation data is in `validation_data/` directory (70, 110, 150, 190, 230 MeV)
+    - Key metrics: Bragg peak position, lateral spread (sigma), PDD shape
 
-### Pattern B: Boundary/Threshold Issues
-- **Problem**: `* 0.999f` limit preventing boundary crossing, missing epsilon tolerance
-- **Fix Applied**: Remove artificial limits, add `BOUNDARY_EPSILON = 0.001f`
-- **Key Lesson**: Don't adjust thresholds repeatedly - check for artificial limits first
-
-### Pattern C: Step Size Multiple Limits
-- **Problem**: cell_limit, 1mm cap, 0.999f limit compounding
-- **Fix Applied**: Remove ALL limits, not just one
-- **Key Lesson**: Search for ALL step size restrictions before fixing
-
-### Pattern D: Double Operations/Unit Errors
-- **Problem**: Double division by mu_init, inconsistent energy bin reference (center vs lower edge)
-- **Fix Applied**: Trace variable origins, ensure write/read consistency
-- **Key Lesson**: Verify unit conversions at system boundaries
-
-### Pattern E: MCS (Multiple Coulomb Scattering)
-- **Problem**: Random per-step scattering instead of variance-based accumulation
-- **Status**: Partially resolved (88% match rate as of mcs2-phase-b)
-- **Key Lesson**: SPEC requires variance accumulation with RMS threshold splitting
-
-### Debugging Workflow Improvement (Learned from Pattern Analysis)
-```
-CORRECT Order:
-1. Check SPEC.md requirements → 2. Verify code matches SPEC → 3. Adjust thresholds
-
-WRONG Order (historically attempted):
-1. Adjust thresholds → 2. Check if fixed → 3. Read SPEC.md (too late!)
-```
-
-### Energy Grid Consistency Rules
-- **NIST Data Range**: E_max must be ≤ 250 MeV (PSTAR data limitation)
-- **Grid Type**: Piecewise-uniform (Option D2) - NOT log-spaced
-- **Bin Resolution**: 0.25 MeV/bin for [100-250] MeV range (1029 bins total)
-- **Consistency Check**: Verify `gpu_transport_wrapper.cu`, `gpu_transport_runner.cpp`, and kernels all use same grid
+12. **Recommended Configuration for 70 MeV**:
+    - Use `sigma_x_mm = 3.8` to match clinical beam profiles (MOQUI validation)
+    - Consider `sigma_theta_rad > 0` for more realistic angular divergence
+    - Scattering reduction factors have been removed (set to 1.0) for accurate physics
 
 ## Safety Rules
 
-9. **Never Remove Whole Codebase**: Do not delete the entire codebase at any time.
+12. **Never Remove Whole Codebase**: Do not delete the entire codebase at any time.
 
-10. **Clean Up Temporary Files**:
-    - Any test files, debug files, or temporary documents must be **removed after use**
-    - Do **not** include temporary files in git commits
+12. **Clean Up Temporary Files**:
+   - Any test files, debug files, or temporary documents must be **removed after use**
+   - Do **not** include temporary files in git commits

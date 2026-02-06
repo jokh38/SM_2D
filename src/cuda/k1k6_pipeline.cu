@@ -328,6 +328,102 @@ __global__ void inject_source_kernel(
     }
 }
 
+// ============================================================================
+// Gaussian Beam Source Injection
+// ============================================================================
+
+// Box-Muller transform for Gaussian sampling (matches device_sample_gaussian)
+__device__ inline float gaussian_sample(unsigned& seed) {
+    // Simple linear congruential generator
+    seed = 1664525u * seed + 1013904223u;
+
+    float u1 = (seed >> 16) / 65536.0f;  // [0, 1)
+    seed = 1664525u * seed + 1013904223u;
+
+    float u2 = (seed >> 16) / 65536.0f;  // [0, 1)
+
+    // Box-Muller transform
+    float r = sqrtf(-2.0f * logf(fmaxf(u1, 1e-10f)));
+    float theta = 2.0f * M_PI * u2;
+
+    return r * cosf(theta);  // Return one of two independent normals
+}
+
+// Inject Gaussian beam source into PsiC
+// Each thread processes one sample from the Gaussian distribution
+__global__ void inject_gaussian_source_kernel(
+    DevicePsiC psi,
+    float x0, float z0,              // Central beam position [mm]
+    float theta0, float E0, float W_total,  // Central angle, energy, total weight
+    float sigma_x, float sigma_theta, float sigma_E,  // Gaussian spreads
+    int n_samples,                    // Number of samples to draw
+    unsigned int random_seed,         // Seed for RNG
+    float x_min, float z_min,         // Grid origin
+    float dx, float dz,               // Cell size
+    int Nx, int Nz,                   // Grid dimensions
+    const float* __restrict__ theta_edges,
+    const float* __restrict__ E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+) {
+    // Each thread processes one sample
+    int sample_idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (sample_idx >= n_samples) return;
+
+    // Initialize RNG with unique seed per thread
+    unsigned seed = random_seed + sample_idx;
+
+    // Sample from Gaussian distributions using Box-Muller
+    float x_sample = x0 + sigma_x * gaussian_sample(seed);
+    float theta_sample = theta0 + sigma_theta * gaussian_sample(seed);
+    float E_sample = E0 + sigma_E * gaussian_sample(seed);
+
+    // Clamp energy to valid range
+    float E_min_grid = E_edges[0];
+    float E_max_grid = E_edges[N_E];
+    E_sample = fmaxf(E_min_grid, fminf(E_sample, E_max_grid));
+
+    // Clamp angle to valid range
+    float theta_min_grid = theta_edges[0];
+    float theta_max_grid = theta_edges[N_theta];
+    theta_sample = fmaxf(theta_min_grid, fminf(theta_sample, theta_max_grid));
+
+    // Calculate grid cell for this sample
+    float x_rel = x_sample - x_min;
+    float z_rel = z0 - z_min;  // All samples at z=0 (incident plane)
+
+    int ix = static_cast<int>(x_rel / dx);
+    int iz = static_cast<int>(z_rel / dz);
+
+    // Skip if outside grid bounds
+    if (ix < 0 || ix >= Nx || iz < 0 || iz >= Nz) return;
+
+    int cell = iz * Nx + ix;
+
+    // Calculate position within cell
+    float x_in_cell = x_rel - ix * dx;          // [0, dx)
+    float z_in_cell = z_rel - iz * dz;          // [0, dz)
+
+    // Convert to centered coordinates for device_psic_inject_source
+    // device_psic_inject_source expects: x, z in [0, dx] and [0, dz]
+    // and internally converts to offsets from center
+
+    // Weight per sample
+    float w_sample = W_total / n_samples;
+
+    // Inject this sample into the phase space
+    device_psic_inject_source(
+        psi,
+        cell,
+        theta_sample, E_sample, w_sample,
+        x_in_cell, z_in_cell,
+        dx, dz,
+        theta_edges, E_edges,
+        N_theta, N_E,
+        N_theta_local, N_E_local
+    );
+}
+
 // Clear all outflow buckets
 __global__ void clear_buckets_kernel(
     DeviceOutflowBucket* buckets,
@@ -512,7 +608,7 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     if (e != cudaSuccess) { std::cerr << "Failed d_OutflowBuckets: " << bucket_bytes << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate audit structures
-    e = cudaMalloc(&d_audit_report, sizeof(AuditReport));
+    e = cudaMalloc(&d_audit_report, N_cells * sizeof(AuditReport));
     if (e != cudaSuccess) { std::cerr << "Failed d_audit_report: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_weight_in, N_cells * sizeof(double));
     if (e != cudaSuccess) { std::cerr << "Failed d_weight_in: " << cudaGetErrorString(e) << std::endl; return false; }
@@ -584,10 +680,21 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemcpy(state.d_n_coarse, &zero, sizeof(int), cudaMemcpyHostToDevice);
 }
 
-AuditReport get_audit_report(const K1K6PipelineState& state) {
-    AuditReport report;
-    cudaMemcpy(&report, state.d_audit_report, sizeof(AuditReport), cudaMemcpyDeviceToHost);
-    return report;
+AuditReport get_audit_report(const K1K6PipelineState& state, int Nx, int Nz) {
+    int N_cells = Nx * Nz;
+    std::vector<AuditReport> reports(N_cells);
+    cudaMemcpy(reports.data(), state.d_audit_report, N_cells * sizeof(AuditReport), cudaMemcpyDeviceToHost);
+
+    AuditReport summary{};
+    summary.W_error = 0.0f;
+    summary.W_pass = true;
+
+    for (int i = 0; i < N_cells; ++i) {
+        summary.W_error = fmaxf(summary.W_error, reports[i].W_error);
+        summary.W_pass = summary.W_pass && reports[i].W_pass;
+    }
+
+    return summary;
 }
 
 // ============================================================================
@@ -803,19 +910,25 @@ bool run_k5_weight_audit(
     const DevicePsiC& psi_out,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
+    const float* d_BoundaryLoss_weight,
     AuditReport* d_report,
     int Nx, int Nz
 ) {
     int N_cells = Nx * Nz;
+    int threads = 256;
+    int blocks = (N_cells + threads - 1) / threads;
+
+    cudaMemset(d_report, 0, N_cells * sizeof(AuditReport));
 
     // Call K5_WeightAudit kernel
-    K5_WeightAudit<<<1, 1>>>(
+    K5_WeightAudit<<<blocks, threads>>>(
         psi_in.block_id,
         psi_in.value,
         psi_out.block_id,
         psi_out.value,
         d_AbsorbedWeight_cutoff,
         d_AbsorbedWeight_nuclear,
+        d_BoundaryLoss_weight,
         d_report,
         N_cells
     );
@@ -1017,6 +1130,7 @@ bool run_k1k6_pipeline_transport(
         if (!run_k5_weight_audit(*psi_in, *psi_out,
                                  state.d_AbsorbedWeight_cutoff,
                                  state.d_AbsorbedWeight_nuclear,
+                                 state.d_BoundaryLoss_weight,
                                  state.d_audit_report,
                                  config.Nx, config.Nz)) {
             std::cerr << "K5 failed at iteration " << iter << std::endl;
@@ -1024,11 +1138,9 @@ bool run_k1k6_pipeline_transport(
         }
 
         // Get audit report
-        AuditReport report = get_audit_report(state);
-        // Only print audit failures
-        if (!report.W_pass) {
-            std::cout << "  Weight audit warning: error=" << report.W_error << std::endl;
-        }
+        AuditReport report = get_audit_report(state, config.Nx, config.Nz);
+        std::cout << "  Weight audit: error=" << report.W_error
+                  << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
 
         // --------------------------------------------------------------------
         // K6: Swap Buffers
@@ -1072,12 +1184,23 @@ bool run_k1k6_pipeline_transport(
         total_cutoff_weight += h_AbsorbedWeight_cutoff[i];
     }
 
-    double total_accounted = total_edep + total_boundary_loss_energy;
-
-    // Only print energy report if there's significant energy
-    if (total_accounted > 1e-6) {
-        std::cout << "  Energy deposited: " << total_edep << " MeV, boundary loss: " << total_boundary_loss_energy << " MeV" << std::endl;
+    // Nuclear energy (from inelastic nuclear interactions)
+    std::vector<double> h_AbsorbedEnergy_nuclear(total_cells);
+    cudaMemcpy(h_AbsorbedEnergy_nuclear.data(), state.d_AbsorbedEnergy_nuclear, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+    double total_nuclear_energy = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_nuclear_energy += h_AbsorbedEnergy_nuclear[i];
     }
+
+    double total_accounted = total_edep + total_boundary_loss_energy + total_nuclear_energy;
+
+    std::cout << "\n=== Energy Conservation Report ===" << std::endl;
+    std::cout << "  Energy Deposited: " << total_edep << " MeV" << std::endl;
+    std::cout << "  Nuclear Energy Deposited: " << total_nuclear_energy << " MeV" << std::endl;
+    std::cout << "  Boundary Loss Energy: " << total_boundary_loss_energy << " MeV" << std::endl;
+    std::cout << "  Cutoff Weight: " << total_cutoff_weight << " (particles below E < 0.1 MeV)" << std::endl;
+    std::cout << "  Total Accounted Energy: " << total_accounted << " MeV" << std::endl;
+    std::cout << "=====================================" << std::endl;
 
     return true;
 }

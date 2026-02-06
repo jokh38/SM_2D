@@ -39,9 +39,18 @@ namespace {
     constexpr float ENERGY_OFFSET_RATIO = 0.50f;         // Offset from lower edge (fraction of half-width)
     constexpr float BOUNDARY_SAFETY_FACTOR = 1.001f;     // Allow slight boundary crossing
 
-    // Lateral spreading configuration
-    constexpr int LATERAL_SPREAD_CELLS = 6;              // Number of cells for lateral distribution (±3 cells)
-    constexpr float LATERAL_SPREAD_MIN_SIGMA = 0.01f;    // Minimum sigma for spread [mm]
+    // Scattering reduction factors (TEST: set all to 1.0 for accurate physics)
+    // BUG: Previous values (0.3, 0.5, 0.7) caused lateral spread to be too narrow
+    // FIX: Use 1.0 (no reduction) at all energies for correct Highland formula
+    constexpr float SCATTER_REDUCTION_HIGH_E = 1.0f;     // E > 100 MeV
+    constexpr float SCATTER_REDUCTION_MID_HIGH = 1.0f;   // E > 50 MeV
+    constexpr float SCATTER_REDUCTION_MID_LOW = 1.0f;    // E > 20 MeV
+    constexpr float SCATTER_REDUCTION_LOW_E = 1.0f;      // E <= 20 MeV (full scattering)
+
+    // Energy thresholds for scattering reduction
+    constexpr float ENERGY_HIGH_THRESHOLD = 100.0f;     // [MeV]
+    constexpr float ENERGY_MID_HIGH_THRESHOLD = 50.0f;  // [MeV]
+    constexpr float ENERGY_MID_LOW_THRESHOLD = 20.0f;   // [MeV]
 }
 
 // ============================================================================
@@ -330,9 +339,31 @@ __global__ void K3_FineTransport(
                 cell_w_nuclear += w_rem;
                 cell_E_nuclear += E_rem;
 
-                // Account for energy/weight carried out by surviving particle
-                cell_boundary_weight += w_new;
-                cell_boundary_energy += E_new * w_new;
+                // CRITICAL FIX: Only count as boundary loss if particle exits simulation domain
+                // Check if neighbor cell exists (within grid bounds)
+                int ix = cell % Nx;
+                int iz = cell / Nx;
+                bool neighbor_exists = true;
+                switch (exit_face) {
+                    case 0:  // +z face
+                        neighbor_exists = (iz + 1 < Nz);
+                        break;
+                    case 1:  // -z face
+                        neighbor_exists = (iz > 0);
+                        break;
+                    case 2:  // +x face
+                        neighbor_exists = (ix + 1 < Nx);
+                        break;
+                    case 3:  // -x face
+                        neighbor_exists = (ix > 0);
+                        break;
+                }
+
+                // Only count as boundary loss if particle is leaving simulation domain
+                if (!neighbor_exists) {
+                    cell_boundary_weight += w_new;
+                    cell_boundary_energy += E_new * w_new;
+                }
             } else {
                 // CRITICAL FIX: Particle remains in cell - MUST write to output phase space!
                 // Previously: particles were lost if they didn't cross boundaries
