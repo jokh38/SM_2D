@@ -237,3 +237,53 @@
 3. 부수 영향
    - `DEVICE_Kb/DEVICE_Kb_out=32` 적용으로 테스트 런타임이 유의미하게 증가했다.
    - 성능-정확도 절충(`32` 유지 vs `16` 등) 재평가가 필요하다.
+
+
+## 추가 점검 기록 (2026-02-06, 후속 세션 인계용 - 업데이트 3)
+
+이번 세션은 `업데이트 2` 항목의 반영 여부와 재현성 확인에 집중했다. 결론적으로 소스 추가 수정 없이, 기존 기록의 핵심 현상과 수치가 동일하게 재현된다.
+
+### 반영 상태 확인
+
+1. `업데이트 2`에서 명시한 계측/보정 항목이 코드에 반영된 상태를 재확인했다.
+   - K3/K2/K4 drop 계측 API: `src/cuda/kernels/k3_finetransport.cuh:73`, `src/cuda/kernels/k2_coarsetransport.cuh:96`, `src/cuda/kernels/k4_transfer.cuh:16`
+   - bucket emit 실패 가시화: `src/cuda/device/device_bucket.cuh:90`, `src/cuda/device/device_bucket.cuh:389`
+   - lateral tail 경계 보정(K3/K2): `src/cuda/kernels/k3_finetransport.cu:521`, `src/cuda/kernels/k2_coarsetransport.cu:477`
+   - 슬롯 수 확장(32): `src/cuda/device/device_psic.cuh:30`, `src/cuda/device/device_bucket.cuh:25`
+   - EnergyLossOnly 테스트 구조 보강: `tests/gpu/test_energy_loss_only_gpu.cu:182`, `tests/gpu/test_energy_loss_only_gpu.cu:526`
+
+2. 이번 세션에서 소스 코드 추가 수정은 수행하지 않았다(검증만 수행).
+
+### 재검증 결과 (2026-02-06)
+
+1. `cmake --build build -j4`
+   - 성공
+
+2. `ctest --test-dir build -R K3Test --output-on-failure`
+   - 4개 전부 통과
+
+3. `ctest --test-dir build -R "EnergyLossOnlyTest\\.(EnergyLossOnly|FullPhysics|StragglingOnly|NuclearOnly)" --output-on-failure`
+   - 4개 중 1개 통과(`NuclearOnly`), 3개 실패
+   - `EnergyLossOnly`
+     - `AccountedTotal=145.673 MeV`
+     - `bragg_depth=90 mm`
+   - `FullPhysics`
+     - `AccountedTotal=155.742 MeV`
+     - `bragg_depth=88 mm`
+   - `StragglingOnly`
+     - `AccountedTotal=142.308 MeV`
+     - `bragg_depth=88 mm`
+
+4. `ctest --test-dir build --output-on-failure`
+   - 84개 중 81개 통과, 3개 실패(EnergyLossOnly 계열 3건)
+
+5. `./run_simulation test_c.ini`
+   - 정상 종료
+   - `Transport complete after 155 iterations`
+   - `Bragg Peak: 148 mm depth`
+
+### 결론
+
+1. `업데이트 2` 이후 개선 효과(회계량 대폭 개선)는 유지되며 재현성도 확인됐다.
+2. 미해결 축도 동일하다: EnergyLossOnly 계열에서 Bragg depth가 `~88-90 mm`로 이론치 `~158 mm` 대비 여전히 얕다.
+3. drop 카운터는 관측되더라도 절대 drop weight/energy가 작아, 잔여 오차는 물리/스텝/경계 모델 결합 영역 추가 점검이 필요하다.
