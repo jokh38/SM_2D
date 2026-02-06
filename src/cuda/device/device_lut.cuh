@@ -68,16 +68,19 @@ __device__ inline float device_lookup_R(const DeviceRLUT& lut, float E) {
     // Option D2: Use binary search with E_edges for piecewise-uniform grid
     int bin = device_find_bin_edges(lut.E_edges, lut.N_E, E_clamped);
 
+    // FIX: Handle edge case where E == E_max (last bin)
+    // When bin == N_E - 1, there's no next bin to interpolate with
+    if (bin == lut.N_E - 1 || E_clamped >= lut.E_max) {
+        return lut.R[lut.N_E - 1];
+    }
+
     float log_E_val = logf(E_clamped);
     float log_E0 = lut.log_E[bin];
-    float log_E1 = lut.log_E[min(bin + 1, lut.N_E - 1)];
+    float log_E1 = lut.log_E[bin + 1];
     float log_R0 = lut.log_R[bin];
-    float log_R1 = lut.log_R[min(bin + 1, lut.N_E - 1)];
+    float log_R1 = lut.log_R[bin + 1];
 
-    float d_log_E = log_E1 - log_E0;
-    if (fabsf(d_log_E) < 1e-10f) return expf(log_R0);
-
-    float log_R_val = log_R0 + (log_R1 - log_R0) * (log_E_val - log_E0) / d_log_E;
+    float log_R_val = log_R0 + (log_R1 - log_R0) * (log_E_val - log_E0) / (log_E1 - log_E0);
     return expf(log_R_val);
 }
 
@@ -87,16 +90,19 @@ __device__ inline float device_lookup_S(const DeviceRLUT& lut, float E) {
     // Option D2: Use binary search with E_edges for piecewise-uniform grid
     int bin = device_find_bin_edges(lut.E_edges, lut.N_E, E_clamped);
 
+    // FIX: Handle edge case where E == E_max (last bin)
+    // When bin == N_E - 1, there's no next bin to interpolate with
+    if (bin == lut.N_E - 1 || E_clamped >= lut.E_max) {
+        return lut.S[lut.N_E - 1];
+    }
+
     float log_E_val = logf(E_clamped);
     float log_E0 = lut.log_E[bin];
-    float log_E1 = lut.log_E[min(bin + 1, lut.N_E - 1)];
+    float log_E1 = lut.log_E[bin + 1];
     float log_S0 = lut.log_S[bin];
-    float log_S1 = lut.log_S[min(bin + 1, lut.N_E - 1)];
+    float log_S1 = lut.log_S[bin + 1];
 
-    float d_log_E = log_E1 - log_E0;
-    if (fabsf(d_log_E) < 1e-10f) return expf(log_S0);
-
-    float log_S_val = log_S0 + (log_S1 - log_S0) * (log_E_val - log_E0) / d_log_E;
+    float log_S_val = log_S0 + (log_S1 - log_S0) * (log_E_val - log_E0) / (log_E1 - log_E0);
     return expf(log_S_val);
 }
 

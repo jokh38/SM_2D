@@ -132,11 +132,17 @@ float RLUT::lookup_R(float E) const {
     float E_clamped = fmaxf(grid.E_min, fminf(E, grid.E_max));
     int bin = grid.FindBin(E_clamped);
 
+    // FIX: Handle edge case where E == E_max (last bin)
+    // When bin == N_E - 1, there's no next bin to interpolate with
+    if (bin == grid.N_E - 1 || E_clamped >= grid.E_max) {
+        return R[grid.N_E - 1];
+    }
+
     float log_E_val = logf(E_clamped);
     float log_E0 = log_E[bin];
-    float log_E1 = log_E[std::min(bin + 1, grid.N_E - 1)];
+    float log_E1 = log_E[bin + 1];
     float log_R0 = log_R[bin];
-    float log_R1 = log_R[std::min(bin + 1, grid.N_E - 1)];
+    float log_R1 = log_R[bin + 1];
 
     float log_R_val = log_R0 + (log_R1 - log_R0) * (log_E_val - log_E0) / (log_E1 - log_E0);
     return expf(log_R_val);
@@ -146,11 +152,17 @@ float RLUT::lookup_S(float E) const {
     float E_clamped = fmaxf(grid.E_min, fminf(E, grid.E_max));
     int bin = grid.FindBin(E_clamped);
 
+    // FIX: Handle edge case where E == E_max (last bin)
+    // When bin == N_E - 1, there's no next bin to interpolate with
+    if (bin == grid.N_E - 1 || E_clamped >= grid.E_max) {
+        return S[grid.N_E - 1];
+    }
+
     float log_E_val = logf(E_clamped);
     float log_E0 = log_E[bin];
-    float log_E1 = log_E[std::min(bin + 1, grid.N_E - 1)];
+    float log_E1 = log_E[bin + 1];
     float log_S0 = log_S[bin];
-    float log_S1 = log_S[std::min(bin + 1, grid.N_E - 1)];
+    float log_S1 = log_S[bin + 1];
 
     float log_S_val = log_S0 + (log_S1 - log_S0) * (log_E_val - log_E0) / (log_E1 - log_E0);
     return expf(log_S_val);

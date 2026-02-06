@@ -77,6 +77,10 @@ bool save_dose_2d(const std::string& filepath, const SimulationResult& result, b
             double x = result.x_centers[ix];
             double z = result.z_centers[iz];
             double dose = result.edep[iz][ix];
+            // FIX: Replace NaN with 0 for invalid dose values
+            if (std::isnan(dose) || std::isinf(dose)) {
+                dose = 0.0;
+            }
             out << std::fixed << std::setprecision(4)
                 << x << "\t" << z << "\t" << dose;
             if (normalize && max_dose > 0) {
@@ -115,6 +119,10 @@ bool save_pdd(const std::string& filepath, const SimulationResult& result, bool 
     for (size_t i = 0; i < depth_dose.size(); ++i) {
         double depth = i * result.dz;
         double dose = depth_dose[i];
+        // FIX: Replace NaN with 0 for invalid dose values
+        if (std::isnan(dose) || std::isinf(dose)) {
+            dose = 0.0;
+        }
         out << std::fixed << std::setprecision(4)
             << depth << "\t" << dose;
         if (normalize && peak_dose > 0) {

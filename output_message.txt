@@ -1,7 +1,7 @@
 ========================================
 SM_2D: Proton Therapy Simulation
 ========================================
-Loading configuration from: /workspaces/SM_2D/sim.ini
+Loading configuration from: sim.ini
 === Incident Particle Configuration ===
 Particle Type: proton
 Beam Profile: gaussian
@@ -27,7 +27,7 @@ Using GPU transport (Vavilov energy straggling)
 === LUT Verification ===
   R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
   R(150 MeV) = 157.7 mm (expected ~158)
-  R(250 MeV) = -nan mm (max range in LUT)
+  R(250 MeV) = 379.077 mm (max range in LUT)
   S(150 MeV) = 5.443 MeV*cm^2/g
   Energy loss test: E=150 -> E_new=148.918, dE=1.0824 MeV (step=2mm)
 =======================
@@ -77,7 +77,7 @@ Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
   Iteration 2: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_02_after_K4.csv (z range: 1.25 - 1.25 mm)
   Iteration 3: 97 active, 0 coarse cells
-  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 52 particles (weight bins: 97)
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_03_after_K4.csv (z range: 1.75 - 1.75 mm)
   Iteration 4: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_04_after_K4.csv (z range: 2.25 - 2.25 mm)
@@ -86,8 +86,10 @@ Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
   Iteration 6: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_06_after_K4.csv (z range: 3.25 - 3.25 mm)
   Iteration 7: 97 active, 0 coarse cells
+  K4: Transferred 13 particles (weight bins: 97)
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_07_after_K4.csv (z range: 3.75 - 3.75 mm)
   Iteration 8: 97 active, 0 coarse cells
+  K4: Transferred 97 particles (weight bins: 97)
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_08_after_K4.csv (z range: 4.25 - 4.25 mm)
   Iteration 9: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_09_after_K4.csv (z range: 4.75 - 4.75 mm)
@@ -97,33 +99,35 @@ Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
   K4: Transferred 77 particles (weight bins: 97)
   K4: Transferred 76 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
-  K4: Transferred 32 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   K4: Transferred 36 particles (weight bins: 97)
   K4: Transferred 5 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 52 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   K4: Transferred 45 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   K4: Transferred 20 particles (weight bins: 97)
   Iteration 50: 97 active, 0 coarse cells
-  K4: Transferred 97 particles (weight bins: 97)
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_50_after_K4.csv (z range: 25.25 - 25.25 mm)
   Iteration 51: 97 active, 0 coarse cells
-  K4: Transferred 65 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 85 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   K4: Transferred 69 particles (weight bins: 97)
   K4: Transferred 84 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
-  K4: Transferred 76 particles (weight bins: 97)
-  K4: Transferred 97 particles (weight bins: 97)
-  K4: Transferred 97 particles (weight bins: 97)
-  K4: Transferred 36 particles (weight bins: 97)
-  K4: Transferred 52 particles (weight bins: 97)
   K4: Transferred 77 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 85 particles (weight bins: 97)
+  K4: Transferred 68 particles (weight bins: 97)
+  K4: Transferred 97 particles (weight bins: 97)
+  K4: Transferred 5 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   Iteration 100: 97 active, 0 coarse cells
   K4: Transferred 97 particles (weight bins: 97)
@@ -133,9 +137,8 @@ Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
   K4: Transferred 28 particles (weight bins: 97)
   K4: Transferred 13 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
-  K4: Transferred 76 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
-  K4: Transferred 44 particles (weight bins: 97)
+  K4: Transferred 77 particles (weight bins: 97)
   K4: Transferred 97 particles (weight bins: 97)
   Iteration 150: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_150_after_K4.csv (z range: 75.25 - 75.25 mm)
@@ -145,24 +148,31 @@ Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
   Iteration 200: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_200_after_K4.csv (z range: 100.25 - 100.25 mm)
   Iteration 201: 97 active, 0 coarse cells
-  K4: Transferred 45 particles (weight bins: 97)
-  K4: Transferred 65 particles (weight bins: 97)
   Iteration 250: 97 active, 0 coarse cells
   DEBUG: Wrote 97 non-zero cells to results/debug_cells_iter_250_after_K4.csv (z range: 125.25 - 125.25 mm)
   Iteration 251: 97 active, 0 coarse cells
   Iteration 300: 97 active, 0 coarse cells
   Iteration 301: 97 active, 0 coarse cells
-  Transport complete after 325 iterations
-K1-K6 pipeline: completed 325 iterations
-  Energy deposited: 137.285 MeV, boundary loss: 29112 MeV
+  Iteration 350: 1753 active, 0 coarse cells
+  Iteration 351: 1759 active, 0 coarse cells
+  Iteration 400: 1760 active, 0 coarse cells
+  Iteration 401: 1760 active, 0 coarse cells
+  Iteration 450: 1760 active, 0 coarse cells
+  Iteration 451: 1760 active, 0 coarse cells
+  Iteration 500: 1760 active, 0 coarse cells
+  Iteration 501: 1760 active, 0 coarse cells
+  Iteration 550: 1759 active, 0 coarse cells
+  Iteration 551: 1759 active, 0 coarse cells
+  Iteration 600: 1758 active, 0 coarse cells
+K1-K6 pipeline: completed 600 iterations
   Energy deposition extracted
 K1-K6 pipeline wrapper complete.
 GPU transport complete.
 Simulation complete.
-  Bragg Peak: 156.5 mm depth, 3.86559 Gy
+  Bragg Peak: 156.5 mm depth, 239.966 Gy
 
 --- Saving Results ---
-  2D dose saved to: /workspaces/SM_2D/results/dose_2d.txt
-  PDD saved to: /workspaces/SM_2D/results/pdd.txt
+  2D dose saved to: results/dose_2d.txt
+  PDD saved to: results/pdd.txt
 
 === Simulation Complete ===
