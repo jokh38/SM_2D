@@ -240,7 +240,18 @@ void run_k1k6_pipeline_transport(
 
     // Inject source particle(s) into psi_in
     // Use Gaussian sampling if parameters indicate, otherwise pencil beam
+    float* d_injected_weight = nullptr;
+    float* d_out_of_grid_weight = nullptr;
+    float* d_slot_dropped_weight = nullptr;
+
     if (use_gaussian) {
+        cudaMalloc(&d_injected_weight, sizeof(float));
+        cudaMalloc(&d_out_of_grid_weight, sizeof(float));
+        cudaMalloc(&d_slot_dropped_weight, sizeof(float));
+        cudaMemset(d_injected_weight, 0, sizeof(float));
+        cudaMemset(d_out_of_grid_weight, 0, sizeof(float));
+        cudaMemset(d_slot_dropped_weight, 0, sizeof(float));
+
         // Gaussian beam: launch multiple threads to sample particles
         int threads = 256;
         int blocks = (n_samples + threads - 1) / threads;
@@ -252,6 +263,9 @@ void run_k1k6_pipeline_transport(
             n_samples, random_seed,
             x_min, z_min,
             dx, dz, Nx, Nz,
+            d_injected_weight,
+            d_out_of_grid_weight,
+            d_slot_dropped_weight,
             theta_edges, E_edges,
             N_theta, N_E,
             N_theta_local, N_E_local
@@ -260,13 +274,14 @@ void run_k1k6_pipeline_transport(
         // Pencil beam: single particle at center
         inject_source_kernel<<<1, 1>>>(
             psi_in,
-            source_cell,
-            theta0, E0, W_total,
-            x_in_cell, z_in_cell,
-            dx, dz,
-            theta_edges, E_edges,
-            N_theta, N_E,
-            N_theta_local, N_E_local
+            Nx, Nz, dx, dz, x_min, z_min,  // Grid info
+            x0, z0,                        // Source position
+            theta0, sigma_theta,           // Angle and spread
+            E0, W_total,                   // Energy and weight
+            sigma_x,                       // Lateral spread
+            theta_edges, E_edges,          // Bin edges
+            N_theta, N_E,                  // Global bins
+            N_theta_local, N_E_local       // Local bins
         );
     }
 
@@ -274,10 +289,35 @@ void run_k1k6_pipeline_transport(
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
         std::cerr << "Source injection failed: " << cudaGetErrorString(err) << std::endl;
+        if (d_injected_weight) cudaFree(d_injected_weight);
+        if (d_out_of_grid_weight) cudaFree(d_out_of_grid_weight);
+        if (d_slot_dropped_weight) cudaFree(d_slot_dropped_weight);
         state.cleanup();
         device_psic_cleanup(psi_in);
         device_psic_cleanup(psi_out);
         return;
+    }
+
+    if (use_gaussian) {
+        float h_injected_weight = 0.0f;
+        float h_out_of_grid_weight = 0.0f;
+        float h_slot_dropped_weight = 0.0f;
+        cudaMemcpy(&h_injected_weight, d_injected_weight, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_out_of_grid_weight, d_out_of_grid_weight, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_slot_dropped_weight, d_slot_dropped_weight, sizeof(float), cudaMemcpyDeviceToHost);
+
+        float denom = (W_total > 1e-20f) ? W_total : 1.0f;
+        std::cout << "  Source injection accounting:" << std::endl;
+        std::cout << "    Injected in-grid: " << h_injected_weight
+                  << " (" << (100.0f * h_injected_weight / denom) << "%)" << std::endl;
+        std::cout << "    Outside grid:     " << h_out_of_grid_weight
+                  << " (" << (100.0f * h_out_of_grid_weight / denom) << "%)" << std::endl;
+        std::cout << "    Slot dropped:     " << h_slot_dropped_weight
+                  << " (" << (100.0f * h_slot_dropped_weight / denom) << "%)" << std::endl;
+
+        cudaFree(d_injected_weight);
+        cudaFree(d_out_of_grid_weight);
+        cudaFree(d_slot_dropped_weight);
     }
 
     // Verify source injection - sum weights across all cells

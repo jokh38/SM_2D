@@ -4,7 +4,13 @@
 
 struct AuditReport {
     float W_error;
-    bool W_pass;
+    int W_pass;
+    float W_in_total;
+    float W_out_total;
+    float W_cutoff_total;
+    float W_nuclear_total;
+    float W_boundary_total;
+    int processed_cells;
 };
 
 __global__ void K5_WeightAudit(
@@ -15,6 +21,9 @@ __global__ void K5_WeightAudit(
     const float* __restrict__ AbsorbedWeight_cutoff,
     const float* __restrict__ AbsorbedWeight_nuclear,
     const float* __restrict__ BoundaryLoss_weight,
+    const float* __restrict__ PrevAbsorbedWeight_cutoff,
+    const float* __restrict__ PrevAbsorbedWeight_nuclear,
+    const float* __restrict__ PrevBoundaryLoss_weight,
     AuditReport* __restrict__ report,
     int N_cells
 );

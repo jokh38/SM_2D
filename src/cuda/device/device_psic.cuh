@@ -247,7 +247,7 @@ __device__ inline void device_psic_add_weight(
 
 // Inject source particles into a specific cell
 // This is called by source initialization kernels to populate PsiC
-__device__ inline void device_psic_inject_source(
+__device__ inline bool device_psic_inject_source(
     DevicePsiC& psic,
     int cell,
     float theta,            // Polar angle [rad]
@@ -262,8 +262,8 @@ __device__ inline void device_psic_inject_source(
     int N_theta_local,      // Local angular bins per block (8)
     int N_E_local           // Local energy bins per block (4)
 ) {
-    if (weight <= 0.0f) return;
-    if (cell < 0 || cell >= psic.N_cells) return;
+    if (weight <= 0.0f) return false;
+    if (cell < 0 || cell >= psic.N_cells) return false;
 
     // Clamp position to cell bounds
     x = fmaxf(0.0f, fminf(x, dx));
@@ -347,7 +347,9 @@ __device__ inline void device_psic_inject_source(
     int slot = device_psic_find_or_allocate_slot(psic, cell, bid);
     if (slot >= 0) {
         device_psic_add_weight(psic, cell, slot, lidx, weight);
+        return true;
     }
+    return false;
 }
 
 // ============================================================================

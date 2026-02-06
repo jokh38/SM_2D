@@ -280,7 +280,7 @@ __global__ void K3_FineTransport(
             float sigma_x = sqrtf(sigma_x_initial * sigma_x_initial + sigma_x_depth * sigma_x_depth);
 
             // Ensure minimum sigma_x for numerical stability
-            sigma_x = fmaxf(sigma_x, LATERAL_SPREAD_MIN_SIGMA);
+            sigma_x = fmaxf(sigma_x, 0.01f);  // MIN_SIGMA for numerical stability
 
             // For deterministic transport, keep direction unchanged (theta_new = theta)
             // Lateral spreading is handled by weight distribution across cells
@@ -460,9 +460,20 @@ __global__ void K3_FineTransport(
                         int ix = cell % Nx;
                         int z_sub_target = get_z_sub_bin(z_new, dz);
 
+                        // FIX: For large sigma_x, we must account for weight that goes to neighbors
+                        // The fraction of the Gaussian distribution within the cell
+                        float left_boundary = -dx * 0.5f;
+                        float right_boundary = dx * 0.5f;
+                        float w_in_cell = device_gaussian_cdf(right_boundary, x_center, sigma_x) -
+                                         device_gaussian_cdf(left_boundary, x_center, sigma_x);
+
+                        // Scale weights by the fraction within the cell to conserve total weight
+                        // (device_gaussian_spread_weights_subcell normalizes to sum=1.0)
+                        float w_cell_fraction = fminf(1.0f, w_in_cell);  // Clamp for safety
+
                         // Distribute weight across all x_sub bins
                         for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
-                            float w_frac = weights[x_sub_target];
+                            float w_frac = weights[x_sub_target] * w_cell_fraction;  // Scale by in-cell fraction
                             if (w_frac < 1e-10f) continue;  // Skip negligible weights
 
                             float w_spread = w_new * w_frac;
@@ -480,11 +491,6 @@ __global__ void K3_FineTransport(
                         // FIX B extended: For large sigma_x (when spread exceeds cell boundary),
                         // also emit to neighbor cells via buckets
                         if (sigma_x > dx * 0.5f) {
-                            // Calculate fraction of weight that extends beyond cell boundaries
-                            // This is a simplified model using Gaussian tails
-                            float left_boundary = -dx * 0.5f;
-                            float right_boundary = dx * 0.5f;
-
                             // Left tail weight (integral from -inf to left_boundary)
                             float w_left = device_gaussian_cdf(left_boundary, x_center, sigma_x);
                             // Right tail weight (integral from right_boundary to +inf)
@@ -507,7 +513,10 @@ __global__ void K3_FineTransport(
                                     N_theta_local, N_E_local
                                 );
 
-                                cell_edep += E_new * w_spread_left;
+                                // FIX: Removed cell_edep += E_new * w_spread_left;
+                                // This was causing double-counting: energy is transferred to neighbor
+                                // via bucket AND counted here. The energy will be deposited when
+                                // the neighbor bucket is processed.
                                 cell_boundary_weight += w_spread_left;
                             }
 
@@ -528,7 +537,10 @@ __global__ void K3_FineTransport(
                                     N_theta_local, N_E_local
                                 );
 
-                                cell_edep += E_new * w_spread_right;
+                                // FIX: Removed cell_edep += E_new * w_spread_right;
+                                // This was causing double-counting: energy is transferred to neighbor
+                                // via bucket AND counted here. The energy will be deposited when
+                                // the neighbor bucket is processed.
                                 cell_boundary_weight += w_spread_right;
                             }
                         }

@@ -361,6 +361,9 @@ __global__ void inject_gaussian_source_kernel(
     float x_min, float z_min,         // Grid origin
     float dx, float dz,               // Cell size
     int Nx, int Nz,                   // Grid dimensions
+    float* d_injected_weight,
+    float* d_out_of_grid_weight,
+    float* d_slot_dropped_weight,
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
@@ -395,8 +398,15 @@ __global__ void inject_gaussian_source_kernel(
     int ix = static_cast<int>(x_rel / dx);
     int iz = static_cast<int>(z_rel / dz);
 
+    float w_sample = W_total / n_samples;
+
     // Skip if outside grid bounds
-    if (ix < 0 || ix >= Nx || iz < 0 || iz >= Nz) return;
+    if (ix < 0 || ix >= Nx || iz < 0 || iz >= Nz) {
+        if (d_out_of_grid_weight != nullptr) {
+            atomicAdd(d_out_of_grid_weight, w_sample);
+        }
+        return;
+    }
 
     int cell = iz * Nx + ix;
 
@@ -408,11 +418,8 @@ __global__ void inject_gaussian_source_kernel(
     // device_psic_inject_source expects: x, z in [0, dx] and [0, dz]
     // and internally converts to offsets from center
 
-    // Weight per sample
-    float w_sample = W_total / n_samples;
-
     // Inject this sample into the phase space
-    device_psic_inject_source(
+    bool injected = device_psic_inject_source(
         psi,
         cell,
         theta_sample, E_sample, w_sample,
@@ -422,6 +429,14 @@ __global__ void inject_gaussian_source_kernel(
         N_theta, N_E,
         N_theta_local, N_E_local
     );
+
+    if (injected) {
+        if (d_injected_weight != nullptr) {
+            atomicAdd(d_injected_weight, w_sample);
+        }
+    } else if (d_slot_dropped_weight != nullptr) {
+        atomicAdd(d_slot_dropped_weight, w_sample);
+    }
 }
 
 // Clear all outflow buckets
@@ -601,6 +616,12 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     if (e != cudaSuccess) { std::cerr << "Failed d_BoundaryLoss_weight: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_BoundaryLoss_energy, N_cells * sizeof(double));
     if (e != cudaSuccess) { std::cerr << "Failed d_BoundaryLoss_energy: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_AbsorbedWeight_cutoff, N_cells * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedWeight_cutoff: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_AbsorbedWeight_nuclear, N_cells * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedWeight_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_BoundaryLoss_weight, N_cells * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_BoundaryLoss_weight: " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate outflow buckets (4 faces per cell)
     size_t bucket_bytes = N_cells * 4 * sizeof(DeviceOutflowBucket);
@@ -633,6 +654,9 @@ void K1K6PipelineState::cleanup() {
     if (d_AbsorbedEnergy_nuclear) cudaFree(d_AbsorbedEnergy_nuclear);
     if (d_BoundaryLoss_weight) cudaFree(d_BoundaryLoss_weight);
     if (d_BoundaryLoss_energy) cudaFree(d_BoundaryLoss_energy);
+    if (d_prev_AbsorbedWeight_cutoff) cudaFree(d_prev_AbsorbedWeight_cutoff);
+    if (d_prev_AbsorbedWeight_nuclear) cudaFree(d_prev_AbsorbedWeight_nuclear);
+    if (d_prev_BoundaryLoss_weight) cudaFree(d_prev_BoundaryLoss_weight);
     if (d_OutflowBuckets) cudaFree(d_OutflowBuckets);
     if (d_audit_report) cudaFree(d_audit_report);
     if (d_weight_in) cudaFree(d_weight_in);
@@ -649,6 +673,9 @@ void K1K6PipelineState::cleanup() {
     d_AbsorbedEnergy_nuclear = nullptr;
     d_BoundaryLoss_weight = nullptr;
     d_BoundaryLoss_energy = nullptr;
+    d_prev_AbsorbedWeight_cutoff = nullptr;
+    d_prev_AbsorbedWeight_nuclear = nullptr;
+    d_prev_BoundaryLoss_weight = nullptr;
     d_OutflowBuckets = nullptr;
     d_audit_report = nullptr;
     d_weight_in = nullptr;
@@ -671,6 +698,9 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemset(state.d_AbsorbedEnergy_nuclear, 0, N_cells * sizeof(double));
     cudaMemset(state.d_BoundaryLoss_weight, 0, N_cells * sizeof(float));
     cudaMemset(state.d_BoundaryLoss_energy, 0, N_cells * sizeof(double));
+    cudaMemset(state.d_prev_AbsorbedWeight_cutoff, 0, N_cells * sizeof(float));
+    cudaMemset(state.d_prev_AbsorbedWeight_nuclear, 0, N_cells * sizeof(float));
+    cudaMemset(state.d_prev_BoundaryLoss_weight, 0, N_cells * sizeof(float));
 
     // Initialize buckets to empty
     cudaMemset(state.d_OutflowBuckets, 0xFF, N_cells * 4 * sizeof(uint32_t) * DEVICE_Kb_out);
@@ -681,19 +711,10 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
 }
 
 AuditReport get_audit_report(const K1K6PipelineState& state, int Nx, int Nz) {
-    int N_cells = Nx * Nz;
-    std::vector<AuditReport> reports(N_cells);
-    cudaMemcpy(reports.data(), state.d_audit_report, N_cells * sizeof(AuditReport), cudaMemcpyDeviceToHost);
-
+    (void)Nx;
+    (void)Nz;
     AuditReport summary{};
-    summary.W_error = 0.0f;
-    summary.W_pass = true;
-
-    for (int i = 0; i < N_cells; ++i) {
-        summary.W_error = fmaxf(summary.W_error, reports[i].W_error);
-        summary.W_pass = summary.W_pass && reports[i].W_pass;
-    }
-
+    cudaMemcpy(&summary, state.d_audit_report, sizeof(AuditReport), cudaMemcpyDeviceToHost);
     return summary;
 }
 
@@ -911,6 +932,9 @@ bool run_k5_weight_audit(
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
     const float* d_BoundaryLoss_weight,
+    const float* d_prev_AbsorbedWeight_cutoff,
+    const float* d_prev_AbsorbedWeight_nuclear,
+    const float* d_prev_BoundaryLoss_weight,
     AuditReport* d_report,
     int Nx, int Nz
 ) {
@@ -929,6 +953,9 @@ bool run_k5_weight_audit(
         d_AbsorbedWeight_cutoff,
         d_AbsorbedWeight_nuclear,
         d_BoundaryLoss_weight,
+        d_prev_AbsorbedWeight_cutoff,
+        d_prev_AbsorbedWeight_nuclear,
+        d_prev_BoundaryLoss_weight,
         d_report,
         N_cells
     );
@@ -1131,6 +1158,9 @@ bool run_k1k6_pipeline_transport(
                                  state.d_AbsorbedWeight_cutoff,
                                  state.d_AbsorbedWeight_nuclear,
                                  state.d_BoundaryLoss_weight,
+                                 state.d_prev_AbsorbedWeight_cutoff,
+                                 state.d_prev_AbsorbedWeight_nuclear,
+                                 state.d_prev_BoundaryLoss_weight,
                                  state.d_audit_report,
                                  config.Nx, config.Nz)) {
             std::cerr << "K5 failed at iteration " << iter << std::endl;
@@ -1141,6 +1171,15 @@ bool run_k1k6_pipeline_transport(
         AuditReport report = get_audit_report(state, config.Nx, config.Nz);
         std::cout << "  Weight audit: error=" << report.W_error
                   << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
+
+        // Update previous cumulative tallies for next iteration's delta-based K5.
+        int N_cells = config.Nx * config.Nz;
+        cudaMemcpy(state.d_prev_AbsorbedWeight_cutoff, state.d_AbsorbedWeight_cutoff,
+                   N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(state.d_prev_AbsorbedWeight_nuclear, state.d_AbsorbedWeight_nuclear,
+                   N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(state.d_prev_BoundaryLoss_weight, state.d_BoundaryLoss_weight,
+                   N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
 
         // --------------------------------------------------------------------
         // K6: Swap Buffers

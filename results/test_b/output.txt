@@ -1,0 +1,91 @@
+========================================
+SM_2D: Proton Therapy Simulation
+========================================
+Loading configuration from: test_b.ini
+=== Incident Particle Configuration ===
+Particle Type: proton
+Beam Profile: gaussian
+Energy: 150 MeV (sigma = 1 MeV)
+Position: (0, 0) mm
+Angle: 0 rad (sigma = 0.001 rad)
+Weight: 1
+Samples: 1000
+
+Grid: 3 x 1 (dx=0.5mm, dz=0.5mm)
+Output Dir: results/test_b/
+======================================
+
+--- Running Simulation ---
+Using GPU transport (Vavilov energy straggling)
+=== Option D2 Energy Grid ===
+  N_E = 1029 bins
+  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)
+  [2-20 MeV]: 0.2 MeV/bin (90 bins)
+  [20-100 MeV]: 0.25 MeV/bin (320 bins)
+  [100-250 MeV]: 0.25 MeV/bin (600 bins)
+=============================
+=== LUT Verification ===
+  R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
+  R(150 MeV) = 157.7 mm (expected ~158)
+  R(250 MeV) = 379.077 mm (max range in LUT)
+  S(150 MeV) = 5.443 MeV*cm^2/g
+  Energy loss test: E=150 -> E_new=148.918, dE=1.0824 MeV (step=2mm)
+=======================
+Running K1-K6 GPU pipeline transport...
+  GPU: NVIDIA GeForce RTX 2080
+  Energy: 150 MeV
+  Phase-space: 36 x 1029 bins
+Running K1-K6 GPU pipeline wrapper...
+  Grid: 3 x 1 cells
+  Source: (0, 0) mm, 150 MeV
+  Angular divergence: 0.001 rad
+  Spatial beam width (sigma_x): 0.1 mm
+DevicePsiC allocation:
+  Grid: 3x1 = 3 cells
+  Kb: 8, LOCAL_BINS: 256
+  block_id: 96 bytes (9.15527e-05 MB)
+  value: 24576 bytes (0.0234375 MB)
+  total per PsiC: 0.0235291 MB
+DevicePsiC allocation successful
+DevicePsiC allocation:
+  Grid: 3x1 = 3 cells
+  Kb: 8, LOCAL_BINS: 256
+  block_id: 96 bytes (9.15527e-05 MB)
+  value: 24576 bytes (0.0234375 MB)
+  total per PsiC: 0.0235291 MB
+DevicePsiC allocation successful
+  Source: (0, 0) mm
+  Energy: 150 MeV, Angle: 0 rad
+  Source injection verification:
+    Total weight: 1.0001 (expected: 1)
+    Non-zero cells: 3 / 3
+  DEBUG: Wrote 3 initial non-zero cells to debug_cells_iter_00_initial.csv
+=== E_trigger Configuration ===
+E_trigger = 1000 MeV
+E_bin for E_trigger = 1028
+N_E_local = 2
+b_E_trigger = 514
+=== 150 MeV Particle ===
+E_bin_150 = 629
+b_E_150 = 314
+Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
+==============================
+  Iteration 1: 3 active, 0 coarse cells
+  Iteration 1: 3 active, 0 coarse cells
+  DEBUG: Wrote 0 non-zero cells to results/debug_cells_iter_01_after_K4.csv (z range: 
+  Weight audit warning: error=0.999506
+  Iteration 2: 0 active, 0 coarse cells
+  Transport complete after 2 iterations
+K1-K6 pipeline: completed 2 iterations
+  Energy deposited: 0.318297 MeV, boundary loss: 149.759 MeV
+  Energy deposition extracted
+K1-K6 pipeline wrapper complete.
+GPU transport complete.
+Simulation complete.
+  Bragg Peak: 0 mm depth, 0.318297 Gy
+
+--- Saving Results ---
+  2D dose saved to: results/test_b//dose_2d.txt
+  PDD saved to: results/test_b//pdd.txt
+
+=== Simulation Complete ===

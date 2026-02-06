@@ -41,33 +41,53 @@
    - After identifying issues, **fix them one-by-one** to see the result
    - This isolates variables and helps pinpoint the exact source of the problem
 
+## Testing
+
+9. **Use ctest for Unit Testing**:
+    - **Preferred method**: Use `ctest` for all CUDA kernel and unit testing
+    - **Basic commands** (run from `build/` directory):
+      ```bash
+      ctest                          # Run all tests
+      ctest --verbose                # Detailed output
+      ctest --output-on-failure      # Show output only on failure
+      ctest -j8                      # Parallel run with 8 threads
+      ctest -R "K3"                  # Run tests matching pattern
+      ctest --rerun-failed           # Re-run failed tests only
+      ```
+    - **Workflow**:
+      1. Write test in `tests/kernels/test_kX_<name>.cpp`
+      2. Rebuild: `cd build && cmake .. && make -j8`
+      3. Run: `ctest -R <test_name> --verbose`
+      4. Check results and fix issues
+    - Test files use Google Test framework: `TEST(TestSuite, TestCase) { ... }`
+
 ## Code Verification
 
-9. **Use AST for Code Structure**:
+10. **Use AST for Code Structure**:
    - Use AST (Abstract Syntax Tree) to identify the correct calling structure of the codebase
    - **Do not use non-existing module names or file names**
    - Before revising code, **verify the file/function/module actually exists**
 
-10. **Check SPEC.md**:
+11. **Check SPEC.md**:
    - Check SPEC.md and compare the code
    - The spec should be reflected in the code
 
 ## Validation
 
-11. **Comparison with MOQUI Validation Data**:
+12. **Comparison with MOQUI Validation Data**:
     - Run `python3 compare_with_validation.py` after simulation to compare with MOQUI Monte Carlo
     - Validation data is in `validation_data/` directory (70, 110, 150, 190, 230 MeV)
     - Key metrics: Bragg peak position, lateral spread (sigma), PDD shape
 
-12. **Recommended Configuration for 70 MeV**:
+13. **Recommended Configuration for 70 MeV**:
     - Use `sigma_x_mm = 3.8` to match clinical beam profiles (MOQUI validation)
     - Consider `sigma_theta_rad > 0` for more realistic angular divergence
     - Scattering reduction factors have been removed (set to 1.0) for accurate physics
 
 ## Safety Rules
 
-12. **Never Remove Whole Codebase**: Do not delete the entire codebase at any time.
+14. **Never Remove Whole Codebase**: Do not delete the entire codebase at any time.
 
-12. **Clean Up Temporary Files**:
+15. **Clean Up Temporary Files**:
    - Any test files, debug files, or temporary documents must be **removed after use**
    - Do **not** include temporary files in git commits

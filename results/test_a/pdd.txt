@@ -1,0 +1,4 @@
+# Depth-Dose Distribution (PDD)
+# Depth(mm) Dose(Gy)
+# Bragg Peak at: 0 mm, 141.025 Gy
+0.0000	141.0251

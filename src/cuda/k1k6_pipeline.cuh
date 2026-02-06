@@ -87,6 +87,10 @@ __global__ void inject_gaussian_source_kernel(
     float x_min, float z_min,         // Grid origin
     float dx, float dz,               // Cell size
     int Nx, int Nz,                   // Grid dimensions
+    // Optional accounting counters (all in units of weight)
+    float* d_injected_weight,
+    float* d_out_of_grid_weight,
+    float* d_slot_dropped_weight,
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
@@ -157,6 +161,10 @@ struct K1K6PipelineState {
     double* d_AbsorbedEnergy_nuclear;
     float* d_BoundaryLoss_weight;
     double* d_BoundaryLoss_energy;
+    // Previous cumulative tallies for iteration-delta audit
+    float* d_prev_AbsorbedWeight_cutoff;
+    float* d_prev_AbsorbedWeight_nuclear;
+    float* d_prev_BoundaryLoss_weight;
 
     // Bucket system
     DeviceOutflowBucket* d_OutflowBuckets;  // [Nx*Nz*4]
@@ -178,6 +186,9 @@ struct K1K6PipelineState {
         , d_AbsorbedWeight_cutoff(nullptr), d_AbsorbedWeight_nuclear(nullptr)
         , d_AbsorbedEnergy_nuclear(nullptr)
         , d_BoundaryLoss_weight(nullptr), d_BoundaryLoss_energy(nullptr)
+        , d_prev_AbsorbedWeight_cutoff(nullptr)
+        , d_prev_AbsorbedWeight_nuclear(nullptr)
+        , d_prev_BoundaryLoss_weight(nullptr)
         , d_OutflowBuckets(nullptr)
         , d_audit_report(nullptr)
         , d_weight_in(nullptr), d_weight_out(nullptr)
@@ -284,6 +295,9 @@ bool run_k5_weight_audit(
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
     const float* d_BoundaryLoss_weight,
+    const float* d_prev_AbsorbedWeight_cutoff,
+    const float* d_prev_AbsorbedWeight_nuclear,
+    const float* d_prev_BoundaryLoss_weight,
     AuditReport* d_report,
     int Nx, int Nz
 );

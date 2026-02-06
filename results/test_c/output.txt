@@ -1,0 +1,975 @@
+========================================
+SM_2D: Proton Therapy Simulation
+========================================
+Loading configuration from: test_c.ini
+=== Incident Particle Configuration ===
+Particle Type: proton
+Beam Profile: gaussian
+Energy: 150 MeV (sigma = 1 MeV)
+Position: (0, 0) mm
+Angle: 0 rad (sigma = 0.001 rad)
+Weight: 1
+Samples: 1000
+
+Grid: 11 x 200 (dx=2mm, dz=2mm)
+Output Dir: results/test_c
+======================================
+
+--- Running Simulation ---
+Using GPU transport (Vavilov energy straggling)
+=== Option D2 Energy Grid ===
+  N_E = 1029 bins
+  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)
+  [2-20 MeV]: 0.2 MeV/bin (90 bins)
+  [20-100 MeV]: 0.25 MeV/bin (320 bins)
+  [100-250 MeV]: 0.25 MeV/bin (600 bins)
+=============================
+=== LUT Verification ===
+  R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
+  R(150 MeV) = 157.7 mm (expected ~158)
+  R(250 MeV) = 379.077 mm (max range in LUT)
+  S(150 MeV) = 5.443 MeV*cm^2/g
+  Energy loss test: E=150 -> E_new=148.918, dE=1.0824 MeV (step=2mm)
+=======================
+Running K1-K6 GPU pipeline transport...
+  GPU: NVIDIA GeForce RTX 2080
+  Energy: 150 MeV
+  Phase-space: 36 x 1029 bins
+Running K1-K6 GPU pipeline wrapper...
+  Grid: 11 x 200 cells
+  Source: (0, 0) mm, 150 MeV
+  Angular divergence: 0.001 rad
+  Spatial beam width (sigma_x): 20 mm
+DevicePsiC allocation:
+  Grid: 11x200 = 2200 cells
+  Kb: 8, LOCAL_BINS: 256
+  block_id: 70400 bytes (0.0671387 MB)
+  value: 18022400 bytes (17.1875 MB)
+  total per PsiC: 17.2546 MB
+DevicePsiC allocation successful
+DevicePsiC allocation:
+  Grid: 11x200 = 2200 cells
+  Kb: 8, LOCAL_BINS: 256
+  block_id: 70400 bytes (0.0671387 MB)
+  value: 18022400 bytes (17.1875 MB)
+  total per PsiC: 17.2546 MB
+DevicePsiC allocation successful
+  Source: (0, 0) mm
+  Energy: 150 MeV, Angle: 0 rad
+  Source injection verification:
+    Total weight: 1.0001 (expected: 1)
+    Non-zero cells: 11 / 2200
+  DEBUG: Wrote 11 initial non-zero cells to debug_cells_iter_00_initial.csv
+=== E_trigger Configuration ===
+E_trigger = 1000 MeV
+E_bin for E_trigger = 1028
+N_E_local = 2
+b_E_trigger = 514
+=== 150 MeV Particle ===
+E_bin_150 = 629
+b_E_150 = 314
+Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
+==============================
+  Iteration 1: 11 active, 0 coarse cells
+  Iteration 1: 11 active, 0 coarse cells
+  K4: Transferred 20 particles (weight bins: 20)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_01_after_K4.csv (z range: 1 - 1 mm)
+  Weight audit warning: error=0.566791
+  Iteration 2: 11 active, 0 coarse cells
+  K4: Transferred 11 particles (weight bins: 25)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_02_after_K4.csv (z range: 3 - 3 mm)
+  Weight audit warning: error=0.998582
+  Iteration 3: 11 active, 0 coarse cells
+  K4: Transferred 27 particles (weight bins: 37)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_03_after_K4.csv (z range: 3 - 3 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 4: 11 active, 0 coarse cells
+  K4: Transferred 21 particles (weight bins: 91)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_04_after_K4.csv (z range: 5 - 5 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 5: 11 active, 0 coarse cells
+  K4: Transferred 42 particles (weight bins: 54)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_05_after_K4.csv (z range: 5 - 5 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 6: 11 active, 0 coarse cells
+  K4: Transferred 22 particles (weight bins: 136)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_06_after_K4.csv (z range: 7 - 7 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 7: 11 active, 0 coarse cells
+  K4: Transferred 48 particles (weight bins: 76)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_07_after_K4.csv (z range: 7 - 7 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 8: 11 active, 0 coarse cells
+  K4: Transferred 32 particles (weight bins: 176)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_08_after_K4.csv (z range: 9 - 9 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 9: 11 active, 0 coarse cells
+  K4: Transferred 54 particles (weight bins: 87)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_09_after_K4.csv (z range: 9 - 9 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 10: 11 active, 0 coarse cells
+  K4: Transferred 33 particles (weight bins: 205)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_10_after_K4.csv (z range: 11 - 11 mm)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 64 particles (weight bins: 110)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 41 particles (weight bins: 252)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 79 particles (weight bins: 142)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 52 particles (weight bins: 322)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 98 particles (weight bins: 170)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 56 particles (weight bins: 380)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 108 particles (weight bins: 196)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 65 particles (weight bins: 448)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 124 particles (weight bins: 227)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 78 particles (weight bins: 513)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 147 particles (weight bins: 260)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 84 particles (weight bins: 585)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 152 particles (weight bins: 280)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 627)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 152 particles (weight bins: 291)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 646)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 152 particles (weight bins: 290)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 648)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 147 particles (weight bins: 281)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 646)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 152 particles (weight bins: 308)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 647)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 150 particles (weight bins: 308)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 620)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 150 particles (weight bins: 291)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 583)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 148 particles (weight bins: 281)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 597)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 148 particles (weight bins: 284)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 640)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 144 particles (weight bins: 274)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 636)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 136 particles (weight bins: 267)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 647)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 144 particles (weight bins: 278)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 88 particles (weight bins: 665)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 148 particles (weight bins: 280)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 163)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 10 particles (weight bins: 18)
+  Weight audit warning: error=1.86995e+16
+  Iteration 50: 11 active, 0 coarse cells
+  K4: Transferred 11 particles (weight bins: 160)
+  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_50_after_K4.csv (z range: 51 - 51 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 51: 11 active, 0 coarse cells
+  K4: Transferred 9 particles (weight bins: 16)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 148)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 8 particles (weight bins: 15)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 133)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 8 particles (weight bins: 16)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 127)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 8 particles (weight bins: 15)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 113)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 9 particles (weight bins: 16)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 130)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 8 particles (weight bins: 16)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 122)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 8 particles (weight bins: 14)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 114)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 9 particles (weight bins: 16)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 146)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 8 particles (weight bins: 15)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 133)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 9 particles (weight bins: 18)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 138)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 145)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 9 particles (weight bins: 18)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 11 particles (weight bins: 139)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 5 particles (weight bins: 31)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 19 particles (weight bins: 165)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 17 particles (weight bins: 171)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 27 particles (weight bins: 252)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 257)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 238)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 322)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 238)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 389)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 233)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 305)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 266)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 31 particles (weight bins: 466)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 322)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 337)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 328)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 461)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 332)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 322)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 311)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 508)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 346)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 344)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 332)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 506)
+  Weight audit warning: error=1.86995e+16
+  Iteration 100: 33 active, 0 coarse cells
+  K4: Transferred 28 particles (weight bins: 356)
+  DEBUG: Wrote 33 non-zero cells to results/debug_cells_iter_100_after_K4.csv (z range: 87 - 91 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 101: 33 active, 0 coarse cells
+  K4: Transferred 28 particles (weight bins: 344)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 28 particles (weight bins: 340)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 504)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 497)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 336)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 328)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 316)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 517)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 27 particles (weight bins: 370)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 27 particles (weight bins: 351)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 27 particles (weight bins: 361)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 496)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 350)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 331)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 505)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 352)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 528)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 376)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 368)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 360)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 524)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 348)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 348)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 348)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 514)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 340)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 340)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 340)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 485)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 332)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 317)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 311)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 463)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 283)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 290)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 292)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 31 particles (weight bins: 421)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 288)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 287)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 298)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 422)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 24 particles (weight bins: 293)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 23 particles (weight bins: 290)
+  Weight audit warning: error=1.86995e+16
+  Iteration 150: 33 active, 0 coarse cells
+  K4: Transferred 22 particles (weight bins: 292)
+  DEBUG: Wrote 33 non-zero cells to results/debug_cells_iter_150_after_K4.csv (z range: 111 - 115 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 151: 33 active, 0 coarse cells
+  K4: Transferred 33 particles (weight bins: 416)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 276)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 266)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 261)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 370)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 267)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 270)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 270)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 425)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 23 particles (weight bins: 288)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 23 particles (weight bins: 255)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 23 particles (weight bins: 254)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 398)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 250)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 252)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 234)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 373)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 238)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 247)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 263)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 401)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 237)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 239)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 249)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 380)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 241)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 249)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 257)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 369)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 270)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 261)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 257)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 367)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 242)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 222)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 247)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 372)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 268)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 282)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 288)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 418)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 28 particles (weight bins: 325)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 22 particles (weight bins: 294)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 27 particles (weight bins: 289)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 33 particles (weight bins: 394)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 252)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 20 particles (weight bins: 222)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 230)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 30 particles (weight bins: 313)
+  Weight audit warning: error=1.86995e+16
+  Iteration 200: 33 active, 0 coarse cells
+  K4: Transferred 19 particles (weight bins: 220)
+  DEBUG: Wrote 33 non-zero cells to results/debug_cells_iter_200_after_K4.csv (z range: 137 - 141 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 201: 33 active, 0 coarse cells
+  K4: Transferred 17 particles (weight bins: 210)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 205)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 28 particles (weight bins: 273)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 19 particles (weight bins: 242)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 14 particles (weight bins: 156)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 78)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 79)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 2 particles (weight bins: 93)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 220)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 208)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 250: 55 active, 0 coarse cells
+  DEBUG: Wrote 55 non-zero cells to results/debug_cells_iter_250_after_K4.csv (z range: 137 - 145 mm)
+  Weight audit warning: error=1.86995e+16
+  Iteration 251: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 21 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Iteration 300: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Iteration 301: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 350: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Iteration 351: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 400: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Iteration 401: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 450: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Iteration 451: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 32 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 500: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Iteration 501: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 550: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Iteration 551: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 29 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 3 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  K4: Transferred 18 particles (weight bins: 206)
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Weight audit warning: error=1.86995e+16
+  Iteration 600: 55 active, 0 coarse cells
+  Weight audit warning: error=1.86995e+16
+K1-K6 pipeline: completed 600 iterations
+  Energy deposition extracted
+K1-K6 pipeline wrapper complete.
+GPU transport complete.
+Simulation complete.
+  Bragg Peak: 124 mm depth, inf Gy
+
+--- Saving Results ---
+  2D dose saved to: results/test_c/dose_2d.txt
+  PDD saved to: results/test_c/pdd.txt
+
+=== Simulation Complete ===
