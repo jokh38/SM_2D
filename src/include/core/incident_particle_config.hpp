@@ -181,11 +181,16 @@ struct TransportConfig {
     std::vector<TransportEnergyGroup> energy_groups = default_transport_energy_groups();
 
     // K1/K2/K3 selection + transport controls
-    float E_trigger = 10.0f;          // Fine transport trigger energy [MeV]
+    float E_fine_on = 10.0f;          // Fine transport activation threshold [MeV]
+    float E_fine_off = 11.0f;         // Fine transport deactivation threshold [MeV] (hysteresis)
+    float E_trigger = 10.0f;          // Legacy alias for E_fine_on [MeV]
     float weight_active_min = 1e-12f; // Active-cell minimum weight
     float E_coarse_max = 300.0f;      // Coarse transport upper validity energy [MeV]
     float step_coarse = 5.0f;         // Coarse transport step [mm]
     int n_steps_per_cell = 1;         // K2 sub-steps
+    int fine_batch_max_cells = 0;     // 0 => auto planning
+    int fine_halo_cells = 1;          // Scratch halo thickness (cells)
+    float preflight_vram_margin = 0.85f; // Preflight usable VRAM fraction [0,1]
 
     // Iteration + logging
     int max_iterations = 0;           // 0 => use grid.max_steps
@@ -331,6 +336,12 @@ inline void IncidentParticleConfig::validate() const {
     if (transport.N_E_local <= 0) {
         throw std::invalid_argument("IncidentParticleConfig: transport.N_E_local must be positive");
     }
+    if (transport.E_fine_on <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.E_fine_on must be positive");
+    }
+    if (transport.E_fine_off < transport.E_fine_on) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.E_fine_off must be >= transport.E_fine_on");
+    }
     if (transport.E_trigger <= 0.0f) {
         throw std::invalid_argument("IncidentParticleConfig: transport.E_trigger must be positive");
     }
@@ -345,6 +356,15 @@ inline void IncidentParticleConfig::validate() const {
     }
     if (transport.n_steps_per_cell <= 0) {
         throw std::invalid_argument("IncidentParticleConfig: transport.n_steps_per_cell must be positive");
+    }
+    if (transport.fine_batch_max_cells < 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.fine_batch_max_cells cannot be negative");
+    }
+    if (transport.fine_halo_cells < 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.fine_halo_cells cannot be negative");
+    }
+    if (transport.preflight_vram_margin <= 0.0f || transport.preflight_vram_margin > 1.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.preflight_vram_margin must be in (0,1]");
     }
     if (transport.max_iterations < 0) {
         throw std::invalid_argument("IncidentParticleConfig: transport.max_iterations cannot be negative");

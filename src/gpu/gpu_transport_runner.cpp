@@ -7,6 +7,7 @@
 #include "lut/nist_loader.hpp"
 #include "core/grids.hpp"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <tuple>
@@ -62,6 +63,15 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     if (runtime_transport.max_iterations == 0) {
         runtime_transport.max_iterations = config.grid.max_steps;
     }
+    // Legacy compatibility: if only E_trigger was customized, lift it into fine-on/off policy.
+    const TransportConfig default_transport{};
+    if (std::abs(runtime_transport.E_trigger - runtime_transport.E_fine_on) > 1e-6f &&
+        std::abs(runtime_transport.E_fine_on - default_transport.E_fine_on) < 1e-6f &&
+        std::abs(runtime_transport.E_fine_off - default_transport.E_fine_off) < 1e-6f) {
+        runtime_transport.E_fine_on = runtime_transport.E_trigger;
+        runtime_transport.E_fine_off = std::max(runtime_transport.E_fine_off, runtime_transport.E_fine_on);
+    }
+    runtime_transport.E_trigger = runtime_transport.E_fine_on;
 
     // Create phase-space grids for K1-K6 pipeline from runtime transport config.
     const int N_theta = runtime_transport.N_theta;

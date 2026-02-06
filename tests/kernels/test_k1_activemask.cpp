@@ -70,6 +70,40 @@ TEST(K1Test, MultipleCells) {
     EXPECT_FALSE(ActiveMask[1]);  // High energy does NOT trigger
 }
 
+TEST(K1Test, HysteresisKeepsActiveUntilFineOff) {
+    PsiC psi(4, 4, 32);
+
+    // Energy between on/off thresholds (b_E = 11, on=10, off=12)
+    uint32_t bid_mid = encode_block(10, 11);
+    int slot = psi.find_or_allocate_slot(0, bid_mid);
+    psi.set_weight(0, slot, 0, 1.0f);
+
+    std::vector<uint8_t> ActiveMask(16, 0);
+    std::vector<uint8_t> PrevMask(16, 0);
+    PrevMask[0] = 1;  // Previously active
+
+    run_K1_ActiveMask(psi, ActiveMask.data(), PrevMask.data(), 4, 4, 10, 12, 1e-10f);
+
+    EXPECT_TRUE(ActiveMask[0]);  // Remains active due to hysteresis
+}
+
+TEST(K1Test, HysteresisDeactivatesAboveFineOff) {
+    PsiC psi(4, 4, 32);
+
+    // Energy above off threshold (b_E = 13, on=10, off=12)
+    uint32_t bid_high = encode_block(10, 13);
+    int slot = psi.find_or_allocate_slot(0, bid_high);
+    psi.set_weight(0, slot, 0, 1.0f);
+
+    std::vector<uint8_t> ActiveMask(16, 0);
+    std::vector<uint8_t> PrevMask(16, 0);
+    PrevMask[0] = 1;  // Previously active
+
+    run_K1_ActiveMask(psi, ActiveMask.data(), PrevMask.data(), 4, 4, 10, 12, 1e-10f);
+
+    EXPECT_FALSE(ActiveMask[0]);  // Drops out once above off threshold
+}
+
 TEST(K1Test, ComputeBETriggerFromEnergy) {
     // P4 FIX: Test the helper function that converts E_trigger (MeV) to b_E_trigger (block index)
     EnergyGrid e_grid(0.1f, 300.0f, 256);

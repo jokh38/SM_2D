@@ -49,7 +49,7 @@ bool init_device_lut(const ::RLUT& cpu_lut, DeviceLUTWrapper& wrapper);
  * - K2: Coarse transport (high-energy cells)
  * - K3: Fine transport (low-energy cells)
  * - K4: Bucket transfer (boundary crossing)
- * - K5: Weight audit (conservation check)
+ * - K5: Weight + energy audit (conservation check)
  * - K6: Buffer swapping
  *
  * Supports both pencil beam and Gaussian beam sources.

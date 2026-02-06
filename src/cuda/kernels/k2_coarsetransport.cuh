@@ -25,6 +25,7 @@ struct K2Config {
     float E_coarse_max;      // Maximum energy for coarse transport [MeV]
     float step_coarse;       // Coarse step size [mm]
     int n_steps_per_cell;    // Number of sub-steps per cell
+    float E_fine_on;         // Fine transport activation threshold [MeV]
     float sigma_x_initial;   // Initial beam width [mm] (FIX C: from input config)
 };
 

@@ -183,13 +183,27 @@ __global__ void K2_CoarseTransport(
             // Convert path length to geometric distance for comparison
             float mu_abs = fmaxf(fabsf(mu), 1e-6f);  // Avoid division by zero
 
-            // BUG FIX: Don't limit step by boundary distance
-            // Boundary detection handles crossing; limiting step causes particles to get stuck
-            // Use the full coarse_step regardless of distance to boundary
+            // BUG FIX: Don't limit step by boundary distance.
+            // Boundary detection handles crossing; limiting step causes particles to get stuck.
             float coarse_step_limited = coarse_step;
 
             // Convert geometric distance to path length for energy calculation
             float coarse_range_step = coarse_step_limited / mu_abs;
+
+            // Crossing guard: if this coarse step would cross the fine threshold,
+            // split at E_fine_on so K2 does not overshoot into low-energy transport.
+            bool split_at_fine_threshold = false;
+            if (E > config.E_fine_on + 1e-6f) {
+                float R_current = device_lookup_R(dlut, E);
+                float R_fine_on = device_lookup_R(dlut, fmaxf(config.E_fine_on, dlut.E_min));
+                float range_to_fine = R_current - R_fine_on;
+
+                if (range_to_fine > 0.0f && range_to_fine < coarse_range_step) {
+                    coarse_range_step = range_to_fine;
+                    coarse_step_limited = coarse_range_step * mu_abs;
+                    split_at_fine_threshold = true;
+                }
+            }
 
             // Energy loss for coarse range step
             float mean_dE = device_compute_energy_deposition(dlut, E, coarse_range_step);
@@ -197,6 +211,9 @@ __global__ void K2_CoarseTransport(
             dE = fminf(dE, E);
 
             float E_new = E - dE;
+            if (split_at_fine_threshold) {
+                E_new = fminf(E_new, config.E_fine_on);
+            }
             float edep = dE * weight;
 
             // Nuclear attenuation for coarse range step

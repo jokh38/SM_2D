@@ -581,6 +581,8 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     // Allocate ActiveMask
     e = cudaMalloc(&d_ActiveMask, N_cells * sizeof(uint8_t));
     if (e != cudaSuccess) { std::cerr << "Failed d_ActiveMask: " << N_cells << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_ActiveMask_prev, N_cells * sizeof(uint8_t));
+    if (e != cudaSuccess) { std::cerr << "Failed d_ActiveMask_prev: " << N_cells << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate ActiveList
     e = cudaMalloc(&d_ActiveList, N_cells * sizeof(uint32_t));
@@ -617,6 +619,12 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedWeight_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_prev_BoundaryLoss_weight, N_cells * sizeof(float));
     if (e != cudaSuccess) { std::cerr << "Failed d_prev_BoundaryLoss_weight: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_EdepC, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_EdepC: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_AbsorbedEnergy_nuclear, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedEnergy_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_BoundaryLoss_energy, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_BoundaryLoss_energy: " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate outflow buckets (4 faces per cell)
     size_t bucket_bytes = N_cells * 4 * sizeof(DeviceOutflowBucket);
@@ -624,7 +632,7 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     if (e != cudaSuccess) { std::cerr << "Failed d_OutflowBuckets: " << bucket_bytes << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate audit structures
-    e = cudaMalloc(&d_audit_report, N_cells * sizeof(AuditReport));
+    e = cudaMalloc(&d_audit_report, sizeof(AuditReport));
     if (e != cudaSuccess) { std::cerr << "Failed d_audit_report: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_weight_in, N_cells * sizeof(double));
     if (e != cudaSuccess) { std::cerr << "Failed d_weight_in: " << cudaGetErrorString(e) << std::endl; return false; }
@@ -639,6 +647,7 @@ void K1K6PipelineState::cleanup() {
     if (!owns_device_memory) return;
 
     if (d_ActiveMask) cudaFree(d_ActiveMask);
+    if (d_ActiveMask_prev) cudaFree(d_ActiveMask_prev);
     if (d_ActiveList) cudaFree(d_ActiveList);
     if (d_CoarseList) cudaFree(d_CoarseList);
     if (d_n_active) cudaFree(d_n_active);
@@ -652,6 +661,9 @@ void K1K6PipelineState::cleanup() {
     if (d_prev_AbsorbedWeight_cutoff) cudaFree(d_prev_AbsorbedWeight_cutoff);
     if (d_prev_AbsorbedWeight_nuclear) cudaFree(d_prev_AbsorbedWeight_nuclear);
     if (d_prev_BoundaryLoss_weight) cudaFree(d_prev_BoundaryLoss_weight);
+    if (d_prev_EdepC) cudaFree(d_prev_EdepC);
+    if (d_prev_AbsorbedEnergy_nuclear) cudaFree(d_prev_AbsorbedEnergy_nuclear);
+    if (d_prev_BoundaryLoss_energy) cudaFree(d_prev_BoundaryLoss_energy);
     if (d_OutflowBuckets) cudaFree(d_OutflowBuckets);
     if (d_theta_edges) cudaFree(d_theta_edges);
     if (d_E_edges) cudaFree(d_E_edges);
@@ -660,6 +672,7 @@ void K1K6PipelineState::cleanup() {
     if (d_weight_out) cudaFree(d_weight_out);
 
     d_ActiveMask = nullptr;
+    d_ActiveMask_prev = nullptr;
     d_ActiveList = nullptr;
     d_CoarseList = nullptr;
     d_n_active = nullptr;
@@ -673,6 +686,9 @@ void K1K6PipelineState::cleanup() {
     d_prev_AbsorbedWeight_cutoff = nullptr;
     d_prev_AbsorbedWeight_nuclear = nullptr;
     d_prev_BoundaryLoss_weight = nullptr;
+    d_prev_EdepC = nullptr;
+    d_prev_AbsorbedEnergy_nuclear = nullptr;
+    d_prev_BoundaryLoss_energy = nullptr;
     d_OutflowBuckets = nullptr;
     d_theta_edges = nullptr;
     d_E_edges = nullptr;
@@ -738,6 +754,7 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     int N_cells = Nx * Nz;
 
     cudaMemset(state.d_ActiveMask, 0, N_cells * sizeof(uint8_t));
+    cudaMemset(state.d_ActiveMask_prev, 0, N_cells * sizeof(uint8_t));
     cudaMemset(state.d_EdepC, 0, N_cells * sizeof(double));
     cudaMemset(state.d_AbsorbedWeight_cutoff, 0, N_cells * sizeof(float));
     cudaMemset(state.d_AbsorbedWeight_nuclear, 0, N_cells * sizeof(float));
@@ -747,6 +764,9 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemset(state.d_prev_AbsorbedWeight_cutoff, 0, N_cells * sizeof(float));
     cudaMemset(state.d_prev_AbsorbedWeight_nuclear, 0, N_cells * sizeof(float));
     cudaMemset(state.d_prev_BoundaryLoss_weight, 0, N_cells * sizeof(float));
+    cudaMemset(state.d_prev_EdepC, 0, N_cells * sizeof(double));
+    cudaMemset(state.d_prev_AbsorbedEnergy_nuclear, 0, N_cells * sizeof(double));
+    cudaMemset(state.d_prev_BoundaryLoss_energy, 0, N_cells * sizeof(double));
 
     // Initialize buckets to empty
     cudaMemset(state.d_OutflowBuckets, 0xFF, N_cells * 4 * sizeof(uint32_t) * DEVICE_Kb_out);
@@ -771,8 +791,10 @@ AuditReport get_audit_report(const K1K6PipelineState& state, int Nx, int Nz) {
 bool run_k1_active_mask(
     const DevicePsiC& psi_in,
     uint8_t* d_ActiveMask,
+    const uint8_t* d_ActiveMaskPrev,
     int Nx, int Nz,
-    int b_E_trigger,
+    int b_E_fine_on,
+    int b_E_fine_off,
     float weight_active_min
 ) {
     int threads = 256;
@@ -783,8 +805,10 @@ bool run_k1_active_mask(
         psi_in.block_id,      // Block IDs from DevicePsiC
         psi_in.value,         // Values from DevicePsiC
         d_ActiveMask,
+        d_ActiveMaskPrev,
         Nx, Nz,
-        b_E_trigger,
+        b_E_fine_on,
+        b_E_fine_off,
         weight_active_min
     );
 
@@ -815,6 +839,7 @@ bool run_k2_coarse_transport(
     k2_cfg.E_coarse_max = config.E_coarse_max;
     k2_cfg.step_coarse = config.step_coarse;
     k2_cfg.n_steps_per_cell = config.n_steps_per_cell;
+    k2_cfg.E_fine_on = config.E_fine_on;
     k2_cfg.sigma_x_initial = config.sigma_x_initial;  // FIX C: Pass beam width
 
     int threads = 256;
@@ -936,15 +961,24 @@ bool run_k4_bucket_transfer(
     return true;
 }
 
-bool run_k5_weight_audit(
+bool run_k5_conservation_audit(
     const DevicePsiC& psi_in,
     const DevicePsiC& psi_out,
+    const double* d_EdepC,
+    const double* d_AbsorbedEnergy_nuclear,
+    const double* d_BoundaryLoss_energy,
+    const double* d_prev_EdepC,
+    const double* d_prev_AbsorbedEnergy_nuclear,
+    const double* d_prev_BoundaryLoss_energy,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
     const float* d_BoundaryLoss_weight,
     const float* d_prev_AbsorbedWeight_cutoff,
     const float* d_prev_AbsorbedWeight_nuclear,
     const float* d_prev_BoundaryLoss_weight,
+    const float* d_E_edges,
+    int N_E,
+    int N_E_local,
     AuditReport* d_report,
     int Nx, int Nz
 ) {
@@ -952,20 +986,29 @@ bool run_k5_weight_audit(
     int threads = 256;
     int blocks = (N_cells + threads - 1) / threads;
 
-    cudaMemset(d_report, 0, N_cells * sizeof(AuditReport));
+    cudaMemset(d_report, 0, sizeof(AuditReport));
 
-    // Call K5_WeightAudit kernel
-    K5_WeightAudit<<<blocks, threads>>>(
+    // Call K5_ConservationAudit kernel
+    K5_ConservationAudit<<<blocks, threads>>>(
         psi_in.block_id,
         psi_in.value,
         psi_out.block_id,
         psi_out.value,
+        d_EdepC,
+        d_AbsorbedEnergy_nuclear,
+        d_BoundaryLoss_energy,
+        d_prev_EdepC,
+        d_prev_AbsorbedEnergy_nuclear,
+        d_prev_BoundaryLoss_energy,
         d_AbsorbedWeight_cutoff,
         d_AbsorbedWeight_nuclear,
         d_BoundaryLoss_weight,
         d_prev_AbsorbedWeight_cutoff,
         d_prev_AbsorbedWeight_nuclear,
         d_prev_BoundaryLoss_weight,
+        d_E_edges,
+        N_E,
+        N_E_local,
         d_report,
         N_cells
     );
@@ -1000,8 +1043,9 @@ bool run_k1k6_pipeline_transport(
     const K1K6PipelineConfig& config,
     K1K6PipelineState& state
 ) {
-    // Compute b_E_trigger from E_trigger
-    const int b_E_trigger = compute_b_E_trigger(config.E_trigger, e_grid, config.N_E_local);
+    // Compute block thresholds for fine activation/deactivation.
+    const int b_E_fine_on = compute_b_E_threshold(config.E_fine_on, e_grid, config.N_E_local);
+    const int b_E_fine_off = compute_b_E_threshold(config.E_fine_off, e_grid, config.N_E_local);
     const bool summary_logging = (config.log_level >= 1);
     const bool verbose_logging = (config.log_level >= 2);
     const bool debug_dumps_enabled =
@@ -1012,12 +1056,15 @@ bool run_k1k6_pipeline_transport(
     #endif
 
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
-    // DEBUG: Print b_E_trigger calculation
-    std::cout << "=== E_trigger Configuration ===" << std::endl;
-    std::cout << "E_trigger = " << config.E_trigger << " MeV" << std::endl;
-    std::cout << "E_bin for E_trigger = " << e_grid.FindBin(config.E_trigger) << std::endl;
+    // DEBUG: Print fine-threshold block mapping
+    std::cout << "=== Fine Threshold Configuration ===" << std::endl;
+    std::cout << "E_fine_on = " << config.E_fine_on << " MeV" << std::endl;
+    std::cout << "E_fine_off = " << config.E_fine_off << " MeV" << std::endl;
+    std::cout << "E_bin for E_fine_on = " << e_grid.FindBin(config.E_fine_on) << std::endl;
+    std::cout << "E_bin for E_fine_off = " << e_grid.FindBin(config.E_fine_off) << std::endl;
     std::cout << "N_E_local = " << config.N_E_local << std::endl;
-    std::cout << "b_E_trigger = " << b_E_trigger << std::endl;
+    std::cout << "b_E_fine_on = " << b_E_fine_on << std::endl;
+    std::cout << "b_E_fine_off = " << b_E_fine_off << std::endl;
 
     // Sample b_E for 150 MeV
     int E_bin_150 = e_grid.FindBin(150.0f);
@@ -1025,7 +1072,7 @@ bool run_k1k6_pipeline_transport(
     std::cout << "=== 150 MeV Particle ===" << std::endl;
     std::cout << "E_bin_150 = " << E_bin_150 << std::endl;
     std::cout << "b_E_150 = " << b_E_150 << std::endl;
-    std::cout << "Condition: b_E_150 < b_E_trigger → " << b_E_150 << " < " << b_E_trigger << " = " << (b_E_150 < b_E_trigger ? "TRUE (K3 active)" : "FALSE (K2 coarse)") << std::endl;
+    std::cout << "Condition: b_E_150 < b_E_fine_on → " << b_E_150 << " < " << b_E_fine_on << " = " << (b_E_150 < b_E_fine_on ? "TRUE (K3 active)" : "FALSE (K2 coarse)") << std::endl;
     std::cout << "==============================" << std::endl;
     #endif
 
@@ -1054,8 +1101,18 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         // K1: Active Mask Identification
         // --------------------------------------------------------------------
-        if (!run_k1_active_mask(*psi_in, state.d_ActiveMask, config.Nx, config.Nz,
-                                 b_E_trigger, config.weight_active_min)) {
+        cudaMemcpy(
+            state.d_ActiveMask_prev,
+            state.d_ActiveMask,
+            config.Nx * config.Nz * sizeof(uint8_t),
+            cudaMemcpyDeviceToDevice
+        );
+
+        if (!run_k1_active_mask(*psi_in, state.d_ActiveMask, state.d_ActiveMask_prev,
+                                 config.Nx, config.Nz,
+                                 b_E_fine_on,
+                                 b_E_fine_off,
+                                 config.weight_active_min)) {
             std::cerr << "K1 failed at iteration " << iter << std::endl;
             return false;
         }
@@ -1175,17 +1232,26 @@ bool run_k1k6_pipeline_transport(
         #endif
 
         // --------------------------------------------------------------------
-        // K5: Weight Audit (conservation check)
+        // K5: Weight + Energy Audit (conservation check)
         // --------------------------------------------------------------------
         // Note: psi_in now contains processed particles (moved from original)
         //       psi_out contains K2+K3+K4 results (cleared at start of iteration)
-        if (!run_k5_weight_audit(*psi_in, *psi_out,
+        if (!run_k5_conservation_audit(*psi_in, *psi_out,
+                                 state.d_EdepC,
+                                 state.d_AbsorbedEnergy_nuclear,
+                                 state.d_BoundaryLoss_energy,
+                                 state.d_prev_EdepC,
+                                 state.d_prev_AbsorbedEnergy_nuclear,
+                                 state.d_prev_BoundaryLoss_energy,
                                  state.d_AbsorbedWeight_cutoff,
                                  state.d_AbsorbedWeight_nuclear,
                                  state.d_BoundaryLoss_weight,
                                  state.d_prev_AbsorbedWeight_cutoff,
                                  state.d_prev_AbsorbedWeight_nuclear,
                                  state.d_prev_BoundaryLoss_weight,
+                                 state.d_E_edges,
+                                 config.N_E,
+                                 config.N_E_local,
                                  state.d_audit_report,
                                  config.Nx, config.Nz)) {
             std::cerr << "K5 failed at iteration " << iter << std::endl;
@@ -1195,7 +1261,9 @@ bool run_k1k6_pipeline_transport(
         if (verbose_logging) {
             AuditReport report = get_audit_report(state, config.Nx, config.Nz);
             std::cout << "  Weight audit: error=" << report.W_error
-                      << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
+                      << " pass=" << (report.W_pass ? "yes" : "no")
+                      << ", Energy audit: error=" << report.E_error
+                      << " pass=" << (report.E_pass ? "yes" : "no") << std::endl;
         }
 
         // Update previous cumulative tallies for next iteration's delta-based K5.
@@ -1206,6 +1274,12 @@ bool run_k1k6_pipeline_transport(
                    N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
         cudaMemcpy(state.d_prev_BoundaryLoss_weight, state.d_BoundaryLoss_weight,
                    N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(state.d_prev_EdepC, state.d_EdepC,
+                   N_cells * sizeof(double), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(state.d_prev_AbsorbedEnergy_nuclear, state.d_AbsorbedEnergy_nuclear,
+                   N_cells * sizeof(double), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(state.d_prev_BoundaryLoss_energy, state.d_BoundaryLoss_energy,
+                   N_cells * sizeof(double), cudaMemcpyDeviceToDevice);
 
         // --------------------------------------------------------------------
         // K6: Swap Buffers

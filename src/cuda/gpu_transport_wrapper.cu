@@ -163,7 +163,8 @@ bool run_k1k6_pipeline_transport(
     config.Nz = Nz;
     config.dx = dx;
     config.dz = dz;
-    config.E_trigger = transport.E_trigger;
+    config.E_fine_on = transport.E_fine_on;
+    config.E_fine_off = transport.E_fine_off;
     config.weight_active_min = transport.weight_active_min;
     config.E_coarse_max = transport.E_coarse_max;
     config.step_coarse = transport.step_coarse;

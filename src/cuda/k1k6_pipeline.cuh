@@ -17,7 +17,7 @@
 // - K2: Coarse transport (high energy, fast physics)
 // - K3: Fine transport (low energy, detailed physics)
 // - K4: Bucket transfer (boundary crossing)
-// - K5: Weight audit (conservation check)
+// - K5: Weight + energy audit (conservation check)
 // - K6: Buffer swap (prepare for next iteration)
 // ============================================================================
 
@@ -35,7 +35,8 @@ namespace sm_2d {
 
 struct K1K6PipelineConfig {
     // Active mask thresholds (K1)
-    float E_trigger;           // Energy threshold for fine transport [MeV]
+    float E_fine_on;           // Fine transport activation threshold [MeV]
+    float E_fine_off;          // Fine transport deactivation threshold [MeV]
     float weight_active_min;   // Minimum weight for active cell
 
     // Coarse transport config (K2)
@@ -43,7 +44,7 @@ struct K1K6PipelineConfig {
     float step_coarse;         // Coarse step size [mm]
     int n_steps_per_cell;      // Number of sub-steps per cell
 
-    // Fine transport is implicitly used when E < E_trigger
+    // Fine transport is used when E <= E_fine_on (with optional hysteresis)
 
     // FIX C: Initial beam width for lateral spreading
     float sigma_x_initial;     // Initial beam width [mm] (from sim.ini sigma_x_mm)
@@ -149,6 +150,7 @@ struct K1K6PipelineState {
 
     // Active cell tracking
     uint8_t* d_ActiveMask;     // Binary mask [Nx*Nz]
+    uint8_t* d_ActiveMask_prev;// Previous iteration mask [Nx*Nz] for hysteresis
     uint32_t* d_ActiveList;    // Compacted list [Nx*Nz]
     uint32_t* d_CoarseList;    // Coarse cells [Nx*Nz]
 
@@ -169,6 +171,9 @@ struct K1K6PipelineState {
     float* d_prev_AbsorbedWeight_cutoff;
     float* d_prev_AbsorbedWeight_nuclear;
     float* d_prev_BoundaryLoss_weight;
+    double* d_prev_EdepC;
+    double* d_prev_AbsorbedEnergy_nuclear;
+    double* d_prev_BoundaryLoss_energy;
 
     // Bucket system
     DeviceOutflowBucket* d_OutflowBuckets;  // [Nx*Nz*4]
@@ -187,7 +192,7 @@ struct K1K6PipelineState {
 
     K1K6PipelineState()
         : psi_in(nullptr), psi_out(nullptr)
-        , d_ActiveMask(nullptr), d_ActiveList(nullptr), d_CoarseList(nullptr)
+        , d_ActiveMask(nullptr), d_ActiveMask_prev(nullptr), d_ActiveList(nullptr), d_CoarseList(nullptr)
         , n_active(0), n_coarse(0)
         , d_n_active(nullptr), d_n_coarse(nullptr)
         , d_EdepC(nullptr)
@@ -197,6 +202,9 @@ struct K1K6PipelineState {
         , d_prev_AbsorbedWeight_cutoff(nullptr)
         , d_prev_AbsorbedWeight_nuclear(nullptr)
         , d_prev_BoundaryLoss_weight(nullptr)
+        , d_prev_EdepC(nullptr)
+        , d_prev_AbsorbedEnergy_nuclear(nullptr)
+        , d_prev_BoundaryLoss_energy(nullptr)
         , d_OutflowBuckets(nullptr)
         , d_theta_edges(nullptr), d_E_edges(nullptr)
         , d_audit_report(nullptr)
@@ -222,12 +230,12 @@ struct K1K6PipelineState {
 // Execute complete K1-K6 transport pipeline
 //
 // Flow:
-// 1. K1: Identify active cells based on E_trigger and weight thresholds
+// 1. K1: Identify active cells based on E_fine_on/E_fine_off and weight thresholds
 // 2. Compact active list and coarse list
 // 3. K2: Coarse transport for high-energy cells (ActiveMask = 0)
 // 4. K3: Fine transport for low-energy cells (ActiveMask = 1)
 // 5. K4: Bucket transfer for boundary crossings
-// 6. K5: Weight audit (conservation check)
+// 6. K5: Weight + energy audit (conservation check)
 // 7. K6: Swap buffers for next iteration
 //
 // Parameters:
@@ -258,8 +266,10 @@ bool run_k1k6_pipeline_transport(
 bool run_k1_active_mask(
     const DevicePsiC& psi_in,
     uint8_t* d_ActiveMask,
+    const uint8_t* d_ActiveMaskPrev,
     int Nx, int Nz,
-    int b_E_trigger,
+    int b_E_fine_on,
+    int b_E_fine_off,
     float weight_active_min
 );
 
@@ -293,16 +303,25 @@ bool run_k4_bucket_transfer(
     int Nx, int Nz
 );
 
-// Run K5 only: Weight audit
-bool run_k5_weight_audit(
+// Run K5 only: Weight + energy conservation audit
+bool run_k5_conservation_audit(
     const DevicePsiC& psi_in,
     const DevicePsiC& psi_out,
+    const double* d_EdepC,
+    const double* d_AbsorbedEnergy_nuclear,
+    const double* d_BoundaryLoss_energy,
+    const double* d_prev_EdepC,
+    const double* d_prev_AbsorbedEnergy_nuclear,
+    const double* d_prev_BoundaryLoss_energy,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
     const float* d_BoundaryLoss_weight,
     const float* d_prev_AbsorbedWeight_cutoff,
     const float* d_prev_AbsorbedWeight_nuclear,
     const float* d_prev_BoundaryLoss_weight,
+    const float* d_E_edges,
+    int N_E,
+    int N_E_local,
     AuditReport* d_report,
     int Nx, int Nz
 );
@@ -338,11 +357,15 @@ AuditReport get_audit_report(
     int Nx, int Nz
 );
 
-// Compute b_E_trigger from E_trigger
-// Helper to convert energy threshold to coarse block index
-inline int compute_b_E_trigger(float E_trigger, const EnergyGrid& e_grid, int N_E_local) {
-    int E_bin = e_grid.FindBin(E_trigger);
+// Compute coarse energy-block threshold from energy in MeV.
+inline int compute_b_E_threshold(float E_threshold, const EnergyGrid& e_grid, int N_E_local) {
+    int E_bin = e_grid.FindBin(E_threshold);
     return E_bin / N_E_local;
+}
+
+// Legacy helper alias (deprecated): use compute_b_E_threshold.
+inline int compute_b_E_trigger(float E_trigger, const EnergyGrid& e_grid, int N_E_local) {
+    return compute_b_E_threshold(E_trigger, e_grid, N_E_local);
 }
 
 // ============================================================================

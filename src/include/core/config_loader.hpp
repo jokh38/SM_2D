@@ -345,14 +345,45 @@ inline IncidentParticleConfig load_incident_particle_config(const std::string& f
     config.transport.N_theta = transport_sec.get_int("N_theta", config.transport.N_theta);
     config.transport.N_theta_local = transport_sec.get_int("N_theta_local", config.transport.N_theta_local);
     config.transport.N_E_local = transport_sec.get_int("N_E_local", config.transport.N_E_local);
-    config.transport.E_trigger = transport_sec.get_float("E_trigger_MeV", config.transport.E_trigger);
-    config.transport.E_trigger = transport_sec.get_float("E_trigger", config.transport.E_trigger);
+    const bool has_fine_on =
+        transport_sec.has("E_fine_on_MeV") || transport_sec.has("E_fine_on");
+    const bool has_fine_off =
+        transport_sec.has("E_fine_off_MeV") || transport_sec.has("E_fine_off");
+    const bool has_legacy_trigger =
+        transport_sec.has("E_trigger_MeV") || transport_sec.has("E_trigger");
+
+    if (has_fine_on) {
+        config.transport.E_fine_on = transport_sec.get_float("E_fine_on_MeV", config.transport.E_fine_on);
+        config.transport.E_fine_on = transport_sec.get_float("E_fine_on", config.transport.E_fine_on);
+    }
+    if (has_fine_off) {
+        config.transport.E_fine_off = transport_sec.get_float("E_fine_off_MeV", config.transport.E_fine_off);
+        config.transport.E_fine_off = transport_sec.get_float("E_fine_off", config.transport.E_fine_off);
+    }
+    if (has_legacy_trigger) {
+        float legacy_trigger = config.transport.E_trigger;
+        legacy_trigger = transport_sec.get_float("E_trigger_MeV", legacy_trigger);
+        legacy_trigger = transport_sec.get_float("E_trigger", legacy_trigger);
+        config.transport.E_trigger = legacy_trigger;
+        if (!has_fine_on) {
+            config.transport.E_fine_on = legacy_trigger;
+        }
+    }
+    if (!has_legacy_trigger) {
+        config.transport.E_trigger = config.transport.E_fine_on;
+    }
+    if (!has_fine_off) {
+        config.transport.E_fine_off = std::max(config.transport.E_fine_off, config.transport.E_fine_on);
+    }
     config.transport.weight_active_min = transport_sec.get_float("weight_active_min", config.transport.weight_active_min);
     config.transport.E_coarse_max = transport_sec.get_float("E_coarse_max_MeV", config.transport.E_coarse_max);
     config.transport.E_coarse_max = transport_sec.get_float("E_coarse_max", config.transport.E_coarse_max);
     config.transport.step_coarse = transport_sec.get_float("step_coarse_mm", config.transport.step_coarse);
     config.transport.step_coarse = transport_sec.get_float("step_coarse", config.transport.step_coarse);
     config.transport.n_steps_per_cell = transport_sec.get_int("n_steps_per_cell", config.transport.n_steps_per_cell);
+    config.transport.fine_batch_max_cells = transport_sec.get_int("fine_batch_max_cells", config.transport.fine_batch_max_cells);
+    config.transport.fine_halo_cells = transport_sec.get_int("fine_halo_cells", config.transport.fine_halo_cells);
+    config.transport.preflight_vram_margin = transport_sec.get_float("preflight_vram_margin", config.transport.preflight_vram_margin);
     config.transport.max_iterations = transport_sec.get_int("max_iterations", config.transport.max_iterations);
     config.transport.log_level = transport_sec.get_int("log_level", config.transport.log_level);
     if (transport_sec.has("energy_groups")) {
@@ -446,11 +477,16 @@ inline bool save_incident_particle_config(
     file << "N_theta = " << config.transport.N_theta << "\n";
     file << "N_theta_local = " << config.transport.N_theta_local << "\n";
     file << "N_E_local = " << config.transport.N_E_local << "\n";
-    file << "E_trigger_MeV = " << config.transport.E_trigger << "\n";
+    file << "E_fine_on_MeV = " << config.transport.E_fine_on << "\n";
+    file << "E_fine_off_MeV = " << config.transport.E_fine_off << "\n";
+    file << "E_trigger_MeV = " << config.transport.E_fine_on << "\n";
     file << "weight_active_min = " << config.transport.weight_active_min << "\n";
     file << "E_coarse_max_MeV = " << config.transport.E_coarse_max << "\n";
     file << "step_coarse_mm = " << config.transport.step_coarse << "\n";
     file << "n_steps_per_cell = " << config.transport.n_steps_per_cell << "\n";
+    file << "fine_batch_max_cells = " << config.transport.fine_batch_max_cells << "\n";
+    file << "fine_halo_cells = " << config.transport.fine_halo_cells << "\n";
+    file << "preflight_vram_margin = " << config.transport.preflight_vram_margin << "\n";
     file << "max_iterations = " << config.transport.max_iterations << "\n";
     file << "log_level = " << config.transport.log_level << "\n";
     file << "energy_groups = " << serialize_transport_energy_groups(config.transport.energy_groups) << "\n\n";
@@ -497,7 +533,8 @@ inline void print_config_summary(std::ostream& os, const IncidentParticleConfig&
     os << " (dx=" << config.grid.dx << "mm, dz=" << config.grid.dz << "mm)\n";
     int runtime_steps = (config.transport.max_iterations > 0) ? config.transport.max_iterations : config.grid.max_steps;
     os << "Transport: theta_bins=" << config.transport.N_theta
-       << ", E_trigger=" << config.transport.E_trigger << " MeV"
+       << ", E_fine_on=" << config.transport.E_fine_on << " MeV"
+       << ", E_fine_off=" << config.transport.E_fine_off << " MeV"
        << ", step_coarse=" << config.transport.step_coarse << " mm"
        << ", max_iterations=" << runtime_steps << "\n";
     os << "Output Dir: " << config.output.output_dir << "\n";
