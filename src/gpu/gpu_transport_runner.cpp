@@ -1,10 +1,7 @@
 #include "gpu/gpu_transport_runner.hpp"
-
-#ifdef SM2D_HAS_CUDA
 #include "cuda/gpu_transport_wrapper.hpp"
 #include "core/local_bins.hpp"  // For N_theta_local, N_E_local
 #include <cuda_runtime.h>
-#endif
 
 #include "lut/r_lut.hpp"
 #include "lut/nist_loader.hpp"
@@ -13,8 +10,6 @@
 #include <stdexcept>
 
 namespace sm_2d {
-
-#ifdef SM2D_HAS_CUDA
 
 bool GPUTransportRunner::is_gpu_available() {
     int device_count = 0;
@@ -137,27 +132,25 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
 
     // Run K1-K6 pipeline transport with angular divergence and spatial spread
     run_k1k6_pipeline_transport(
-        config.get_position_x_mm(),
-        config.get_position_z_mm(),
-        config.get_angle_rad(),
-        config.angular.sigma_theta,  // Angular divergence from config
-        config.spatial.sigma_x,       // Spatial beam width from config
-        config.get_energy_MeV(),
-        config.W_total,
-        config.spatial.sigma_x,        // Lateral beam spread
-        config.angular.sigma_theta,    // Angular divergence
-        config.energy.sigma_E,         // Energy spread
-        config.sampling.n_samples,     // Number of samples
-        config.sampling.random_seed,   // RNG seed
-        config.grid.Nx, config.grid.Nz,
-        config.grid.dx, config.grid.dz,
-        x_min, z_min,
-        N_theta, N_E,
-        N_theta_local, N_E_local,
-        d_theta_edges,
-        d_E_edges,
-        *device_lut.get(),
-        result.edep
+        config.get_position_x_mm(),      // x0
+        config.get_position_z_mm(),      // z0
+        config.get_angle_rad(),          // theta0
+        config.get_energy_MeV(),         // E0 (beam energy)
+        config.W_total,                  // W_total (total weight)
+        config.spatial.sigma_x,          // sigma_x (lateral beam spread)
+        config.angular.sigma_theta,      // sigma_theta (angular divergence)
+        config.energy.sigma_E,           // sigma_E (energy spread)
+        config.sampling.n_samples,       // n_samples
+        config.sampling.random_seed,     // random_seed
+        config.grid.Nx, config.grid.Nz,  // Nx, Nz
+        config.grid.dx, config.grid.dz,  // dx, dz
+        x_min, z_min,                    // x_min, z_min
+        N_theta, N_E,                    // N_theta, N_E
+        N_theta_local, N_E_local,        // N_theta_local, N_E_local
+        d_theta_edges,                   // theta_edges
+        d_E_edges,                       // E_edges
+        *device_lut.get(),               // dlut
+        result.edep                      // edep output
     );
 
     // Cleanup device edges
@@ -168,21 +161,5 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
 
     return result;
 }
-
-#else // !SM2D_HAS_CUDA (CPU-only build)
-
-bool GPUTransportRunner::is_gpu_available() {
-    return false;  // No CUDA support in this build
-}
-
-std::string GPUTransportRunner::get_gpu_name() {
-    return "N/A (CPU-only build)";
-}
-
-SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
-    throw std::runtime_error("GPU transport not available. This binary was built without CUDA support. Please use the CPU deterministic transport path.");
-}
-
-#endif // SM2D_HAS_CUDA
 
 } // namespace sm_2d

@@ -1,10 +1,10 @@
 #include "core/config_loader.hpp"
-#include "validation/pencil_beam.hpp"
-#include "validation/bragg_peak.hpp"
 #include "gpu/gpu_transport_runner.hpp"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
+#include <cmath>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -26,24 +26,34 @@ bool create_output_directory(const std::string& path) {
 }
 
 /**
- * @brief Convert IncidentParticleConfig to PencilBeamConfig
+ * @brief Compute depth-dose curve by summing lateral bins at each depth.
  */
-PencilBeamConfig make_pencil_beam_config(const IncidentParticleConfig& config) {
-    PencilBeamConfig pbc;
-    pbc.E0 = config.energy.mean_E0;
-    pbc.x0 = config.spatial.x0;
-    pbc.z0 = config.spatial.z0;
-    pbc.theta0 = config.angular.theta0;
-    pbc.sigma_theta0 = config.angular.sigma_theta;
-    pbc.Nx = config.grid.Nx;
-    pbc.Nz = config.grid.Nz;
-    pbc.dx = config.grid.dx;
-    pbc.dz = config.grid.dz;
-    pbc.max_steps = config.grid.max_steps;
-    pbc.sigma_x0 = config.spatial.sigma_x;  // Initial Gaussian beam width
-    pbc.W_total = config.W_total;
-    pbc.random_seed = config.sampling.random_seed;
-    return pbc;
+static std::vector<double> compute_depth_dose(const SimulationResult& result) {
+    std::vector<double> depth_dose(result.Nz, 0.0);
+    for (int iz = 0; iz < result.Nz; ++iz) {
+        double sum = 0.0;
+        for (int ix = 0; ix < result.Nx; ++ix) {
+            sum += result.edep[iz][ix];
+        }
+        depth_dose[iz] = sum;
+    }
+    return depth_dose;
+}
+
+/**
+ * @brief Find Bragg peak depth index from a depth-dose curve.
+ */
+static int find_bragg_peak_index(const std::vector<double>& depth_dose) {
+    if (depth_dose.empty()) return 0;
+    int peak_idx = 0;
+    double peak_val = depth_dose[0];
+    for (size_t i = 1; i < depth_dose.size(); ++i) {
+        if (depth_dose[i] > peak_val) {
+            peak_val = depth_dose[i];
+            peak_idx = static_cast<int>(i);
+        }
+    }
+    return peak_idx;
 }
 
 /**
@@ -104,8 +114,8 @@ bool save_pdd(const std::string& filepath, const SimulationResult& result, bool 
         return false;
     }
 
-    auto depth_dose = get_depth_dose(result);
-    int peak_z = find_bragg_peak_z(result);
+    auto depth_dose = compute_depth_dose(result);
+    int peak_z = find_bragg_peak_index(depth_dose);
     double peak_dose = depth_dose[peak_z];
 
     out << "# Depth-Dose Distribution (PDD)\n";
@@ -172,20 +182,12 @@ int main(int argc, char* argv[]) {
 
         SimulationResult result;
 
-        // Try GPU transport first (with proper energy straggling)
-        if (GPUTransportRunner::is_gpu_available()) {
-            std::cout << "Using GPU transport (Vavilov energy straggling)" << std::endl;
-            result = GPUTransportRunner::run(config);
-        } else {
-            std::cout << "GPU not available, using CPU deterministic transport" << std::endl;
-            std::cout << "  Note: CPU mode uses simplified range straggling approximation" << std::endl;
-            auto pbc = make_pencil_beam_config(config);
-            result = run_pencil_beam(pbc);
-        }
+        std::cout << "Using GPU transport (Vavilov energy straggling)" << std::endl;
+        result = GPUTransportRunner::run(config);
 
-        int peak_z = find_bragg_peak_z(result);
+        auto depth_dose = compute_depth_dose(result);
+        int peak_z = find_bragg_peak_index(depth_dose);
         double peak_depth = peak_z * result.dz;
-        auto depth_dose = get_depth_dose(result);
         double peak_dose = depth_dose[peak_z];
 
         std::cout << "Simulation complete." << std::endl;
