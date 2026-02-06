@@ -1,15 +1,14 @@
 #include <gtest/gtest.h>
 #include "core/local_bins.hpp"
 
-TEST(LocalBinsTest, LocalBinsEquals512) {
-    // FIX Problem 1: Added z_sub bin (4D encoding)
+TEST(LocalBinsTest, LocalBinsConfigurationMatchesBuild) {
     // LOCAL_BINS = N_theta_local * N_E_local * N_x_sub * N_z_sub
-    //            = 8 * 4 * 4 * 4 = 512
-    EXPECT_EQ(LOCAL_BINS, 512);
-    EXPECT_EQ(N_theta_local, 8);
-    EXPECT_EQ(N_E_local, 4);
-    EXPECT_EQ(N_x_sub, 4);
-    EXPECT_EQ(N_z_sub, 4);  // New: z_sub bins
+    EXPECT_EQ(LOCAL_BINS, N_theta_local * N_E_local * N_x_sub * N_z_sub);
+    EXPECT_EQ(LOCAL_BINS, 256);
+    EXPECT_EQ(N_theta_local, 4);
+    EXPECT_EQ(N_E_local, 2);
+    EXPECT_EQ(N_x_sub, 8);
+    EXPECT_EQ(N_z_sub, 4);
 }
 
 TEST(LocalBinsTest, EncodeDecodeRoundTrip) {
@@ -51,8 +50,8 @@ TEST(LocalBinsTest, XOffsetToBinRoundTrip) {
 
     // Test boundary values
     EXPECT_EQ(get_x_sub_bin(-0.5f * dx, dx), 0);  // Left edge
-    EXPECT_EQ(get_x_sub_bin(0.0f, dx), 2);        // Center
-    EXPECT_EQ(get_x_sub_bin(0.49f * dx, dx), 3);  // Near right edge
+    EXPECT_EQ(get_x_sub_bin(0.0f, dx), N_x_sub / 2);        // Center
+    EXPECT_EQ(get_x_sub_bin(0.49f * dx, dx), N_x_sub - 1);  // Near right edge
 }
 
 TEST(LocalBinsTest, ZOffsetToBinRoundTrip) {
@@ -67,8 +66,8 @@ TEST(LocalBinsTest, ZOffsetToBinRoundTrip) {
 
     // Test boundary values
     EXPECT_EQ(get_z_sub_bin(-0.5f * dz, dz), 0);  // Bottom edge
-    EXPECT_EQ(get_z_sub_bin(0.0f, dz), 2);        // Center
-    EXPECT_EQ(get_z_sub_bin(0.49f * dz, dz), 3);  // Near top edge
+    EXPECT_EQ(get_z_sub_bin(0.0f, dz), N_z_sub / 2);        // Center
+    EXPECT_EQ(get_z_sub_bin(0.49f * dz, dz), N_z_sub - 1);  // Near top edge
 }
 
 TEST(LocalBinsTest, EncodeDecode4DRoundTrip) {

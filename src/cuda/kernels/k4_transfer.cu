@@ -12,50 +12,11 @@
 // Now: Full transfer from buckets to neighbor cells with proper slot allocation
 // ============================================================================
 
-__device__ int get_neighbor(int cell, int face, int Nx, int Nz) {
-    int ix = cell % Nx;
-    int iz = cell / Nx;
-
-    switch (face) {
-        case 0:  // +z
-            if (iz + 1 >= Nz) return -1;
-            return cell + Nx;
-        case 1:  // -z
-            if (iz <= 0) return -1;
-            return cell - Nx;
-        case 2:  // +x
-            if (ix + 1 >= Nx) return -1;
-            return cell + 1;
-        case 3:  // -x
-            if (ix <= 0) return -1;
-            return cell - 1;
-    }
-    return -1;
-}
-
-// P3 FIX: Device function to transfer bucket contents to PsiC output
-__device__ inline void device_transfer_bucket_to_psi(
-    const DeviceOutflowBucket& bucket,
-    int cell,
-    int Nx, int Nz,
-    uint32_t* __restrict__ block_ids_out,
-    float* __restrict__ values_out,
-    int max_slots_per_cell
-) {
-    for (int slot = 0; slot < DEVICE_Kb_out; ++slot) {
-        uint32_t bid = bucket.block_id[slot];
-        if (bid == DEVICE_EMPTY_BLOCK_ID) continue;
-
-        // Find neighbor cell
-        // Note: bucket index encodes the source cell and face
-        // We need to determine the destination based on the face
-        // This is handled by the caller; here we just process the bucket
-    }
-}
-
-// Global counter for debugging bucket transfers
+// Global counters for optional debugging bucket transfers
+#if defined(SM2D_ENABLE_DEBUG_DUMPS)
 __device__ int d_transferred_particles = 0;
 __device__ int d_transferred_weight = 0;
+#endif
 
 __global__ void K4_BucketTransfer(
     const DeviceOutflowBucket* __restrict__ OutflowBuckets,
@@ -66,12 +27,14 @@ __global__ void K4_BucketTransfer(
     int cell = blockIdx.x * blockDim.x + threadIdx.x;
     if (cell >= Nx * Nz) return;
 
-    // Reset counters (first thread does this)
+    // Reset debug counters (first thread does this)
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
     if (cell == 0) {
         d_transferred_particles = 0;
         d_transferred_weight = 0;
     }
     __syncthreads();
+    #endif
 
     // P3 FIX: Define max slots per cell (must match PsiC structure)
     constexpr int max_slots_per_cell = DEVICE_Kb;  // = 8
@@ -162,15 +125,20 @@ __global__ void K4_BucketTransfer(
                     if (w > 0) {
                         int global_idx = (cell * max_slots_per_cell + out_slot) * DEVICE_LOCAL_BINS + lidx;
                         atomicAdd(&values_out[global_idx], w);
-                        atomicAdd(&d_transferred_weight, 1);  // DEBUG: count transfers
+                        #if defined(SM2D_ENABLE_DEBUG_DUMPS)
+                        atomicAdd(&d_transferred_weight, 1);
+                        #endif
                     }
                 }
-                atomicAdd(&d_transferred_particles, 1);  // DEBUG: count slots transferred
+                #if defined(SM2D_ENABLE_DEBUG_DUMPS)
+                atomicAdd(&d_transferred_particles, 1);
+                #endif
             }
         }
     }
 
-    // DEBUG: Print transfer stats (first thread in last block)
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
+    // DEBUG: Print transfer stats (first thread in block 0)
     __shared__ int s_transfer_count;
     if (threadIdx.x == 0) s_transfer_count = 0;
     __syncthreads();
@@ -184,6 +152,7 @@ __global__ void K4_BucketTransfer(
         printf("  K4: Transferred %d particles (weight bins: %d)\n",
                s_transfer_count, d_transferred_weight);
     }
+    #endif
 }
 
 // ============================================================================

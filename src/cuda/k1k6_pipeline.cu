@@ -20,8 +20,9 @@
 namespace sm_2d {
 
 // ============================================================================
-// Debug: Dump non-zero cell information to CSV
+// Optional debug dump: non-zero cell information to CSV
 // ============================================================================
+#if defined(SM2D_ENABLE_DEBUG_DUMPS)
 void dump_nonzero_cells_to_csv(
     const DevicePsiC& psi,
     int Nx, int Nz, float dx, float dz,
@@ -187,6 +188,7 @@ void dump_nonzero_cells_to_csv(
     }
     std::cout << std::endl;
 }
+#endif
 
 // ============================================================================
 // Helper Kernel Implementations
@@ -211,8 +213,6 @@ __global__ void inject_source_kernel(
 
     // Gauss-Hermite quadrature for angular spread only
     __constant__ static float gh_abscissas[7] = {-2.65f, -1.67f, -0.82f, 0.0f, 0.82f, 1.67f, 2.65f};
-    __constant__ static float gh_weights[7] = {0.015f, 0.11f, 0.35f, 0.48f, 0.35f, 0.11f, 0.015f};
-
     // Normalized GH weights (sum = 1.0 for proper probability distribution)
     __constant__ static float gh_weights_norm[7] = {0.0105f, 0.0769f, 0.2448f, 0.3357f, 0.2448f, 0.0769f, 0.0105f};
 
@@ -259,10 +259,6 @@ __global__ void inject_source_kernel(
     // Clamp to valid grid range
     ix_start = (ix_start < 0) ? 0 : ix_start;
     ix_end = (ix_end > Nx) ? Nx : ix_end;
-
-    // Pre-compute Gaussian normalization factor
-    const float sqrt_2pi = 2.50662827463f;  // sqrt(2*pi)
-    const float norm_factor = 1.0f / (sigma_x * sqrt_2pi);
 
     // Angular spread configuration
     int theta_start = (use_angular_spread) ? 0 : 0;
@@ -993,6 +989,7 @@ bool run_k1k6_pipeline_transport(
     // Compute b_E_trigger from E_trigger
     int b_E_trigger = compute_b_E_trigger(config.E_trigger, e_grid, config.N_E_local);
 
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
     // DEBUG: Print b_E_trigger calculation
     std::cout << "=== E_trigger Configuration ===" << std::endl;
     std::cout << "E_trigger = " << config.E_trigger << " MeV" << std::endl;
@@ -1008,6 +1005,7 @@ bool run_k1k6_pipeline_transport(
     std::cout << "b_E_150 = " << b_E_150 << std::endl;
     std::cout << "Condition: b_E_150 < b_E_trigger → " << b_E_150 << " < " << b_E_trigger << " = " << (b_E_150 < b_E_trigger ? "TRUE (K3 active)" : "FALSE (K2 coarse)") << std::endl;
     std::cout << "==============================" << std::endl;
+    #endif
 
     // Reset pipeline state
     reset_pipeline_state(state, config.Nx, config.Nz);
@@ -1019,10 +1017,8 @@ bool run_k1k6_pipeline_transport(
     // FIX: Need enough iterations for 150 MeV protons to travel ~158mm
     // With coarse_step = 0.3mm, need at least 158/0.3 ≈ 527 iterations
     const int max_iter = 600;
-    const double weight_threshold = 1e-6;
 
     int iter = 0;
-    double total_weight_remaining = 0.0;
 
     // ========================================================================
     // Main Transport Loop
@@ -1141,6 +1137,7 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         // DEBUG: Dump non-zero cells after K4 for selected iterations
         // --------------------------------------------------------------------
+        #if defined(SM2D_ENABLE_DEBUG_DUMPS)
         if (iter <= 10 || iter == 50 || iter == 100 || iter == 150 || iter == 200 || iter == 250) {
             dump_nonzero_cells_to_csv(*psi_out, config.Nx, config.Nz, config.dx, config.dz,
                                        iter, "after_K4",
@@ -1148,6 +1145,7 @@ bool run_k1k6_pipeline_transport(
                                        config.N_theta, config.N_E,
                                        config.N_theta_local, config.N_E_local);
         }
+        #endif
 
         // --------------------------------------------------------------------
         // K5: Weight Audit (conservation check)

@@ -26,37 +26,6 @@ bool create_output_directory(const std::string& path) {
 }
 
 /**
- * @brief Compute depth-dose curve by summing lateral bins at each depth.
- */
-static std::vector<double> compute_depth_dose(const SimulationResult& result) {
-    std::vector<double> depth_dose(result.Nz, 0.0);
-    for (int iz = 0; iz < result.Nz; ++iz) {
-        double sum = 0.0;
-        for (int ix = 0; ix < result.Nx; ++ix) {
-            sum += result.edep[iz][ix];
-        }
-        depth_dose[iz] = sum;
-    }
-    return depth_dose;
-}
-
-/**
- * @brief Find Bragg peak depth index from a depth-dose curve.
- */
-static int find_bragg_peak_index(const std::vector<double>& depth_dose) {
-    if (depth_dose.empty()) return 0;
-    int peak_idx = 0;
-    double peak_val = depth_dose[0];
-    for (size_t i = 1; i < depth_dose.size(); ++i) {
-        if (depth_dose[i] > peak_val) {
-            peak_val = depth_dose[i];
-            peak_idx = static_cast<int>(i);
-        }
-    }
-    return peak_idx;
-}
-
-/**
  * @brief Save 2D dose distribution to file
  */
 bool save_dose_2d(const std::string& filepath, const SimulationResult& result, bool normalize) {
@@ -114,8 +83,8 @@ bool save_pdd(const std::string& filepath, const SimulationResult& result, bool 
         return false;
     }
 
-    auto depth_dose = compute_depth_dose(result);
-    int peak_z = find_bragg_peak_index(depth_dose);
+    auto depth_dose = get_depth_dose(result);
+    int peak_z = find_bragg_peak_z(result);
     double peak_dose = depth_dose[peak_z];
 
     out << "# Depth-Dose Distribution (PDD)\n";
@@ -164,7 +133,7 @@ int main(int argc, char* argv[]) {
         // Resolve output directory relative to config file location
         // If config_file is a path, get its directory
         std::string output_dir = config.output.output_dir;
-        if (output_dir[0] != '/') {
+        if (!output_dir.empty() && output_dir[0] != '/') {
             // Relative path - resolve from config file directory
             size_t last_slash = config_file.find_last_of("/\\");
             if (last_slash != std::string::npos) {
@@ -185,8 +154,8 @@ int main(int argc, char* argv[]) {
         std::cout << "Using GPU transport (Vavilov energy straggling)" << std::endl;
         result = GPUTransportRunner::run(config);
 
-        auto depth_dose = compute_depth_dose(result);
-        int peak_z = find_bragg_peak_index(depth_dose);
+        auto depth_dose = get_depth_dose(result);
+        int peak_z = find_bragg_peak_z(result);
         double peak_depth = peak_z * result.dz;
         double peak_dose = depth_dose[peak_z];
 

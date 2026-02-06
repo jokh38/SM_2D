@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 project(SM_2D LANGUAGES C CXX CUDA)
 find_package(CUDAToolkit REQUIRED)
 set(CUDA_ENABLED TRUE)
+option(SM2D_ENABLE_DEBUG_DUMPS "Enable verbose debug CSV dumps and kernel debug logs" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,6 +14,10 @@ if(CUDA_ENABLED)
     set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
     add_compile_definitions(SM2D_HAS_CUDA)
+endif()
+
+if(SM2D_ENABLE_DEBUG_DUMPS)
+    add_compile_definitions(SM2D_ENABLE_DEBUG_DUMPS)
 endif()
 
 # Find dependencies
@@ -45,6 +50,11 @@ set(IMPL_CPU_SOURCES
     src/audit/reporting.cpp
     src/validation/bragg_peak.cpp
     src/validation/lateral_spread.cpp
+    src/validation/deterministic_beam.cpp
+    src/validation/determinism.cpp
+    src/validation/validation_report.cpp
+    src/source/pencil_source.cpp
+    src/source/gaussian_source.cpp
     src/gpu/gpu_transport_runner.cpp
 )
 

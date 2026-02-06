@@ -20,7 +20,20 @@ set(TEST_COMMON_FILES
     audit/test_global_budget.cpp
     audit/test_reporting.cpp
     perf/test_memory_profiling.cpp
+    source/test_pencil.cpp
+    source/test_gaussian.cpp
 )
+
+option(SM2D_ENABLE_VALIDATION_TESTS "Enable validation test suite (longer runtime)" OFF)
+if(SM2D_ENABLE_VALIDATION_TESTS)
+    list(APPEND TEST_COMMON_FILES
+        validation/test_bragg_peak.cpp
+        validation/test_determinism.cpp
+        validation/test_lateral_spread.cpp
+        validation/test_pencil_beam.cpp
+        validation/test_validation_report.cpp
+    )
+endif()
 
 # CUDA-specific test files
 set(TEST_CUDA_FILES

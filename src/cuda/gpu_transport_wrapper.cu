@@ -12,14 +12,12 @@
 #include <fstream>
 #include <iomanip>
 
-// Bring CUDA types into sm_2d namespace for compatibility
-using ::DeviceLUTWrapper;
-
 namespace sm_2d {
 
 // ============================================================================
-// Debug: Dump non-zero cell information to CSV (initial state)
+// Optional debug dump: non-zero cell information to CSV (initial state)
 // ============================================================================
+#if defined(SM2D_ENABLE_DEBUG_DUMPS)
 static void dump_initial_cells_to_csv(
     const DevicePsiC& psi,
     int Nx, int Nz, float dx, float dz
@@ -93,6 +91,7 @@ static void dump_initial_cells_to_csv(
     ofs.close();
     std::cout << "  DEBUG: Wrote " << nonzero_cells.size() << " initial non-zero cells to debug_cells_iter_00_initial.csv" << std::endl;
 }
+#endif
 
 // ============================================================================
 
@@ -344,8 +343,10 @@ void run_k1k6_pipeline_transport(
     std::cout << "    Total weight: " << total_weight << " (expected: " << W_total << ")" << std::endl;
     std::cout << "    Non-zero cells: " << nonzero_cells << " / " << psi_in.N_cells << std::endl;
 
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
     // DEBUG: Dump initial cell state
     dump_initial_cells_to_csv(psi_in, Nx, Nz, dx, dz);
+    #endif
 
     // ========================================================================
     // STEP 4: Run Main Pipeline

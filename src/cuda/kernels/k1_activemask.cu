@@ -69,6 +69,6 @@ void run_K1_ActiveMask(
             }
         }
 
-        ActiveMask[cell] = needs_fine_transport ? 1 : 0;  // Removed weight check to allow all low-energy particles
+        ActiveMask[cell] = (needs_fine_transport && W_cell > weight_active_min) ? 1 : 0;
     }
 }
