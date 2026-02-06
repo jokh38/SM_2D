@@ -530,11 +530,9 @@ __global__ void K2_CoarseTransport(
                                     }
                                 } else {
                                     // No left neighbor: treat lateral tail as domain boundary loss.
+                                    cell_boundary_weight += w_spread_left;
                                     cell_boundary_energy += E_new * w_spread_left;
                                 }
-
-                                // Keep outflow accounting for both internal transfer and domain loss.
-                                cell_boundary_weight += w_spread_left;
                             }
 
                             // Emit right tail to right neighbor (or boundary if no neighbor)
@@ -561,11 +559,9 @@ __global__ void K2_CoarseTransport(
                                     }
                                 } else {
                                     // No right neighbor: treat lateral tail as domain boundary loss.
+                                    cell_boundary_weight += w_spread_right;
                                     cell_boundary_energy += E_new * w_spread_right;
                                 }
-
-                                // Keep outflow accounting for both internal transfer and domain loss.
-                                cell_boundary_weight += w_spread_right;
                             }
                         }
                     }

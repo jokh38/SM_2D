@@ -96,6 +96,10 @@ __global__ void inject_gaussian_source_kernel(
     float* d_injected_weight,
     float* d_out_of_grid_weight,
     float* d_slot_dropped_weight,
+    // Optional accounting counters (all in units of MeV)
+    double* d_injected_energy,
+    double* d_out_of_grid_energy,
+    double* d_slot_dropped_energy,
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
@@ -186,6 +190,13 @@ struct K1K6PipelineState {
     AuditReport* d_audit_report;
     double* d_weight_in;
     double* d_weight_out;
+    // Source accounting (host-side scalars captured before transport loop)
+    float source_injected_weight;
+    float source_out_of_grid_weight;
+    float source_slot_dropped_weight;
+    double source_injected_energy;
+    double source_out_of_grid_energy;
+    double source_slot_dropped_energy;
 
     // Device memory ownership
     bool owns_device_memory;
@@ -209,6 +220,10 @@ struct K1K6PipelineState {
         , d_theta_edges(nullptr), d_E_edges(nullptr)
         , d_audit_report(nullptr)
         , d_weight_in(nullptr), d_weight_out(nullptr)
+        , source_injected_weight(0.0f), source_out_of_grid_weight(0.0f)
+        , source_slot_dropped_weight(0.0f)
+        , source_injected_energy(0.0), source_out_of_grid_energy(0.0)
+        , source_slot_dropped_energy(0.0)
         , owns_device_memory(false)
     {}
 
@@ -319,6 +334,11 @@ bool run_k5_conservation_audit(
     const float* d_prev_AbsorbedWeight_cutoff,
     const float* d_prev_AbsorbedWeight_nuclear,
     const float* d_prev_BoundaryLoss_weight,
+    float source_out_of_grid_weight,
+    float source_slot_dropped_weight,
+    double source_out_of_grid_energy,
+    double source_slot_dropped_energy,
+    int include_source_terms,
     const float* d_E_edges,
     int N_E,
     int N_E_local,

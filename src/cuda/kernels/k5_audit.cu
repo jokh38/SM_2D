@@ -36,6 +36,11 @@ __global__ void K5_ConservationAudit(
     const float* __restrict__ PrevAbsorbedWeight_cutoff,
     const float* __restrict__ PrevAbsorbedWeight_nuclear,
     const float* __restrict__ PrevBoundaryLoss_weight,
+    float source_out_of_grid_weight,
+    float source_slot_dropped_weight,
+    double source_out_of_grid_energy,
+    double source_slot_dropped_energy,
+    int include_source_terms,
     const float* __restrict__ E_edges,
     int N_E,
     int N_E_local,
@@ -104,12 +109,30 @@ __global__ void K5_ConservationAudit(
     atomicAdd(&report[0].E_nuclear_total, E_nuclear);
     atomicAdd(&report[0].E_boundary_total, E_boundary);
 
+    if (include_source_terms && cell == 0) {
+        float W_source_out = fmaxf(0.0f, source_out_of_grid_weight);
+        float W_source_slot = fmaxf(0.0f, source_slot_dropped_weight);
+        double E_source_out = fmax(0.0, source_out_of_grid_energy);
+        double E_source_slot = fmax(0.0, source_slot_dropped_energy);
+
+        // Lift iteration-1 audit from in-grid-only accounting to source-total accounting.
+        atomicAdd(&report[0].W_in_total, W_source_out + W_source_slot);
+        atomicAdd(&report[0].E_in_total, E_source_out + E_source_slot);
+
+        atomicAdd(&report[0].W_source_out_of_grid_total, W_source_out);
+        atomicAdd(&report[0].W_source_slot_drop_total, W_source_slot);
+        atomicAdd(&report[0].E_source_out_of_grid_total, E_source_out);
+        atomicAdd(&report[0].E_source_slot_drop_total, E_source_slot);
+    }
+
     int prev_count = atomicAdd(&report[0].processed_cells, 1);
     if (prev_count == N_cells - 1) {
         float W_rhs = report[0].W_out_total +
                       report[0].W_cutoff_total +
                       report[0].W_nuclear_total +
-                      report[0].W_boundary_total;
+                      report[0].W_boundary_total +
+                      report[0].W_source_out_of_grid_total +
+                      report[0].W_source_slot_drop_total;
         float W_error_abs = fabsf(report[0].W_in_total - W_rhs);
         float W_rel_error = W_error_abs / fmaxf(report[0].W_in_total, 1e-20f);
 
@@ -120,7 +143,9 @@ __global__ void K5_ConservationAudit(
                        report[0].E_dep_total +
                        report[0].E_cutoff_total +
                        report[0].E_nuclear_total +
-                       report[0].E_boundary_total;
+                       report[0].E_boundary_total +
+                       report[0].E_source_out_of_grid_total +
+                       report[0].E_source_slot_drop_total;
         double E_error_abs = fabs(report[0].E_in_total - E_rhs);
         float E_rel_error = static_cast<float>(E_error_abs / fmax(report[0].E_in_total, 1e-20));
         report[0].E_error = E_rel_error;

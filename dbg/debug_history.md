@@ -305,3 +305,112 @@ for (int i = 0; i < total_cells; ++i) {
 - Test 2: Match MOQUI beam characteristics (sigma_x ≈ 3.8mm)
 - Test 3: Verify energy deposition scaling
 
+
+---
+
+## Commit: 4ad569c (2026-02-06)
+
+### Current Test Run: test_c.ini (150 MeV)
+
+**Configuration:**
+- Energy: 150 MeV
+- Grid: 11 x 200 (dx=2mm, dz=2mm)
+- Beam: Gaussian, sigma_x=20mm, sigma_theta=0.001 rad, n_samples=1000
+- Weight: 1.0
+
+**Results:**
+
+**❌ CRITICAL ISSUE: Source Injection Problem**
+```
+Source injection accounting:
+  Injected in-grid: 0.088 (8.8%)
+  Outside grid:     0.672995 (67.2995%)
+  Slot dropped:     0.239 (23.9%)
+Total weight: 0.088 (expected: 1)
+```
+
+**Root Cause Analysis:**
+1. **Grid misalignment**: Grid spans x=1mm to x=21mm (not centered at 0)
+   - With sigma_x=20mm and beam centered at x=0, ~67% of beam falls outside the grid
+   - Grid should be centered at beam position (x=-11mm to +11mm) or beam should be centered in grid
+
+2. **Bragg Peak incorrectly identified at 0mm depth**
+   - For 150 MeV, Bragg peak should be at ~157mm depth (R(150 MeV) = 157.7mm per LUT)
+   - Actual dose goes to 0 at ~52mm - particles stopping way too early
+
+3. **Energy conservation issue:**
+   - Energy Deposited: 1.22007 MeV (vs 150 MeV input)
+   - Total Accounted Energy: 1.48912 MeV
+   - Only ~1% of input energy is being deposited
+
+4. **Weight audit fails consistently** throughout all 231 iterations
+
+**Analysis:**
+- The grid/beam misalignment causes most particles (67%) to be lost immediately
+- Even the 8.8% that enter the grid are not reaching their expected range
+- This suggests fundamental issues with the transport physics beyond just the grid alignment
+
+**Recommendations:**
+1. Fix grid centering or beam positioning in test config
+2. Re-run with proper alignment to see if transport physics is correct
+3. Investigate why particles are stopping at ~52mm instead of ~157mm
+
+---
+
+## Session Handoff: 2026-02-06 (K2/K3 boundary fix + source energy accounting)
+
+### What Was Done
+
+1. **Fixed lateral boundary-weight mis-accounting in K2/K3**
+   - Updated `src/cuda/kernels/k2_coarsetransport.cu` and `src/cuda/kernels/k3_finetransport.cu` so lateral spread tails contribute to `BoundaryLoss_weight` **only when neighbor cell does not exist** (true domain exit).
+   - Internal neighbor transfer via buckets no longer inflates boundary-loss terms.
+
+2. **Added source injection energy accounting channels**
+   - Extended Gaussian source injection to track:
+     - injected in-grid energy,
+     - outside-grid energy,
+     - slot-dropped energy.
+   - Implemented in:
+     - `src/cuda/k1k6_pipeline.cuh`
+     - `src/cuda/k1k6_pipeline.cu`
+     - `src/cuda/gpu_transport_wrapper.cu`
+
+3. **Wired source loss channels into K5 audit inputs (iteration 1)**
+   - Extended K5 interfaces and report struct to include source out-of-grid / slot-drop channels.
+   - Implemented in:
+     - `src/cuda/kernels/k5_audit.cuh`
+     - `src/cuda/kernels/k5_audit.cu`
+     - `src/cuda/k1k6_pipeline.cuh`
+     - `src/cuda/k1k6_pipeline.cu`
+
+4. **Improved runtime conservation reporting**
+   - Energy report now prints:
+     - source energy breakdown,
+     - transport-only accounted energy,
+     - accounted energy including source-loss channels.
+
+### Current Validation Snapshot (verbose `test_c.ini`)
+
+- Source energy accounting is now visible and non-zero:
+  - in-grid ~15.147 MeV
+  - outside-grid ~74.401 MeV
+  - slot-dropped ~60.453 MeV
+  - source total ~150.002 MeV
+- Weight audit improved strongly after boundary fix:
+  - pass/fail: 195 / 5
+  - max weight error: ~1.74e-06
+- Energy audit still fails all iterations (0/200 pass), but first-iteration error dropped (now reflects source terms).
+
+### Next Session Plan
+
+1. **Implement real `E_cutoff` energy tally in K5 path**
+   - Replace hardcoded `E_cutoff = 0.0` with actual per-iteration cutoff energy accounting.
+
+2. **Include transport drop channels in K5 conservation equations**
+   - Fold K2/K3 bucket/slot drop and K4 slot drop channels into both weight and energy audits, or fail-fast when non-zero.
+
+3. **Add focused regression checks**
+   - Add/extend tests to protect:
+     - lateral boundary-loss semantics,
+     - source-energy accounting visibility,
+     - K5 equation terms for source/drop/cutoff channels.

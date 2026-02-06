@@ -10,6 +10,7 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
+#include <cmath>
 
 namespace sm_2d {
 
@@ -232,14 +233,30 @@ bool run_k1k6_pipeline_transport(
     float* d_injected_weight = nullptr;
     float* d_out_of_grid_weight = nullptr;
     float* d_slot_dropped_weight = nullptr;
+    double* d_injected_energy = nullptr;
+    double* d_out_of_grid_energy = nullptr;
+    double* d_slot_dropped_energy = nullptr;
+
+    float h_injected_weight = use_gaussian ? 0.0f : W_total;
+    float h_out_of_grid_weight = 0.0f;
+    float h_slot_dropped_weight = 0.0f;
+    double h_injected_energy = static_cast<double>(E0) * static_cast<double>(h_injected_weight);
+    double h_out_of_grid_energy = 0.0;
+    double h_slot_dropped_energy = 0.0;
 
     if (use_gaussian) {
         cudaMalloc(&d_injected_weight, sizeof(float));
         cudaMalloc(&d_out_of_grid_weight, sizeof(float));
         cudaMalloc(&d_slot_dropped_weight, sizeof(float));
+        cudaMalloc(&d_injected_energy, sizeof(double));
+        cudaMalloc(&d_out_of_grid_energy, sizeof(double));
+        cudaMalloc(&d_slot_dropped_energy, sizeof(double));
         cudaMemset(d_injected_weight, 0, sizeof(float));
         cudaMemset(d_out_of_grid_weight, 0, sizeof(float));
         cudaMemset(d_slot_dropped_weight, 0, sizeof(float));
+        cudaMemset(d_injected_energy, 0, sizeof(double));
+        cudaMemset(d_out_of_grid_energy, 0, sizeof(double));
+        cudaMemset(d_slot_dropped_energy, 0, sizeof(double));
 
         // Gaussian beam: launch multiple threads to sample particles
         int threads = 256;
@@ -255,6 +272,9 @@ bool run_k1k6_pipeline_transport(
             d_injected_weight,
             d_out_of_grid_weight,
             d_slot_dropped_weight,
+            d_injected_energy,
+            d_out_of_grid_energy,
+            d_slot_dropped_energy,
             state.d_theta_edges, state.d_E_edges,
             N_theta, N_E,
             N_theta_local, N_E_local
@@ -281,6 +301,9 @@ bool run_k1k6_pipeline_transport(
         if (d_injected_weight) cudaFree(d_injected_weight);
         if (d_out_of_grid_weight) cudaFree(d_out_of_grid_weight);
         if (d_slot_dropped_weight) cudaFree(d_slot_dropped_weight);
+        if (d_injected_energy) cudaFree(d_injected_energy);
+        if (d_out_of_grid_energy) cudaFree(d_out_of_grid_energy);
+        if (d_slot_dropped_energy) cudaFree(d_slot_dropped_energy);
         state.cleanup();
         device_psic_cleanup(psi_in);
         device_psic_cleanup(psi_out);
@@ -288,15 +311,18 @@ bool run_k1k6_pipeline_transport(
     }
 
     if (use_gaussian) {
-        float h_injected_weight = 0.0f;
-        float h_out_of_grid_weight = 0.0f;
-        float h_slot_dropped_weight = 0.0f;
         cudaMemcpy(&h_injected_weight, d_injected_weight, sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(&h_out_of_grid_weight, d_out_of_grid_weight, sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(&h_slot_dropped_weight, d_slot_dropped_weight, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_injected_energy, d_injected_energy, sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_out_of_grid_energy, d_out_of_grid_energy, sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_slot_dropped_energy, d_slot_dropped_energy, sizeof(double), cudaMemcpyDeviceToHost);
 
         if (verbose_logging) {
             float denom = (W_total > 1e-20f) ? W_total : 1.0f;
+            double E_denom = (std::abs(h_injected_energy + h_out_of_grid_energy + h_slot_dropped_energy) > 1e-20)
+                             ? (h_injected_energy + h_out_of_grid_energy + h_slot_dropped_energy)
+                             : 1.0;
             std::cout << "  Source injection accounting:" << std::endl;
             std::cout << "    Injected in-grid: " << h_injected_weight
                       << " (" << (100.0f * h_injected_weight / denom) << "%)" << std::endl;
@@ -304,12 +330,29 @@ bool run_k1k6_pipeline_transport(
                       << " (" << (100.0f * h_out_of_grid_weight / denom) << "%)" << std::endl;
             std::cout << "    Slot dropped:     " << h_slot_dropped_weight
                       << " (" << (100.0f * h_slot_dropped_weight / denom) << "%)" << std::endl;
+            std::cout << "  Source energy accounting:" << std::endl;
+            std::cout << "    Injected in-grid: " << h_injected_energy
+                      << " MeV (" << (100.0 * h_injected_energy / E_denom) << "%)" << std::endl;
+            std::cout << "    Outside grid:     " << h_out_of_grid_energy
+                      << " MeV (" << (100.0 * h_out_of_grid_energy / E_denom) << "%)" << std::endl;
+            std::cout << "    Slot dropped:     " << h_slot_dropped_energy
+                      << " MeV (" << (100.0 * h_slot_dropped_energy / E_denom) << "%)" << std::endl;
         }
 
         cudaFree(d_injected_weight);
         cudaFree(d_out_of_grid_weight);
         cudaFree(d_slot_dropped_weight);
+        cudaFree(d_injected_energy);
+        cudaFree(d_out_of_grid_energy);
+        cudaFree(d_slot_dropped_energy);
     }
+
+    state.source_injected_weight = h_injected_weight;
+    state.source_out_of_grid_weight = h_out_of_grid_weight;
+    state.source_slot_dropped_weight = h_slot_dropped_weight;
+    state.source_injected_energy = h_injected_energy;
+    state.source_out_of_grid_energy = h_out_of_grid_energy;
+    state.source_slot_dropped_energy = h_slot_dropped_energy;
 
     if (verbose_logging || debug_dumps_enabled) {
         // Optional heavy verification path for source injection accounting.

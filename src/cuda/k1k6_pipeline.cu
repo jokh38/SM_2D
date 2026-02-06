@@ -359,6 +359,9 @@ __global__ void inject_gaussian_source_kernel(
     float* d_injected_weight,
     float* d_out_of_grid_weight,
     float* d_slot_dropped_weight,
+    double* d_injected_energy,
+    double* d_out_of_grid_energy,
+    double* d_slot_dropped_energy,
     const float* __restrict__ theta_edges,
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
@@ -400,6 +403,9 @@ __global__ void inject_gaussian_source_kernel(
         if (d_out_of_grid_weight != nullptr) {
             atomicAdd(d_out_of_grid_weight, w_sample);
         }
+        if (d_out_of_grid_energy != nullptr) {
+            atomicAdd(d_out_of_grid_energy, static_cast<double>(E_sample * w_sample));
+        }
         return;
     }
 
@@ -429,8 +435,16 @@ __global__ void inject_gaussian_source_kernel(
         if (d_injected_weight != nullptr) {
             atomicAdd(d_injected_weight, w_sample);
         }
-    } else if (d_slot_dropped_weight != nullptr) {
-        atomicAdd(d_slot_dropped_weight, w_sample);
+        if (d_injected_energy != nullptr) {
+            atomicAdd(d_injected_energy, static_cast<double>(E_sample * w_sample));
+        }
+    } else {
+        if (d_slot_dropped_weight != nullptr) {
+            atomicAdd(d_slot_dropped_weight, w_sample);
+        }
+        if (d_slot_dropped_energy != nullptr) {
+            atomicAdd(d_slot_dropped_energy, static_cast<double>(E_sample * w_sample));
+        }
     }
 }
 
@@ -774,6 +788,7 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     int zero = 0;
     cudaMemcpy(state.d_n_active, &zero, sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(state.d_n_coarse, &zero, sizeof(int), cudaMemcpyHostToDevice);
+
 }
 
 AuditReport get_audit_report(const K1K6PipelineState& state, int Nx, int Nz) {
@@ -976,6 +991,11 @@ bool run_k5_conservation_audit(
     const float* d_prev_AbsorbedWeight_cutoff,
     const float* d_prev_AbsorbedWeight_nuclear,
     const float* d_prev_BoundaryLoss_weight,
+    float source_out_of_grid_weight,
+    float source_slot_dropped_weight,
+    double source_out_of_grid_energy,
+    double source_slot_dropped_energy,
+    int include_source_terms,
     const float* d_E_edges,
     int N_E,
     int N_E_local,
@@ -1006,6 +1026,11 @@ bool run_k5_conservation_audit(
         d_prev_AbsorbedWeight_cutoff,
         d_prev_AbsorbedWeight_nuclear,
         d_prev_BoundaryLoss_weight,
+        source_out_of_grid_weight,
+        source_slot_dropped_weight,
+        source_out_of_grid_energy,
+        source_slot_dropped_energy,
+        include_source_terms,
         d_E_edges,
         N_E,
         N_E_local,
@@ -1249,6 +1274,11 @@ bool run_k1k6_pipeline_transport(
                                  state.d_prev_AbsorbedWeight_cutoff,
                                  state.d_prev_AbsorbedWeight_nuclear,
                                  state.d_prev_BoundaryLoss_weight,
+                                 state.source_out_of_grid_weight,
+                                 state.source_slot_dropped_weight,
+                                 state.source_out_of_grid_energy,
+                                 state.source_slot_dropped_energy,
+                                 (iter == 1) ? 1 : 0,
                                  state.d_E_edges,
                                  config.N_E,
                                  config.N_E_local,
@@ -1337,14 +1367,24 @@ bool run_k1k6_pipeline_transport(
         total_nuclear_energy += h_AbsorbedEnergy_nuclear[i];
     }
 
-    double total_accounted = total_edep + total_boundary_loss_energy + total_nuclear_energy;
+    const double source_injected_energy = state.source_injected_energy;
+    const double source_out_of_grid_energy = state.source_out_of_grid_energy;
+    const double source_slot_dropped_energy = state.source_slot_dropped_energy;
+    const double source_total_energy = source_injected_energy + source_out_of_grid_energy + source_slot_dropped_energy;
+    double total_accounted_transport = total_edep + total_boundary_loss_energy + total_nuclear_energy;
+    double total_accounted_system = total_accounted_transport + source_out_of_grid_energy + source_slot_dropped_energy;
 
     std::cout << "\n=== Energy Conservation Report ===" << std::endl;
+    std::cout << "  Source Energy (in-grid): " << source_injected_energy << " MeV" << std::endl;
+    std::cout << "  Source Energy (outside grid): " << source_out_of_grid_energy << " MeV" << std::endl;
+    std::cout << "  Source Energy (slot dropped): " << source_slot_dropped_energy << " MeV" << std::endl;
+    std::cout << "  Source Energy (total): " << source_total_energy << " MeV" << std::endl;
     std::cout << "  Energy Deposited: " << total_edep << " MeV" << std::endl;
     std::cout << "  Nuclear Energy Deposited: " << total_nuclear_energy << " MeV" << std::endl;
     std::cout << "  Boundary Loss Energy: " << total_boundary_loss_energy << " MeV" << std::endl;
     std::cout << "  Cutoff Weight: " << total_cutoff_weight << " (particles below E < 0.1 MeV)" << std::endl;
-    std::cout << "  Total Accounted Energy: " << total_accounted << " MeV" << std::endl;
+    std::cout << "  Total Accounted Energy (transport only): " << total_accounted_transport << " MeV" << std::endl;
+    std::cout << "  Total Accounted Energy (including source losses): " << total_accounted_system << " MeV" << std::endl;
     std::cout << "=====================================" << std::endl;
 
     return true;
