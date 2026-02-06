@@ -22,7 +22,7 @@ extern __device__ void device_gaussian_spread_weights_subcell(float* weights, fl
 // ============================================================================
 
 constexpr uint32_t DEVICE_EMPTY_BLOCK_ID = 0xFFFFFFFF;
-constexpr int DEVICE_Kb_out = 8;  // Reduced from 64 to match DEVICE_Kb and save memory
+constexpr int DEVICE_Kb_out = 32; // Match DEVICE_Kb to reduce bucket slot drops
 constexpr int DEVICE_LOCAL_BINS = LOCAL_BINS;  // Now 128 for 3D (theta, E, x_sub)
 
 // Face definitions (must match K4 get_neighbor)
@@ -87,21 +87,23 @@ __device__ inline int device_bucket_find_or_allocate_slot(
 
 // Emit a particle weight to a bucket
 // P3 FIX: This function was missing from original implementation
-__device__ inline void device_emit_to_bucket(
+__device__ inline bool device_emit_to_bucket(
     DeviceOutflowBucket& bucket,
     uint32_t bid,           // Coarse block ID
     uint16_t lidx,          // Local bin index (0-31)
     float weight            // Weight to add
 ) {
-    if (weight <= 0.0f) return;
+    if (weight <= 0.0f) return true;
 
     int slot = device_bucket_find_or_allocate_slot(bucket, bid);
     if (slot >= 0) {
         // Atomic add for thread safety
         atomicAdd(&bucket.value[slot][lidx], weight);
         bucket.local_count[slot]++;
+        return true;
     }
     // Note: If bucket is full, weight is lost (should be rare with Kb_out=64)
+    return false;
 }
 
 // Emit a component to a bucket with full phase-space encoding (2D version for compatibility)
@@ -384,7 +386,7 @@ __device__ inline void device_emit_component_to_bucket_interp(
 // FIX Problem 1: Added z_sub for complete particle position tracking
 // ============================================================================
 
-__device__ inline void device_emit_component_to_bucket_4d(
+__device__ inline float device_emit_component_to_bucket_4d(
     DeviceOutflowBucket& bucket,
     float theta,            // Polar angle [rad]
     float E,                // Energy [MeV]
@@ -398,7 +400,7 @@ __device__ inline void device_emit_component_to_bucket_4d(
     int N_theta_local,      // Local angular bins per block (8)
     int N_E_local           // Local energy bins per block (4)
 ) {
-    if (weight <= 0.0f) return;
+    if (weight <= 0.0f) return 0.0f;
 
     // Find global bins
     int theta_bin = 0;
@@ -444,7 +446,7 @@ __device__ inline void device_emit_component_to_bucket_4d(
     uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
 
     // Emit to bucket
-    device_emit_to_bucket(bucket, bid, lidx, weight);
+    return device_emit_to_bucket(bucket, bid, lidx, weight) ? 0.0f : weight;
 }
 
 // ============================================================================

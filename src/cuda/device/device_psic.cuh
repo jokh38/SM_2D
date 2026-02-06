@@ -27,7 +27,7 @@
 // - Total per cell: 32 * 512 = 16,384 values
 // ============================================================================
 
-constexpr int DEVICE_Kb = 8;            // Slots per cell on device (reduced for memory)
+constexpr int DEVICE_Kb = 32;           // Slots per cell on device
 constexpr uint32_t DEVICE_EMPTY_SLOT = 0xFFFFFFFF;  // Empty slot marker
 
 // ============================================================================

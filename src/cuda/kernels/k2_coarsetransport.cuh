@@ -92,6 +92,17 @@ void run_K2_CoarseTransport(
     float* values_out
 );
 
+// Debug counters for slot allocation failures in K2 output PsiC.
+void k2_reset_debug_counters();
+void k2_get_debug_counters(
+    unsigned long long& slot_drop_count,
+    double& slot_drop_weight,
+    double& slot_drop_energy,
+    unsigned long long& bucket_drop_count,
+    double& bucket_drop_weight,
+    double& bucket_drop_energy
+);
+
 // ============================================================================
 // Profiling Functions (ITERATION 3)
 // ============================================================================

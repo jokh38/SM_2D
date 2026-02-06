@@ -35,6 +35,14 @@ __device__ double g_mcs_total_sqrt_A = 0.0;                      // Accumulated 
 __device__ double g_mcs_total_sqrt_C_dx = 0.0;                   // Accumulated sqrt(C)/dx values
 #endif
 
+// Debug counters for output-slot allocation failures (K2).
+__device__ unsigned long long g_k2_slot_drop_count = 0;
+__device__ double g_k2_slot_drop_weight = 0.0;
+__device__ double g_k2_slot_drop_energy = 0.0;
+__device__ unsigned long long g_k2_bucket_drop_count = 0;
+__device__ double g_k2_bucket_drop_weight = 0.0;
+__device__ double g_k2_bucket_drop_energy = 0.0;
+
 // ============================================================================
 // K2 Coarse Transport: Energy Loss with Fermi-Eyges Moment-Based Lateral Spreading
 // ============================================================================
@@ -313,11 +321,16 @@ __global__ void K2_CoarseTransport(
 
                     int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
                     DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                    device_emit_component_to_bucket_4d(
+                    float dropped_boundary_weight = device_emit_component_to_bucket_4d(
                         bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
                         theta_edges, E_edges, N_theta, N_E,
                         N_theta_local, N_E_local
                     );
+                    if (dropped_boundary_weight > 0.0f) {
+                        atomicAdd(&g_k2_bucket_drop_count, 1ULL);
+                        atomicAdd(&g_k2_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
+                        atomicAdd(&g_k2_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
+                    }
 
                     // Deposit energy in current cell before particle leaves
                     cell_edep += edep;
@@ -396,7 +409,14 @@ __global__ void K2_CoarseTransport(
                     // with proper sub-cell spacing (dx/8 instead of dx)
                     // ====================================================================
 
-                    if (out_slot >= 0 && E_new > 0.1f) {
+                    if (out_slot < 0 && E_new > 0.1f) {
+                        atomicAdd(&g_k2_slot_drop_count, 1ULL);
+                        atomicAdd(&g_k2_slot_drop_weight, static_cast<double>(w_new));
+                        atomicAdd(&g_k2_slot_drop_energy, static_cast<double>(E_new * w_new));
+                        continue;
+                    }
+
+                    if (E_new > 0.1f) {
                         // FIX B: Use sub-cell Gaussian spreading with correct dx/8 spacing
                         constexpr int N_x_sub = 8;  // Number of sub-cell bins
 
@@ -454,7 +474,7 @@ __global__ void K2_CoarseTransport(
 
                         // FIX B extended: For large sigma_x (when spread exceeds cell boundary),
                         // also emit to neighbor cells via buckets
-                        if (sigma_x > dx * 0.5f) {
+                        if (w_cell_fraction < 1.0f - 1e-6f) {
                             // Left/right tail weights from Gaussian CDF.
                             // Re-normalize to guarantee: w_cell_fraction + w_left + w_right = 1.
                             float w_left_raw = fmaxf(0.0f, device_gaussian_cdf(left_boundary, x_center, sigma_x));
@@ -480,12 +500,17 @@ __global__ void K2_CoarseTransport(
                                     int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
                                     DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
 
-                                    device_emit_component_to_bucket_4d(
+                                    float dropped_left_tail = device_emit_component_to_bucket_4d(
                                         lateral_bucket, theta_new, E_new, w_spread_left,
                                         x_sub_neighbor, z_sub_neighbor,
                                         theta_edges, E_edges, N_theta, N_E,
                                         N_theta_local, N_E_local
                                     );
+                                    if (dropped_left_tail > 0.0f) {
+                                        atomicAdd(&g_k2_bucket_drop_count, 1ULL);
+                                        atomicAdd(&g_k2_bucket_drop_weight, static_cast<double>(dropped_left_tail));
+                                        atomicAdd(&g_k2_bucket_drop_energy, static_cast<double>(E_new * dropped_left_tail));
+                                    }
                                 } else {
                                     // No left neighbor: treat lateral tail as domain boundary loss.
                                     cell_boundary_energy += E_new * w_spread_left;
@@ -506,12 +531,17 @@ __global__ void K2_CoarseTransport(
                                     int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
                                     DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
 
-                                    device_emit_component_to_bucket_4d(
+                                    float dropped_right_tail = device_emit_component_to_bucket_4d(
                                         lateral_bucket, theta_new, E_new, w_spread_right,
                                         x_sub_neighbor, z_sub_neighbor,
                                         theta_edges, E_edges, N_theta, N_E,
                                         N_theta_local, N_E_local
                                     );
+                                    if (dropped_right_tail > 0.0f) {
+                                        atomicAdd(&g_k2_bucket_drop_count, 1ULL);
+                                        atomicAdd(&g_k2_bucket_drop_weight, static_cast<double>(dropped_right_tail));
+                                        atomicAdd(&g_k2_bucket_drop_energy, static_cast<double>(E_new * dropped_right_tail));
+                                    }
                                 } else {
                                     // No right neighbor: treat lateral tail as domain boundary loss.
                                     cell_boundary_energy += E_new * w_spread_right;
@@ -534,6 +564,33 @@ __global__ void K2_CoarseTransport(
     atomicAdd(&AbsorbedEnergy_nuclear[cell], cell_E_nuclear);
     atomicAdd(&BoundaryLoss_weight[cell], cell_boundary_weight);
     atomicAdd(&BoundaryLoss_energy[cell], cell_boundary_energy);
+}
+
+void k2_reset_debug_counters() {
+    constexpr unsigned long long zero_count = 0ULL;
+    constexpr double zero_value = 0.0;
+    cudaMemcpyToSymbol(g_k2_slot_drop_count, &zero_count, sizeof(zero_count));
+    cudaMemcpyToSymbol(g_k2_slot_drop_weight, &zero_value, sizeof(zero_value));
+    cudaMemcpyToSymbol(g_k2_slot_drop_energy, &zero_value, sizeof(zero_value));
+    cudaMemcpyToSymbol(g_k2_bucket_drop_count, &zero_count, sizeof(zero_count));
+    cudaMemcpyToSymbol(g_k2_bucket_drop_weight, &zero_value, sizeof(zero_value));
+    cudaMemcpyToSymbol(g_k2_bucket_drop_energy, &zero_value, sizeof(zero_value));
+}
+
+void k2_get_debug_counters(
+    unsigned long long& slot_drop_count,
+    double& slot_drop_weight,
+    double& slot_drop_energy,
+    unsigned long long& bucket_drop_count,
+    double& bucket_drop_weight,
+    double& bucket_drop_energy
+) {
+    cudaMemcpyFromSymbol(&slot_drop_count, g_k2_slot_drop_count, sizeof(slot_drop_count));
+    cudaMemcpyFromSymbol(&slot_drop_weight, g_k2_slot_drop_weight, sizeof(slot_drop_weight));
+    cudaMemcpyFromSymbol(&slot_drop_energy, g_k2_slot_drop_energy, sizeof(slot_drop_energy));
+    cudaMemcpyFromSymbol(&bucket_drop_count, g_k2_bucket_drop_count, sizeof(bucket_drop_count));
+    cudaMemcpyFromSymbol(&bucket_drop_weight, g_k2_bucket_drop_weight, sizeof(bucket_drop_weight));
+    cudaMemcpyFromSymbol(&bucket_drop_energy, g_k2_bucket_drop_energy, sizeof(bucket_drop_energy));
 }
 
 // ============================================================================

@@ -18,6 +18,10 @@ __device__ int d_transferred_particles = 0;
 __device__ int d_transferred_weight = 0;
 #endif
 
+// Debug counters for K4 slot allocation failures.
+__device__ unsigned long long g_k4_slot_drop_count = 0;
+__device__ double g_k4_slot_drop_weight = 0.0;
+
 __global__ void K4_BucketTransfer(
     const DeviceOutflowBucket* __restrict__ OutflowBuckets,
     float* __restrict__ values_out,
@@ -116,6 +120,18 @@ __global__ void K4_BucketTransfer(
                         }
                     }
                 }
+                if (out_slot < 0) {
+                    double dropped_weight = 0.0;
+                    for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
+                        float w = bucket.value[slot][lidx];
+                        if (w > 0.0f) {
+                            dropped_weight += static_cast<double>(w);
+                        }
+                    }
+                    atomicAdd(&g_k4_slot_drop_count, 1ULL);
+                    atomicAdd(&g_k4_slot_drop_weight, dropped_weight);
+                    continue;
+                }
             }
 
             // Transfer all local bins
@@ -153,6 +169,21 @@ __global__ void K4_BucketTransfer(
                s_transfer_count, d_transferred_weight);
     }
     #endif
+}
+
+void k4_reset_debug_counters() {
+    constexpr unsigned long long zero_count = 0ULL;
+    constexpr double zero_value = 0.0;
+    cudaMemcpyToSymbol(g_k4_slot_drop_count, &zero_count, sizeof(zero_count));
+    cudaMemcpyToSymbol(g_k4_slot_drop_weight, &zero_value, sizeof(zero_value));
+}
+
+void k4_get_debug_counters(
+    unsigned long long& slot_drop_count,
+    double& slot_drop_weight
+) {
+    cudaMemcpyFromSymbol(&slot_drop_count, g_k4_slot_drop_count, sizeof(slot_drop_count));
+    cudaMemcpyFromSymbol(&slot_drop_weight, g_k4_slot_drop_weight, sizeof(slot_drop_weight));
 }
 
 // ============================================================================

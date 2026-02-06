@@ -12,6 +12,13 @@ __global__ void K4_BucketTransfer(
     int Nx, int Nz
 );
 
+// Debug counters for bucket-transfer slot allocation failures in K4.
+void k4_reset_debug_counters();
+void k4_get_debug_counters(
+    unsigned long long& slot_drop_count,
+    double& slot_drop_weight
+);
+
 // CPU wrapper
 void run_K4_BucketTransfer(
     const DeviceOutflowBucket* buckets,

@@ -69,6 +69,20 @@ __global__ void K3_FineTransport(
     float* __restrict__ values_out
 );
 
+// Debug counters for slot allocation failures in K3 output PsiC.
+void k3_reset_debug_counters();
+void k3_get_debug_counters(
+    unsigned long long& slot_drop_count,
+    double& slot_drop_weight,
+    double& slot_drop_energy,
+    unsigned long long& bucket_drop_count,
+    double& bucket_drop_weight,
+    double& bucket_drop_energy,
+    unsigned long long& pruned_weight_count,
+    double& pruned_weight_sum,
+    double& pruned_energy_sum
+);
+
 // CPU test stubs (unchanged)
 K3Result run_K3_single_component(const Component& c);
 K3Result run_K3_with_forced_split(const Component& c);
