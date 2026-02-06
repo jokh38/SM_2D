@@ -52,6 +52,8 @@ __global__ void K3_FineTransport(
     // Physics configuration flags (for testing/validation)
     bool enable_straggling,   // Enable energy straggling (Vavilov)
     bool enable_nuclear,      // Enable nuclear interactions
+    // FIX C: Initial beam width for lateral spreading (from input config)
+    float sigma_x_initial,
     // Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
     // Outputs
     double* __restrict__ EdepC,

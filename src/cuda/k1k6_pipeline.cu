@@ -643,6 +643,7 @@ bool run_k2_coarse_transport(
     k2_cfg.E_coarse_max = config.E_coarse_max;
     k2_cfg.step_coarse = config.step_coarse;
     k2_cfg.n_steps_per_cell = config.n_steps_per_cell;
+    k2_cfg.sigma_x_initial = config.sigma_x_initial;  // FIX C: Pass beam width
 
     // Allocate device grid edges
     float* d_theta_edges;
@@ -671,6 +672,7 @@ bool run_k2_coarse_transport(
         config.N_theta, config.N_E,
         config.N_theta_local, config.N_E_local,
         k2_cfg,
+        config.sigma_x_initial,  // FIX C: Pass initial beam width
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
         state.d_AbsorbedWeight_nuclear,
@@ -741,6 +743,7 @@ bool run_k3_fine_transport(
         config.N_theta_local, config.N_E_local,
         true,   // enable_straggling (full physics)
         true,   // enable_nuclear (full physics)
+        config.sigma_x_initial,  // FIX C: Pass initial beam width
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
         state.d_AbsorbedWeight_nuclear,

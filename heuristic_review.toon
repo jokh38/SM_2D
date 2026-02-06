@@ -1,0 +1,173 @@
+# Code Review: SM_2D
+
+architecture:
+  type: "Standard src layout"
+  domain: "General purpose"
+  description: "66 cpp files"
+
+components:
+  batch_plot.py:
+    imports:
+      external: ["matplotlib", "numpy"]
+      stdlib: ["argparse", "os", "pathlib", "re", "sys", "typing"]
+    complexity: "max=9, avg=5.0, hotspots=0"
+    exports: ["class BatchPlotter", "def __init__", "def _find_result_dirs", "def _load_results", "def _parse_params"]
+  batch_run.py:
+    imports:
+      external: ["batch_plot", "yaml"]
+      stdlib: ["argparse", "copy", "itertools", "multiprocessing", "os", "pathlib", "shutil", "subprocess", "sys", "typing"]
+    complexity: "max=13, avg=4.2, hotspots=0"
+    exports: ["class ConfigManager", "class ParameterSweep", "class BatchRunner", "def _run_wrapper", "def __init__"]
+  run_simulation.cpp:
+    complexity: "max=10, avg=5.4, hotspots=0"
+    exports: ["class stat", "def create_output_directory", "def make_pencil_beam_config", "def save_dose_2d", "def save_pdd"]
+  src/audit/conservation.cpp:
+    complexity: "max=1, avg=1.0, hotspots=0"
+    exports: ["def check_weight_conservation", "def compute_weight_error", "def check_energy_conservation", "def compute_energy_error"]
+  src/audit/global_budget.cpp:
+    complexity: "max=1, avg=1.0, hotspots=0"
+    exports: ["def aggregate_cell_audits", "def check_global_weight_conservation", "def check_global_energy_conservation"]
+  src/audit/reporting.cpp:
+    complexity: "max=1, avg=1.0, hotspots=0"
+    exports: ["def print_cell_weight_report", "def print_global_report", "def print_failed_cells", "def print_summary"]
+  src/boundary/boundaries.cpp:
+    complexity: "max=5, avg=5.0, hotspots=0"
+    exports: ["def get_neighbor"]
+  src/boundary/loss_tracking.cpp:
+    complexity: "max=2, avg=2.0, hotspots=0"
+    exports: ["def record_boundary_loss", "def total_boundary_weight_loss", "def total_boundary_energy_loss"]
+  src/core/buckets.cpp:
+    complexity: "max=5, avg=3.0, hotspots=0"
+    exports: ["def OutflowBucket", "def find_or_allocate_slot", "def clear"]
+  src/core/grids.cpp:
+    complexity: "max=5, avg=3.0, hotspots=0"
+    exports: ["class PiecewiseGridResult", "def EnergyGrid", "def create_piecewise_grid", "def CreatePiecewise", "def FindBin"]
+  src/core/psi_storage.cpp:
+    complexity: "max=5, avg=3.7, hotspots=0"
+    exports: ["def PsiC", "def find_or_allocate_slot", "def get_weight", "def set_weight", "def clear"]
+  src/gpu/gpu_transport_runner.cpp:
+    complexity: "max=5, avg=1.7, hotspots=0"
+    exports: ["def is_gpu_available", "def get_gpu_name", "def run", "def is_gpu_available", "def get_gpu_name"]
+  src/lut/nist_loader.cpp:
+    complexity: "max=5, avg=3.0, hotspots=0"
+    exports: ["def LoadNistData", "def FileExists"]
+  src/lut/r_lut.cpp:
+    complexity: "max=5, avg=3.0, hotspots=0"
+    exports: ["def GenerateRLUT", "def GenerateRLUT", "def lookup_R", "def lookup_S", "def lookup_E_inverse"]
+  src/perf/kernel_profiler.cpp:
+    complexity: "max=2, avg=1.4, hotspots=0"
+    exports: ["def start", "def stop", "def get_time_ms", "def get_total_time_ms", "def print_report"]
+  src/perf/memory_profiler.cpp:
+    complexity: "max=2, avg=1.1, hotspots=0"
+    exports: ["def MemoryProfiler", "def set_budget", "def start", "def stop", "def get_peak_bytes"]
+  src/perf/occupancy_analyzer.cpp:
+    complexity: "max=1, avg=1.0, hotspots=0"
+    exports: ["def analyze_kernel", "def get_occupancy_percent", "def get_limiting_factor"]
+  src/source/gaussian_source.cpp:
+    complexity: "max=5, avg=5.0, hotspots=0"
+    exports: ["def inject_source"]
+  src/source/pencil_source.cpp:
+    complexity: "max=3, avg=3.0, hotspots=0"
+    exports: ["def inject_source"]
+  src/utils/cuda_pool.cpp:
+    complexity: "max=3, avg=1.8, hotspots=0"
+    exports: ["def CudaPool", "def unknown", "def unknown", "def deallocate"]
+  src/utils/logger.cpp:
+    complexity: "max=3, avg=1.2, hotspots=0"
+    exports: ["def Logger", "def unknown", "def set_level", "def get_level", "def info"]
+  src/utils/memory_tracker.cpp:
+    complexity: "max=1, avg=1.0, hotspots=0"
+    exports: ["def MemoryTracker", "def get_current_usage", "def get_total_memory", "def set_warning_threshold", "def check_warning"]
+  src/validation/bragg_peak.cpp:
+    complexity: "max=8, avg=4.6, hotspots=0"
+    exports: ["def find_bragg_peak_position_mm", "def compute_bragg_peak_fwhm", "def find_R80", "def find_R20", "def compute_distal_falloff"]
+  src/validation/determinism.cpp:
+    complexity: "max=3, avg=2.0, hotspots=0"
+    exports: ["def compute_checksum", "def verify_determinism"]
+  src/validation/deterministic_beam.cpp:
+    complexity: "max=14, avg=7.0, hotspots=0"
+    exports: ["def run_pencil_beam", "def find_bragg_peak_z", "def get_depth_dose"]
+  src/validation/lateral_spread.cpp:
+    complexity: "max=7, avg=3.0, hotspots=0"
+    exports: ["def get_lateral_sigma_at_z", "def get_lateral_profile", "def compute_fermi_eyges_sigma", "def fit_gaussian_sigma", "def get_lateral_profile_subcell"]
+  src/validation/validation_report.cpp:
+    complexity: "max=2, avg=2.0, hotspots=0"
+    exports: ["def generate_validation_report", "def run_full_validation"]
+  validation/analyze_angular_divergence.py:
+    imports:
+      external: ["matplotlib", "numpy", "scipy"]
+      stdlib: ["pathlib", "sys", "traceback"]
+    complexity: "max=11, avg=2.8, hotspots=0"
+    exports: ["def load_moqui_data", "def extract_central_slice", "def gaussian", "def fit_sigma", "def sigma_evolution_model"]
+  validation/analyze_beam_size.py:
+    imports:
+      external: ["matplotlib", "numpy", "scipy"]
+      stdlib: ["pathlib", "sys", "traceback"]
+    complexity: "max=9, avg=2.7, hotspots=0"
+    exports: ["def load_moqui_3d_dose", "def extract_central_slice", "def gaussian", "def fit_gaussian_sigma", "def calculate_fwhm"]
+  validation/compare_sm2d_moqui.py:
+    imports:
+      external: ["matplotlib", "numpy", "scipy"]
+      stdlib: ["pathlib", "sys", "traceback"]
+    complexity: "max=9, avg=2.7, hotspots=0"
+    exports: ["def load_moqui_3d_dose", "def extract_moqui_central_slice", "def load_sm2d_dose", "def load_sm2d_pdd", "def get_bragg_peak_info"]
+  validation/visualize_raw.py:
+    imports:
+      external: ["matplotlib", "numpy"]
+      stdlib: ["pathlib"]
+    complexity: "max=3, avg=2.2, hotspots=0"
+    exports: ["def get_moqui_dimensions", "def load_moqui_3d_dose", "def extract_central_slice", "def calculate_gaussian_sigma", "def get_x_profile"]
+  visualize.py:
+    imports:
+      external: ["matplotlib", "numpy"]
+      stdlib: ["pathlib", "sys"]
+    complexity: "max=8, avg=4.0, hotspots=0"
+    exports: ["def load_pdd", "def load_dose_2d", "def get_roi_limits", "def plot_pdd", "def plot_dose_2d"]
+
+data_flow:
+
+key_abstractions:
+  ConfigManager:
+    file: "batch_run.py"
+    type: "class"
+  ParameterSweep:
+    file: "batch_run.py"
+    type: "class"
+
+contracts:
+  batch_run.py:modify:
+    input: ["self", "section", "key", "value"]
+  batch_run.py:save:
+    input: ["self", "output_path"]
+  batch_run.py:generate_combinations:
+    input: ["sweep_config"]
+  batch_run.py:prepare_runs:
+    input: ["self"]
+  batch_run.py:run_single:
+    input: ["self", "run"]
+  batch_run.py:run_all:
+    input: ["self"]
+  batch_run.py:get_completed_dirs:
+    input: ["self"]
+  visualize.py:load_pdd:
+    input: ["filepath"]
+  visualize.py:load_dose_2d:
+    input: ["filepath"]
+  visualize.py:get_roi_limits:
+    input: ["x_data", "y_data", "threshold_fraction", "x_margin_fraction", "y_max_fraction"]
+
+known_issues:
+
+quality:
+  linting: "28 issues (26 auto-fixable)"
+  quick_fix: "Run: ruff check --fix ."
+  type_coverage: "0%"
+  security: "0 critical, 0 warnings"
+
+test_coverage:
+  test_files: 0
+  note: "Test files may exist but detection has issues"
+
+recommendations:
+  priority:
+    - "[2min] Run: ruff check --fix ."

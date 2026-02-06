@@ -25,6 +25,7 @@ struct K2Config {
     float E_coarse_max;      // Maximum energy for coarse transport [MeV]
     float step_coarse;       // Coarse step size [mm]
     int n_steps_per_cell;    // Number of sub-steps per cell
+    float sigma_x_initial;   // Initial beam width [mm] (FIX C: from input config)
 };
 
 // Forward declaration of DeviceRLUT
@@ -49,6 +50,8 @@ __global__ void K2_CoarseTransport(
     int N_theta_local, int N_E_local,
     // Coarse transport config
     K2Config config,
+    // FIX C: Initial beam width (now from config instead of hardcoded)
+    float sigma_x_initial,
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
@@ -77,6 +80,7 @@ void run_K2_CoarseTransport(
     int N_theta, int N_E,
     int N_theta_local, int N_E_local,
     K2Config config,
+    float sigma_x_initial,  // FIX C: Initial beam width from config
     double* EdepC,
     float* AbsorbedWeight_cutoff,
     float* AbsorbedWeight_nuclear,

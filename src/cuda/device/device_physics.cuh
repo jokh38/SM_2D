@@ -313,6 +313,66 @@ __device__ inline void device_gaussian_spread_weights(
     }
 }
 
+// ============================================================================
+// FIX B: Sub-cell Gaussian spreading (for lateral spreading within a cell)
+// ============================================================================
+// This function correctly handles spreading across sub-cell bins (N_x_sub = 8)
+// where each bin has spacing dx/N_x_sub instead of dx.
+//
+// Parameters:
+//   weights:          Output array of N weights (sum = 1.0)
+//   x_mean:           Mean lateral position within cell [-dx/2, +dx/2]
+//   sigma_x:          Lateral spread standard deviation (mm)
+//   dx:               Cell size (mm)
+//   N_x_sub:          Number of sub-cell bins (default 8)
+//
+// The distribution covers all N_x_sub sub-bins within the cell
+// ============================================================================
+__device__ inline void device_gaussian_spread_weights_subcell(
+    float* weights,
+    float x_mean,
+    float sigma_x,
+    float dx,
+    int N_x_sub = 8
+) {
+    // Clamp sigma_x to avoid division issues
+    sigma_x = fmaxf(sigma_x, 1e-6f);
+
+    // Sub-cell spacing
+    float dx_sub = dx / N_x_sub;
+
+    // Calculate sub-bin boundaries within cell
+    // Cell spans from -dx/2 to +dx/2
+    float x_min = -dx * 0.5f;
+
+    // Calculate weights using Gaussian CDF
+    float cdf_prev = device_gaussian_cdf(x_min, x_mean, sigma_x);
+
+    for (int i = 0; i < N_x_sub; i++) {
+        float x_boundary = x_min + (i + 1) * dx_sub;
+        float cdf_curr = device_gaussian_cdf(x_boundary, x_mean, sigma_x);
+        weights[i] = cdf_curr - cdf_prev;
+        cdf_prev = cdf_curr;
+    }
+
+    // Normalize to ensure sum = 1.0
+    float w_sum = 0.0f;
+    for (int i = 0; i < N_x_sub; i++) {
+        w_sum += weights[i];
+    }
+
+    if (w_sum > 1e-10f) {
+        for (int i = 0; i < N_x_sub; i++) {
+            weights[i] /= w_sum;
+        }
+    } else {
+        // If sigma_x is very small, put all weight in center bin
+        for (int i = 0; i < N_x_sub; i++) {
+            weights[i] = (i == N_x_sub / 2) ? 1.0f : 0.0f;
+        }
+    }
+}
+
 // Calculate lateral spread sigma_x from scattering angle
 // Applies sqrt(3) correction for continuous scattering distributed within step
 //

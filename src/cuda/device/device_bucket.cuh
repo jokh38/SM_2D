@@ -8,6 +8,7 @@
 // Avoid circular dependency by using forward declarations where possible
 extern __device__ float device_gaussian_cdf(float x, float mu, float sigma);
 extern __device__ void device_gaussian_spread_weights(float* weights, float x_mean, float sigma_x, float dx, int N);
+extern __device__ void device_gaussian_spread_weights_subcell(float* weights, float x_mean, float sigma_x, float dx, int N_x_sub);
 
 // ============================================================================
 // Device Bucket Emission Functions for K3 FineTransport

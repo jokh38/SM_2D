@@ -469,6 +469,9 @@ CUDA_nvrtc_static_LIBRARY:FILEPATH=/usr/local/cuda-12.4/lib64/libnvrtc_static.a
 //Path to a library.
 CUDA_pcsamplingutil_LIBRARY:FILEPATH=/usr/local/cuda-12.4/lib64/libpcsamplingutil.so
 
+//No help, variable specified on the command line.
+GPU:UNINITIALIZED=ON
+
 //The directory containing a CMake configuration file for GTest.
 GTest_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/GTest
 

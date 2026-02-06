@@ -67,6 +67,8 @@ __global__ void K2_CoarseTransport(
     int N_theta_local, int N_E_local,
     // Config
     K2Config config,
+    // FIX C: Initial beam width (now from config instead of hardcoded)
+    float sigma_x_initial,
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
@@ -212,8 +214,8 @@ __global__ void K2_CoarseTransport(
             float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
             float sigma_x_depth = sigma_theta_depth * depth_from_surface_mm / 1.7320508f;  // / sqrt(3)
 
-            // Combine with initial beam width (sigma_x0 = 6mm from Gaussian source)
-            float sigma_x_initial = 6.0f;
+            // Combine with initial beam width (FIX C: now from input parameter)
+            // sigma_x_initial is passed from config (sim.ini sigma_x_mm)
             float sigma_x = sqrtf(sigma_x_initial * sigma_x_initial + sigma_x_depth * sigma_x_depth);
 
             // Ensure minimum sigma_x
@@ -387,73 +389,95 @@ __global__ void K2_CoarseTransport(
 
                     // ====================================================================
                     // Apply Gaussian lateral spreading within the cell
+                    // FIX B: Use sub-cell spreading function for correct spatial scale
                     // ====================================================================
                     // Distribute weight across x_sub bins using Gaussian distribution
+                    // with proper sub-cell spacing (dx/8 instead of dx)
                     // ====================================================================
 
                     if (out_slot >= 0 && E_new > 0.1f) {
-                        // Number of x_sub bins to spread across (centered at current x_sub)
-                        // INCREASED from 4 to 8 for smoother lateral profiles
-                        constexpr int N_x_spread = 8;  // Spread across ±4 x_sub bins
+                        // FIX B: Use sub-cell Gaussian spreading with correct dx/8 spacing
+                        constexpr int N_x_sub = 8;  // Number of sub-cell bins
 
-                        // Calculate weights for each x_sub bin using Gaussian CDF
-                        float weights[N_x_spread];
-                        float x_center = x_new;  // Center of Gaussian
+                        // Calculate weights for each sub-bin using Gaussian CDF
+                        float weights[N_x_sub];
+                        float x_center = x_new;  // Center of Gaussian within cell
 
-                        device_gaussian_spread_weights(weights, x_center, sigma_x, dx, N_x_spread);
+                        device_gaussian_spread_weights_subcell(weights, x_center, sigma_x, dx, N_x_sub);
 
-                        // Distribute weight across x_sub bins
-                        for (int i = 0; i < N_x_spread; ++i) {
-                            float w_frac = weights[i];
+                        // Get cell coordinates
+                        int ix = cell % Nx;
+                        int z_sub_target = get_z_sub_bin(z_new, dz);
+
+                        // Distribute weight across all x_sub bins
+                        for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
+                            float w_frac = weights[x_sub_target];
                             if (w_frac < 1e-10f) continue;  // Skip negligible weights
 
                             float w_spread = w_new * w_frac;
-
-                            // Calculate x position for this weight fraction
-                            float x_pos = x_center - (N_x_spread / 2) * dx + (i + 0.5f) * dx;
-                            int x_sub_spread = get_x_sub_bin(x_pos, dx);
-
-                            // FIX: Use soft boundary reflection instead of hard clamping
-                            // This prevents discontinuities at cell edges
-                            if (x_sub_spread < 0) {
-                                x_sub_spread = -x_sub_spread - 1;  // Reflect
-                                if (x_sub_spread < 0) x_sub_spread = 0;
-                            }
-                            // Upper bound is handled by get_x_sub_bin which clamps to N_x_sub-1
-
-                            // Determine if this x position maps to a different cell
-                            int target_cell = cell;
-                            int x_sub_target = x_sub_spread;
-                            int z_sub_target = get_z_sub_bin(z_new, dz);
-
-                            // Check if x_spread crosses cell boundary
-                            if (x_pos < -half_dx) {
-                                // Left neighbor cell
-                                if (ix > 0) {
-                                    target_cell = cell - 1;
-                                    x_sub_target = 7;  // Rightmost sub-bin of left neighbor (N_x_sub-1)
-                                }
-                            } else if (x_pos > half_dx) {
-                                // Right neighbor cell
-                                if (ix < Nx - 1) {
-                                    target_cell = cell + 1;
-                                    x_sub_target = 0;  // Leftmost sub-bin of right neighbor
-                                }
-                            }
 
                             // Compute new local bin index
                             int theta_local_new = theta_bin_new % N_theta_local;
                             int E_local_new = E_bin_new % N_E_local;
                             int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub_target, z_sub_target);
 
-                            if (target_cell == cell) {
-                                // Same cell: write to output phase space
-                                int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
-                                atomicAdd(&values_out[global_idx_out], w_spread);
-                            } else {
-                                // Different cell: deposit locally as energy (simplified)
-                                cell_edep += E_new * w_spread;
-                                cell_w_cutoff += w_spread;
+                            // Write to output phase space (all within same cell)
+                            int global_idx_out = (cell * Kb + out_slot) * DEVICE_LOCAL_BINS + lidx_new;
+                            atomicAdd(&values_out[global_idx_out], w_spread);
+                        }
+
+                        // FIX B extended: For large sigma_x (when spread exceeds cell boundary),
+                        // also emit to neighbor cells via buckets
+                        if (sigma_x > dx * 0.5f) {
+                            // Calculate fraction of weight that extends beyond cell boundaries
+                            float left_boundary = -dx * 0.5f;
+                            float right_boundary = dx * 0.5f;
+
+                            // Left tail weight (integral from -inf to left_boundary)
+                            float w_left = device_gaussian_cdf(left_boundary, x_center, sigma_x);
+                            // Right tail weight (integral from right_boundary to +inf)
+                            float w_right = 1.0f - device_gaussian_cdf(right_boundary, x_center, sigma_x);
+
+                            // Emit left tail to left neighbor
+                            if (w_left > 1e-6f && ix > 0) {
+                                float w_spread_left = w_new * w_left;
+                                int lateral_face = FACE_X_MINUS;
+                                int x_sub_neighbor = N_x_sub - 1;  // Rightmost bin of left neighbor
+                                int z_sub_neighbor = get_z_sub_bin(z_new, dz);
+
+                                int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
+                                DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
+
+                                device_emit_component_to_bucket_4d(
+                                    lateral_bucket, theta_new, E_new, w_spread_left,
+                                    x_sub_neighbor, z_sub_neighbor,
+                                    theta_edges, E_edges, N_theta, N_E,
+                                    N_theta_local, N_E_local
+                                );
+
+                                cell_edep += E_new * w_spread_left;
+                                cell_boundary_weight += w_spread_left;
+                            }
+
+                            // Emit right tail to right neighbor
+                            if (w_right > 1e-6f && ix < Nx - 1) {
+                                float w_spread_right = w_new * w_right;
+                                int lateral_face = FACE_X_PLUS;
+                                int x_sub_neighbor = 0;  // Leftmost bin of right neighbor
+                                int z_sub_neighbor = get_z_sub_bin(z_new, dz);
+
+                                int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
+                                DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
+
+                                device_emit_component_to_bucket_4d(
+                                    lateral_bucket, theta_new, E_new, w_spread_right,
+                                    x_sub_neighbor, z_sub_neighbor,
+                                    theta_edges, E_edges, N_theta, N_E,
+                                    N_theta_local, N_E_local
+                                );
+
+                                cell_edep += E_new * w_spread_right;
+                                cell_boundary_weight += w_spread_right;
                             }
                         }
                     }
@@ -488,6 +512,7 @@ void run_K2_CoarseTransport(
     int N_theta, int N_E,
     int N_theta_local, int N_E_local,
     K2Config config,
+    float sigma_x_initial,  // FIX C: Initial beam width from config
     double* EdepC,
     float* AbsorbedWeight_cutoff,
     float* AbsorbedWeight_nuclear,
@@ -509,6 +534,7 @@ void run_K2_CoarseTransport(
         theta_edges, E_edges,
         N_theta, N_E, N_theta_local, N_E_local,
         config,
+        sigma_x_initial,  // FIX C: Pass initial beam width
         EdepC, AbsorbedWeight_cutoff, AbsorbedWeight_nuclear, AbsorbedEnergy_nuclear,
         BoundaryLoss_weight, BoundaryLoss_energy,
         OutflowBuckets,

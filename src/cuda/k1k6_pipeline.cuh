@@ -45,6 +45,9 @@ struct K1K6PipelineConfig {
 
     // Fine transport is implicitly used when E < E_trigger
 
+    // FIX C: Initial beam width for lateral spreading
+    float sigma_x_initial;     // Initial beam width [mm] (from sim.ini sigma_x_mm)
+
     // Grid dimensions
     int Nx, Nz;                // Spatial grid
     float dx, dz;              // Cell sizes [mm]

@@ -177,6 +177,10 @@ void run_k1k6_pipeline_transport(
     config.N_theta_local = N_theta_local;
     config.N_E_local = N_E_local;
 
+    // FIX C: Set initial beam width from input parameter
+    // This is passed to K2 and K3 kernels for lateral spreading calculation
+    config.sigma_x_initial = sigma_x;
+
     // Create grids
     // Option D2: Piecewise-uniform energy grid (must match gpu_transport_runner.cpp)
     // Use finer energy resolution at high energies for accurate energy tracking

@@ -360,6 +360,7 @@ protected:
                 N_theta_local, N_E_local,
                 enable_straggling,
                 enable_nuclear,
+                6.0f,  // FIX C: sigma_x_initial (matches sim.ini default)
                 d_EdepC,
                 d_AbsorbedWeight_cutoff,
                 d_AbsorbedWeight_nuclear,
