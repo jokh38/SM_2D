@@ -279,6 +279,7 @@ bool run_k5_weight_audit(
     const DevicePsiC& psi_out,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
+    const float* d_BoundaryLoss_weight,
     AuditReport* d_report,
     int Nx, int Nz
 );
@@ -308,7 +309,8 @@ void reset_pipeline_state(
 
 // Copy audit report from device to host
 AuditReport get_audit_report(
-    const K1K6PipelineState& state
+    const K1K6PipelineState& state,
+    int Nx, int Nz
 );
 
 // Compute b_E_trigger from E_trigger

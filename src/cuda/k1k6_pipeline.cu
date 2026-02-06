@@ -337,7 +337,7 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     if (e != cudaSuccess) { std::cerr << "Failed d_OutflowBuckets: " << bucket_bytes << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate audit structures
-    e = cudaMalloc(&d_audit_report, sizeof(AuditReport));
+    e = cudaMalloc(&d_audit_report, N_cells * sizeof(AuditReport));
     if (e != cudaSuccess) { std::cerr << "Failed d_audit_report: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_weight_in, N_cells * sizeof(double));
     if (e != cudaSuccess) { std::cerr << "Failed d_weight_in: " << cudaGetErrorString(e) << std::endl; return false; }
@@ -410,10 +410,21 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemcpy(state.d_n_coarse, &zero, sizeof(int), cudaMemcpyHostToDevice);
 }
 
-AuditReport get_audit_report(const K1K6PipelineState& state) {
-    AuditReport report;
-    cudaMemcpy(&report, state.d_audit_report, sizeof(AuditReport), cudaMemcpyDeviceToHost);
-    return report;
+AuditReport get_audit_report(const K1K6PipelineState& state, int Nx, int Nz) {
+    int N_cells = Nx * Nz;
+    std::vector<AuditReport> reports(N_cells);
+    cudaMemcpy(reports.data(), state.d_audit_report, N_cells * sizeof(AuditReport), cudaMemcpyDeviceToHost);
+
+    AuditReport summary{};
+    summary.W_error = 0.0f;
+    summary.W_pass = true;
+
+    for (int i = 0; i < N_cells; ++i) {
+        summary.W_error = fmaxf(summary.W_error, reports[i].W_error);
+        summary.W_pass = summary.W_pass && reports[i].W_pass;
+    }
+
+    return summary;
 }
 
 // ============================================================================
@@ -626,19 +637,25 @@ bool run_k5_weight_audit(
     const DevicePsiC& psi_out,
     const float* d_AbsorbedWeight_cutoff,
     const float* d_AbsorbedWeight_nuclear,
+    const float* d_BoundaryLoss_weight,
     AuditReport* d_report,
     int Nx, int Nz
 ) {
     int N_cells = Nx * Nz;
+    int threads = 256;
+    int blocks = (N_cells + threads - 1) / threads;
+
+    cudaMemset(d_report, 0, N_cells * sizeof(AuditReport));
 
     // Call K5_WeightAudit kernel
-    K5_WeightAudit<<<1, 1>>>(
+    K5_WeightAudit<<<blocks, threads>>>(
         psi_in.block_id,
         psi_in.value,
         psi_out.block_id,
         psi_out.value,
         d_AbsorbedWeight_cutoff,
         d_AbsorbedWeight_nuclear,
+        d_BoundaryLoss_weight,
         d_report,
         N_cells
     );
@@ -891,6 +908,7 @@ bool run_k1k6_pipeline_transport(
         if (!run_k5_weight_audit(*psi_in, *psi_out,
                                  state.d_AbsorbedWeight_cutoff,
                                  state.d_AbsorbedWeight_nuclear,
+                                 state.d_BoundaryLoss_weight,
                                  state.d_audit_report,
                                  config.Nx, config.Nz)) {
             std::cerr << "K5 failed at iteration " << iter << std::endl;
@@ -898,7 +916,7 @@ bool run_k1k6_pipeline_transport(
         }
 
         // Get audit report
-        AuditReport report = get_audit_report(state);
+        AuditReport report = get_audit_report(state, config.Nx, config.Nz);
         std::cout << "  Weight audit: error=" << report.W_error
                   << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
 

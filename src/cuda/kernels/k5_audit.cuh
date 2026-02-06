@@ -14,6 +14,7 @@ __global__ void K5_WeightAudit(
     const float* __restrict__ values_out,
     const float* __restrict__ AbsorbedWeight_cutoff,
     const float* __restrict__ AbsorbedWeight_nuclear,
+    const float* __restrict__ BoundaryLoss_weight,
     AuditReport* __restrict__ report,
     int N_cells
 );

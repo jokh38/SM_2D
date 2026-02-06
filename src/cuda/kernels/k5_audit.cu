@@ -11,6 +11,7 @@ __global__ void K5_WeightAudit(
     const float* __restrict__ values_out,
     const float* __restrict__ AbsorbedWeight_cutoff,
     const float* __restrict__ AbsorbedWeight_nuclear,
+    const float* __restrict__ BoundaryLoss_weight,
     AuditReport* __restrict__ report,
     int N_cells
 ) {
@@ -37,8 +38,9 @@ __global__ void K5_WeightAudit(
 
     float W_cutoff = AbsorbedWeight_cutoff[cell];
     float W_nuclear = AbsorbedWeight_nuclear[cell];
+    float W_boundary = BoundaryLoss_weight[cell];
 
-    float W_error = fabsf(W_in - W_out - W_cutoff - W_nuclear);
+    float W_error = fabsf(W_in - W_out - W_cutoff - W_nuclear - W_boundary);
     float W_rel_error = W_error / fmaxf(W_in, 1e-20f);
 
     report[cell].W_error = W_rel_error;
