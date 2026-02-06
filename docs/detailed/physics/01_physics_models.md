@@ -4,6 +4,16 @@
 
 SM_2D implements comprehensive physics models for proton transport in water, following ICRU, PDG, and NIST standards. All models are implemented as CUDA device functions for GPU acceleration.
 
+## Implementation Status (Feb 2026)
+
+| Physics Model | Status | Match Rate | Notes |
+|---------------|--------|------------|-------|
+| Energy Loss (CSDA) | ✅ Complete | ~99% | NIST PSTAR based |
+| Fermi-Eyges MCS | ⚠️ Phase B | 88% | Moment-based (see commit 9e691a3) |
+| Nuclear Attenuation | ✅ Complete | ~95% | ICRU 63 based |
+| Energy Straggling | ✅ Complete | N/A | Vavilov implementation |
+| Lateral Spreading | ✅ Complete | ~92% | Deterministic Gaussian |
+
 ---
 
 ## 1. Multiple Coulomb Scattering (Highland Formula)

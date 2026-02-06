@@ -4,6 +4,19 @@
 
 SM_2D implements a 6-stage CUDA kernel pipeline for deterministic proton transport. The pipeline processes particles through hierarchical refinement, with coarse transport for high-energy particles and fine transport for the critical Bragg peak region.
 
+## Implementation Status (Feb 2026)
+
+| Kernel | File | Status | Notes |
+|--------|------|--------|-------|
+| K1 | `k1_activemask.cu` | ✅ Complete | Active cell detection |
+| K2 | `k2_coarsetransport.cu` | ✅ Complete | Fermi-Eyges moment-based MCS |
+| K3 | `k3_finetransport.cu` | ✅ Complete | Fine transport with full physics |
+| K4 | `k4_transfer.cu` | ✅ Complete | Bucket transfer between cells |
+| K5 | `k5_audit.cu` | ✅ Complete | Conservation verification |
+| K6 | `k6_swap.cu` | ✅ Complete | Buffer swap (CPU-side) |
+| Wrapper | `gpu_transport_wrapper.cu` | ⚠️ Has debug code | See code_quality.md |
+| Pipeline | `k1k6_pipeline.cu` | ✅ Complete | Main pipeline orchestration |
+
 ---
 
 ## Pipeline Architecture

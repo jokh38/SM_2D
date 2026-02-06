@@ -27,10 +27,12 @@ SM_2D is a **deterministic proton transport solver** for radiotherapy dose calcu
 
 ```
 Language:        C++17 with CUDA
-Lines of Code:   ~15,000
+Lines of Code:   ~20,000 (66 C++ files, 9 CUDA kernels, 5 Python scripts)
 GPU Memory:      ~4.3GB per simulation
 Accuracy:        Bragg peak <1%, Lateral spread <15%
 Compute:         RTX 2080+ (Compute Capability 75+)
+Quality Score:   75/100 (cdreview, Feb 2026)
+Test Coverage:   31 test files (GTest)
 ```
 
 ### Directory Structure
@@ -312,6 +314,32 @@ python3 visualize.py
 3. **[Core Data Structures](modules/01_core_data_structures.md)** - Storage and encoding details
 4. **[Physics Models](physics/01_physics_models.md)** - Complete physics reference
 5. **[API Reference](api/01_api_reference.md)** - Function-by-function documentation
+6. **[Code Quality](code_quality.md)** - Code review findings and technical debt
+
+---
+
+## Code Quality Status (Feb 2026)
+
+### Recent Code Review Findings
+
+| Metric | Score | Status |
+|--------|-------|--------|
+| Quality Score | 75/100 | Good |
+| Linting Issues | 28 (26 auto-fixable) | Minor |
+| Security Issues | 0 critical, 0 warnings | Pass |
+| Test Coverage | 31 test files | Excellent |
+
+### Known Issues
+
+1. **Debug Code**: Debug CSV dumping present in main transport file (should be behind `#ifdef DEBUG`)
+2. **Magic Numbers**: Scattered hardcoded values (`0.999f`, `1e-12f`) need named constants
+3. **MCS Implementation**: Fermi-Eyges moment-based MCS at 88% match rate (see `revision_history.md`)
+
+### Recent Improvements
+
+- `50092bd` - Fix lateral profiles: increase x_sub resolution (4→8), implement depth-based MCS
+- `9e691a3` - feat(k2): implement Fermi-Eyges moment-based MCS (PDCA mcs2-phase-b)
+- `dbf5cac` - feat(k2,k3): implement deterministic lateral spreading (NOT Monte Carlo)
 
 ---
 

@@ -5,11 +5,12 @@
 **SM_2D** is a high-performance 2D deterministic transport solver for proton therapy dose calculation using CUDA-accelerated GPU computing. The project implements a hierarchical S-matrix solver with block-sparse phase-space representation.
 
 ### Key Statistics
-- **Total Files**: 30+ C++ source files
-- **CUDA Kernels**: 6 major kernels (K1-K6)
-- **Lines of Code**: ~15,000 lines
-- **Memory per Simulation**: ~3GB GPU memory
+- **Total Files**: 66 C++ source files, 9 CUDA kernels, 5 Python scripts
+- **CUDA Kernels**: 9 files (K1-K6 pipeline + wrapper + support)
+- **Lines of Code**: ~20,000 lines
+- **Memory per Simulation**: ~4.3GB GPU memory
 - **Grid Size**: Up to 200 × 640 cells
+- **Test Files**: 31 test files (GoogleTest framework)
 
 ---
 
