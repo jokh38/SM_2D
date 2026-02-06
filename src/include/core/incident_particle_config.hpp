@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
+#include <tuple>
 #include <vector>
 #include <memory>
 #include <stdexcept>
+#include "core/local_bins.hpp"
 
 namespace sm_2d {
 
@@ -151,6 +153,46 @@ struct GridConfig {
 };
 
 /**
+ * @brief Piecewise energy-grid segment for transport
+ */
+struct TransportEnergyGroup {
+    float E_min_MeV = 0.1f;
+    float E_max_MeV = 1.0f;
+    float dE_MeV = 0.1f;
+};
+
+inline std::vector<TransportEnergyGroup> default_transport_energy_groups() {
+    return {
+        {0.1f, 2.0f, 0.1f},
+        {2.0f, 20.0f, 0.2f},
+        {20.0f, 100.0f, 0.25f},
+        {100.0f, 250.0f, 0.25f}
+    };
+}
+
+/**
+ * @brief Transport pipeline runtime configuration
+ */
+struct TransportConfig {
+    // Phase-space grid
+    int N_theta = 36;                 // Global angular bins
+    int N_theta_local = ::N_theta_local;  // Local angular bins per block (must match compile-time constant)
+    int N_E_local = ::N_E_local;          // Local energy bins per block (must match compile-time constant)
+    std::vector<TransportEnergyGroup> energy_groups = default_transport_energy_groups();
+
+    // K1/K2/K3 selection + transport controls
+    float E_trigger = 10.0f;          // Fine transport trigger energy [MeV]
+    float weight_active_min = 1e-12f; // Active-cell minimum weight
+    float E_coarse_max = 300.0f;      // Coarse transport upper validity energy [MeV]
+    float step_coarse = 5.0f;         // Coarse transport step [mm]
+    int n_steps_per_cell = 1;         // K2 sub-steps
+
+    // Iteration + logging
+    int max_iterations = 0;           // 0 => use grid.max_steps
+    int log_level = 1;                // 0: quiet, 1: summary, 2: verbose
+};
+
+/**
  * @brief Output file configuration
  */
 struct OutputConfig {
@@ -196,6 +238,9 @@ struct IncidentParticleConfig {
 
     // Grid configuration
     GridConfig grid;
+
+    // Transport kernel configuration
+    TransportConfig transport;
 
     // Output configuration
     OutputConfig output;
@@ -274,6 +319,58 @@ inline void IncidentParticleConfig::validate() const {
     }
     if (grid.max_steps <= 0) {
         throw std::invalid_argument("IncidentParticleConfig: max_steps must be positive");
+    }
+
+    // Transport validation
+    if (transport.N_theta <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.N_theta must be positive");
+    }
+    if (transport.N_theta_local <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.N_theta_local must be positive");
+    }
+    if (transport.N_E_local <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.N_E_local must be positive");
+    }
+    if (transport.E_trigger <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.E_trigger must be positive");
+    }
+    if (transport.weight_active_min <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.weight_active_min must be positive");
+    }
+    if (transport.E_coarse_max <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.E_coarse_max must be positive");
+    }
+    if (transport.step_coarse <= 0.0f) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.step_coarse must be positive");
+    }
+    if (transport.n_steps_per_cell <= 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.n_steps_per_cell must be positive");
+    }
+    if (transport.max_iterations < 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.max_iterations cannot be negative");
+    }
+    if (transport.log_level < 0) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.log_level cannot be negative");
+    }
+    if (transport.energy_groups.empty()) {
+        throw std::invalid_argument("IncidentParticleConfig: transport.energy_groups cannot be empty");
+    }
+    float last_max = transport.energy_groups.front().E_min_MeV;
+    for (size_t i = 0; i < transport.energy_groups.size(); ++i) {
+        const auto& group = transport.energy_groups[i];
+        if (group.E_min_MeV <= 0.0f) {
+            throw std::invalid_argument("IncidentParticleConfig: transport.energy_groups E_min must be positive");
+        }
+        if (group.E_max_MeV <= group.E_min_MeV) {
+            throw std::invalid_argument("IncidentParticleConfig: transport.energy_groups E_max must be > E_min");
+        }
+        if (group.dE_MeV <= 0.0f) {
+            throw std::invalid_argument("IncidentParticleConfig: transport.energy_groups dE must be positive");
+        }
+        if (i > 0 && group.E_min_MeV < last_max) {
+            throw std::invalid_argument("IncidentParticleConfig: transport.energy_groups must be non-overlapping and ordered");
+        }
+        last_max = group.E_max_MeV;
     }
 }
 

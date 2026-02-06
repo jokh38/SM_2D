@@ -55,6 +55,10 @@ struct K1K6PipelineConfig {
     // Phase-space grid
     int N_theta, N_E;          // Global bins
     int N_theta_local, N_E_local;  // Local bins per block
+
+    // Loop control + logging
+    int max_iterations;        // Maximum transport iterations
+    int log_level;             // 0: quiet, 1: summary, 2: verbose
 };
 
 // ============================================================================
@@ -169,6 +173,10 @@ struct K1K6PipelineState {
     // Bucket system
     DeviceOutflowBucket* d_OutflowBuckets;  // [Nx*Nz*4]
 
+    // Reusable phase-space grid edges on device
+    float* d_theta_edges;      // [N_theta + 1]
+    float* d_E_edges;          // [N_E + 1]
+
     // Audit
     AuditReport* d_audit_report;
     double* d_weight_in;
@@ -190,6 +198,7 @@ struct K1K6PipelineState {
         , d_prev_AbsorbedWeight_nuclear(nullptr)
         , d_prev_BoundaryLoss_weight(nullptr)
         , d_OutflowBuckets(nullptr)
+        , d_theta_edges(nullptr), d_E_edges(nullptr)
         , d_audit_report(nullptr)
         , d_weight_in(nullptr), d_weight_out(nullptr)
         , owns_device_memory(false)
@@ -263,8 +272,6 @@ bool run_k2_coarse_transport(
     int n_coarse,
     const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
-    const EnergyGrid& e_grid,
-    const AngularGrid& a_grid,
     K1K6PipelineState& state
 );
 
@@ -276,8 +283,6 @@ bool run_k3_fine_transport(
     int n_active,
     const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
-    const EnergyGrid& e_grid,
-    const AngularGrid& a_grid,
     K1K6PipelineState& state
 );
 
@@ -315,6 +320,8 @@ void run_k6_swap_buffers(
 // Initialize pipeline state from configuration
 bool init_pipeline_state(
     const K1K6PipelineConfig& config,
+    const EnergyGrid& e_grid,
+    const AngularGrid& a_grid,
     K1K6PipelineState& state
 );
 

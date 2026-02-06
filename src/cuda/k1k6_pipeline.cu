@@ -9,7 +9,6 @@
 #include "device/device_bucket.cuh"
 #include "device/device_psic.cuh"
 #include "core/local_bins.hpp"  // For decode_local_idx_4d
-#include "cuda/gpu_transport_wrapper.hpp"
 #include <cuda_runtime.h>
 #include <iostream>
 #include <cmath>
@@ -654,6 +653,8 @@ void K1K6PipelineState::cleanup() {
     if (d_prev_AbsorbedWeight_nuclear) cudaFree(d_prev_AbsorbedWeight_nuclear);
     if (d_prev_BoundaryLoss_weight) cudaFree(d_prev_BoundaryLoss_weight);
     if (d_OutflowBuckets) cudaFree(d_OutflowBuckets);
+    if (d_theta_edges) cudaFree(d_theta_edges);
+    if (d_E_edges) cudaFree(d_E_edges);
     if (d_audit_report) cudaFree(d_audit_report);
     if (d_weight_in) cudaFree(d_weight_in);
     if (d_weight_out) cudaFree(d_weight_out);
@@ -673,6 +674,8 @@ void K1K6PipelineState::cleanup() {
     d_prev_AbsorbedWeight_nuclear = nullptr;
     d_prev_BoundaryLoss_weight = nullptr;
     d_OutflowBuckets = nullptr;
+    d_theta_edges = nullptr;
+    d_E_edges = nullptr;
     d_audit_report = nullptr;
     d_weight_in = nullptr;
     d_weight_out = nullptr;
@@ -680,8 +683,55 @@ void K1K6PipelineState::cleanup() {
     owns_device_memory = false;
 }
 
-bool init_pipeline_state(const K1K6PipelineConfig& config, K1K6PipelineState& state) {
-    return state.allocate(config.Nx, config.Nz);
+bool init_pipeline_state(
+    const K1K6PipelineConfig& config,
+    const EnergyGrid& e_grid,
+    const AngularGrid& a_grid,
+    K1K6PipelineState& state
+) {
+    if (!state.allocate(config.Nx, config.Nz)) {
+        return false;
+    }
+
+    cudaError_t e = cudaMalloc(&state.d_theta_edges, (config.N_theta + 1) * sizeof(float));
+    if (e != cudaSuccess) {
+        std::cerr << "Failed d_theta_edges: " << cudaGetErrorString(e) << std::endl;
+        state.cleanup();
+        return false;
+    }
+
+    e = cudaMalloc(&state.d_E_edges, (config.N_E + 1) * sizeof(float));
+    if (e != cudaSuccess) {
+        std::cerr << "Failed d_E_edges: " << cudaGetErrorString(e) << std::endl;
+        state.cleanup();
+        return false;
+    }
+
+    e = cudaMemcpy(
+        state.d_theta_edges,
+        a_grid.edges.data(),
+        (config.N_theta + 1) * sizeof(float),
+        cudaMemcpyHostToDevice
+    );
+    if (e != cudaSuccess) {
+        std::cerr << "Failed copy d_theta_edges: " << cudaGetErrorString(e) << std::endl;
+        state.cleanup();
+        return false;
+    }
+
+    e = cudaMemcpy(
+        state.d_E_edges,
+        e_grid.edges.data(),
+        (config.N_E + 1) * sizeof(float),
+        cudaMemcpyHostToDevice
+    );
+    if (e != cudaSuccess) {
+        std::cerr << "Failed copy d_E_edges: " << cudaGetErrorString(e) << std::endl;
+        state.cleanup();
+        return false;
+    }
+
+    return true;
 }
 
 void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
@@ -757,8 +807,6 @@ bool run_k2_coarse_transport(
     int n_coarse,
     const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
-    const EnergyGrid& e_grid,
-    const AngularGrid& a_grid,
     K1K6PipelineState& state
 ) {
     if (n_coarse == 0) return true;
@@ -768,16 +816,6 @@ bool run_k2_coarse_transport(
     k2_cfg.step_coarse = config.step_coarse;
     k2_cfg.n_steps_per_cell = config.n_steps_per_cell;
     k2_cfg.sigma_x_initial = config.sigma_x_initial;  // FIX C: Pass beam width
-
-    // Allocate device grid edges
-    float* d_theta_edges;
-    float* d_E_edges;
-    cudaMalloc(&d_theta_edges, (config.N_theta + 1) * sizeof(float));
-    cudaMalloc(&d_E_edges, (config.N_E + 1) * sizeof(float));
-
-    // Copy grid edges to device
-    cudaMemcpy(d_theta_edges, a_grid.edges.data(), (config.N_theta + 1) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_E_edges, e_grid.edges.data(), (config.N_E + 1) * sizeof(float), cudaMemcpyHostToDevice);
 
     int threads = 256;
     int blocks = (n_coarse + threads - 1) / threads;
@@ -791,8 +829,8 @@ bool run_k2_coarse_transport(
         config.Nx, config.Nz, config.dx, config.dz,
         n_coarse,
         dlut,
-        d_theta_edges,
-        d_E_edges,
+        state.d_theta_edges,
+        state.d_E_edges,
         config.N_theta, config.N_E,
         config.N_theta_local, config.N_E_local,
         k2_cfg,
@@ -811,16 +849,10 @@ bool run_k2_coarse_transport(
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
         std::cerr << "K2 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
-        cudaFree(d_theta_edges);
-        cudaFree(d_E_edges);
         return false;
     }
 
     cudaDeviceSynchronize();
-
-    // Cleanup
-    cudaFree(d_theta_edges);
-    cudaFree(d_E_edges);
 
     return true;
 }
@@ -832,21 +864,9 @@ bool run_k3_fine_transport(
     int n_active,
     const ::DeviceRLUT& dlut,
     const K1K6PipelineConfig& config,
-    const EnergyGrid& e_grid,
-    const AngularGrid& a_grid,
     K1K6PipelineState& state
 ) {
     if (n_active == 0) return true;
-
-    // Allocate device grid edges
-    float* d_theta_edges;
-    float* d_E_edges;
-    cudaMalloc(&d_theta_edges, (config.N_theta + 1) * sizeof(float));
-    cudaMalloc(&d_E_edges, (config.N_E + 1) * sizeof(float));
-
-    // Copy grid edges to device
-    cudaMemcpy(d_theta_edges, a_grid.edges.data(), (config.N_theta + 1) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_E_edges, e_grid.edges.data(), (config.N_E + 1) * sizeof(float), cudaMemcpyHostToDevice);
 
     int threads = 256;
     int blocks = (n_active + threads - 1) / threads;
@@ -861,8 +881,8 @@ bool run_k3_fine_transport(
         config.Nx, config.Nz, config.dx, config.dz,
         n_active,
         dlut,
-        d_theta_edges,
-        d_E_edges,
+        state.d_theta_edges,
+        state.d_E_edges,
         config.N_theta, config.N_E,
         config.N_theta_local, config.N_E_local,
         true,   // enable_straggling (full physics)
@@ -882,16 +902,10 @@ bool run_k3_fine_transport(
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
         std::cerr << "K3 kernel launch failed: " << cudaGetErrorString(err) << std::endl;
-        cudaFree(d_theta_edges);
-        cudaFree(d_E_edges);
         return false;
     }
 
     cudaDeviceSynchronize();
-
-    // Cleanup
-    cudaFree(d_theta_edges);
-    cudaFree(d_E_edges);
 
     return true;
 }
@@ -987,7 +1001,15 @@ bool run_k1k6_pipeline_transport(
     K1K6PipelineState& state
 ) {
     // Compute b_E_trigger from E_trigger
-    int b_E_trigger = compute_b_E_trigger(config.E_trigger, e_grid, config.N_E_local);
+    const int b_E_trigger = compute_b_E_trigger(config.E_trigger, e_grid, config.N_E_local);
+    const bool summary_logging = (config.log_level >= 1);
+    const bool verbose_logging = (config.log_level >= 2);
+    const bool debug_dumps_enabled =
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
+        true;
+    #else
+        false;
+    #endif
 
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
     // DEBUG: Print b_E_trigger calculation
@@ -1007,6 +1029,11 @@ bool run_k1k6_pipeline_transport(
     std::cout << "==============================" << std::endl;
     #endif
 
+    if (config.max_iterations <= 0) {
+        std::cerr << "Invalid max_iterations: " << config.max_iterations << std::endl;
+        return false;
+    }
+
     // Reset pipeline state
     reset_pipeline_state(state, config.Nx, config.Nz);
 
@@ -1014,9 +1041,7 @@ bool run_k1k6_pipeline_transport(
     device_psic_clear(*psi_out);
 
     // Maximum iterations
-    // FIX: Need enough iterations for 150 MeV protons to travel ~158mm
-    // With coarse_step = 0.3mm, need at least 158/0.3 ≈ 527 iterations
-    const int max_iter = 600;
+    const int max_iter = config.max_iterations;
 
     int iter = 0;
 
@@ -1070,14 +1095,14 @@ bool run_k1k6_pipeline_transport(
         cudaMemcpy(&state.n_coarse, state.d_n_coarse, sizeof(int), cudaMemcpyDeviceToHost);
 
         // Progress update every 50 iterations
-        if (iter % 50 == 1 || iter == 1) {
+        if (summary_logging && (iter == 1 || iter % 50 == 0)) {
             std::cout << "  Iteration " << iter << ": "
                       << state.n_active << " active, "
                       << state.n_coarse << " coarse cells" << std::endl;
         }
 
-        // DEBUG: Print detailed stats every 10 iterations for coarse-only mode
-        if (iter <= 10 || iter % 50 == 0) {
+        // Verbose mode: print detailed early-iteration stats
+        if (verbose_logging && iter <= 10) {
             std::cout << "  Iteration " << iter << ": "
                       << state.n_active << " active, "
                       << state.n_coarse << " coarse cells" << std::endl;
@@ -1085,7 +1110,9 @@ bool run_k1k6_pipeline_transport(
 
         // Check if we're done
         if (state.n_active == 0 && state.n_coarse == 0) {
-            std::cout << "  Transport complete after " << iter << " iterations" << std::endl;
+            if (summary_logging) {
+                std::cout << "  Transport complete after " << iter << " iterations" << std::endl;
+            }
             break;
         }
 
@@ -1106,7 +1133,7 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         if (state.n_coarse > 0) {
             if (!run_k2_coarse_transport(*psi_in, *psi_out, state.d_ActiveMask, state.d_CoarseList,
-                                          state.n_coarse, dlut, config, e_grid, a_grid, state)) {
+                                          state.n_coarse, dlut, config, state)) {
                 std::cerr << "K2 failed at iteration " << iter << std::endl;
                 return false;
             }
@@ -1117,7 +1144,7 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         if (state.n_active > 0) {
             if (!run_k3_fine_transport(*psi_in, *psi_out, state.d_ActiveList, state.n_active,
-                                       dlut, config, e_grid, a_grid, state)) {
+                                       dlut, config, state)) {
                 std::cerr << "K3 failed at iteration " << iter << std::endl;
                 return false;
             }
@@ -1165,10 +1192,11 @@ bool run_k1k6_pipeline_transport(
             return false;
         }
 
-        // Get audit report
-        AuditReport report = get_audit_report(state, config.Nx, config.Nz);
-        std::cout << "  Weight audit: error=" << report.W_error
-                  << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
+        if (verbose_logging) {
+            AuditReport report = get_audit_report(state, config.Nx, config.Nz);
+            std::cout << "  Weight audit: error=" << report.W_error
+                      << " pass=" << (report.W_pass ? "yes" : "no") << std::endl;
+        }
 
         // Update previous cumulative tallies for next iteration's delta-based K5.
         int N_cells = config.Nx * config.Nz;
@@ -1190,11 +1218,17 @@ bool run_k1k6_pipeline_transport(
         device_psic_clear(*psi_out);
     }
 
-    std::cout << "K1-K6 pipeline: completed " << iter << " iterations" << std::endl;
+    if (summary_logging) {
+        std::cout << "K1-K6 pipeline: completed " << iter << " iterations" << std::endl;
+    }
 
     // ========================================================================
     // Energy Conservation Report
     // ========================================================================
+    if (!(verbose_logging || debug_dumps_enabled)) {
+        return true;
+    }
+
     int total_cells = config.Nx * config.Nz;
 
     // Energy deposition

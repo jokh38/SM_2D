@@ -2,13 +2,12 @@
 #include "k1k6_pipeline.cuh"
 #include "kernels/k3_finetransport.cuh"
 #include "device/device_psic.cuh"
+#include "core/incident_particle_config.hpp"
 #include "lut/r_lut.hpp"
-#include "lut/nist_loader.hpp"
 #include <cuda_runtime.h>
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <tuple>
 #include <fstream>
 #include <iomanip>
 
@@ -110,44 +109,53 @@ DeviceLUTWrapper::~DeviceLUTWrapper() {
     delete p_impl;
 }
 
-bool init_device_lut(const RLUT& cpu_lut, DeviceLUTWrapper& wrapper) {
-    // Cast from sm_2d::RLUT to ::RLUT (same type, different namespace)
-    const ::RLUT& native_lut = reinterpret_cast<const ::RLUT&>(cpu_lut);
-    bool result = wrapper.p_impl->impl.init(native_lut);
+bool init_device_lut(const ::RLUT& cpu_lut, DeviceLUTWrapper& wrapper) {
+    bool result = wrapper.p_impl->impl.init(cpu_lut);
     if (result) {
-        wrapper.dlut_ptr = reinterpret_cast<const DeviceRLUT*>(&wrapper.p_impl->impl.dlut);
+        wrapper.dlut_ptr = &wrapper.p_impl->impl.dlut;
     }
     return result;
 }
 
-void run_k1k6_pipeline_transport(
+bool run_k1k6_pipeline_transport(
     float x0, float z0, float theta0, float E0, float W_total,
     float sigma_x, float sigma_theta, float sigma_E,  // Gaussian beam parameters
     int n_samples,                                     // Number of samples
     unsigned int random_seed,                          // RNG seed
     int Nx, int Nz, float dx, float dz,
     float x_min, float z_min,
-    int N_theta, int N_E,
     int N_theta_local, int N_E_local,
-    const float* theta_edges,
-    const float* E_edges,
-    const DeviceRLUT& dlut,
+    const AngularGrid& theta_grid,
+    const EnergyGrid& e_grid,
+    const ::DeviceRLUT& dlut,
+    const TransportConfig& transport,
     std::vector<std::vector<double>>& edep
 ) {
-    std::cout << "Running K1-K6 GPU pipeline wrapper..." << std::endl;
-    std::cout << "  Grid: " << Nx << " x " << Nz << " cells" << std::endl;
-    std::cout << "  Source: (" << x0 << ", " << z0 << ") mm, " << E0 << " MeV" << std::endl;
+    const bool summary_logging = transport.log_level >= 1;
+    const bool verbose_logging = transport.log_level >= 2;
+    const bool debug_dumps_enabled =
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
+        true;
+    #else
+        false;
+    #endif
+
+    const int N_theta = theta_grid.N_theta;
+    const int N_E = e_grid.N_E;
+
+    if (summary_logging) {
+        std::cout << "Running K1-K6 GPU pipeline wrapper..." << std::endl;
+        std::cout << "  Grid: " << Nx << " x " << Nz << " cells" << std::endl;
+        std::cout << "  Source: (" << x0 << ", " << z0 << ") mm, " << E0 << " MeV" << std::endl;
+    }
 
     // Determine if using Gaussian or pencil beam
     bool use_gaussian = (n_samples > 1) || (sigma_x > 0) || (sigma_theta > 0);
-    if (use_gaussian) {
+    if (summary_logging && use_gaussian) {
         std::cout << "  Using GAUSSIAN beam: sigma_x=" << sigma_x << " mm, sigma_theta=" << sigma_theta << " rad, n_samples=" << n_samples << std::endl;
-    } else {
+    } else if (summary_logging) {
         std::cout << "  Using PENCIL beam (single particle)" << std::endl;
     }
-
-    // Cast from sm_2d::DeviceRLUT to ::DeviceRLUT (same type, different namespace)
-    const ::DeviceRLUT& native_dlut = reinterpret_cast<const ::DeviceRLUT&>(dlut);
 
     // Initialize pipeline configuration
     K1K6PipelineConfig config;
@@ -155,22 +163,13 @@ void run_k1k6_pipeline_transport(
     config.Nz = Nz;
     config.dx = dx;
     config.dz = dz;
-
-    // Energy thresholds
-    // TEST: Use very high E_trigger to force ALL particles to use K3 fine transport
-    // This enables lateral scattering from the beginning
-    config.E_trigger = 1000.0f;        // K3 for E < 1000 MeV (essentially all particles)
-    config.weight_active_min = 1e-12f;  // Lowered from 1e-6 to fix transport gap
-
-    // Coarse transport settings
-    config.E_coarse_max = 300.0f;       // Up to 300 MeV (original value)
-    // Option D2: Adaptive step size for coarse transport
-    // To ensure particles cross energy bins: dE/step > bin_width
-    // At 150 MeV: dE/dx ≈ 0.54 MeV/mm, bin_width = 1 MeV
-    // Need step > 1 / 0.54 ≈ 2mm for particles to cross bins
-    // Using 5mm step gives dE ≈ 2.7 MeV > bin_width ✓
-    config.step_coarse = 5.0f;  // Adaptive step for high energy (100-250 MeV)
-    config.n_steps_per_cell = 1;        // One step per cell for coarse
+    config.E_trigger = transport.E_trigger;
+    config.weight_active_min = transport.weight_active_min;
+    config.E_coarse_max = transport.E_coarse_max;
+    config.step_coarse = transport.step_coarse;
+    config.n_steps_per_cell = transport.n_steps_per_cell;
+    config.max_iterations = transport.max_iterations;
+    config.log_level = transport.log_level;
 
     // Phase-space dimensions
     config.N_theta = N_theta;
@@ -182,18 +181,6 @@ void run_k1k6_pipeline_transport(
     // This is passed to K2 and K3 kernels for lateral spreading calculation
     config.sigma_x_initial = sigma_x;
 
-    // Create grids
-    // Option D2: Piecewise-uniform energy grid (must match gpu_transport_runner.cpp)
-    // Use finer energy resolution at high energies for accurate energy tracking
-    std::vector<std::tuple<float, float, float>> energy_groups = {
-        {0.1f, 2.0f, 0.1f},      // 19 bins - Bragg peak core
-        {2.0f, 20.0f, 0.2f},     // 90 bins - Bragg peak falloff (finer)
-        {20.0f, 100.0f, 0.25f},  // 320 bins - Mid-energy plateau (finer)
-        {100.0f, 250.0f, 0.25f}   // 600 bins - High energy (MUCH FINER for tracking)
-    };
-    EnergyGrid e_grid = EnergyGrid::CreatePiecewise(energy_groups);  // Option D2: piecewise-uniform
-    AngularGrid a_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
-
     // ========================================================================
     // STEP 1: Allocate Device PsiC Buffers
     // ========================================================================
@@ -204,18 +191,18 @@ void run_k1k6_pipeline_transport(
     cudaError_t device_err = cudaSetDevice(0);
     if (device_err != cudaSuccess) {
         std::cerr << "Failed to set CUDA device: " << cudaGetErrorString(device_err) << std::endl;
-        return;
+        return false;
     }
 
     if (!device_psic_init(psi_in, Nx, Nz)) {
         std::cerr << "Failed to allocate psi_in" << std::endl;
-        return;
+        return false;
     }
 
     if (!device_psic_init(psi_out, Nx, Nz)) {
         std::cerr << "Failed to allocate psi_out" << std::endl;
         device_psic_cleanup(psi_in);
-        return;
+        return false;
     }
 
     // ========================================================================
@@ -223,19 +210,21 @@ void run_k1k6_pipeline_transport(
     // ========================================================================
 
     K1K6PipelineState state;
-    if (!init_pipeline_state(config, state)) {
+    if (!init_pipeline_state(config, e_grid, theta_grid, state)) {
         std::cerr << "Failed to allocate pipeline state" << std::endl;
         device_psic_cleanup(psi_in);
         device_psic_cleanup(psi_out);
-        return;
+        return false;
     }
 
     // ========================================================================
     // STEP 3: Inject Source Particle
     // ========================================================================
 
-    std::cout << "  Source: (" << x0 << ", " << z0 << ") mm" << std::endl;
-    std::cout << "  Energy: " << E0 << " MeV, Angle: " << theta0 << " rad" << std::endl;
+    if (summary_logging) {
+        std::cout << "  Source: (" << x0 << ", " << z0 << ") mm" << std::endl;
+        std::cout << "  Energy: " << E0 << " MeV, Angle: " << theta0 << " rad" << std::endl;
+    }
 
     // Inject source particle(s) into psi_in
     // Use Gaussian sampling if parameters indicate, otherwise pencil beam
@@ -265,7 +254,7 @@ void run_k1k6_pipeline_transport(
             d_injected_weight,
             d_out_of_grid_weight,
             d_slot_dropped_weight,
-            theta_edges, E_edges,
+            state.d_theta_edges, state.d_E_edges,
             N_theta, N_E,
             N_theta_local, N_E_local
         );
@@ -278,7 +267,7 @@ void run_k1k6_pipeline_transport(
             theta0, sigma_theta,           // Angle and spread
             E0, W_total,                   // Energy and weight
             sigma_x,                       // Lateral spread
-            theta_edges, E_edges,          // Bin edges
+            state.d_theta_edges, state.d_E_edges,  // Bin edges
             N_theta, N_E,                  // Global bins
             N_theta_local, N_E_local       // Local bins
         );
@@ -294,7 +283,7 @@ void run_k1k6_pipeline_transport(
         state.cleanup();
         device_psic_cleanup(psi_in);
         device_psic_cleanup(psi_out);
-        return;
+        return false;
     }
 
     if (use_gaussian) {
@@ -305,43 +294,50 @@ void run_k1k6_pipeline_transport(
         cudaMemcpy(&h_out_of_grid_weight, d_out_of_grid_weight, sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(&h_slot_dropped_weight, d_slot_dropped_weight, sizeof(float), cudaMemcpyDeviceToHost);
 
-        float denom = (W_total > 1e-20f) ? W_total : 1.0f;
-        std::cout << "  Source injection accounting:" << std::endl;
-        std::cout << "    Injected in-grid: " << h_injected_weight
-                  << " (" << (100.0f * h_injected_weight / denom) << "%)" << std::endl;
-        std::cout << "    Outside grid:     " << h_out_of_grid_weight
-                  << " (" << (100.0f * h_out_of_grid_weight / denom) << "%)" << std::endl;
-        std::cout << "    Slot dropped:     " << h_slot_dropped_weight
-                  << " (" << (100.0f * h_slot_dropped_weight / denom) << "%)" << std::endl;
+        if (verbose_logging) {
+            float denom = (W_total > 1e-20f) ? W_total : 1.0f;
+            std::cout << "  Source injection accounting:" << std::endl;
+            std::cout << "    Injected in-grid: " << h_injected_weight
+                      << " (" << (100.0f * h_injected_weight / denom) << "%)" << std::endl;
+            std::cout << "    Outside grid:     " << h_out_of_grid_weight
+                      << " (" << (100.0f * h_out_of_grid_weight / denom) << "%)" << std::endl;
+            std::cout << "    Slot dropped:     " << h_slot_dropped_weight
+                      << " (" << (100.0f * h_slot_dropped_weight / denom) << "%)" << std::endl;
+        }
 
         cudaFree(d_injected_weight);
         cudaFree(d_out_of_grid_weight);
         cudaFree(d_slot_dropped_weight);
     }
 
-    // Verify source injection - sum weights across all cells
-    std::vector<float> h_all_values(psi_in.N_cells * psi_in.Kb * LOCAL_BINS);
-    cudaMemcpy(h_all_values.data(), psi_in.value,
-               psi_in.N_cells * psi_in.Kb * LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
+    if (verbose_logging || debug_dumps_enabled) {
+        // Optional heavy verification path for source injection accounting.
+        std::vector<float> h_all_values(psi_in.N_cells * psi_in.Kb * LOCAL_BINS);
+        cudaMemcpy(h_all_values.data(), psi_in.value,
+                   psi_in.N_cells * psi_in.Kb * LOCAL_BINS * sizeof(float), cudaMemcpyDeviceToHost);
 
-    float total_weight = 0.0f;
-    int nonzero_cells = 0;
-    for (int cell = 0; cell < psi_in.N_cells; ++cell) {
-        float cell_weight = 0.0f;
-        for (size_t i = 0; i < psi_in.Kb * LOCAL_BINS; ++i) {
-            size_t idx = cell * psi_in.Kb * LOCAL_BINS + i;
-            if (h_all_values[idx] > 0.0f) {
-                cell_weight += h_all_values[idx];
+        float total_weight = 0.0f;
+        int nonzero_cells = 0;
+        for (int cell = 0; cell < psi_in.N_cells; ++cell) {
+            float cell_weight = 0.0f;
+            for (size_t i = 0; i < psi_in.Kb * LOCAL_BINS; ++i) {
+                size_t idx = cell * psi_in.Kb * LOCAL_BINS + i;
+                if (h_all_values[idx] > 0.0f) {
+                    cell_weight += h_all_values[idx];
+                }
+            }
+            if (cell_weight > 0.0f) {
+                nonzero_cells++;
+                total_weight += cell_weight;
             }
         }
-        if (cell_weight > 0.0f) {
-            nonzero_cells++;
-            total_weight += cell_weight;
+
+        if (verbose_logging) {
+            std::cout << "  Source injection verification:" << std::endl;
+            std::cout << "    Total weight: " << total_weight << " (expected: " << W_total << ")" << std::endl;
+            std::cout << "    Non-zero cells: " << nonzero_cells << " / " << psi_in.N_cells << std::endl;
         }
     }
-    std::cout << "  Source injection verification:" << std::endl;
-    std::cout << "    Total weight: " << total_weight << " (expected: " << W_total << ")" << std::endl;
-    std::cout << "    Non-zero cells: " << nonzero_cells << " / " << psi_in.N_cells << std::endl;
 
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
     // DEBUG: Dump initial cell state
@@ -352,12 +348,12 @@ void run_k1k6_pipeline_transport(
     // STEP 4: Run Main Pipeline
     // ========================================================================
 
-    if (!run_k1k6_pipeline_transport(&psi_in, &psi_out, native_dlut, e_grid, a_grid, config, state)) {
+    if (!run_k1k6_pipeline_transport(&psi_in, &psi_out, dlut, e_grid, theta_grid, config, state)) {
         std::cerr << "Pipeline failed" << std::endl;
         state.cleanup();
         device_psic_cleanup(psi_in);
         device_psic_cleanup(psi_out);
-        return;
+        return false;
     }
 
     // ========================================================================
@@ -375,7 +371,9 @@ void run_k1k6_pipeline_transport(
         }
     }
 
-    std::cout << "  Energy deposition extracted" << std::endl;
+    if (summary_logging) {
+        std::cout << "  Energy deposition extracted" << std::endl;
+    }
 
     // ========================================================================
     // STEP 6: Cleanup
@@ -385,7 +383,10 @@ void run_k1k6_pipeline_transport(
     device_psic_cleanup(psi_in);
     device_psic_cleanup(psi_out);
 
-    std::cout << "K1-K6 pipeline wrapper complete." << std::endl;
+    if (summary_logging) {
+        std::cout << "K1-K6 pipeline wrapper complete." << std::endl;
+    }
+    return true;
 }
 
 std::string get_gpu_name_internal() {

@@ -6,6 +6,7 @@ set(TEST_COMMON_FILES
     unit/test_memory_pool.cpp
     unit/test_grids.cpp
     unit/test_r_lut.cpp
+    unit/test_transport_config.cpp
     unit/test_local_bins.cpp
     unit/test_block_encoding.cpp
     unit/test_psi_storage.cpp

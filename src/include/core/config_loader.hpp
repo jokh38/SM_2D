@@ -6,6 +6,7 @@
 #include <sstream>
 #include <algorithm>
 #include <stdexcept>
+#include <cctype>
 
 namespace sm_2d {
 
@@ -208,6 +209,72 @@ private:
     }
 };
 
+inline std::string trim_config_token(const std::string& str) {
+    size_t start = 0;
+    while (start < str.length() && std::isspace(static_cast<unsigned char>(str[start]))) {
+        ++start;
+    }
+    if (start == str.length()) {
+        return "";
+    }
+
+    size_t end = str.length() - 1;
+    while (end > start && std::isspace(static_cast<unsigned char>(str[end]))) {
+        --end;
+    }
+    return str.substr(start, end - start + 1);
+}
+
+inline std::vector<TransportEnergyGroup> parse_transport_energy_groups(
+    const std::string& raw,
+    const std::vector<TransportEnergyGroup>& fallback
+) {
+    if (raw.empty()) {
+        return fallback;
+    }
+
+    std::vector<TransportEnergyGroup> groups;
+    std::stringstream ss(raw);
+    std::string token;
+    while (std::getline(ss, token, ',')) {
+        token = trim_config_token(token);
+        if (token.empty()) {
+            continue;
+        }
+
+        std::stringstream ts(token);
+        std::string p0, p1, p2;
+        if (!std::getline(ts, p0, ':') ||
+            !std::getline(ts, p1, ':') ||
+            !std::getline(ts, p2, ':')) {
+            return fallback;
+        }
+
+        try {
+            TransportEnergyGroup g;
+            g.E_min_MeV = std::stof(trim_config_token(p0));
+            g.E_max_MeV = std::stof(trim_config_token(p1));
+            g.dE_MeV = std::stof(trim_config_token(p2));
+            groups.push_back(g);
+        } catch (...) {
+            return fallback;
+        }
+    }
+
+    return groups.empty() ? fallback : groups;
+}
+
+inline std::string serialize_transport_energy_groups(const std::vector<TransportEnergyGroup>& groups) {
+    std::ostringstream oss;
+    for (size_t i = 0; i < groups.size(); ++i) {
+        if (i > 0) {
+            oss << ",";
+        }
+        oss << groups[i].E_min_MeV << ":" << groups[i].E_max_MeV << ":" << groups[i].dE_MeV;
+    }
+    return oss.str();
+}
+
 /**
  * @brief Load IncidentParticleConfig from file
  */
@@ -272,6 +339,28 @@ inline IncidentParticleConfig load_incident_particle_config(const std::string& f
     config.grid.dx = grid_sec.get_float("dx_mm", config.grid.dx);
     config.grid.dz = grid_sec.get_float("dz_mm", config.grid.dz);
     config.grid.max_steps = grid_sec.get_int("max_steps", config.grid.max_steps);
+
+    // [transport] section
+    ConfigSection transport_sec = loader.get_section("transport");
+    config.transport.N_theta = transport_sec.get_int("N_theta", config.transport.N_theta);
+    config.transport.N_theta_local = transport_sec.get_int("N_theta_local", config.transport.N_theta_local);
+    config.transport.N_E_local = transport_sec.get_int("N_E_local", config.transport.N_E_local);
+    config.transport.E_trigger = transport_sec.get_float("E_trigger_MeV", config.transport.E_trigger);
+    config.transport.E_trigger = transport_sec.get_float("E_trigger", config.transport.E_trigger);
+    config.transport.weight_active_min = transport_sec.get_float("weight_active_min", config.transport.weight_active_min);
+    config.transport.E_coarse_max = transport_sec.get_float("E_coarse_max_MeV", config.transport.E_coarse_max);
+    config.transport.E_coarse_max = transport_sec.get_float("E_coarse_max", config.transport.E_coarse_max);
+    config.transport.step_coarse = transport_sec.get_float("step_coarse_mm", config.transport.step_coarse);
+    config.transport.step_coarse = transport_sec.get_float("step_coarse", config.transport.step_coarse);
+    config.transport.n_steps_per_cell = transport_sec.get_int("n_steps_per_cell", config.transport.n_steps_per_cell);
+    config.transport.max_iterations = transport_sec.get_int("max_iterations", config.transport.max_iterations);
+    config.transport.log_level = transport_sec.get_int("log_level", config.transport.log_level);
+    if (transport_sec.has("energy_groups")) {
+        config.transport.energy_groups = parse_transport_energy_groups(
+            transport_sec.get("energy_groups"),
+            config.transport.energy_groups
+        );
+    }
 
     // [output] section
     ConfigSection output_sec = loader.get_section("output");
@@ -352,6 +441,20 @@ inline bool save_incident_particle_config(
     file << "dz_mm = " << config.grid.dz << "\n";
     file << "max_steps = " << config.grid.max_steps << "\n\n";
 
+    // [transport] section
+    file << "[transport]\n";
+    file << "N_theta = " << config.transport.N_theta << "\n";
+    file << "N_theta_local = " << config.transport.N_theta_local << "\n";
+    file << "N_E_local = " << config.transport.N_E_local << "\n";
+    file << "E_trigger_MeV = " << config.transport.E_trigger << "\n";
+    file << "weight_active_min = " << config.transport.weight_active_min << "\n";
+    file << "E_coarse_max_MeV = " << config.transport.E_coarse_max << "\n";
+    file << "step_coarse_mm = " << config.transport.step_coarse << "\n";
+    file << "n_steps_per_cell = " << config.transport.n_steps_per_cell << "\n";
+    file << "max_iterations = " << config.transport.max_iterations << "\n";
+    file << "log_level = " << config.transport.log_level << "\n";
+    file << "energy_groups = " << serialize_transport_energy_groups(config.transport.energy_groups) << "\n\n";
+
     // [output] section
     file << "[output]\n";
     file << "output_dir = " << config.output.output_dir << "\n";
@@ -392,6 +495,11 @@ inline void print_config_summary(std::ostream& os, const IncidentParticleConfig&
     os << "\n";
     os << "Grid: " << config.grid.Nx << " x " << config.grid.Nz;
     os << " (dx=" << config.grid.dx << "mm, dz=" << config.grid.dz << "mm)\n";
+    int runtime_steps = (config.transport.max_iterations > 0) ? config.transport.max_iterations : config.grid.max_steps;
+    os << "Transport: theta_bins=" << config.transport.N_theta
+       << ", E_trigger=" << config.transport.E_trigger << " MeV"
+       << ", step_coarse=" << config.transport.step_coarse << " mm"
+       << ", max_iterations=" << runtime_steps << "\n";
     os << "Output Dir: " << config.output.output_dir << "\n";
     os << "======================================\n";
 }

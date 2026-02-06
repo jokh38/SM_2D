@@ -264,7 +264,6 @@ __global__ void K3_FineTransport(
             // FIX: Use depth-based sigma_x for correct Fermi-Eyges O(z^(3/2)) scaling
             // Previous per-step calculation caused sigma_x << dx, resulting in no lateral spread
             // New calculation uses accumulated depth from surface
-            int ix = cell % Nx;
             int iz = cell / Nx;
             float depth_from_surface_mm = iz * dz + z_cell;  // Total depth from surface
 
@@ -339,28 +338,8 @@ __global__ void K3_FineTransport(
                 cell_w_nuclear += w_rem;
                 cell_E_nuclear += E_rem;
 
-                // CRITICAL FIX: Only count as boundary loss if particle exits simulation domain
-                // Check if neighbor cell exists (within grid bounds)
-                int ix = cell % Nx;
-                int iz = cell / Nx;
-                bool neighbor_exists = true;
-                switch (exit_face) {
-                    case 0:  // +z face
-                        neighbor_exists = (iz + 1 < Nz);
-                        break;
-                    case 1:  // -z face
-                        neighbor_exists = (iz > 0);
-                        break;
-                    case 2:  // +x face
-                        neighbor_exists = (ix + 1 < Nx);
-                        break;
-                    case 3:  // -x face
-                        neighbor_exists = (ix > 0);
-                        break;
-                }
-
-                // Only count as boundary loss if particle is leaving simulation domain
-                if (!neighbor_exists) {
+                // Only count as boundary loss if particle is leaving simulation domain.
+                if (device_get_neighbor(cell, exit_face, Nx, Nz) < 0) {
                     cell_boundary_weight += w_new;
                     cell_boundary_energy += E_new * w_new;
                 }
