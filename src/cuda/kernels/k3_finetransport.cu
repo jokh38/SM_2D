@@ -312,7 +312,7 @@ __global__ void K3_FineTransport(
                     z_offset_neighbor = dz * 0.5f - dz * 0.125f;  // bin 3 center
                 } else {
                     // x face: preserve relative z position
-                    z_offset_neighbor = z_new - dz * 0.5f;
+                    z_offset_neighbor = z_new;
                 }
                 int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
                 z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
@@ -448,11 +448,25 @@ __global__ void K3_FineTransport(
 
                         // Scale weights by the fraction within the cell to conserve total weight
                         // (device_gaussian_spread_weights_subcell normalizes to sum=1.0)
-                        float w_cell_fraction = fminf(1.0f, w_in_cell);  // Clamp for safety
+                        float w_cell_fraction = fminf(1.0f, fmaxf(0.0f, w_in_cell));  // Clamp for safety
+
+                        // Normalize sub-cell weights in non-negative space for robustness.
+                        float w_sub_sum = 0.0f;
+                        for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
+                            weights[x_sub_target] = fmaxf(0.0f, weights[x_sub_target]);
+                            w_sub_sum += weights[x_sub_target];
+                        }
+                        if (w_sub_sum < 1e-12f) {
+                            for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
+                                weights[x_sub_target] = 0.0f;
+                            }
+                            weights[N_x_sub / 2] = 1.0f;
+                            w_sub_sum = 1.0f;
+                        }
 
                         // Distribute weight across all x_sub bins
                         for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
-                            float w_frac = weights[x_sub_target] * w_cell_fraction;  // Scale by in-cell fraction
+                            float w_frac = (weights[x_sub_target] / w_sub_sum) * w_cell_fraction;
                             if (w_frac < 1e-10f) continue;  // Skip negligible weights
 
                             float w_spread = w_new * w_frac;
@@ -470,56 +484,69 @@ __global__ void K3_FineTransport(
                         // FIX B extended: For large sigma_x (when spread exceeds cell boundary),
                         // also emit to neighbor cells via buckets
                         if (sigma_x > dx * 0.5f) {
-                            // Left tail weight (integral from -inf to left_boundary)
-                            float w_left = device_gaussian_cdf(left_boundary, x_center, sigma_x);
-                            // Right tail weight (integral from right_boundary to +inf)
-                            float w_right = 1.0f - device_gaussian_cdf(right_boundary, x_center, sigma_x);
+                            // Left/right tail weights from Gaussian CDF.
+                            // Re-normalize to guarantee: w_cell_fraction + w_left + w_right = 1.
+                            float w_left_raw = fmaxf(0.0f, device_gaussian_cdf(left_boundary, x_center, sigma_x));
+                            float w_right_raw = fmaxf(0.0f, 1.0f - device_gaussian_cdf(right_boundary, x_center, sigma_x));
+                            float w_tail_total = fmaxf(0.0f, 1.0f - w_cell_fraction);
+                            float w_tail_sum = w_left_raw + w_right_raw;
+                            float w_left = 0.0f;
+                            float w_right = 0.0f;
+                            if (w_tail_total > 0.0f && w_tail_sum > 1e-12f) {
+                                float tail_scale = w_tail_total / w_tail_sum;
+                                w_left = w_left_raw * tail_scale;
+                                w_right = w_right_raw * tail_scale;
+                            }
 
-                            // Emit left tail to left neighbor
-                            if (w_left > 1e-6f && ix > 0) {
+                            // Emit left tail to left neighbor (or boundary if no neighbor)
+                            if (w_left > 1e-6f) {
                                 float w_spread_left = w_new * w_left;
-                                int lateral_face = FACE_X_MINUS;
-                                int x_sub_neighbor = N_x_sub - 1;  // Rightmost bin of left neighbor
-                                int z_sub_neighbor = get_z_sub_bin(z_new, dz);
+                                if (ix > 0) {
+                                    int lateral_face = FACE_X_MINUS;
+                                    int x_sub_neighbor = N_x_sub - 1;  // Rightmost bin of left neighbor
+                                    int z_sub_neighbor = get_z_sub_bin(z_new, dz);
 
-                                int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
-                                DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
+                                    int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
+                                    DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
 
-                                device_emit_component_to_bucket_4d(
-                                    lateral_bucket, theta_new, E_new, w_spread_left,
-                                    x_sub_neighbor, z_sub_neighbor,
-                                    theta_edges, E_edges, N_theta, N_E,
-                                    N_theta_local, N_E_local
-                                );
+                                    device_emit_component_to_bucket_4d(
+                                        lateral_bucket, theta_new, E_new, w_spread_left,
+                                        x_sub_neighbor, z_sub_neighbor,
+                                        theta_edges, E_edges, N_theta, N_E,
+                                        N_theta_local, N_E_local
+                                    );
+                                } else {
+                                    // No left neighbor: treat lateral tail as domain boundary loss.
+                                    cell_boundary_energy += E_new * w_spread_left;
+                                }
 
-                                // FIX: Removed cell_edep += E_new * w_spread_left;
-                                // This was causing double-counting: energy is transferred to neighbor
-                                // via bucket AND counted here. The energy will be deposited when
-                                // the neighbor bucket is processed.
+                                // Keep outflow accounting for both internal transfer and domain loss.
                                 cell_boundary_weight += w_spread_left;
                             }
 
-                            // Emit right tail to right neighbor
-                            if (w_right > 1e-6f && ix < Nx - 1) {
+                            // Emit right tail to right neighbor (or boundary if no neighbor)
+                            if (w_right > 1e-6f) {
                                 float w_spread_right = w_new * w_right;
-                                int lateral_face = FACE_X_PLUS;
-                                int x_sub_neighbor = 0;  // Leftmost bin of right neighbor
-                                int z_sub_neighbor = get_z_sub_bin(z_new, dz);
+                                if (ix < Nx - 1) {
+                                    int lateral_face = FACE_X_PLUS;
+                                    int x_sub_neighbor = 0;  // Leftmost bin of right neighbor
+                                    int z_sub_neighbor = get_z_sub_bin(z_new, dz);
 
-                                int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
-                                DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
+                                    int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
+                                    DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
 
-                                device_emit_component_to_bucket_4d(
-                                    lateral_bucket, theta_new, E_new, w_spread_right,
-                                    x_sub_neighbor, z_sub_neighbor,
-                                    theta_edges, E_edges, N_theta, N_E,
-                                    N_theta_local, N_E_local
-                                );
+                                    device_emit_component_to_bucket_4d(
+                                        lateral_bucket, theta_new, E_new, w_spread_right,
+                                        x_sub_neighbor, z_sub_neighbor,
+                                        theta_edges, E_edges, N_theta, N_E,
+                                        N_theta_local, N_E_local
+                                    );
+                                } else {
+                                    // No right neighbor: treat lateral tail as domain boundary loss.
+                                    cell_boundary_energy += E_new * w_spread_right;
+                                }
 
-                                // FIX: Removed cell_edep += E_new * w_spread_right;
-                                // This was causing double-counting: energy is transferred to neighbor
-                                // via bucket AND counted here. The energy will be deposited when
-                                // the neighbor bucket is processed.
+                                // Keep outflow accounting for both internal transfer and domain loss.
                                 cell_boundary_weight += w_spread_right;
                             }
                         }

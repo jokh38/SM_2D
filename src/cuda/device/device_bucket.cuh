@@ -636,7 +636,7 @@ __device__ inline float device_get_neighbor_x_offset(
         case FACE_X_MINUS:  // Exiting -x face, entering neighbor from right
             return dx * 0.5f;   // Neighbor cell's right edge (relative to center)
         default:            // Z direction: preserve x offset
-            return x_exit - dx * 0.5f;
+            return x_exit;
     }
 }
 
