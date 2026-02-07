@@ -289,24 +289,21 @@ __global__ void K3_FineTransport(
             // ========================================================================
 
             int iz = cell / Nx;
-            float depth_from_surface_mm =
+            float path_start_mm =
                 fmaxf(0.0f, static_cast<float>(iz) * dz + (z_cell + 0.5f * dz));
-
-            float A = 0.0f;
-            float B = 0.0f;
-            float C = sigma_x_initial * sigma_x_initial;
-            if (depth_from_surface_mm > 0.0f) {
-                float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
-                A = sigma_theta_depth * sigma_theta_depth;
-                B = 0.5f * A * depth_from_surface_mm;
-                C += (A * depth_from_surface_mm * depth_from_surface_mm) / 3.0f;
-            }
-
-            float T = device_scattering_power_T(E, fmaxf(actual_range_step, 1e-6f));
-            device_fermi_eyges_step(A, B, C, T, actual_range_step);
+            float path_end_mm = path_start_mm + fmaxf(actual_range_step, 0.0f);
 
             float sigma_theta_step = device_highland_sigma(E, actual_range_step);
-            float sigma_x = fmaxf(device_accumulated_sigma_x(C), 0.01f);
+            float sigma_theta_transport = device_highland_sigma(E, path_end_mm);
+
+            float sigma_x_start = 0.0f;
+            if (path_start_mm > 0.0f) {
+                float sigma_theta_start = device_highland_sigma(E, path_start_mm);
+                sigma_x_start = sigma_theta_start * path_start_mm / 1.7320508f;
+            }
+            float sigma_x_end = sigma_theta_transport * path_end_mm / 1.7320508f;
+            float delta_C = fmaxf(0.0f, sigma_x_end * sigma_x_end - sigma_x_start * sigma_x_start);
+            float sigma_x = fmaxf(sqrtf(delta_C), 0.01f);
 
             unsigned theta_seed =
                 (static_cast<unsigned>(cell + 1) * THETA_SEED_A) ^
@@ -316,8 +313,8 @@ __global__ void K3_FineTransport(
             float theta_scatter = device_sample_mcs_angle(sigma_theta_step, theta_seed);
             float theta_new = theta + theta_scatter;
             theta_new = fmaxf(theta_edges[0], fminf(theta_new, theta_edges[N_theta]));
-            float mu_new = mu_init;
-            float eta_new = eta_init;
+            float mu_new = cosf(theta_new);
+            float eta_new = sinf(theta_new);
 
             // Complete position update: move along original direction
             // Lateral spreading will be applied via weight distribution to output
@@ -365,7 +362,7 @@ __global__ void K3_FineTransport(
                         N_E,
                         N_theta_local,
                         N_E_local,
-                        10,
+                        11,
                         &lateral_boundary_weight
                     );
                     if (lateral_boundary_weight > 0.0f) {
@@ -459,21 +456,11 @@ __global__ void K3_FineTransport(
                     constexpr int Kb = DEVICE_Kb;
                     int out_slot = -1;
                     for (int s = 0; s < Kb; ++s) {
-                        uint32_t existing_bid = block_ids_out[cell * Kb + s];
-                        if (existing_bid == bid_new) {
+                        uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
+                        uint32_t old = atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new);
+                        if (old == expected || old == bid_new) {
                             out_slot = s;
                             break;
-                        }
-                    }
-
-                    // Allocate new slot if needed
-                    if (out_slot < 0) {
-                        for (int s = 0; s < Kb; ++s) {
-                            uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
-                            if (atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new) == expected) {
-                                out_slot = s;
-                                break;
-                            }
                         }
                     }
 

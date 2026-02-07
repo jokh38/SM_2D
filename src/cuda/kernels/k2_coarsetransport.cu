@@ -186,16 +186,13 @@ __global__ void K2_CoarseTransport(
                                            fminf(step_to_x_plus, step_to_x_minus));
             step_to_boundary = fmaxf(step_to_boundary, 0.0f);
 
-            // CRITICAL FIX: step_to_boundary is a path length, coarse_step is geometric distance
-            // Convert path length to geometric distance for comparison
-            float mu_abs = fmaxf(fabsf(mu), 1e-6f);  // Avoid division by zero
-
             // BUG FIX: Don't limit step by boundary distance.
             // Boundary detection handles crossing; limiting step causes particles to get stuck.
             float coarse_step_limited = coarse_step;
 
-            // Convert geometric distance to path length for energy calculation
-            float coarse_range_step = coarse_step_limited / mu_abs;
+            // coarse_step_limited is already used as the transported path length in
+            // the position update below, so use the same quantity for energy loss.
+            float coarse_range_step = coarse_step_limited;
 
             // Crossing guard: if this coarse step would cross the fine threshold,
             // split at E_fine_on so K2 does not overshoot into low-energy transport.
@@ -207,7 +204,7 @@ __global__ void K2_CoarseTransport(
 
                 if (range_to_fine > 0.0f && range_to_fine < coarse_range_step) {
                     coarse_range_step = range_to_fine;
-                    coarse_step_limited = coarse_range_step * mu_abs;
+                    coarse_step_limited = coarse_range_step;
                     split_at_fine_threshold = true;
                 }
             }
@@ -228,33 +225,28 @@ __global__ void K2_CoarseTransport(
             float w_new = device_apply_nuclear_attenuation(weight, E, coarse_range_step, w_rem, E_rem);
 
             // ========================================================================
-            // K2 Coarse Transport: Incremental Fermi-Eyges lateral spreading
+            // K2 Coarse Transport: incremental lateral spread for this step only
             // ========================================================================
-            // Build moments at current depth, then evolve over this transport step.
-            // This keeps spreading depth-dependent while still integrating an incremental
-            // Fermi-Eyges update in the kernels.
+            // The source width is already represented in injected phase space.
+            // Re-applying absolute sigma_x(depth) each transport step over-broadens the
+            // beam, so use only the variance growth over the current step.
             // ========================================================================
-
             int iz = cell / Nx;
-            float depth_from_surface_mm =
+            float path_start_mm =
                 fmaxf(0.0f, static_cast<float>(iz) * dz + (z_cell + 0.5f * dz));
-
-            float A = 0.0f;
-            float B = 0.0f;
-            float C = sigma_x_initial * sigma_x_initial;
-            if (depth_from_surface_mm > 0.0f) {
-                float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
-                A = sigma_theta_depth * sigma_theta_depth;
-                B = 0.5f * A * depth_from_surface_mm;
-                C += (A * depth_from_surface_mm * depth_from_surface_mm) / 3.0f;
-            }
-
-            float T = device_scattering_power_T(E, fmaxf(coarse_range_step, 1e-6f));
-            device_fermi_eyges_step(A, B, C, T, coarse_range_step);
+            float path_end_mm = path_start_mm + fmaxf(coarse_range_step, 0.0f);
 
             float sigma_theta_step = device_highland_sigma(E, coarse_range_step);
-            float sigma_theta_transport = device_accumulated_sigma_theta(A);
-            float sigma_x = fmaxf(device_accumulated_sigma_x(C), 0.01f);
+            float sigma_theta_transport = device_highland_sigma(E, path_end_mm);
+
+            float sigma_x_start = 0.0f;
+            if (path_start_mm > 0.0f) {
+                float sigma_theta_start = device_highland_sigma(E, path_start_mm);
+                sigma_x_start = sigma_theta_start * path_start_mm / 1.7320508f;
+            }
+            float sigma_x_end = sigma_theta_transport * path_end_mm / 1.7320508f;
+            float delta_C = fmaxf(0.0f, sigma_x_end * sigma_x_end - sigma_x_start * sigma_x_start);
+            float sigma_x = fmaxf(sqrtf(delta_C), 0.01f);
 
             // ========================================================================
             // Iteration 2: Moment-Based Spreading Enhancement
@@ -308,8 +300,8 @@ __global__ void K2_CoarseTransport(
             float theta_scatter = device_sample_mcs_angle(sigma_theta_step, theta_seed);
             float theta_new = theta + theta_scatter;
             theta_new = fmaxf(theta_edges[0], fminf(theta_new, theta_edges[N_theta]));
-            float mu_new = mu;
-            float eta_new = eta;
+            float mu_new = cosf(theta_new);
+            float eta_new = sinf(theta_new);
 
             // Position update (use limited step to avoid boundary crossing)
             float x_new = x_cell + eta_new * coarse_step_limited;
@@ -365,7 +357,7 @@ __global__ void K2_CoarseTransport(
                             N_E,
                             N_theta_local,
                             N_E_local,
-                            10,
+                            11,
                             &lateral_boundary_weight
                         );
                         if (lateral_boundary_weight > 0.0f) {
@@ -444,21 +436,11 @@ __global__ void K2_CoarseTransport(
                     constexpr int Kb = DEVICE_Kb;
                     int out_slot = -1;
                     for (int s = 0; s < Kb; ++s) {
-                        uint32_t existing_bid = block_ids_out[cell * Kb + s];
-                        if (existing_bid == bid_new) {
+                        uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
+                        uint32_t old = atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new);
+                        if (old == expected || old == bid_new) {
                             out_slot = s;
                             break;
-                        }
-                    }
-
-                    // Allocate new slot if needed
-                    if (out_slot < 0) {
-                        for (int s = 0; s < Kb; ++s) {
-                            uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
-                            if (atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new) == expected) {
-                                out_slot = s;
-                                break;
-                            }
                         }
                     }
 

@@ -61,22 +61,27 @@ __device__ inline int device_bucket_find_or_allocate_slot(
     DeviceOutflowBucket& bucket,
     uint32_t bid
 ) {
-    // First, try to find existing slot
+    // First, try to find existing slot.
     for (int slot = 0; slot < DEVICE_Kb_out; ++slot) {
         if (bucket.block_id[slot] == bid) {
             return slot;
         }
     }
 
-    // Not found, try to allocate new slot
+    // Not found, try to allocate new slot with contention-safe CAS.
+    // IMPORTANT: Do not zero slot payload here; buckets are cleared before use,
+    // and per-claim zeroing races with concurrent writers.
     for (int slot = 0; slot < DEVICE_Kb_out; ++slot) {
-        if (bucket.block_id[slot] == DEVICE_EMPTY_BLOCK_ID) {
-            // Initialize new slot
-            bucket.block_id[slot] = bid;
-            bucket.local_count[slot] = 0;
-            for (int i = 0; i < DEVICE_LOCAL_BINS; ++i) {
-                bucket.value[slot][i] = 0.0f;
-            }
+        uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
+        uint32_t old = atomicCAS(&bucket.block_id[slot], expected, bid);
+        if (old == expected || old == bid) {
+            return slot;
+        }
+    }
+
+    // Another thread may have claimed this bid while we were racing.
+    for (int slot = 0; slot < DEVICE_Kb_out; ++slot) {
+        if (bucket.block_id[slot] == bid) {
             return slot;
         }
     }
@@ -749,7 +754,7 @@ __device__ inline int device_get_neighbor(int cell, int face, int Nx, int Nz) {
 //   sigma_x:        Lateral spread standard deviation (mm)
 //   dx:             Cell size (mm)
 //   Nx, Nz:         Grid dimensions
-//   N_spread:       Number of cells to spread across (must be even)
+//   N_spread:       Number of cells to spread across (odd preferred for symmetry)
 //   theta_edges, E_edges, N_theta, N_E, N_theta_local, N_E_local: Grid info
 __device__ inline float device_emit_lateral_spread(
     DeviceOutflowBucket* __restrict__ OutflowBuckets,
@@ -766,7 +771,7 @@ __device__ inline float device_emit_lateral_spread(
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
     int N_theta_local, int N_E_local,
-    int N_spread = 10,         // Number of cells to spread across
+    int N_spread = 11,         // Number of cells to spread across
     float* boundary_weight_out = nullptr
 ) {
     if (weight <= 0.0f || N_spread <= 0) return 0.0f;
@@ -806,20 +811,45 @@ __device__ inline float device_emit_lateral_spread(
 
     // Calculate Gaussian weight distribution
     // Fixed-size array for device code
-    constexpr int MAX_SPREAD_CELLS = 10;
-    int N_actual = fminf(N_spread, MAX_SPREAD_CELLS);
+    constexpr int MAX_SPREAD_CELLS = 11;
+    int N_actual = max(1, min(N_spread, MAX_SPREAD_CELLS));
+    // Enforce odd cell count to keep integer x-cell offsets symmetric.
+    if ((N_actual & 1) == 0) {
+        if (N_actual < MAX_SPREAD_CELLS) {
+            N_actual += 1;
+        } else {
+            N_actual -= 1;
+        }
+    }
 
     float weights[MAX_SPREAD_CELLS];
 
     // x_mean is the mean lateral position (x_offset = position within cell)
     device_gaussian_spread_weights(weights, x_offset, sigma_x, dx, N_actual);
+    // Guard against approximation/precision artifacts: enforce non-negative
+    // weights and renormalize before emission to prevent weight amplification.
+    float w_sum = 0.0f;
+    for (int i = 0; i < N_actual; ++i) {
+        weights[i] = fmaxf(0.0f, weights[i]);
+        w_sum += weights[i];
+    }
+    if (w_sum < 1e-12f) {
+        for (int i = 0; i < N_actual; ++i) {
+            weights[i] = 0.0f;
+        }
+        weights[N_actual / 2] = 1.0f;
+    } else {
+        for (int i = 0; i < N_actual; ++i) {
+            weights[i] /= w_sum;
+        }
+    }
 
     // Get source cell indices
     int ix_source = source_cell % Nx;
     int iz_source = source_cell / Nx;
 
     // Emit to each target cell with distributed weight
-    int x_offset_start = -(N_actual / 2);  // -5 for N=10
+    int x_offset_start = -(N_actual / 2);  // Symmetric range: -k..+k for odd N
 
     for (int i = 0; i < N_actual; i++) {
         float w_frac = weights[i];

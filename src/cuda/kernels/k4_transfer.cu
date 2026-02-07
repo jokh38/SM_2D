@@ -129,16 +129,15 @@ __global__ void K4_BucketTransfer(
             // If not found, try to allocate new slot
             if (out_slot < 0) {
                 for (int s = 0; s < max_slots_per_cell; ++s) {
-                    uint32_t existing_bid = block_ids_out[cell * max_slots_per_cell + s];
                     uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
-
-                    // Atomic swap to allocate slot
-                    if (existing_bid == expected) {
-                        if (atomicCAS(&block_ids_out[cell * max_slots_per_cell + s],
-                                      expected, bid) == expected) {
-                            out_slot = s;
-                            break;
-                        }
+                    uint32_t old = atomicCAS(
+                        &block_ids_out[cell * max_slots_per_cell + s],
+                        expected,
+                        bid
+                    );
+                    if (old == expected || old == bid) {
+                        out_slot = s;
+                        break;
                     }
                 }
                 if (out_slot < 0) {

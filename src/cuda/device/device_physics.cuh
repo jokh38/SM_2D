@@ -244,21 +244,10 @@ __device__ inline float device_apply_nuclear_attenuation(
 // Returns: P(X <= x) for X ~ N(mu, sigma^2)
 __device__ inline float device_gaussian_cdf(float x, float mu, float sigma) {
     if (sigma < 1e-10f) return (x >= mu) ? 1.0f : 0.0f;
-
-    float t = (x - mu) / (sigma * 0.70710678f);  // / sqrt(2)
-    float abs_t = fabsf(t);
-    float r;
-
-    // Abramowitz and Stegun approximation for erf
-    if (abs_t < 1.0f) {
-        r = 0.5f * t * (1.0f + abs_t * (0.16666667f + abs_t * (0.04166667f +
-            abs_t * (0.00833333f + abs_t * 0.00142857f))));
-    } else {
-        r = 1.0f - 0.5f * expf(-abs_t * (1.0f + abs_t * (0.5f + abs_t * (0.33333333f +
-            abs_t * 0.25f)))) / sqrtf(2.0f * (float)M_PI);
-    }
-
-    return (t > 0.0f) ? 0.5f + r : 0.5f - r;
+    constexpr float INV_SQRT_2 = 0.70710678f;
+    float arg = (x - mu) / sigma * INV_SQRT_2;
+    float cdf = 0.5f * (1.0f + erff(arg));
+    return fminf(1.0f, fmaxf(0.0f, cdf));
 }
 
 // Calculate Gaussian weight distribution for lateral scattering
@@ -269,9 +258,9 @@ __device__ inline float device_gaussian_cdf(float x, float mu, float sigma) {
 //   x_mean:           Mean lateral position (cell-centered)
 //   sigma_x:          Lateral spread standard deviation (mm)
 //   dx:               Cell size (mm)
-//   N:                Number of cells to spread across (must be even)
+//   N:                Number of cells to spread across (odd N preferred)
 //
-// The distribution covers ±(N/2)*dx around x_mean
+// The distribution covers N cells centered around x_mean.
 __device__ inline void device_gaussian_spread_weights(
     float* weights,
     float x_mean,
@@ -282,8 +271,9 @@ __device__ inline void device_gaussian_spread_weights(
     // Clamp sigma_x to avoid division issues
     sigma_x = fmaxf(sigma_x, 1e-6f);
 
-    // Calculate cell boundaries (N cells cover range from -N/2*dx to +N/2*dx)
-    float x_min = x_mean - (N / 2) * dx;
+    // Center the N-cell window around x_mean.
+    // Using 0.5*N keeps odd-N windows truly symmetric around the source cell.
+    float x_min = x_mean - 0.5f * static_cast<float>(N) * dx;
 
     // Calculate weights using Gaussian CDF
     float cdf_prev = device_gaussian_cdf(x_min, x_mean, sigma_x);
@@ -308,7 +298,7 @@ __device__ inline void device_gaussian_spread_weights(
     } else {
         // If sigma_x is very small, put all weight in center cell
         for (int i = 0; i < N; i++) {
-            weights[i] = (i == N / 2 - 1) ? 1.0f : 0.0f;
+            weights[i] = (i == N / 2) ? 1.0f : 0.0f;
         }
     }
 }
