@@ -113,60 +113,41 @@ __global__ void K4_BucketTransfer(
             if (bid == DEVICE_EMPTY_BLOCK_ID) continue;
             uint32_t b_E = (bid >> 12) & 0xFFF;
 
-            // Find or allocate slot in this cell's output
-            // Note: This requires atomic operations for thread safety
-            int out_slot = -1;
-
-            // First try to find existing slot
-            for (int s = 0; s < max_slots_per_cell; ++s) {
-                uint32_t existing_bid = block_ids_out[cell * max_slots_per_cell + s];
-                if (existing_bid == bid) {
-                    out_slot = s;
-                    break;
-                }
-            }
-
-            // If not found, try to allocate new slot
+            // Find/allocate output slot. If saturated, reuse the closest existing
+            // slot block instead of dropping the entire bucket slot.
+            uint32_t selected_bid = bid;
+            int out_slot = device_psic_find_or_allocate_slot_with_fallback(
+                &block_ids_out[cell * max_slots_per_cell],
+                max_slots_per_cell,
+                bid,
+                selected_bid
+            );
             if (out_slot < 0) {
-                for (int s = 0; s < max_slots_per_cell; ++s) {
-                    uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
-                    uint32_t old = atomicCAS(
-                        &block_ids_out[cell * max_slots_per_cell + s],
-                        expected,
-                        bid
-                    );
-                    if (old == expected || old == bid) {
-                        out_slot = s;
-                        break;
+                double dropped_weight = 0.0;
+                double dropped_energy = 0.0;
+                for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
+                    float w = bucket.value[slot][lidx];
+                    if (w > 0.0f) {
+                        dropped_weight += static_cast<double>(w);
+                        int theta_local_unused;
+                        int E_local;
+                        int x_sub_unused;
+                        int z_sub_unused;
+                        decode_local_idx_4d(
+                            lidx,
+                            theta_local_unused,
+                            E_local,
+                            x_sub_unused,
+                            z_sub_unused
+                        );
+                        float E = k4_energy_from_bin(E_edges, N_E, b_E, E_local, N_E_local);
+                        dropped_energy += static_cast<double>(E) * static_cast<double>(w);
                     }
                 }
-                if (out_slot < 0) {
-                    double dropped_weight = 0.0;
-                    double dropped_energy = 0.0;
-                    for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
-                        float w = bucket.value[slot][lidx];
-                        if (w > 0.0f) {
-                            dropped_weight += static_cast<double>(w);
-                            int theta_local_unused;
-                            int E_local;
-                            int x_sub_unused;
-                            int z_sub_unused;
-                            decode_local_idx_4d(
-                                lidx,
-                                theta_local_unused,
-                                E_local,
-                                x_sub_unused,
-                                z_sub_unused
-                            );
-                            float E = k4_energy_from_bin(E_edges, N_E, b_E, E_local, N_E_local);
-                            dropped_energy += static_cast<double>(E) * static_cast<double>(w);
-                        }
-                    }
-                    atomicAdd(&g_k4_slot_drop_count, 1ULL);
-                    atomicAdd(&g_k4_slot_drop_weight, dropped_weight);
-                    atomicAdd(&g_k4_slot_drop_energy, dropped_energy);
-                    continue;
-                }
+                atomicAdd(&g_k4_slot_drop_count, 1ULL);
+                atomicAdd(&g_k4_slot_drop_weight, dropped_weight);
+                atomicAdd(&g_k4_slot_drop_energy, dropped_energy);
+                continue;
             }
 
             // Transfer all local bins
@@ -174,7 +155,15 @@ __global__ void K4_BucketTransfer(
                 for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
                     float w = bucket.value[slot][lidx];
                     if (w > 0) {
-                        int global_idx = (cell * max_slots_per_cell + out_slot) * DEVICE_LOCAL_BINS + lidx;
+                        uint16_t lidx_emit = static_cast<uint16_t>(lidx);
+                        if (selected_bid != bid) {
+                            lidx_emit = device_remap_lidx_to_bid(
+                                static_cast<uint16_t>(lidx),
+                                bid,
+                                selected_bid
+                            );
+                        }
+                        int global_idx = (cell * max_slots_per_cell + out_slot) * DEVICE_LOCAL_BINS + lidx_emit;
                         atomicAdd(&values_out[global_idx], w);
                         #if defined(SM2D_ENABLE_DEBUG_DUMPS)
                         atomicAdd(&d_transferred_weight, 1);

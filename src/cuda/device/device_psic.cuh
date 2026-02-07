@@ -168,30 +168,127 @@ __device__ inline int device_psic_find_or_allocate_slot(
     if (cell < 0 || cell >= psic.N_cells) return -1;
 
     size_t base_slot = cell * psic.Kb;
-
-    // First pass: try to find existing slot
-    for (int slot = 0; slot < psic.Kb; ++slot) {
-        if (psic.block_id[base_slot + slot] == bid) {
-            return slot;
-        }
-    }
-
-    // Second pass: try to allocate new slot
+    // Contention-safe find-or-allocate:
+    // - If slot is EMPTY, atomically claim it for `bid`
+    // - If slot already contains `bid`, reuse it
+    //
+    // IMPORTANT: Do NOT zero slot values here. PsiC is cleared before each
+    // transport iteration, and zeroing at claim time can race with concurrent
+    // writers that already add weights to the same slot.
     for (int slot = 0; slot < psic.Kb; ++slot) {
         uint32_t expected = DEVICE_EMPTY_SLOT;
-        // Atomic CAS to claim this slot
-        if (atomicCAS(&psic.block_id[base_slot + slot], expected, bid) == expected) {
-            // Successfully claimed - initialize values to zero
-            size_t value_base = (cell * psic.Kb + slot) * LOCAL_BINS;
-            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
-                psic.value[value_base + lidx] = 0.0f;
-            }
+        uint32_t old = atomicCAS(&psic.block_id[base_slot + slot], expected, bid);
+        if (old == expected || old == bid) {
             return slot;
         }
     }
 
-    // All slots full or claimed by other threads
+    // All slots full with other block IDs.
     return -1;
+}
+
+// Compute a lightweight block-distance metric in coarse (theta, E) space.
+// Lower distance means closer representation if we must reuse another slot.
+__device__ inline int device_bid_distance(uint32_t lhs_bid, uint32_t rhs_bid) {
+    int lhs_theta = static_cast<int>(lhs_bid & 0xFFF);
+    int lhs_E = static_cast<int>((lhs_bid >> 12) & 0xFFF);
+    int rhs_theta = static_cast<int>(rhs_bid & 0xFFF);
+    int rhs_E = static_cast<int>((rhs_bid >> 12) & 0xFFF);
+
+    int d_theta = abs(lhs_theta - rhs_theta);
+    int d_E = abs(lhs_E - rhs_E);
+
+    // Prioritize energy proximity; angular mismatch is less costly than energy mismatch.
+    return d_E * 8 + d_theta;
+}
+
+// Find/allocate an exact slot for desired_bid, or fall back to the closest
+// occupied slot when the cell is saturated. Returns -1 only when the cell has
+// no usable slot at all.
+__device__ inline int device_psic_find_or_allocate_slot_with_fallback(
+    uint32_t* __restrict__ cell_block_ids,
+    int Kb,
+    uint32_t desired_bid,
+    uint32_t& selected_bid_out
+) {
+    selected_bid_out = desired_bid;
+
+    // Reuse exact slot if already present.
+    for (int slot = 0; slot < Kb; ++slot) {
+        if (cell_block_ids[slot] == desired_bid) {
+            return slot;
+        }
+    }
+
+    // Try to allocate an empty slot for the desired block.
+    for (int slot = 0; slot < Kb; ++slot) {
+        uint32_t expected = DEVICE_EMPTY_SLOT;
+        uint32_t old = atomicCAS(&cell_block_ids[slot], expected, desired_bid);
+        if (old == expected || old == desired_bid) {
+            return slot;
+        }
+    }
+
+    // Another thread may have installed desired_bid while we raced.
+    for (int slot = 0; slot < Kb; ++slot) {
+        if (cell_block_ids[slot] == desired_bid) {
+            return slot;
+        }
+    }
+
+    // Saturated: choose closest occupied slot as a conservative fallback.
+    int best_slot = -1;
+    int best_dist = 0x7fffffff;
+    uint32_t best_bid = DEVICE_EMPTY_SLOT;
+    for (int slot = 0; slot < Kb; ++slot) {
+        uint32_t existing_bid = cell_block_ids[slot];
+        if (existing_bid == DEVICE_EMPTY_SLOT) {
+            continue;
+        }
+        int dist = device_bid_distance(existing_bid, desired_bid);
+        if (dist < best_dist) {
+            best_dist = dist;
+            best_slot = slot;
+            best_bid = existing_bid;
+        }
+    }
+
+    if (best_slot >= 0) {
+        selected_bid_out = best_bid;
+    }
+    return best_slot;
+}
+
+// Remap a local 4D index (theta_local, E_local, x_sub, z_sub) from the
+// source coarse block to a target coarse block by clamping global theta/E bins
+// into the target block range.
+__device__ inline uint16_t device_remap_lidx_to_bid(
+    uint16_t lidx_src,
+    uint32_t bid_src,
+    uint32_t bid_dst
+) {
+    if (bid_src == bid_dst) {
+        return lidx_src;
+    }
+
+    int theta_local_src, E_local_src, x_sub, z_sub;
+    decode_local_idx_4d(lidx_src, theta_local_src, E_local_src, x_sub, z_sub);
+
+    int b_theta_src = static_cast<int>(bid_src & 0xFFF);
+    int b_E_src = static_cast<int>((bid_src >> 12) & 0xFFF);
+    int b_theta_dst = static_cast<int>(bid_dst & 0xFFF);
+    int b_E_dst = static_cast<int>((bid_dst >> 12) & 0xFFF);
+
+    int theta_global = b_theta_src * N_theta_local + theta_local_src;
+    int E_global = b_E_src * N_E_local + E_local_src;
+
+    int theta_local_dst = theta_global - b_theta_dst * N_theta_local;
+    int E_local_dst = E_global - b_E_dst * N_E_local;
+
+    theta_local_dst = max(0, min(theta_local_dst, N_theta_local - 1));
+    E_local_dst = max(0, min(E_local_dst, N_E_local - 1));
+
+    return encode_local_idx_4d(theta_local_dst, E_local_dst, x_sub, z_sub);
 }
 
 // Get weight from a specific cell, slot, and local bin

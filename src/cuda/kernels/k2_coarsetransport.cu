@@ -432,17 +432,16 @@ __global__ void K2_CoarseTransport(
                     uint32_t b_E_new = static_cast<uint32_t>(E_bin_new) / N_E_local;
                     uint32_t bid_new = (b_E_new << 12) | (b_theta_new & 0xFFF);
 
-                    // Find or allocate slot in output
+                    // Find/allocate output slot, and if saturated, reuse the closest
+                    // existing block instead of dropping the entire component.
                     constexpr int Kb = DEVICE_Kb;
-                    int out_slot = -1;
-                    for (int s = 0; s < Kb; ++s) {
-                        uint32_t expected = DEVICE_EMPTY_BLOCK_ID;
-                        uint32_t old = atomicCAS(&block_ids_out[cell * Kb + s], expected, bid_new);
-                        if (old == expected || old == bid_new) {
-                            out_slot = s;
-                            break;
-                        }
-                    }
+                    uint32_t selected_bid = bid_new;
+                    int out_slot = device_psic_find_or_allocate_slot_with_fallback(
+                        &block_ids_out[cell * Kb],
+                        Kb,
+                        bid_new,
+                        selected_bid
+                    );
 
                     // ====================================================================
                     // Apply Gaussian lateral spreading within the cell
@@ -460,6 +459,21 @@ __global__ void K2_CoarseTransport(
                     }
 
                     if (E_new > 0.1f) {
+                        int theta_bin_emit = theta_bin_new;
+                        int E_bin_emit = E_bin_new;
+                        if (selected_bid != bid_new) {
+                            int b_theta_emit = static_cast<int>(selected_bid & 0xFFF);
+                            int b_E_emit = static_cast<int>((selected_bid >> 12) & 0xFFF);
+                            int theta_min_emit = b_theta_emit * N_theta_local;
+                            int theta_max_emit = theta_min_emit + N_theta_local - 1;
+                            int E_min_emit = b_E_emit * N_E_local;
+                            int E_max_emit = E_min_emit + N_E_local - 1;
+                            theta_bin_emit = max(theta_min_emit, min(theta_bin_emit, theta_max_emit));
+                            E_bin_emit = max(E_min_emit, min(E_bin_emit, E_max_emit));
+                        }
+                        int theta_local_new = theta_bin_emit % N_theta_local;
+                        int E_local_new = E_bin_emit % N_E_local;
+
                         // FIX B: Use sub-cell Gaussian spreading with correct dx/8 spacing
                         constexpr int N_x_sub = 8;  // Number of sub-cell bins
 
@@ -506,8 +520,6 @@ __global__ void K2_CoarseTransport(
                             float w_spread = w_new * w_frac;
 
                             // Compute new local bin index
-                            int theta_local_new = theta_bin_new % N_theta_local;
-                            int E_local_new = E_bin_new % N_E_local;
                             int lidx_new = encode_local_idx_4d(theta_local_new, E_local_new, x_sub_target, z_sub_target);
 
                             // Write to output phase space (all within same cell)

@@ -351,26 +351,64 @@
    - `src/cuda/kernels/k3_finetransport.cu`
    - `src/cuda/kernels/k4_transfer.cu`
 
+10. Fixed PDD mid-depth discontinuity root cause (slot saturation -> transport loss):
+   - Added saturation fallback and local-bin remap (closest occupied block) instead of dropping when exact slot allocation fails.
+   - Files:
+     - `src/cuda/device/device_psic.cuh`
+     - `src/cuda/device/device_bucket.cuh`
+     - `src/cuda/kernels/k2_coarsetransport.cu`
+     - `src/cuda/kernels/k3_finetransport.cu`
+     - `src/cuda/kernels/k4_transfer.cu`
+
+### Latest validation snapshot after PDD/drop fix pass (2026-02-07)
+
+1. **Root cause confirmed:**
+   - PDD depth discontinuity (mid-depth drop and distal re-rise) was caused by K2/K3/K4 slot saturation drops under high phase-space occupancy.
+   - Mid-depth energy was lost in transport-drop channels; surviving components still formed a distal peak, creating non-physical "drop then Bragg again" behavior.
+
+2. **Drop channels after fix (verbose run):**
+   - `K2 slot=0, K2 bucket=0, K3 slot=0, K3 bucket=0, K4 slot=0`
+   - `Transport Drop Energy: 0 MeV`
+
+3. **Range/PDD recovery (8 GB config):**
+   - `validation/gpu_compare_sigma38_600.ini` rerun:
+     - `Transport complete after 204 iterations`
+     - `Bragg Peak: 157 mm`
+   - This removes the prior shallow-range behavior (`~111 mm`) observed before the saturation fallback pass.
+
+4. **Energy channels still open (not fully closed):**
+   - Example verbose run totals:
+     - `Source Energy (total): 150.002 MeV`
+     - `Energy Deposited: 127.745 MeV`
+     - `Nuclear Energy Deposited: 17.2682 MeV`
+     - `Cutoff Energy Deposited: 0.0110319 MeV`
+     - `Boundary Loss Energy: 4.94782e-07 MeV`
+     - `Transport Drop Energy: 0 MeV`
+     - `Total Accounted Energy (transport only): 145.024 MeV`
+   - Remaining deficit is no longer dominated by slot/bucket drops.
+
+5. **Regression status:**
+   - `build/tests/sm2d_tests --gtest_filter=EnergyLossOnlyTest.FullPhysics` still fails:
+     - `sigma_100 = 0.112099 mm` (expected `> 0.5 mm`)
+   - Mid-depth lateral spread deficiency remains open.
+
 ---
 
 ## Required Next Fixes
 
-1. **Reduce transport-drop saturation (highest priority).**
-   - Current verbose run still loses ~`45.96 MeV` to transport drops.
-   - Investigate K2 bucket overflow and K3/K4 slot saturation under high phase-space occupancy.
-2. **Reconcile energy channels so transport totals close to source energy.**
-   - Current total accounted energy remains above source (`152.885 MeV` vs `150.002 MeV`).
-   - Revisit overlap between continuous `edep` and nuclear removal accounting.
-3. **Recover physically correct depth-dose range (Bragg still shallow).**
-   - Current Bragg remains at `111 mm` vs MOQUI `154 mm`.
-4. **Improve mid-depth lateral spread without reintroducing directional bias.**
+1. **Reconcile energy channels so transport totals close to source energy.**
+   - Transport drop channels are now `0`, but transport accounting still under-closes in verbose runs (`145.024 MeV` vs `150.002 MeV`).
+   - Revisit remaining sinks (including pruning/loss channels and per-step accounting consistency).
+2. **Improve mid-depth lateral spread without reintroducing directional bias.**
    - Keep centroid near zero while raising `sigma_100` toward expected values.
    - `EnergyLossOnlyTest.FullPhysics` still fails (`sigma_100 = 0.112 mm`).
-5. Keep K5/transition behaviors under regression protection (implemented, must not regress):
+3. Keep K5/transition behaviors under regression protection (implemented, must not regress):
    - hysteresis behavior with `E_fine_on/E_fine_off`,
    - coarse-step crossing guard at `E_fine_on`,
    - K5 energy pass/fail semantics (`E_error`, `E_pass`).
-6. Add targeted regressions:
+4. Add targeted regressions:
+   - no-transport-drop closure regression (`K2/K3/K4 slot,bucket drops == 0` under standard validation config),
+   - PDD continuity regression (no mid-depth collapse + distal re-rise in 150 MeV reference case),
    - depth-dependent sigma growth check (`sigma_20 < sigma_100 < sigma_140` for 150 MeV),
    - lateral-centroid symmetry check (`|mu_x(z)|` bounded for centered source),
    - energy conservation check (`|accounted-source|/source < tolerance`),

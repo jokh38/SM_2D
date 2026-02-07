@@ -3,6 +3,7 @@
 #include <cstdint>
 #include "core/local_bins.hpp"
 #include "core/block_encoding.hpp"
+#include "device/device_psic.cuh"
 
 // Forward declarations for physics functions (defined in device_physics.cuh)
 // Avoid circular dependency by using forward declarations where possible
@@ -88,6 +89,42 @@ __device__ inline int device_bucket_find_or_allocate_slot(
 
     // Bucket is full
     return -1;
+}
+
+// Find/allocate exact bucket slot, or fall back to the closest occupied slot
+// when the bucket is saturated.
+__device__ inline int device_bucket_find_or_allocate_slot_with_fallback(
+    DeviceOutflowBucket& bucket,
+    uint32_t desired_bid,
+    uint32_t& selected_bid_out
+) {
+    selected_bid_out = desired_bid;
+
+    int exact_slot = device_bucket_find_or_allocate_slot(bucket, desired_bid);
+    if (exact_slot >= 0) {
+        return exact_slot;
+    }
+
+    int best_slot = -1;
+    int best_dist = 0x7fffffff;
+    uint32_t best_bid = DEVICE_EMPTY_BLOCK_ID;
+    for (int slot = 0; slot < DEVICE_Kb_out; ++slot) {
+        uint32_t existing_bid = bucket.block_id[slot];
+        if (existing_bid == DEVICE_EMPTY_BLOCK_ID) {
+            continue;
+        }
+        int dist = device_bid_distance(existing_bid, desired_bid);
+        if (dist < best_dist) {
+            best_dist = dist;
+            best_slot = slot;
+            best_bid = existing_bid;
+        }
+    }
+
+    if (best_slot >= 0) {
+        selected_bid_out = best_bid;
+    }
+    return best_slot;
 }
 
 // Emit a particle weight to a bucket
@@ -450,8 +487,19 @@ __device__ inline float device_emit_component_to_bucket_4d(
     // 4D local index encoding with x_sub and z_sub
     uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
 
-    // Emit to bucket
-    return device_emit_to_bucket(bucket, bid, lidx, weight) ? 0.0f : weight;
+    // Emit to bucket; if saturated, conservatively remap to closest occupied slot.
+    uint32_t selected_bid = bid;
+    int slot = device_bucket_find_or_allocate_slot_with_fallback(bucket, bid, selected_bid);
+    if (slot < 0) {
+        return weight;
+    }
+
+    uint16_t lidx_emit = (selected_bid == bid)
+        ? lidx
+        : device_remap_lidx_to_bid(lidx, bid, selected_bid);
+    atomicAdd(&bucket.value[slot][lidx_emit], weight);
+    bucket.local_count[slot]++;
+    return 0.0f;
 }
 
 // ============================================================================
