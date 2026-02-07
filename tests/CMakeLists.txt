@@ -44,6 +44,7 @@ set(TEST_CUDA_FILES
     perf/test_kernel_profiling.cpp
     perf/test_occupancy.cpp
     gpu/test_energy_loss_only_gpu.cu
+    gpu/test_k5_drop_channels_gpu.cu
 )
 
 # GPU-only test target: always include CUDA tests.

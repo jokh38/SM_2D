@@ -80,6 +80,7 @@ __global__ void K2_CoarseTransport(
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
+    double* __restrict__ AbsorbedEnergy_cutoff,
     float* __restrict__ AbsorbedWeight_nuclear,
     double* __restrict__ AbsorbedEnergy_nuclear,
     float* __restrict__ BoundaryLoss_weight,
@@ -105,6 +106,7 @@ __global__ void K2_CoarseTransport(
     constexpr int Kb = DEVICE_Kb;
     double cell_edep = 0.0;
     float cell_w_cutoff = 0.0f;
+    double cell_E_cutoff = 0.0;
     float cell_w_nuclear = 0.0f;
     double cell_E_nuclear = 0.0f;
     float cell_boundary_weight = 0.0f;
@@ -143,18 +145,17 @@ __global__ void K2_CoarseTransport(
             float dtheta = (theta_max - theta_min) / N_theta;
             float theta = theta_min + (theta_bin + 0.5f) * dtheta;
 
-            // CRITICAL: Use the same energy calculation as K3 for consistency
-            // K3 uses lower edge + 20% of half-width to ensure energy actually decreases
-            // K2 must use the same calculation to avoid energy jumps when transitioning
+            // CRITICAL: Use the same representative energy calculation as K3 for consistency.
+            // K2 and K3 both use the bin center to avoid transition discontinuities.
             float E_lower = E_edges[E_bin];
             float E_upper = E_edges[E_bin + 1];
             float E_half_width = (E_upper - E_lower) * 0.5f;
-            float E = E_lower + 0.50f * E_half_width;  // 50% of half-width from lower edge
+            float E = E_lower + 1.00f * E_half_width;  // Bin center
 
             // Cutoff check
             if (E <= 0.1f) {
-                cell_edep += E * weight;
                 cell_w_cutoff += weight;
+                cell_E_cutoff += E * weight;
                 continue;
             }
 
@@ -312,8 +313,9 @@ __global__ void K2_CoarseTransport(
                 // so particles can never reach E <= 0.1 MeV if we check after binning.
                 if (E_new <= 0.1f) {
                     // Particle should be absorbed - deposit remaining energy locally
-                    cell_edep += edep + E_new * w_new;  // Remaining energy from step
+                    cell_edep += edep;
                     cell_w_cutoff += w_new;
+                    cell_E_cutoff += E_new * w_new;  // Remaining energy from step
                 } else {
                     // ====================================================================
                     // Single-cell emission (K2: deterministic lateral spreading)
@@ -369,8 +371,8 @@ __global__ void K2_CoarseTransport(
 
                 // Cutoff check - don't write to output if below cutoff
                 if (E_new <= 0.1f) {
-                    cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
+                    cell_E_cutoff += E_new * w_new;
                 } else {
                     // ========================================================================
                     // DETERMINISTIC LATERAL SPREADING: Gaussian weight distribution
@@ -573,6 +575,7 @@ __global__ void K2_CoarseTransport(
     // Write accumulators
     atomicAdd(&EdepC[cell], cell_edep);
     atomicAdd(&AbsorbedWeight_cutoff[cell], cell_w_cutoff);
+    atomicAdd(&AbsorbedEnergy_cutoff[cell], cell_E_cutoff);
     atomicAdd(&AbsorbedWeight_nuclear[cell], cell_w_nuclear);
     atomicAdd(&AbsorbedEnergy_nuclear[cell], cell_E_nuclear);
     atomicAdd(&BoundaryLoss_weight[cell], cell_boundary_weight);
@@ -626,6 +629,7 @@ void run_K2_CoarseTransport(
     float sigma_x_initial,  // FIX C: Initial beam width from config
     double* EdepC,
     float* AbsorbedWeight_cutoff,
+    double* AbsorbedEnergy_cutoff,
     float* AbsorbedWeight_nuclear,
     double* AbsorbedEnergy_nuclear,
     float* BoundaryLoss_weight,
@@ -646,7 +650,7 @@ void run_K2_CoarseTransport(
         N_theta, N_E, N_theta_local, N_E_local,
         config,
         sigma_x_initial,  // FIX C: Pass initial beam width
-        EdepC, AbsorbedWeight_cutoff, AbsorbedWeight_nuclear, AbsorbedEnergy_nuclear,
+        EdepC, AbsorbedWeight_cutoff, AbsorbedEnergy_cutoff, AbsorbedWeight_nuclear, AbsorbedEnergy_nuclear,
         BoundaryLoss_weight, BoundaryLoss_energy,
         OutflowBuckets,
         block_ids_out, values_out

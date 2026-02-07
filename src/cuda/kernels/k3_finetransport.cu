@@ -36,7 +36,8 @@ namespace {
     // Energy tracking constants
     constexpr float ENERGY_CUTOFF_MEV = 0.1f;           // Minimum energy for transport [MeV]
     constexpr float WEIGHT_THRESHOLD = 1e-15f;           // Minimum weight for transport
-    constexpr float ENERGY_OFFSET_RATIO = 0.50f;         // Offset from lower edge (fraction of half-width)
+    // Use bin center as representative energy to reduce systematic range bias.
+    constexpr float ENERGY_OFFSET_RATIO = 1.00f;         // Offset from lower edge (fraction of half-width)
     constexpr float BOUNDARY_SAFETY_FACTOR = 1.001f;     // Allow slight boundary crossing
 
     // Scattering reduction factors (TEST: set all to 1.0 for accurate physics)
@@ -98,6 +99,7 @@ __global__ void K3_FineTransport(
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
+    double* __restrict__ AbsorbedEnergy_cutoff,
     float* __restrict__ AbsorbedWeight_nuclear,
     double* __restrict__ AbsorbedEnergy_nuclear,
     float* __restrict__ BoundaryLoss_weight,
@@ -117,6 +119,7 @@ __global__ void K3_FineTransport(
     // Accumulators for this cell
     double cell_edep = 0.0;
     float cell_w_cutoff = 0.0f;
+    double cell_E_cutoff = 0.0;
     float cell_w_nuclear = 0.0f;
     double cell_E_nuclear = 0.0;
     float cell_boundary_weight = 0.0f;
@@ -171,16 +174,14 @@ __global__ void K3_FineTransport(
             // The E_edges array contains the actual bin edges for the piecewise-uniform grid
             //
             // CRITICAL FIX FOR ENERGY TRACKING:
-            // Using the bin midpoint causes energy to "reset" in each iteration because
-            // the phase space only stores which bin a particle is in, not the continuous
-            // energy value. To ensure actual energy loss across iterations, we use the
-            // lower edge PLUS a small fraction of the bin width (20% of half-width).
+            // The phase space stores discrete bins, not a continuous per-particle energy.
+            // Use the bin center as representative energy for transport/audit consistency.
             //
-            // This ensures particles actually move to lower bins as they lose energy:
-            //   - Particle in bin [150, 151] uses E ≈ 150.10 for physics (20% offset)
+            // This ensures particles move to lower bins as they lose energy:
+            //   - Particle in bin [150, 151] uses E ≈ 150.50 for physics (bin center)
             //   - Loses 0.24 MeV → E_new ≈ 149.86
             //   - Gets binned to [149, 150] (since 149.86 < 150)
-            //   - Next iteration uses E ≈ 149.10 for physics
+            //   - Next iteration uses E ≈ 149.50 for physics
             //   - Energy actually decreases over time!
             float E_lower = E_edges[E_bin];
             float E_upper = E_edges[E_bin + 1];
@@ -189,8 +190,8 @@ __global__ void K3_FineTransport(
 
             // Cutoff check
             if (E <= ENERGY_CUTOFF_MEV) {
-                cell_edep += E * weight;
                 cell_w_cutoff += weight;
+                cell_E_cutoff += E * weight;
                 continue;
             }
 
@@ -380,8 +381,8 @@ __global__ void K3_FineTransport(
 
                 // Cutoff check - don't write to output if below cutoff
                 if (E_new <= ENERGY_CUTOFF_MEV) {
-                    cell_edep += E_new * w_new;
                     cell_w_cutoff += w_new;
+                    cell_E_cutoff += E_new * w_new;
                 } else {
                     // ========================================================================
                     // DETERMINISTIC LATERAL SPREADING: Gaussian weight distribution
@@ -600,6 +601,7 @@ __global__ void K3_FineTransport(
     // Write accumulators to global memory (atomic for thread safety)
     atomicAdd(&EdepC[cell], cell_edep);
     atomicAdd(&AbsorbedWeight_cutoff[cell], cell_w_cutoff);
+    atomicAdd(&AbsorbedEnergy_cutoff[cell], cell_E_cutoff);
     atomicAdd(&AbsorbedWeight_nuclear[cell], cell_w_nuclear);
     atomicAdd(&AbsorbedEnergy_nuclear[cell], cell_E_nuclear);
     atomicAdd(&BoundaryLoss_weight[cell], cell_boundary_weight);

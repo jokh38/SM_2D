@@ -70,11 +70,11 @@ void dump_nonzero_cells_to_csv(
         theta_centers[i] = theta_min + (i + 0.5f) * dtheta;
     }
     for (int i = 0; i < N_E; ++i) {
-        // Use lower edge + 50% of half-width (same as K2/K3)
+        // Use bin center (same representative energy convention as K2/K3/K5).
         float E_lower = E_edges[i];
         float E_upper = E_edges[i + 1];
         float E_half_width = (E_upper - E_lower) * 0.5f;
-        E_centers[i] = E_lower + 0.50f * E_half_width;
+        E_centers[i] = E_lower + 1.00f * E_half_width;
     }
 
     for (int cell = 0; cell < N_cells; ++cell) {
@@ -619,6 +619,8 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     // Allocate weight tracking arrays
     e = cudaMalloc(&d_AbsorbedWeight_cutoff, N_cells * sizeof(float));
     if (e != cudaSuccess) { std::cerr << "Failed d_AbsorbedWeight_cutoff: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_AbsorbedEnergy_cutoff, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_AbsorbedEnergy_cutoff: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_AbsorbedWeight_nuclear, N_cells * sizeof(float));
     if (e != cudaSuccess) { std::cerr << "Failed d_AbsorbedWeight_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_AbsorbedEnergy_nuclear, N_cells * sizeof(double));
@@ -629,6 +631,8 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     if (e != cudaSuccess) { std::cerr << "Failed d_BoundaryLoss_energy: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_prev_AbsorbedWeight_cutoff, N_cells * sizeof(float));
     if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedWeight_cutoff: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_prev_AbsorbedEnergy_cutoff, N_cells * sizeof(double));
+    if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedEnergy_cutoff: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_prev_AbsorbedWeight_nuclear, N_cells * sizeof(float));
     if (e != cudaSuccess) { std::cerr << "Failed d_prev_AbsorbedWeight_nuclear: " << cudaGetErrorString(e) << std::endl; return false; }
     e = cudaMalloc(&d_prev_BoundaryLoss_weight, N_cells * sizeof(float));
@@ -668,11 +672,13 @@ void K1K6PipelineState::cleanup() {
     if (d_n_coarse) cudaFree(d_n_coarse);
     if (d_EdepC) cudaFree(d_EdepC);
     if (d_AbsorbedWeight_cutoff) cudaFree(d_AbsorbedWeight_cutoff);
+    if (d_AbsorbedEnergy_cutoff) cudaFree(d_AbsorbedEnergy_cutoff);
     if (d_AbsorbedWeight_nuclear) cudaFree(d_AbsorbedWeight_nuclear);
     if (d_AbsorbedEnergy_nuclear) cudaFree(d_AbsorbedEnergy_nuclear);
     if (d_BoundaryLoss_weight) cudaFree(d_BoundaryLoss_weight);
     if (d_BoundaryLoss_energy) cudaFree(d_BoundaryLoss_energy);
     if (d_prev_AbsorbedWeight_cutoff) cudaFree(d_prev_AbsorbedWeight_cutoff);
+    if (d_prev_AbsorbedEnergy_cutoff) cudaFree(d_prev_AbsorbedEnergy_cutoff);
     if (d_prev_AbsorbedWeight_nuclear) cudaFree(d_prev_AbsorbedWeight_nuclear);
     if (d_prev_BoundaryLoss_weight) cudaFree(d_prev_BoundaryLoss_weight);
     if (d_prev_EdepC) cudaFree(d_prev_EdepC);
@@ -693,11 +699,13 @@ void K1K6PipelineState::cleanup() {
     d_n_coarse = nullptr;
     d_EdepC = nullptr;
     d_AbsorbedWeight_cutoff = nullptr;
+    d_AbsorbedEnergy_cutoff = nullptr;
     d_AbsorbedWeight_nuclear = nullptr;
     d_AbsorbedEnergy_nuclear = nullptr;
     d_BoundaryLoss_weight = nullptr;
     d_BoundaryLoss_energy = nullptr;
     d_prev_AbsorbedWeight_cutoff = nullptr;
+    d_prev_AbsorbedEnergy_cutoff = nullptr;
     d_prev_AbsorbedWeight_nuclear = nullptr;
     d_prev_BoundaryLoss_weight = nullptr;
     d_prev_EdepC = nullptr;
@@ -771,11 +779,13 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemset(state.d_ActiveMask_prev, 0, N_cells * sizeof(uint8_t));
     cudaMemset(state.d_EdepC, 0, N_cells * sizeof(double));
     cudaMemset(state.d_AbsorbedWeight_cutoff, 0, N_cells * sizeof(float));
+    cudaMemset(state.d_AbsorbedEnergy_cutoff, 0, N_cells * sizeof(double));
     cudaMemset(state.d_AbsorbedWeight_nuclear, 0, N_cells * sizeof(float));
     cudaMemset(state.d_AbsorbedEnergy_nuclear, 0, N_cells * sizeof(double));
     cudaMemset(state.d_BoundaryLoss_weight, 0, N_cells * sizeof(float));
     cudaMemset(state.d_BoundaryLoss_energy, 0, N_cells * sizeof(double));
     cudaMemset(state.d_prev_AbsorbedWeight_cutoff, 0, N_cells * sizeof(float));
+    cudaMemset(state.d_prev_AbsorbedEnergy_cutoff, 0, N_cells * sizeof(double));
     cudaMemset(state.d_prev_AbsorbedWeight_nuclear, 0, N_cells * sizeof(float));
     cudaMemset(state.d_prev_BoundaryLoss_weight, 0, N_cells * sizeof(float));
     cudaMemset(state.d_prev_EdepC, 0, N_cells * sizeof(double));
@@ -788,6 +798,8 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     int zero = 0;
     cudaMemcpy(state.d_n_active, &zero, sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(state.d_n_coarse, &zero, sizeof(int), cudaMemcpyHostToDevice);
+    state.transport_dropped_weight = 0.0;
+    state.transport_dropped_energy = 0.0;
 
 }
 
@@ -877,6 +889,7 @@ bool run_k2_coarse_transport(
         config.sigma_x_initial,  // FIX C: Pass initial beam width
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
+        state.d_AbsorbedEnergy_cutoff,
         state.d_AbsorbedWeight_nuclear,
         state.d_AbsorbedEnergy_nuclear,
         state.d_BoundaryLoss_weight,
@@ -930,6 +943,7 @@ bool run_k3_fine_transport(
         config.sigma_x_initial,  // FIX C: Pass initial beam width
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
+        state.d_AbsorbedEnergy_cutoff,
         state.d_AbsorbedWeight_nuclear,
         state.d_AbsorbedEnergy_nuclear,
         state.d_BoundaryLoss_weight,
@@ -953,7 +967,10 @@ bool run_k3_fine_transport(
 bool run_k4_bucket_transfer(
     DevicePsiC& psi_out,
     const DeviceOutflowBucket* d_OutflowBuckets,
-    int Nx, int Nz
+    int Nx, int Nz,
+    const float* d_E_edges,
+    int N_E,
+    int N_E_local
 ) {
     int threads = 256;
     int blocks = (Nx * Nz + threads - 1) / threads;
@@ -963,7 +980,10 @@ bool run_k4_bucket_transfer(
         d_OutflowBuckets,
         psi_out.value,
         psi_out.block_id,
-        Nx, Nz
+        Nx, Nz,
+        d_E_edges,
+        N_E,
+        N_E_local
     );
 
     cudaError_t err = cudaGetLastError();
@@ -980,9 +1000,11 @@ bool run_k5_conservation_audit(
     const DevicePsiC& psi_in,
     const DevicePsiC& psi_out,
     const double* d_EdepC,
+    const double* d_AbsorbedEnergy_cutoff,
     const double* d_AbsorbedEnergy_nuclear,
     const double* d_BoundaryLoss_energy,
     const double* d_prev_EdepC,
+    const double* d_prev_AbsorbedEnergy_cutoff,
     const double* d_prev_AbsorbedEnergy_nuclear,
     const double* d_prev_BoundaryLoss_energy,
     const float* d_AbsorbedWeight_cutoff,
@@ -995,6 +1017,8 @@ bool run_k5_conservation_audit(
     float source_slot_dropped_weight,
     double source_out_of_grid_energy,
     double source_slot_dropped_energy,
+    float transport_dropped_weight,
+    double transport_dropped_energy,
     int include_source_terms,
     const float* d_E_edges,
     int N_E,
@@ -1017,9 +1041,11 @@ bool run_k5_conservation_audit(
         d_EdepC,
         d_AbsorbedEnergy_nuclear,
         d_BoundaryLoss_energy,
+        d_AbsorbedEnergy_cutoff,
         d_prev_EdepC,
         d_prev_AbsorbedEnergy_nuclear,
         d_prev_BoundaryLoss_energy,
+        d_prev_AbsorbedEnergy_cutoff,
         d_AbsorbedWeight_cutoff,
         d_AbsorbedWeight_nuclear,
         d_BoundaryLoss_weight,
@@ -1030,6 +1056,8 @@ bool run_k5_conservation_audit(
         source_slot_dropped_weight,
         source_out_of_grid_energy,
         source_slot_dropped_energy,
+        transport_dropped_weight,
+        transport_dropped_energy,
         include_source_terms,
         d_E_edges,
         N_E,
@@ -1209,6 +1237,9 @@ bool run_k1k6_pipeline_transport(
         int b_blocks = (num_buckets + b_threads - 1) / b_threads;
         clear_buckets_kernel<<<b_blocks, b_threads>>>(state.d_OutflowBuckets, num_buckets);
         cudaDeviceSynchronize();
+        k2_reset_debug_counters();
+        k3_reset_debug_counters();
+        k4_reset_debug_counters();
 
         // --------------------------------------------------------------------
         // K2: Coarse Transport (high energy cells)
@@ -1235,13 +1266,94 @@ bool run_k1k6_pipeline_transport(
         // --------------------------------------------------------------------
         // K4: Bucket Transfer (boundary crossings)
         // --------------------------------------------------------------------
-        if (!run_k4_bucket_transfer(*psi_out, state.d_OutflowBuckets, config.Nx, config.Nz)) {
+        if (!run_k4_bucket_transfer(*psi_out, state.d_OutflowBuckets,
+                                    config.Nx, config.Nz,
+                                    state.d_E_edges,
+                                    config.N_E,
+                                    config.N_E_local)) {
             std::cerr << "K4 failed at iteration " << iter << std::endl;
             return false;
         }
 
         // Note: Buckets are cleared at START of next iteration (before K2/K3)
         // This is correct because K4 needs to read the buckets AFTER K2/K3 write to them
+
+        // Gather per-iteration drop channels from transport kernels and fold into K5.
+        unsigned long long k2_slot_drop_count = 0;
+        unsigned long long k2_bucket_drop_count = 0;
+        double k2_slot_drop_weight = 0.0;
+        double k2_slot_drop_energy = 0.0;
+        double k2_bucket_drop_weight = 0.0;
+        double k2_bucket_drop_energy = 0.0;
+        k2_get_debug_counters(
+            k2_slot_drop_count,
+            k2_slot_drop_weight,
+            k2_slot_drop_energy,
+            k2_bucket_drop_count,
+            k2_bucket_drop_weight,
+            k2_bucket_drop_energy
+        );
+
+        unsigned long long k3_slot_drop_count = 0;
+        unsigned long long k3_bucket_drop_count = 0;
+        unsigned long long k3_pruned_weight_count = 0;
+        double k3_slot_drop_weight = 0.0;
+        double k3_slot_drop_energy = 0.0;
+        double k3_bucket_drop_weight = 0.0;
+        double k3_bucket_drop_energy = 0.0;
+        double k3_pruned_weight_sum = 0.0;
+        double k3_pruned_energy_sum = 0.0;
+        k3_get_debug_counters(
+            k3_slot_drop_count,
+            k3_slot_drop_weight,
+            k3_slot_drop_energy,
+            k3_bucket_drop_count,
+            k3_bucket_drop_weight,
+            k3_bucket_drop_energy,
+            k3_pruned_weight_count,
+            k3_pruned_weight_sum,
+            k3_pruned_energy_sum
+        );
+
+        unsigned long long k4_slot_drop_count = 0;
+        double k4_slot_drop_weight = 0.0;
+        double k4_slot_drop_energy = 0.0;
+        k4_get_debug_counters(
+            k4_slot_drop_count,
+            k4_slot_drop_weight,
+            k4_slot_drop_energy
+        );
+
+        const double transport_drop_weight_iter =
+            k2_slot_drop_weight +
+            k2_bucket_drop_weight +
+            k3_slot_drop_weight +
+            k3_bucket_drop_weight +
+            k4_slot_drop_weight;
+        const double transport_drop_energy_iter =
+            k2_slot_drop_energy +
+            k2_bucket_drop_energy +
+            k3_slot_drop_energy +
+            k3_bucket_drop_energy +
+            k4_slot_drop_energy;
+        state.transport_dropped_weight += transport_drop_weight_iter;
+        state.transport_dropped_energy += transport_drop_energy_iter;
+
+        if (verbose_logging && (transport_drop_weight_iter > 0.0 || k3_pruned_weight_count > 0)) {
+            std::cout << "  Transport drops: weight=" << transport_drop_weight_iter
+                      << ", energy=" << transport_drop_energy_iter << " MeV"
+                      << " [K2 slot=" << k2_slot_drop_count
+                      << ", K2 bucket=" << k2_bucket_drop_count
+                      << ", K3 slot=" << k3_slot_drop_count
+                      << ", K3 bucket=" << k3_bucket_drop_count
+                      << ", K4 slot=" << k4_slot_drop_count << "]" << std::endl;
+            if (k3_pruned_weight_count > 0) {
+                std::cout << "  K3 pruned tiny weights (not in K5 drop channel): count="
+                          << k3_pruned_weight_count
+                          << ", weight=" << k3_pruned_weight_sum
+                          << ", energy=" << k3_pruned_energy_sum << " MeV" << std::endl;
+            }
+        }
 
         // --------------------------------------------------------------------
         // DEBUG: Dump non-zero cells after K4 for selected iterations
@@ -1263,9 +1375,11 @@ bool run_k1k6_pipeline_transport(
         //       psi_out contains K2+K3+K4 results (cleared at start of iteration)
         if (!run_k5_conservation_audit(*psi_in, *psi_out,
                                  state.d_EdepC,
+                                 state.d_AbsorbedEnergy_cutoff,
                                  state.d_AbsorbedEnergy_nuclear,
                                  state.d_BoundaryLoss_energy,
                                  state.d_prev_EdepC,
+                                 state.d_prev_AbsorbedEnergy_cutoff,
                                  state.d_prev_AbsorbedEnergy_nuclear,
                                  state.d_prev_BoundaryLoss_energy,
                                  state.d_AbsorbedWeight_cutoff,
@@ -1278,6 +1392,8 @@ bool run_k1k6_pipeline_transport(
                                  state.source_slot_dropped_weight,
                                  state.source_out_of_grid_energy,
                                  state.source_slot_dropped_energy,
+                                 static_cast<float>(transport_drop_weight_iter),
+                                 transport_drop_energy_iter,
                                  (iter == 1) ? 1 : 0,
                                  state.d_E_edges,
                                  config.N_E,
@@ -1300,6 +1416,8 @@ bool run_k1k6_pipeline_transport(
         int N_cells = config.Nx * config.Nz;
         cudaMemcpy(state.d_prev_AbsorbedWeight_cutoff, state.d_AbsorbedWeight_cutoff,
                    N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(state.d_prev_AbsorbedEnergy_cutoff, state.d_AbsorbedEnergy_cutoff,
+                   N_cells * sizeof(double), cudaMemcpyDeviceToDevice);
         cudaMemcpy(state.d_prev_AbsorbedWeight_nuclear, state.d_AbsorbedWeight_nuclear,
                    N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
         cudaMemcpy(state.d_prev_BoundaryLoss_weight, state.d_BoundaryLoss_weight,
@@ -1351,12 +1469,18 @@ bool run_k1k6_pipeline_transport(
         total_boundary_loss_energy += h_BoundaryLoss_energy[i];
     }
 
-    // Cutoff weight (particles below energy threshold)
+    // Cutoff channels (particles below energy threshold)
     std::vector<float> h_AbsorbedWeight_cutoff(total_cells);
     cudaMemcpy(h_AbsorbedWeight_cutoff.data(), state.d_AbsorbedWeight_cutoff, total_cells * sizeof(float), cudaMemcpyDeviceToHost);
     double total_cutoff_weight = 0.0;
     for (int i = 0; i < total_cells; ++i) {
         total_cutoff_weight += h_AbsorbedWeight_cutoff[i];
+    }
+    std::vector<double> h_AbsorbedEnergy_cutoff(total_cells);
+    cudaMemcpy(h_AbsorbedEnergy_cutoff.data(), state.d_AbsorbedEnergy_cutoff, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+    double total_cutoff_energy = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_cutoff_energy += h_AbsorbedEnergy_cutoff[i];
     }
 
     // Nuclear energy (from inelastic nuclear interactions)
@@ -1370,8 +1494,10 @@ bool run_k1k6_pipeline_transport(
     const double source_injected_energy = state.source_injected_energy;
     const double source_out_of_grid_energy = state.source_out_of_grid_energy;
     const double source_slot_dropped_energy = state.source_slot_dropped_energy;
+    const double transport_drop_weight = state.transport_dropped_weight;
+    const double transport_drop_energy = state.transport_dropped_energy;
     const double source_total_energy = source_injected_energy + source_out_of_grid_energy + source_slot_dropped_energy;
-    double total_accounted_transport = total_edep + total_boundary_loss_energy + total_nuclear_energy;
+    double total_accounted_transport = total_edep + total_cutoff_energy + total_boundary_loss_energy + total_nuclear_energy + transport_drop_energy;
     double total_accounted_system = total_accounted_transport + source_out_of_grid_energy + source_slot_dropped_energy;
 
     std::cout << "\n=== Energy Conservation Report ===" << std::endl;
@@ -1380,9 +1506,12 @@ bool run_k1k6_pipeline_transport(
     std::cout << "  Source Energy (slot dropped): " << source_slot_dropped_energy << " MeV" << std::endl;
     std::cout << "  Source Energy (total): " << source_total_energy << " MeV" << std::endl;
     std::cout << "  Energy Deposited: " << total_edep << " MeV" << std::endl;
+    std::cout << "  Cutoff Energy Deposited: " << total_cutoff_energy << " MeV" << std::endl;
     std::cout << "  Nuclear Energy Deposited: " << total_nuclear_energy << " MeV" << std::endl;
     std::cout << "  Boundary Loss Energy: " << total_boundary_loss_energy << " MeV" << std::endl;
+    std::cout << "  Transport Drop Energy: " << transport_drop_energy << " MeV" << std::endl;
     std::cout << "  Cutoff Weight: " << total_cutoff_weight << " (particles below E < 0.1 MeV)" << std::endl;
+    std::cout << "  Transport Drop Weight: " << transport_drop_weight << std::endl;
     std::cout << "  Total Accounted Energy (transport only): " << total_accounted_transport << " MeV" << std::endl;
     std::cout << "  Total Accounted Energy (including source losses): " << total_accounted_system << " MeV" << std::endl;
     std::cout << "=====================================" << std::endl;

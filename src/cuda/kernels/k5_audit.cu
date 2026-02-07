@@ -16,7 +16,7 @@ __device__ inline float k5_energy_from_bin(
     float E_lower = E_edges[E_bin];
     float E_upper = E_edges[E_bin + 1];
     float E_half_width = 0.5f * (E_upper - E_lower);
-    return E_lower + 0.50f * E_half_width;
+    return E_lower + 1.00f * E_half_width;
 }
 
 __global__ void K5_ConservationAudit(
@@ -27,9 +27,11 @@ __global__ void K5_ConservationAudit(
     const double* __restrict__ EdepC,
     const double* __restrict__ AbsorbedEnergy_nuclear,
     const double* __restrict__ BoundaryLoss_energy,
+    const double* __restrict__ AbsorbedEnergy_cutoff,
     const double* __restrict__ PrevEdepC,
     const double* __restrict__ PrevAbsorbedEnergy_nuclear,
     const double* __restrict__ PrevBoundaryLoss_energy,
+    const double* __restrict__ PrevAbsorbedEnergy_cutoff,
     const float* __restrict__ AbsorbedWeight_cutoff,
     const float* __restrict__ AbsorbedWeight_nuclear,
     const float* __restrict__ BoundaryLoss_weight,
@@ -40,6 +42,8 @@ __global__ void K5_ConservationAudit(
     float source_slot_dropped_weight,
     double source_out_of_grid_energy,
     double source_slot_dropped_energy,
+    float transport_dropped_weight,
+    double transport_dropped_energy,
     int include_source_terms,
     const float* __restrict__ E_edges,
     int N_E,
@@ -92,7 +96,7 @@ __global__ void K5_ConservationAudit(
     double E_dep = fmax(0.0, EdepC[cell] - PrevEdepC[cell]);
     double E_nuclear = fmax(0.0, AbsorbedEnergy_nuclear[cell] - PrevAbsorbedEnergy_nuclear[cell]);
     double E_boundary = fmax(0.0, BoundaryLoss_energy[cell] - PrevBoundaryLoss_energy[cell]);
-    double E_cutoff = 0.0;
+    double E_cutoff = fmax(0.0, AbsorbedEnergy_cutoff[cell] - PrevAbsorbedEnergy_cutoff[cell]);
 
     // Global conservation audit:
     //   Sum(W_in) = Sum(W_out) + Sum(W_cutoff) + Sum(W_nuclear) + Sum(W_boundary)
@@ -108,6 +112,13 @@ __global__ void K5_ConservationAudit(
     atomicAdd(&report[0].E_cutoff_total, E_cutoff);
     atomicAdd(&report[0].E_nuclear_total, E_nuclear);
     atomicAdd(&report[0].E_boundary_total, E_boundary);
+
+    if (cell == 0) {
+        float W_transport_drop = fmaxf(0.0f, transport_dropped_weight);
+        double E_transport_drop = fmax(0.0, transport_dropped_energy);
+        atomicAdd(&report[0].W_transport_drop_total, W_transport_drop);
+        atomicAdd(&report[0].E_transport_drop_total, E_transport_drop);
+    }
 
     if (include_source_terms && cell == 0) {
         float W_source_out = fmaxf(0.0f, source_out_of_grid_weight);
@@ -131,6 +142,7 @@ __global__ void K5_ConservationAudit(
                       report[0].W_cutoff_total +
                       report[0].W_nuclear_total +
                       report[0].W_boundary_total +
+                      report[0].W_transport_drop_total +
                       report[0].W_source_out_of_grid_total +
                       report[0].W_source_slot_drop_total;
         float W_error_abs = fabsf(report[0].W_in_total - W_rhs);
@@ -144,6 +156,7 @@ __global__ void K5_ConservationAudit(
                        report[0].E_cutoff_total +
                        report[0].E_nuclear_total +
                        report[0].E_boundary_total +
+                       report[0].E_transport_drop_total +
                        report[0].E_source_out_of_grid_total +
                        report[0].E_source_slot_drop_total;
         double E_error_abs = fabs(report[0].E_in_total - E_rhs);
