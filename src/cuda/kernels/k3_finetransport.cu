@@ -56,6 +56,9 @@ namespace {
     constexpr unsigned THETA_SEED_A = 2654435761u;
     constexpr unsigned THETA_SEED_B = 2246822519u;
     constexpr unsigned THETA_SEED_C = 3266489917u;
+    // Fraction of pre-step C carried into per-step spreading to compensate for
+    // unresolved lateral variance in discretized sub-cell transport.
+    constexpr float UNRESOLVED_C_FRACTION = 0.04f;
 }
 
 // Debug counters for output-slot allocation failures (K3).
@@ -288,28 +291,45 @@ __global__ void K3_FineTransport(
             // This is deterministic and reproducible, not Monte Carlo.
             // ========================================================================
 
+            // Fermi-Eyges step evolution:
+            // reconstruct a depth-dependent moment state at the component position,
+            // evolve one step using scattering power, and use accumulated C for spread.
             int iz = cell / Nx;
             float path_start_mm =
                 fmaxf(0.0f, static_cast<float>(iz) * dz + (z_cell + 0.5f * dz));
-            float path_end_mm = path_start_mm + fmaxf(actual_range_step, 0.0f);
+            float step_mm = fmaxf(actual_range_step, 0.0f);
 
-            float sigma_theta_step = device_highland_sigma(E, actual_range_step);
-            float sigma_theta_transport = device_highland_sigma(E, path_end_mm);
-
-            float sigma_x_start = 0.0f;
+            float sigma_theta_start = 0.0f;
             if (path_start_mm > 0.0f) {
-                float sigma_theta_start = device_highland_sigma(E, path_start_mm);
-                sigma_x_start = sigma_theta_start * path_start_mm / 1.7320508f;
+                sigma_theta_start = device_highland_sigma(E, path_start_mm);
             }
-            float sigma_x_end = sigma_theta_transport * path_end_mm / 1.7320508f;
-            float delta_C = fmaxf(0.0f, sigma_x_end * sigma_x_end - sigma_x_start * sigma_x_start);
-            float sigma_x = fmaxf(sqrtf(delta_C), 0.01f);
 
+            float A_old = sigma_theta_start * sigma_theta_start;
+            float B_old = 0.5f * A_old * path_start_mm;
+            float C_old = sigma_x_initial * sigma_x_initial +
+                          (A_old * path_start_mm * path_start_mm) / 3.0f;
+
+            float E_mid = fmaxf(E - 0.5f * dE, dlut.E_min);
+            float T_step = device_scattering_power_T(E_mid, step_mm);
+
+            float A_new = A_old;
+            float B_new = B_old;
+            float C_new = C_old;
+            device_fermi_eyges_step(A_new, B_new, C_new, T_step, step_mm);
+            (void)B_new;
+
+            float sigma_theta_step = sqrtf(fmaxf(A_new - A_old, 0.0f));
+            float delta_C = fmaxf(C_new - C_old, 0.0f);
+            float C_effective = delta_C + UNRESOLVED_C_FRACTION * C_old;
+            float sigma_x = fmaxf(device_accumulated_sigma_x(C_effective), 0.01f);
+
+            unsigned path_seed = static_cast<unsigned>(fminf(path_start_mm * 1000.0f, 4294967295.0f));
             unsigned theta_seed =
                 (static_cast<unsigned>(cell + 1) * THETA_SEED_A) ^
                 (static_cast<unsigned>(slot + 1) * THETA_SEED_B) ^
                 (static_cast<unsigned>(lidx + 1) * THETA_SEED_C) ^
-                static_cast<unsigned>(E_bin + 17);
+                static_cast<unsigned>(E_bin + 17) ^
+                (path_seed * 747796405u);
             float theta_scatter = device_sample_mcs_angle(sigma_theta_step, theta_seed);
             float theta_new = theta + theta_scatter;
             theta_new = fmaxf(theta_edges[0], fminf(theta_new, theta_edges[N_theta]));
@@ -535,7 +555,7 @@ __global__ void K3_FineTransport(
                         // Distribute weight across all x_sub bins
                         for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
                             float w_frac = (weights[x_sub_target] / w_sub_sum) * w_cell_fraction;
-                            if (w_frac < 1e-10f) continue;  // Skip negligible weights
+                            if (w_frac <= 0.0f) continue;
 
                             float w_spread = w_new * w_frac;
 
@@ -565,7 +585,7 @@ __global__ void K3_FineTransport(
                             }
 
                             // Emit left tail to left neighbor (or boundary if no neighbor)
-                            if (w_left > 1e-6f) {
+                            if (w_left > 0.0f) {
                                 float w_spread_left = w_new * w_left;
                                 if (ix > 0) {
                                     int lateral_face = FACE_X_MINUS;
@@ -594,7 +614,7 @@ __global__ void K3_FineTransport(
                             }
 
                             // Emit right tail to right neighbor (or boundary if no neighbor)
-                            if (w_right > 1e-6f) {
+                            if (w_right > 0.0f) {
                                 float w_spread_right = w_new * w_right;
                                 if (ix < Nx - 1) {
                                     int lateral_face = FACE_X_PLUS;

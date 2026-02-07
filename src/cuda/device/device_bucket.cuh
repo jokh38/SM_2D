@@ -829,34 +829,6 @@ __device__ inline float device_emit_lateral_spread(
     // Clamp sigma_x to avoid numerical issues
     sigma_x = fmaxf(sigma_x, 1e-6f);
 
-    // If sigma_x is very small compared to cell size, just emit to single cell
-    if (sigma_x < dx * 0.1f) {
-        // Single-cell emission (center)
-        int ix_center = source_cell % Nx;
-        int iz_source = source_cell / Nx;
-
-        if (target_z >= 0 && target_z < Nz) {
-            int emit_cell = ix_center + iz_source * Nx;
-            int bucket_idx = device_bucket_index(emit_cell, FACE_Z_PLUS, Nx, Nz);
-            DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-
-            // Use center sub-cell bins
-            int x_sub_center = N_x_sub / 2;  // Center x bin
-            int z_sub_neighbor = 0;  // Bottom of neighbor cell (entering from -z)
-
-            dropped_total += device_emit_component_to_bucket_4d(
-                bucket, theta, E, weight, x_sub_center, z_sub_neighbor,
-                theta_edges, E_edges, N_theta, N_E,
-                N_theta_local, N_E_local
-            );
-        } else if (boundary_weight_out != nullptr) {
-            *boundary_weight_out += weight;
-        } else {
-            dropped_total += weight;
-        }
-        return dropped_total;
-    }
-
     // Calculate Gaussian weight distribution
     // Fixed-size array for device code
     constexpr int MAX_SPREAD_CELLS = 11;
@@ -901,7 +873,7 @@ __device__ inline float device_emit_lateral_spread(
 
     for (int i = 0; i < N_actual; i++) {
         float w_frac = weights[i];
-        if (w_frac < 1e-6f) continue;  // Skip negligible weights
+        if (w_frac <= 0.0f) continue;
 
         int x_offset = x_offset_start + i;
         int ix_target = ix_source + x_offset;

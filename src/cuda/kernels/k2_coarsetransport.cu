@@ -42,8 +42,15 @@ __device__ double g_k2_slot_drop_energy = 0.0;
 __device__ unsigned long long g_k2_bucket_drop_count = 0;
 __device__ double g_k2_bucket_drop_weight = 0.0;
 __device__ double g_k2_bucket_drop_energy = 0.0;
+__device__ unsigned long long g_k2_pruned_weight_count = 0;
+__device__ double g_k2_pruned_weight_sum = 0.0;
+__device__ double g_k2_pruned_energy_sum = 0.0;
 
 namespace {
+constexpr float K2_WEIGHT_PRUNE_THRESHOLD = 1e-12f;
+// Fraction of pre-step C carried into per-step spreading to compensate for
+// unresolved lateral variance in discretized sub-cell transport.
+constexpr float UNRESOLVED_C_FRACTION = 0.04f;
 constexpr unsigned THETA_SEED_A = 2654435761u;
 constexpr unsigned THETA_SEED_B = 2246822519u;
 constexpr unsigned THETA_SEED_C = 3266489917u;
@@ -136,7 +143,7 @@ __global__ void K2_CoarseTransport(
         for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
             int global_idx = (cell * Kb + slot) * DEVICE_LOCAL_BINS + lidx;
             float weight = values_in[global_idx];
-            if (weight < 1e-12f) continue;
+            if (weight <= 0.0f) continue;
 
             // Decode 4D local index
             int theta_local, E_local, x_sub, z_sub;
@@ -157,6 +164,13 @@ __global__ void K2_CoarseTransport(
             float E_upper = E_edges[E_bin + 1];
             float E_half_width = (E_upper - E_lower) * 0.5f;
             float E = E_lower + 1.00f * E_half_width;  // Bin center
+
+            if (weight < K2_WEIGHT_PRUNE_THRESHOLD) {
+                atomicAdd(&g_k2_pruned_weight_count, 1ULL);
+                atomicAdd(&g_k2_pruned_weight_sum, static_cast<double>(weight));
+                atomicAdd(&g_k2_pruned_energy_sum, static_cast<double>(E * weight));
+                continue;
+            }
 
             // Cutoff check
             if (E <= 0.1f) {
@@ -215,38 +229,56 @@ __global__ void K2_CoarseTransport(
             dE = fminf(dE, E);
 
             float E_new = E - dE;
-            if (split_at_fine_threshold) {
-                E_new = fminf(E_new, config.E_fine_on);
-            }
             float edep = dE * weight;
 
             // Nuclear attenuation for coarse range step
             float w_rem, E_rem;
             float w_new = device_apply_nuclear_attenuation(weight, E, coarse_range_step, w_rem, E_rem);
 
+            // Crossing guard energy closure:
+            // If the coarse step is split at E_fine_on, clamp any residual
+            // over-threshold survivor energy into local deposition so transport
+            // channels remain closed.
+            if (split_at_fine_threshold && E_new > config.E_fine_on) {
+                float E_clamp_excess = E_new - config.E_fine_on;
+                if (E_clamp_excess > 0.0f && w_new > 0.0f) {
+                    edep += E_clamp_excess * w_new;
+                }
+                E_new = config.E_fine_on;
+            }
+
             // ========================================================================
-            // K2 Coarse Transport: incremental lateral spread for this step only
-            // ========================================================================
-            // The source width is already represented in injected phase space.
-            // Re-applying absolute sigma_x(depth) each transport step over-broadens the
-            // beam, so use only the variance growth over the current step.
-            // ========================================================================
+            // Fermi-Eyges step evolution:
+            // reconstruct a depth-dependent moment state at the component position,
+            // evolve one step using scattering power, and use accumulated C for spread.
             int iz = cell / Nx;
             float path_start_mm =
                 fmaxf(0.0f, static_cast<float>(iz) * dz + (z_cell + 0.5f * dz));
-            float path_end_mm = path_start_mm + fmaxf(coarse_range_step, 0.0f);
+            float step_mm = fmaxf(coarse_range_step, 0.0f);
 
-            float sigma_theta_step = device_highland_sigma(E, coarse_range_step);
-            float sigma_theta_transport = device_highland_sigma(E, path_end_mm);
-
-            float sigma_x_start = 0.0f;
+            float sigma_theta_start = 0.0f;
             if (path_start_mm > 0.0f) {
-                float sigma_theta_start = device_highland_sigma(E, path_start_mm);
-                sigma_x_start = sigma_theta_start * path_start_mm / 1.7320508f;
+                sigma_theta_start = device_highland_sigma(E, path_start_mm);
             }
-            float sigma_x_end = sigma_theta_transport * path_end_mm / 1.7320508f;
-            float delta_C = fmaxf(0.0f, sigma_x_end * sigma_x_end - sigma_x_start * sigma_x_start);
-            float sigma_x = fmaxf(sqrtf(delta_C), 0.01f);
+
+            float A_old = sigma_theta_start * sigma_theta_start;
+            float B_old = 0.5f * A_old * path_start_mm;
+            float C_old = sigma_x_initial * sigma_x_initial +
+                          (A_old * path_start_mm * path_start_mm) / 3.0f;
+
+            float E_mid = fmaxf(E - 0.5f * dE, dlut.E_min);
+            float T_step = device_scattering_power_T(E_mid, step_mm);
+
+            float A_new = A_old;
+            float B_new = B_old;
+            float C_new = C_old;
+            device_fermi_eyges_step(A_new, B_new, C_new, T_step, step_mm);
+            (void)B_new;
+
+            float sigma_theta_step = sqrtf(fmaxf(A_new - A_old, 0.0f));
+            float delta_C = fmaxf(C_new - C_old, 0.0f);
+            float C_effective = delta_C + UNRESOLVED_C_FRACTION * C_old;
+            float sigma_x = fmaxf(device_accumulated_sigma_x(C_effective), 0.01f);
 
             // ========================================================================
             // Iteration 2: Moment-Based Spreading Enhancement
@@ -265,7 +297,7 @@ __global__ void K2_CoarseTransport(
             // ITERATION 3: Added profiling counters for verification
             // ========================================================================
 
-            float sqrt_A = sigma_theta_transport;
+            float sqrt_A = device_accumulated_sigma_theta(A_new);
             float sqrt_C_over_dx = sigma_x / dx;  // σₓ in bin units
 
 #ifdef ENABLE_MCS_PROFILING
@@ -292,11 +324,13 @@ __global__ void K2_CoarseTransport(
 
             // Deterministic angular diffusion: use a stable per-component seed
             // so directions evolve instead of staying frozen at the input angle.
+            unsigned path_seed = static_cast<unsigned>(fminf(path_start_mm * 1000.0f, 4294967295.0f));
             unsigned theta_seed =
                 (static_cast<unsigned>(cell + 1) * THETA_SEED_A) ^
                 (static_cast<unsigned>(slot + 1) * THETA_SEED_B) ^
                 (static_cast<unsigned>(lidx + 1) * THETA_SEED_C) ^
-                static_cast<unsigned>(E_bin + 17);
+                static_cast<unsigned>(E_bin + 17) ^
+                (path_seed * 747796405u);
             float theta_scatter = device_sample_mcs_angle(sigma_theta_step, theta_seed);
             float theta_new = theta + theta_scatter;
             theta_new = fmaxf(theta_edges[0], fminf(theta_new, theta_edges[N_theta]));
@@ -321,6 +355,8 @@ __global__ void K2_CoarseTransport(
                 if (E_new <= 0.1f) {
                     // Particle should be absorbed - deposit remaining energy locally
                     cell_edep += edep;
+                    cell_w_nuclear += w_rem;
+                    cell_E_nuclear += E_rem;
                     cell_w_cutoff += w_new;
                     cell_E_cutoff += E_new * w_new;  // Remaining energy from step
                 } else {
@@ -515,7 +551,7 @@ __global__ void K2_CoarseTransport(
                         // Distribute weight across all x_sub bins
                         for (int x_sub_target = 0; x_sub_target < N_x_sub; ++x_sub_target) {
                             float w_frac = (weights[x_sub_target] / w_sub_sum) * w_cell_fraction;
-                            if (w_frac < 1e-10f) continue;  // Skip negligible weights
+                            if (w_frac <= 0.0f) continue;
 
                             float w_spread = w_new * w_frac;
 
@@ -545,7 +581,7 @@ __global__ void K2_CoarseTransport(
                             }
 
                             // Emit left tail to left neighbor (or boundary if no neighbor)
-                            if (w_left > 1e-6f) {
+                            if (w_left > 0.0f) {
                                 float w_spread_left = w_new * w_left;
                                 if (ix > 0) {
                                     int lateral_face = FACE_X_MINUS;
@@ -574,7 +610,7 @@ __global__ void K2_CoarseTransport(
                             }
 
                             // Emit right tail to right neighbor (or boundary if no neighbor)
-                            if (w_right > 1e-6f) {
+                            if (w_right > 0.0f) {
                                 float w_spread_right = w_new * w_right;
                                 if (ix < Nx - 1) {
                                     int lateral_face = FACE_X_PLUS;
@@ -627,6 +663,9 @@ void k2_reset_debug_counters() {
     cudaMemcpyToSymbol(g_k2_bucket_drop_count, &zero_count, sizeof(zero_count));
     cudaMemcpyToSymbol(g_k2_bucket_drop_weight, &zero_value, sizeof(zero_value));
     cudaMemcpyToSymbol(g_k2_bucket_drop_energy, &zero_value, sizeof(zero_value));
+    cudaMemcpyToSymbol(g_k2_pruned_weight_count, &zero_count, sizeof(zero_count));
+    cudaMemcpyToSymbol(g_k2_pruned_weight_sum, &zero_value, sizeof(zero_value));
+    cudaMemcpyToSymbol(g_k2_pruned_energy_sum, &zero_value, sizeof(zero_value));
 }
 
 void k2_get_debug_counters(
@@ -635,7 +674,10 @@ void k2_get_debug_counters(
     double& slot_drop_energy,
     unsigned long long& bucket_drop_count,
     double& bucket_drop_weight,
-    double& bucket_drop_energy
+    double& bucket_drop_energy,
+    unsigned long long& pruned_weight_count,
+    double& pruned_weight_sum,
+    double& pruned_energy_sum
 ) {
     cudaMemcpyFromSymbol(&slot_drop_count, g_k2_slot_drop_count, sizeof(slot_drop_count));
     cudaMemcpyFromSymbol(&slot_drop_weight, g_k2_slot_drop_weight, sizeof(slot_drop_weight));
@@ -643,6 +685,9 @@ void k2_get_debug_counters(
     cudaMemcpyFromSymbol(&bucket_drop_count, g_k2_bucket_drop_count, sizeof(bucket_drop_count));
     cudaMemcpyFromSymbol(&bucket_drop_weight, g_k2_bucket_drop_weight, sizeof(bucket_drop_weight));
     cudaMemcpyFromSymbol(&bucket_drop_energy, g_k2_bucket_drop_energy, sizeof(bucket_drop_energy));
+    cudaMemcpyFromSymbol(&pruned_weight_count, g_k2_pruned_weight_count, sizeof(pruned_weight_count));
+    cudaMemcpyFromSymbol(&pruned_weight_sum, g_k2_pruned_weight_sum, sizeof(pruned_weight_sum));
+    cudaMemcpyFromSymbol(&pruned_energy_sum, g_k2_pruned_energy_sum, sizeof(pruned_energy_sum));
 }
 
 // ============================================================================
