@@ -349,75 +349,114 @@ __global__ void K3_FineTransport(
             z_new = fmaxf(-half_dz, fminf(z_new, half_dz));
 
             if (exit_face >= 0) {
-                // Deposit step-local channels in current cell before transfer.
-                cell_edep += edep;
-                cell_w_nuclear += w_rem;
-                cell_E_nuclear += E_rem;
-
-                int neighbor_cell = device_get_neighbor(cell, exit_face, Nx, Nz);
-                if (neighbor_cell < 0) {
-                    // Particle leaves the simulation domain.
-                    cell_boundary_weight += w_new;
-                    cell_boundary_energy += E_new * w_new;
-                } else if (exit_face == FACE_Z_PLUS) {
-                    // Forward transport is the dominant path in proton runs:
-                    // use robust multi-cell Gaussian emission for this branch.
-                    int target_z = cell / Nx + 1;
-                    float lateral_boundary_weight = 0.0f;
-                    float dropped_boundary_weight = device_emit_lateral_spread(
-                        OutflowBuckets,
-                        cell,
-                        target_z,
-                        theta_new,
-                        E_new,
-                        w_new,
-                        x_new,
-                        sigma_x,
-                        dx,
-                        Nx,
-                        Nz,
-                        theta_edges,
-                        E_edges,
-                        N_theta,
-                        N_E,
-                        N_theta_local,
-                        N_E_local,
-                        11,
-                        &lateral_boundary_weight
-                    );
-                    if (lateral_boundary_weight > 0.0f) {
-                        cell_boundary_weight += lateral_boundary_weight;
-                        cell_boundary_energy += E_new * lateral_boundary_weight;
-                    }
-                    if (dropped_boundary_weight > 0.0f) {
-                        atomicAdd(&g_k3_bucket_drop_count, 1ULL);
-                        atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
-                        atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
-                    }
+                // CRITICAL FIX: Check E_new directly against cutoff BEFORE emitting.
+                // Binned phase space can raise representative energy after transfer,
+                // so crossing components must be absorbed here once below cutoff.
+                if (E_new <= ENERGY_CUTOFF_MEV) {
+                    cell_edep += edep;
+                    cell_w_nuclear += w_rem;
+                    cell_E_nuclear += E_rem;
+                    cell_w_cutoff += w_new;
+                    cell_E_cutoff += E_new * w_new;
                 } else {
-                    float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
-                    int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+                    // Deposit step-local channels in current cell before transfer.
+                    cell_edep += edep;
+                    cell_w_nuclear += w_rem;
+                    cell_E_nuclear += E_rem;
 
-                    float z_offset_neighbor;
-                    if (exit_face == FACE_Z_MINUS) {
-                        z_offset_neighbor = dz * 0.5f - dz * 0.125f;
+                    int neighbor_cell = device_get_neighbor(cell, exit_face, Nx, Nz);
+                    if (neighbor_cell < 0) {
+                        // Particle leaves the simulation domain.
+                        cell_boundary_weight += w_new;
+                        cell_boundary_energy += E_new * w_new;
                     } else {
-                        z_offset_neighbor = z_new;
-                    }
-                    int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
-                    z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+                        // Re-binned transport uses representative bin-center energies.
+                        // Fold E_new->E_emit mismatch back into local deposition to keep
+                        // step-wise energy accounting closed.
+                        int E_bin_transport = device_find_bin_edges(E_edges, N_E, E_new);
+                        float E_lower_transport = E_edges[E_bin_transport];
+                        float E_upper_transport = E_edges[E_bin_transport + 1];
+                        float E_emit_transport =
+                            E_lower_transport + 0.5f * (E_upper_transport - E_lower_transport);
 
-                    int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
-                    DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                    float dropped_boundary_weight = device_emit_component_to_bucket_4d(
-                        bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
-                        theta_edges, E_edges, N_theta, N_E,
-                        N_theta_local, N_E_local
-                    );
-                    if (dropped_boundary_weight > 0.0f) {
-                        atomicAdd(&g_k3_bucket_drop_count, 1ULL);
-                        atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
-                        atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
+                        if (exit_face == FACE_Z_PLUS) {
+                            // Forward transport is the dominant path in proton runs:
+                            // use robust multi-cell Gaussian emission for this branch.
+                            int target_z = cell / Nx + 1;
+                            float lateral_boundary_weight = 0.0f;
+                            float dropped_boundary_weight = device_emit_lateral_spread(
+                                OutflowBuckets,
+                                cell,
+                                target_z,
+                                theta_new,
+                                E_new,
+                                w_new,
+                                x_new,
+                                sigma_x,
+                                dx,
+                                Nx,
+                                Nz,
+                                theta_edges,
+                                E_edges,
+                                N_theta,
+                                N_E,
+                                N_theta_local,
+                                N_E_local,
+                                11,
+                                &lateral_boundary_weight
+                            );
+                            if (lateral_boundary_weight > 0.0f) {
+                                cell_boundary_weight += lateral_boundary_weight;
+                                cell_boundary_energy += E_new * lateral_boundary_weight;
+                            }
+                            if (dropped_boundary_weight > 0.0f) {
+                                atomicAdd(&g_k3_bucket_drop_count, 1ULL);
+                                atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
+                                atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
+                            }
+
+                            float transported_weight = fmaxf(
+                                0.0f,
+                                w_new - lateral_boundary_weight - dropped_boundary_weight
+                            );
+                            if (transported_weight > 0.0f) {
+                                cell_edep += static_cast<double>(
+                                    (E_new - E_emit_transport) * transported_weight
+                                );
+                            }
+                        } else {
+                            float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                            int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+
+                            float z_offset_neighbor;
+                            if (exit_face == FACE_Z_MINUS) {
+                                z_offset_neighbor = dz * 0.5f - dz * 0.125f;
+                            } else {
+                                z_offset_neighbor = z_new;
+                            }
+                            int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
+                            z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+
+                            int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                            DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                            float dropped_boundary_weight = device_emit_component_to_bucket_4d(
+                                bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
+                                theta_edges, E_edges, N_theta, N_E,
+                                N_theta_local, N_E_local
+                            );
+                            if (dropped_boundary_weight > 0.0f) {
+                                atomicAdd(&g_k3_bucket_drop_count, 1ULL);
+                                atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
+                                atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
+                            }
+
+                            float transported_weight = fmaxf(0.0f, w_new - dropped_boundary_weight);
+                            if (transported_weight > 0.0f) {
+                                cell_edep += static_cast<double>(
+                                    (E_new - E_emit_transport) * transported_weight
+                                );
+                            }
+                        }
                     }
                 }
             } else {
@@ -449,23 +488,7 @@ __global__ void K3_FineTransport(
 
                     // H6 FIX: Use binary search for piecewise-uniform energy grid (Option D2)
                     // Binary search in E_edges to find the bin containing E_new
-                    int E_bin_new = 0;
-                    if (E_new <= E_edges[0]) {
-                        E_bin_new = 0;
-                    } else if (E_new >= E_edges[N_E]) {
-                        E_bin_new = N_E - 1;
-                    } else {
-                        int lo = 0, hi = N_E;
-                        while (lo < hi) {
-                            int mid = (lo + hi) / 2;
-                            if (E_edges[mid + 1] <= E_new) {
-                                lo = mid + 1;
-                            } else {
-                                hi = mid;
-                            }
-                        }
-                        E_bin_new = lo;
-                    }
+                    int E_bin_new = device_find_bin_edges(E_edges, N_E, E_new);
 
                     // Compute new block_id
                     uint32_t b_theta_new = static_cast<uint32_t>(theta_bin_new) / N_theta_local;
@@ -513,6 +536,9 @@ __global__ void K3_FineTransport(
                         }
                         int theta_local_new = theta_bin_emit % N_theta_local;
                         int E_local_new = E_bin_emit % N_E_local;
+                        float E_lower_emit = E_edges[E_bin_emit];
+                        float E_upper_emit = E_edges[E_bin_emit + 1];
+                        float E_emit = E_lower_emit + 0.5f * (E_upper_emit - E_lower_emit);
 
                         // FIX B: Use sub-cell Gaussian spreading with correct dx/8 spacing
                         constexpr int N_x_sub = 8;  // Number of sub-cell bins
@@ -537,6 +563,8 @@ __global__ void K3_FineTransport(
                         // Scale weights by the fraction within the cell to conserve total weight
                         // (device_gaussian_spread_weights_subcell normalizes to sum=1.0)
                         float w_cell_fraction = fminf(1.0f, fmaxf(0.0f, w_in_cell));  // Clamp for safety
+                        float w_left = 0.0f;
+                        float w_right = 0.0f;
 
                         // Normalize sub-cell weights in non-negative space for robustness.
                         float w_sub_sum = 0.0f;
@@ -576,8 +604,6 @@ __global__ void K3_FineTransport(
                             float w_right_raw = fmaxf(0.0f, 1.0f - device_gaussian_cdf(right_boundary, x_center, sigma_x));
                             float w_tail_total = fmaxf(0.0f, 1.0f - w_cell_fraction);
                             float w_tail_sum = w_left_raw + w_right_raw;
-                            float w_left = 0.0f;
-                            float w_right = 0.0f;
                             if (w_tail_total > 0.0f && w_tail_sum > 1e-12f) {
                                 float tail_scale = w_tail_total / w_tail_sum;
                                 w_left = w_left_raw * tail_scale;
@@ -641,6 +667,15 @@ __global__ void K3_FineTransport(
                                     cell_boundary_energy += E_new * w_spread_right;
                                 }
                             }
+                        }
+
+                        float rebinned_fraction = w_cell_fraction;
+                        if (ix > 0) rebinned_fraction += w_left;
+                        if (ix < Nx - 1) rebinned_fraction += w_right;
+                        rebinned_fraction = fminf(1.0f, fmaxf(0.0f, rebinned_fraction));
+                        float rebinned_weight = w_new * rebinned_fraction;
+                        if (rebinned_weight > 0.0f) {
+                            cell_edep += static_cast<double>((E_new - E_emit) * rebinned_weight);
                         }
                     }
                 }
