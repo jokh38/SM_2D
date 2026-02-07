@@ -466,6 +466,23 @@ __global__ void clear_buckets_kernel(
             bucket.value[i][j] = 0.0f;
         }
     }
+    bucket.moment_A = 0.0f;
+    bucket.moment_B = 0.0f;
+    bucket.moment_C = 0.0f;
+}
+
+// Build compact source-cell -> bucket-base map for a single batch.
+// Each source cell in CellList maps to base index (idx * 4), others stay -1.
+__global__ void build_cell_to_bucket_base_kernel(
+    const uint32_t* __restrict__ CellList,
+    int n_cells,
+    int* __restrict__ CellToBucketBase
+) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= n_cells) return;
+
+    int cell = static_cast<int>(CellList[idx]);
+    CellToBucketBase[cell] = idx * 4;
 }
 
 __global__ void compact_active_list(
@@ -649,6 +666,85 @@ bool compute_psic_total_weight_energy(
     return true;
 }
 
+bool ensure_bucket_scratch_capacity(
+    K1K6PipelineState& state,
+    int required_cells
+) {
+    if (required_cells <= 0) {
+        return true;
+    }
+    if (state.bucket_scratch_capacity_cells >= required_cells &&
+        state.d_BucketScratch != nullptr) {
+        return true;
+    }
+
+    if (state.d_BucketScratch != nullptr) {
+        cudaFree(state.d_BucketScratch);
+        state.d_BucketScratch = nullptr;
+        state.bucket_scratch_capacity_cells = 0;
+    }
+
+    size_t bucket_bytes = static_cast<size_t>(required_cells) * 4 * sizeof(DeviceOutflowBucket);
+    cudaError_t e = cudaMalloc(&state.d_BucketScratch, bucket_bytes);
+    if (e != cudaSuccess) {
+        std::cerr << "Failed d_BucketScratch: " << bucket_bytes
+                  << " bytes - " << cudaGetErrorString(e) << std::endl;
+        return false;
+    }
+
+    state.bucket_scratch_capacity_cells = required_cells;
+    return true;
+}
+
+bool prepare_bucket_scratch_for_batch(
+    K1K6PipelineState& state,
+    const uint32_t* d_CellList,
+    int n_cells,
+    int N_cells
+) {
+    if (n_cells <= 0) {
+        return true;
+    }
+    if (!ensure_bucket_scratch_capacity(state, n_cells)) {
+        return false;
+    }
+
+    cudaError_t e = cudaMemset(state.d_CellToBucketBase, 0xFF, N_cells * sizeof(int));
+    if (e != cudaSuccess) {
+        std::cerr << "Failed memset d_CellToBucketBase: "
+                  << cudaGetErrorString(e) << std::endl;
+        return false;
+    }
+
+    int threads = 256;
+    int blocks = (n_cells + threads - 1) / threads;
+    build_cell_to_bucket_base_kernel<<<blocks, threads>>>(
+        d_CellList,
+        n_cells,
+        state.d_CellToBucketBase
+    );
+    e = cudaGetLastError();
+    if (e != cudaSuccess) {
+        std::cerr << "build_cell_to_bucket_base_kernel launch failed: "
+                  << cudaGetErrorString(e) << std::endl;
+        return false;
+    }
+
+    int n_buckets = n_cells * 4;
+    int b_threads = 256;
+    int b_blocks = (n_buckets + b_threads - 1) / b_threads;
+    clear_buckets_kernel<<<b_blocks, b_threads>>>(state.d_BucketScratch, n_buckets);
+    e = cudaGetLastError();
+    if (e != cudaSuccess) {
+        std::cerr << "clear_buckets_kernel launch failed: "
+                  << cudaGetErrorString(e) << std::endl;
+        return false;
+    }
+
+    cudaDeviceSynchronize();
+    return true;
+}
+
 // ============================================================================
 // Pipeline State Allocation
 // ============================================================================
@@ -709,10 +805,9 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     e = cudaMalloc(&d_prev_BoundaryLoss_energy, N_cells * sizeof(double));
     if (e != cudaSuccess) { std::cerr << "Failed d_prev_BoundaryLoss_energy: " << cudaGetErrorString(e) << std::endl; return false; }
 
-    // Allocate outflow buckets (4 faces per cell)
-    size_t bucket_bytes = N_cells * 4 * sizeof(DeviceOutflowBucket);
-    e = cudaMalloc(&d_OutflowBuckets, bucket_bytes);
-    if (e != cudaSuccess) { std::cerr << "Failed d_OutflowBuckets: " << bucket_bytes << " bytes - " << cudaGetErrorString(e) << std::endl; return false; }
+    // Allocate compact bucket-base map (batch-local buckets are allocated on-demand).
+    e = cudaMalloc(&d_CellToBucketBase, N_cells * sizeof(int));
+    if (e != cudaSuccess) { std::cerr << "Failed d_CellToBucketBase: " << cudaGetErrorString(e) << std::endl; return false; }
 
     // Allocate audit structures
     e = cudaMalloc(&d_audit_report, sizeof(AuditReport));
@@ -749,7 +844,8 @@ void K1K6PipelineState::cleanup() {
     if (d_prev_EdepC) cudaFree(d_prev_EdepC);
     if (d_prev_AbsorbedEnergy_nuclear) cudaFree(d_prev_AbsorbedEnergy_nuclear);
     if (d_prev_BoundaryLoss_energy) cudaFree(d_prev_BoundaryLoss_energy);
-    if (d_OutflowBuckets) cudaFree(d_OutflowBuckets);
+    if (d_BucketScratch) cudaFree(d_BucketScratch);
+    if (d_CellToBucketBase) cudaFree(d_CellToBucketBase);
     if (d_theta_edges) cudaFree(d_theta_edges);
     if (d_E_edges) cudaFree(d_E_edges);
     if (d_audit_report) cudaFree(d_audit_report);
@@ -776,7 +872,9 @@ void K1K6PipelineState::cleanup() {
     d_prev_EdepC = nullptr;
     d_prev_AbsorbedEnergy_nuclear = nullptr;
     d_prev_BoundaryLoss_energy = nullptr;
-    d_OutflowBuckets = nullptr;
+    d_BucketScratch = nullptr;
+    bucket_scratch_capacity_cells = 0;
+    d_CellToBucketBase = nullptr;
     d_theta_edges = nullptr;
     d_E_edges = nullptr;
     d_audit_report = nullptr;
@@ -857,8 +955,8 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemset(state.d_prev_AbsorbedEnergy_nuclear, 0, N_cells * sizeof(double));
     cudaMemset(state.d_prev_BoundaryLoss_energy, 0, N_cells * sizeof(double));
 
-    // Initialize buckets to empty
-    cudaMemset(state.d_OutflowBuckets, 0xFF, N_cells * 4 * sizeof(uint32_t) * DEVICE_Kb_out);
+    // Cell-to-bucket map is rebuilt per batch.
+    cudaMemset(state.d_CellToBucketBase, 0xFF, N_cells * sizeof(int));
 
     int zero = 0;
     cudaMemcpy(state.d_n_active, &zero, sizeof(int), cudaMemcpyHostToDevice);
@@ -960,7 +1058,8 @@ bool run_k2_coarse_transport(
         state.d_AbsorbedEnergy_nuclear,
         state.d_BoundaryLoss_weight,
         state.d_BoundaryLoss_energy,
-        state.d_OutflowBuckets,
+        state.d_BucketScratch,
+        state.d_CellToBucketBase,
         psi_out.block_id,  // CRITICAL FIX: Output phase space
         psi_out.value
     );
@@ -1014,7 +1113,8 @@ bool run_k3_fine_transport(
         state.d_AbsorbedEnergy_nuclear,
         state.d_BoundaryLoss_weight,
         state.d_BoundaryLoss_energy,
-        state.d_OutflowBuckets,
+        state.d_BucketScratch,
+        state.d_CellToBucketBase,
         psi_out.block_id,  // CRITICAL FIX: Output phase space
         psi_out.value
     );
@@ -1033,6 +1133,7 @@ bool run_k3_fine_transport(
 bool run_k4_bucket_transfer(
     DevicePsiC& psi_out,
     const DeviceOutflowBucket* d_OutflowBuckets,
+    const int* d_CellToBucketBase,
     int Nx, int Nz,
     const float* d_E_edges,
     int N_E,
@@ -1044,6 +1145,7 @@ bool run_k4_bucket_transfer(
     // Call K4_BucketTransfer kernel
     K4_BucketTransfer<<<blocks, threads>>>(
         d_OutflowBuckets,
+        d_CellToBucketBase,
         psi_out.value,
         psi_out.block_id,
         Nx, Nz,
@@ -1208,8 +1310,10 @@ bool run_k1k6_pipeline_transport(
 
     // Maximum iterations
     const int max_iter = config.max_iterations;
+    const int N_cells = config.Nx * config.Nz;
 
     int iter = 0;
+    bool k2_batching_notified = false;
     bool k3_batching_notified = false;
 
     // ========================================================================
@@ -1321,13 +1425,6 @@ bool run_k1k6_pipeline_transport(
         // This prevents accumulation of particles from previous iterations
         device_psic_clear(*psi_out);
 
-        // CRITICAL FIX: Clear buckets BEFORE K2/K3 run
-        // This ensures buckets only contain transfers from CURRENT iteration
-        size_t num_buckets = config.Nx * config.Nz * 4;
-        int b_threads = 256;
-        int b_blocks = (num_buckets + b_threads - 1) / b_threads;
-        clear_buckets_kernel<<<b_blocks, b_threads>>>(state.d_OutflowBuckets, num_buckets);
-        cudaDeviceSynchronize();
         k2_reset_debug_counters();
         k3_reset_debug_counters();
         k4_reset_debug_counters();
@@ -1336,10 +1433,56 @@ bool run_k1k6_pipeline_transport(
         // K2: Coarse Transport (high energy cells)
         // --------------------------------------------------------------------
         if (state.n_coarse > 0) {
-            if (!run_k2_coarse_transport(*psi_in, *psi_out, state.d_ActiveMask, state.d_CoarseList,
-                                          state.n_coarse, dlut, config, state)) {
-                std::cerr << "K2 failed at iteration " << iter << std::endl;
+            const int requested_batch = config.fine_batch_max_cells;
+            const int effective_batch = (requested_batch > 0)
+                ? std::min(requested_batch, state.n_coarse)
+                : state.n_coarse;
+            if (effective_batch <= 0) {
+                std::cerr << "Invalid K2 batch size at iteration " << iter
+                          << ": requested=" << requested_batch
+                          << ", coarse=" << state.n_coarse << std::endl;
                 return false;
+            }
+
+            if (summary_logging &&
+                !k2_batching_notified &&
+                requested_batch > 0 &&
+                state.n_coarse > effective_batch) {
+                const int n_batches = (state.n_coarse + effective_batch - 1) / effective_batch;
+                std::cout << "  K2 batching enabled: " << n_batches
+                          << " batches (cap=" << effective_batch << " cells/batch)" << std::endl;
+                k2_batching_notified = true;
+            }
+
+            for (int batch_offset = 0; batch_offset < state.n_coarse; batch_offset += effective_batch) {
+                const int batch_cells = std::min(effective_batch, state.n_coarse - batch_offset);
+                const uint32_t* batch_coarse_list = state.d_CoarseList + batch_offset;
+
+                if (!prepare_bucket_scratch_for_batch(state, batch_coarse_list, batch_cells, N_cells)) {
+                    std::cerr << "Failed to prepare K2 bucket scratch at iteration " << iter
+                              << ", batch_offset=" << batch_offset
+                              << ", batch_cells=" << batch_cells << std::endl;
+                    return false;
+                }
+
+                if (!run_k2_coarse_transport(*psi_in, *psi_out, state.d_ActiveMask, batch_coarse_list,
+                                             batch_cells, dlut, config, state)) {
+                    std::cerr << "K2 failed at iteration " << iter
+                              << ", batch_offset=" << batch_offset
+                              << ", batch_cells=" << batch_cells << std::endl;
+                    return false;
+                }
+
+                if (!run_k4_bucket_transfer(*psi_out, state.d_BucketScratch, state.d_CellToBucketBase,
+                                            config.Nx, config.Nz,
+                                            state.d_E_edges,
+                                            config.N_E,
+                                            config.N_E_local)) {
+                    std::cerr << "K4 failed after K2 at iteration " << iter
+                              << ", batch_offset=" << batch_offset
+                              << ", batch_cells=" << batch_cells << std::endl;
+                    return false;
+                }
             }
         }
 
@@ -1371,6 +1514,14 @@ bool run_k1k6_pipeline_transport(
             for (int batch_offset = 0; batch_offset < state.n_active; batch_offset += effective_batch) {
                 const int batch_cells = std::min(effective_batch, state.n_active - batch_offset);
                 const uint32_t* batch_active_list = state.d_ActiveList + batch_offset;
+
+                if (!prepare_bucket_scratch_for_batch(state, batch_active_list, batch_cells, N_cells)) {
+                    std::cerr << "Failed to prepare K3 bucket scratch at iteration " << iter
+                              << ", batch_offset=" << batch_offset
+                              << ", batch_cells=" << batch_cells << std::endl;
+                    return false;
+                }
+
                 if (!run_k3_fine_transport(
                         *psi_in,
                         *psi_out,
@@ -1384,23 +1535,19 @@ bool run_k1k6_pipeline_transport(
                               << ", batch_cells=" << batch_cells << std::endl;
                     return false;
                 }
+
+                if (!run_k4_bucket_transfer(*psi_out, state.d_BucketScratch, state.d_CellToBucketBase,
+                                            config.Nx, config.Nz,
+                                            state.d_E_edges,
+                                            config.N_E,
+                                            config.N_E_local)) {
+                    std::cerr << "K4 failed after K3 at iteration " << iter
+                              << ", batch_offset=" << batch_offset
+                              << ", batch_cells=" << batch_cells << std::endl;
+                    return false;
+                }
             }
         }
-
-        // --------------------------------------------------------------------
-        // K4: Bucket Transfer (boundary crossings)
-        // --------------------------------------------------------------------
-        if (!run_k4_bucket_transfer(*psi_out, state.d_OutflowBuckets,
-                                    config.Nx, config.Nz,
-                                    state.d_E_edges,
-                                    config.N_E,
-                                    config.N_E_local)) {
-            std::cerr << "K4 failed at iteration " << iter << std::endl;
-            return false;
-        }
-
-        // Note: Buckets are cleared at START of next iteration (before K2/K3)
-        // This is correct because K4 needs to read the buckets AFTER K2/K3 write to them
 
         // Gather per-iteration drop channels from transport kernels and fold into K5.
         unsigned long long k2_slot_drop_count = 0;
@@ -1574,7 +1721,6 @@ bool run_k1k6_pipeline_transport(
         }
 
         // Update previous cumulative tallies for next iteration's delta-based K5.
-        int N_cells = config.Nx * config.Nz;
         cudaMemcpy(state.d_prev_AbsorbedWeight_cutoff, state.d_AbsorbedWeight_cutoff,
                    N_cells * sizeof(float), cudaMemcpyDeviceToDevice);
         cudaMemcpy(state.d_prev_AbsorbedEnergy_cutoff, state.d_AbsorbedEnergy_cutoff,

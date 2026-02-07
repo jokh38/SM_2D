@@ -56,12 +56,14 @@ __global__ void K2_CoarseTransport(
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
+    double* __restrict__ AbsorbedEnergy_cutoff,
     float* __restrict__ AbsorbedWeight_nuclear,
     double* __restrict__ AbsorbedEnergy_nuclear,
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets
     struct DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    const int* __restrict__ CellToBucketBase,
     // Output phase space for particles remaining in cell
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out
@@ -84,11 +86,13 @@ void run_K2_CoarseTransport(
     float sigma_x_initial,  // FIX C: Initial beam width from config
     double* EdepC,
     float* AbsorbedWeight_cutoff,
+    double* AbsorbedEnergy_cutoff,
     float* AbsorbedWeight_nuclear,
     double* AbsorbedEnergy_nuclear,
     float* BoundaryLoss_weight,
     double* BoundaryLoss_energy,
     struct DeviceOutflowBucket* OutflowBuckets,
+    const int* CellToBucketBase,
     uint32_t* block_ids_out,
     float* values_out
 );
@@ -101,7 +105,10 @@ void k2_get_debug_counters(
     double& slot_drop_energy,
     unsigned long long& bucket_drop_count,
     double& bucket_drop_weight,
-    double& bucket_drop_energy
+    double& bucket_drop_energy,
+    unsigned long long& pruned_weight_count,
+    double& pruned_weight_sum,
+    double& pruned_energy_sum
 );
 
 // ============================================================================

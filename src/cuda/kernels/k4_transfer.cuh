@@ -7,16 +7,21 @@
 // P3 FIX: Updated K4 header with device bucket support
 __global__ void K4_BucketTransfer(
     const DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    const int* __restrict__ CellToBucketBase,
     float* __restrict__ values_out,
     uint32_t* __restrict__ block_ids_out,
-    int Nx, int Nz
+    int Nx, int Nz,
+    const float* __restrict__ E_edges,
+    int N_E,
+    int N_E_local
 );
 
 // Debug counters for bucket-transfer slot allocation failures in K4.
 void k4_reset_debug_counters();
 void k4_get_debug_counters(
     unsigned long long& slot_drop_count,
-    double& slot_drop_weight
+    double& slot_drop_weight,
+    double& slot_drop_energy
 );
 
 // CPU wrapper

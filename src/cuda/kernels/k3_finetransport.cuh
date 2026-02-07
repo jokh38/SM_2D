@@ -58,12 +58,14 @@ __global__ void K3_FineTransport(
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
+    double* __restrict__ AbsorbedEnergy_cutoff,
     float* __restrict__ AbsorbedWeight_nuclear,
     double* __restrict__ AbsorbedEnergy_nuclear,
     float* __restrict__ BoundaryLoss_weight,
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets for boundary crossing (P3 FIX)
     DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    const int* __restrict__ CellToBucketBase,
     // CRITICAL FIX: Output phase space for particles remaining in cell
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out

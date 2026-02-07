@@ -113,6 +113,7 @@ __global__ void K3_FineTransport(
     double* __restrict__ BoundaryLoss_energy,
     // Outflow buckets for boundary crossing (P3 FIX)
     DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    const int* __restrict__ CellToBucketBase,
     // CRITICAL FIX: Output phase space for particles remaining in cell
     uint32_t* __restrict__ block_ids_out,
     float* __restrict__ values_out
@@ -386,6 +387,7 @@ __global__ void K3_FineTransport(
                             float lateral_boundary_weight = 0.0f;
                             float dropped_boundary_weight = device_emit_lateral_spread(
                                 OutflowBuckets,
+                                CellToBucketBase,
                                 cell,
                                 target_z,
                                 theta_new,
@@ -437,7 +439,19 @@ __global__ void K3_FineTransport(
                             int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
                             z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
 
-                            int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                            int bucket_idx = device_bucket_index_from_base(
+                                CellToBucketBase,
+                                cell,
+                                exit_face,
+                                Nx,
+                                Nz
+                            );
+                            if (bucket_idx < 0) {
+                                atomicAdd(&g_k3_bucket_drop_count, 1ULL);
+                                atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(w_new));
+                                atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * w_new));
+                                continue;
+                            }
                             DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
                             float dropped_boundary_weight = device_emit_component_to_bucket_4d(
                                 bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
@@ -618,7 +632,19 @@ __global__ void K3_FineTransport(
                                     int x_sub_neighbor = N_x_sub - 1;  // Rightmost bin of left neighbor
                                     int z_sub_neighbor = get_z_sub_bin(z_new, dz);
 
-                                    int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
+                                    int bucket_idx = device_bucket_index_from_base(
+                                        CellToBucketBase,
+                                        cell,
+                                        lateral_face,
+                                        Nx,
+                                        Nz
+                                    );
+                                    if (bucket_idx < 0) {
+                                        atomicAdd(&g_k3_bucket_drop_count, 1ULL);
+                                        atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(w_spread_left));
+                                        atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * w_spread_left));
+                                        continue;
+                                    }
                                     DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
 
                                     float dropped_left_tail = device_emit_component_to_bucket_4d(
@@ -647,7 +673,19 @@ __global__ void K3_FineTransport(
                                     int x_sub_neighbor = 0;  // Leftmost bin of right neighbor
                                     int z_sub_neighbor = get_z_sub_bin(z_new, dz);
 
-                                    int bucket_idx = device_bucket_index(cell, lateral_face, Nx, Nz);
+                                    int bucket_idx = device_bucket_index_from_base(
+                                        CellToBucketBase,
+                                        cell,
+                                        lateral_face,
+                                        Nx,
+                                        Nz
+                                    );
+                                    if (bucket_idx < 0) {
+                                        atomicAdd(&g_k3_bucket_drop_count, 1ULL);
+                                        atomicAdd(&g_k3_bucket_drop_weight, static_cast<double>(w_spread_right));
+                                        atomicAdd(&g_k3_bucket_drop_energy, static_cast<double>(E_new * w_spread_right));
+                                        continue;
+                                    }
                                     DeviceOutflowBucket& lateral_bucket = OutflowBuckets[bucket_idx];
 
                                     float dropped_right_tail = device_emit_component_to_bucket_4d(

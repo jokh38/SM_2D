@@ -183,8 +183,10 @@ struct K1K6PipelineState {
     double* d_prev_AbsorbedEnergy_nuclear;
     double* d_prev_BoundaryLoss_energy;
 
-    // Bucket system
-    DeviceOutflowBucket* d_OutflowBuckets;  // [Nx*Nz*4]
+    // Batch-local bucket scratch (P1 memory reduction path)
+    DeviceOutflowBucket* d_BucketScratch;  // [bucket_scratch_capacity_cells * 4]
+    int bucket_scratch_capacity_cells;     // Number of cells currently allocated in scratch
+    int* d_CellToBucketBase;               // [Nx*Nz], -1 for cells not in current batch
 
     // Reusable phase-space grid edges on device
     float* d_theta_edges;      // [N_theta + 1]
@@ -227,7 +229,9 @@ struct K1K6PipelineState {
         , d_prev_EdepC(nullptr)
         , d_prev_AbsorbedEnergy_nuclear(nullptr)
         , d_prev_BoundaryLoss_energy(nullptr)
-        , d_OutflowBuckets(nullptr)
+        , d_BucketScratch(nullptr)
+        , bucket_scratch_capacity_cells(0)
+        , d_CellToBucketBase(nullptr)
         , d_theta_edges(nullptr), d_E_edges(nullptr)
         , d_audit_report(nullptr)
         , d_weight_in(nullptr), d_weight_out(nullptr)
@@ -329,6 +333,7 @@ bool run_k3_fine_transport(
 bool run_k4_bucket_transfer(
     DevicePsiC& psi_out,
     const DeviceOutflowBucket* d_OutflowBuckets,
+    const int* d_CellToBucketBase,
     int Nx, int Nz,
     const float* d_E_edges,
     int N_E,
@@ -386,7 +391,7 @@ bool init_pipeline_state(
 );
 
 // Reset pipeline state for new iteration
-// Clears buckets, counters, and tallies
+// Clears counters, tallies, and batch maps
 void reset_pipeline_state(
     K1K6PipelineState& state,
     int Nx, int Nz

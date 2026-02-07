@@ -422,6 +422,7 @@ protected:
                 d_BoundaryLoss_weight,
                 d_BoundaryLoss_energy,
                 d_OutflowBuckets,
+                nullptr,
                 psi_out.block_id,
                 psi_out.value
             );
@@ -437,6 +438,7 @@ protected:
             int bucket_blocks = (n_buckets + threads - 1) / threads;
             K4_BucketTransfer<<<bucket_blocks, threads>>>(
                 d_OutflowBuckets,
+                nullptr,
                 psi_out.value,
                 psi_out.block_id,
                 Nx, Nz,

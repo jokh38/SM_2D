@@ -41,6 +41,7 @@ __device__ inline float k4_energy_from_bin(
 
 __global__ void K4_BucketTransfer(
     const DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    const int* __restrict__ CellToBucketBase,
     float* __restrict__ values_out,
     uint32_t* __restrict__ block_ids_out,
     int Nx, int Nz,
@@ -104,7 +105,11 @@ __global__ void K4_BucketTransfer(
         if (source_cell < 0) continue;
 
         // Get the bucket from the source cell
-        int bucket_idx = source_cell * 4 + source_face;
+        int source_bucket_base = CellToBucketBase ? CellToBucketBase[source_cell] : (source_cell * 4);
+        if (source_bucket_base < 0) {
+            continue;
+        }
+        int bucket_idx = source_bucket_base + source_face;
         const DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
 
         // Transfer all slots from bucket to this cell

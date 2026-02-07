@@ -727,6 +727,26 @@ __device__ inline int device_bucket_index(int cell, int face, int Nx, int Nz) {
     return cell * 4 + face;
 }
 
+// Resolve bucket index for a source cell/face using either:
+// - compact batch-local bucket storage (cell_bucket_base != nullptr), or
+// - legacy dense full-grid bucket storage (cell_bucket_base == nullptr).
+__device__ inline int device_bucket_index_from_base(
+    const int* __restrict__ cell_bucket_base,
+    int cell,
+    int face,
+    int Nx,
+    int Nz
+) {
+    if (cell_bucket_base == nullptr) {
+        return device_bucket_index(cell, face, Nx, Nz);
+    }
+    int base = cell_bucket_base[cell];
+    if (base < 0) {
+        return -1;
+    }
+    return base + face;
+}
+
 // Determine which face a particle will exit through
 // Returns -1 if particle remains in cell
 // NOTE: Assumes centered coordinate system: x ∈ [-dx/2, +dx/2], z ∈ [-dz/2, +dz/2]
@@ -806,6 +826,7 @@ __device__ inline int device_get_neighbor(int cell, int face, int Nx, int Nz) {
 //   theta_edges, E_edges, N_theta, N_E, N_theta_local, N_E_local: Grid info
 __device__ inline float device_emit_lateral_spread(
     DeviceOutflowBucket* __restrict__ OutflowBuckets,
+    const int* __restrict__ cell_bucket_base,
     int source_cell,
     int target_z,
     float theta,
@@ -899,7 +920,17 @@ __device__ inline float device_emit_lateral_spread(
         // KEY: To send weight to cell (ix_target, target_z), we emit to the +z bucket
         // of cell (ix_target, iz_source). K4 will then transfer it to (ix_target, target_z).
         int emit_cell = ix_target + iz_source * Nx;
-        int bucket_idx = device_bucket_index(emit_cell, FACE_Z_PLUS, Nx, Nz);
+        int bucket_idx = device_bucket_index_from_base(
+            cell_bucket_base,
+            emit_cell,
+            FACE_Z_PLUS,
+            Nx,
+            Nz
+        );
+        if (bucket_idx < 0) {
+            dropped_total += weight * w_frac;
+            continue;
+        }
         DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
 
         // Sub-cell bins for entry into neighbor cell
