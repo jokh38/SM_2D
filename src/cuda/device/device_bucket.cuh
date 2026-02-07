@@ -751,7 +751,7 @@ __device__ inline int device_get_neighbor(int cell, int face, int Nx, int Nz) {
 //   Nx, Nz:         Grid dimensions
 //   N_spread:       Number of cells to spread across (must be even)
 //   theta_edges, E_edges, N_theta, N_E, N_theta_local, N_E_local: Grid info
-__device__ inline void device_emit_lateral_spread(
+__device__ inline float device_emit_lateral_spread(
     DeviceOutflowBucket* __restrict__ OutflowBuckets,
     int source_cell,
     int target_z,
@@ -766,9 +766,12 @@ __device__ inline void device_emit_lateral_spread(
     const float* __restrict__ E_edges,
     int N_theta, int N_E,
     int N_theta_local, int N_E_local,
-    int N_spread = 10          // Number of cells to spread across
+    int N_spread = 10,         // Number of cells to spread across
+    float* boundary_weight_out = nullptr
 ) {
-    if (weight <= 0.0f || N_spread <= 0) return;
+    if (weight <= 0.0f || N_spread <= 0) return 0.0f;
+
+    float dropped_total = 0.0f;
 
     // Clamp sigma_x to avoid numerical issues
     sigma_x = fmaxf(sigma_x, 1e-6f);
@@ -788,13 +791,17 @@ __device__ inline void device_emit_lateral_spread(
             int x_sub_center = N_x_sub / 2;  // Center x bin
             int z_sub_neighbor = 0;  // Bottom of neighbor cell (entering from -z)
 
-            device_emit_component_to_bucket_4d(
+            dropped_total += device_emit_component_to_bucket_4d(
                 bucket, theta, E, weight, x_sub_center, z_sub_neighbor,
                 theta_edges, E_edges, N_theta, N_E,
                 N_theta_local, N_E_local
             );
+        } else if (boundary_weight_out != nullptr) {
+            *boundary_weight_out += weight;
+        } else {
+            dropped_total += weight;
         }
-        return;
+        return dropped_total;
     }
 
     // Calculate Gaussian weight distribution
@@ -821,9 +828,23 @@ __device__ inline void device_emit_lateral_spread(
         int x_offset = x_offset_start + i;
         int ix_target = ix_source + x_offset;
 
-        // Boundary check
-        if (ix_target < 0 || ix_target >= Nx) continue;
-        if (target_z < 0 || target_z >= Nz) continue;
+        // Boundary check: track out-of-domain tails as dropped weight.
+        if (ix_target < 0 || ix_target >= Nx) {
+            if (boundary_weight_out != nullptr) {
+                *boundary_weight_out += weight * w_frac;
+            } else {
+                dropped_total += weight * w_frac;
+            }
+            continue;
+        }
+        if (target_z < 0 || target_z >= Nz) {
+            if (boundary_weight_out != nullptr) {
+                *boundary_weight_out += weight * w_frac;
+            } else {
+                dropped_total += weight * w_frac;
+            }
+            continue;
+        }
 
         // KEY: To send weight to cell (ix_target, target_z), we emit to the +z bucket
         // of cell (ix_target, iz_source). K4 will then transfer it to (ix_target, target_z).
@@ -844,10 +865,12 @@ __device__ inline void device_emit_lateral_spread(
         int z_sub_neighbor = 0;  // Bottom of neighbor cell
 
         // Emit with distributed weight
-        device_emit_component_to_bucket_4d(
+        dropped_total += device_emit_component_to_bucket_4d(
             bucket, theta, E, weight * w_frac, x_sub_target, z_sub_neighbor,
             theta_edges, E_edges, N_theta, N_E,
             N_theta_local, N_E_local
         );
     }
+
+    return dropped_total;
 }

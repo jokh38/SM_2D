@@ -43,6 +43,12 @@ __device__ unsigned long long g_k2_bucket_drop_count = 0;
 __device__ double g_k2_bucket_drop_weight = 0.0;
 __device__ double g_k2_bucket_drop_energy = 0.0;
 
+namespace {
+constexpr unsigned THETA_SEED_A = 2654435761u;
+constexpr unsigned THETA_SEED_B = 2246822519u;
+constexpr unsigned THETA_SEED_C = 3266489917u;
+}  // namespace
+
 // ============================================================================
 // K2 Coarse Transport: Energy Loss with Fermi-Eyges Moment-Based Lateral Spreading
 // ============================================================================
@@ -220,31 +226,35 @@ __global__ void K2_CoarseTransport(
             // Nuclear attenuation for coarse range step
             float w_rem, E_rem;
             float w_new = device_apply_nuclear_attenuation(weight, E, coarse_range_step, w_rem, E_rem);
-            edep += E_rem;
 
             // ========================================================================
-            // K2 Coarse Transport: Fermi-Eyges Moment-Based Lateral Spreading
+            // K2 Coarse Transport: Incremental Fermi-Eyges lateral spreading
             // ========================================================================
-            // FIX: Use depth-based sigma_x for correct Fermi-Eyges O(z^(3/2)) scaling
-            // Previous implementation reset moments to zero each iteration, causing
-            // sigma_x << dx and no lateral spreading. New calculation uses depth from surface.
+            // Build moments at current depth, then evolve over this transport step.
+            // This keeps spreading depth-dependent while still integrating an incremental
+            // Fermi-Eyges update in the kernels.
             // ========================================================================
 
-            // Calculate depth from surface for accumulated lateral spread
             int iz = cell / Nx;
-            float depth_from_surface_mm = iz * dz + z_cell;  // Total depth from surface
+            float depth_from_surface_mm =
+                fmaxf(0.0f, static_cast<float>(iz) * dz + (z_cell + 0.5f * dz));
 
-            // Calculate accumulated lateral spread using Fermi-Eyges theory
-            // sigma_x(z) ≈ theta_0 * z / sqrt(3) for thin target
-            float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
-            float sigma_x_depth = sigma_theta_depth * depth_from_surface_mm / 1.7320508f;  // / sqrt(3)
+            float A = 0.0f;
+            float B = 0.0f;
+            float C = sigma_x_initial * sigma_x_initial;
+            if (depth_from_surface_mm > 0.0f) {
+                float sigma_theta_depth = device_highland_sigma(E, depth_from_surface_mm);
+                A = sigma_theta_depth * sigma_theta_depth;
+                B = 0.5f * A * depth_from_surface_mm;
+                C += (A * depth_from_surface_mm * depth_from_surface_mm) / 3.0f;
+            }
 
-            // Combine with initial beam width (FIX C: now from input parameter)
-            // sigma_x_initial is passed from config (sim.ini sigma_x_mm)
-            float sigma_x = sqrtf(sigma_x_initial * sigma_x_initial + sigma_x_depth * sigma_x_depth);
+            float T = device_scattering_power_T(E, fmaxf(coarse_range_step, 1e-6f));
+            device_fermi_eyges_step(A, B, C, T, coarse_range_step);
 
-            // Ensure minimum sigma_x
-            sigma_x = fmaxf(sigma_x, 0.01f);
+            float sigma_theta_step = device_highland_sigma(E, coarse_range_step);
+            float sigma_theta_transport = device_accumulated_sigma_theta(A);
+            float sigma_x = fmaxf(device_accumulated_sigma_x(C), 0.01f);
 
             // ========================================================================
             // Iteration 2: Moment-Based Spreading Enhancement
@@ -263,8 +273,7 @@ __global__ void K2_CoarseTransport(
             // ITERATION 3: Added profiling counters for verification
             // ========================================================================
 
-            // Calculate sqrt_A from depth (angular spread at this depth)
-            float sqrt_A = sigma_theta_depth;  // Already computed above
+            float sqrt_A = sigma_theta_transport;
             float sqrt_C_over_dx = sigma_x / dx;  // σₓ in bin units
 
 #ifdef ENABLE_MCS_PROFILING
@@ -280,21 +289,27 @@ __global__ void K2_CoarseTransport(
                 (sqrt_A < 0.02f) &&           // θ_RMS < 20 mrad
                 (sqrt_C_over_dx < 3.0f);      // σₓ < 3 bins
 
-            // Apply moment-based spreading enhancement
-            // When moments exceed K2 validity thresholds, enhance spreading
+            // Track when K2 moment limits are exceeded, but do not apply the
+            // legacy 2x sigma inflation. That heuristic over-broadens profiles
+            // and masks the intended K2->K3 handoff behavior.
             if (!k2_moments_valid) {
 #ifdef ENABLE_MCS_PROFILING
                 atomicAdd(&g_mcs_enhancement_count, 1);
 #endif
-                // Enhance spreading to approximate K3 behavior
-                // This compensates for not transferring to K3 by using wider sigma_x
-                sigma_x *= 2.0f;  // 2x spreading for large moment cases
             }
 
-            // Theta remains unchanged (direction doesn't change, weight spreads instead)
-            float theta_new = theta;
-            float mu_new = cosf(theta_new);
-            float eta_new = sinf(theta_new);
+            // Deterministic angular diffusion: use a stable per-component seed
+            // so directions evolve instead of staying frozen at the input angle.
+            unsigned theta_seed =
+                (static_cast<unsigned>(cell + 1) * THETA_SEED_A) ^
+                (static_cast<unsigned>(slot + 1) * THETA_SEED_B) ^
+                (static_cast<unsigned>(lidx + 1) * THETA_SEED_C) ^
+                static_cast<unsigned>(E_bin + 17);
+            float theta_scatter = device_sample_mcs_angle(sigma_theta_step, theta_seed);
+            float theta_new = theta + theta_scatter;
+            theta_new = fmaxf(theta_edges[0], fminf(theta_new, theta_edges[N_theta]));
+            float mu_new = mu;
+            float eta_new = eta;
 
             // Position update (use limited step to avoid boundary crossing)
             float x_new = x_cell + eta_new * coarse_step_limited;
@@ -317,49 +332,76 @@ __global__ void K2_CoarseTransport(
                     cell_w_cutoff += w_new;
                     cell_E_cutoff += E_new * w_new;  // Remaining energy from step
                 } else {
-                    // ====================================================================
-                    // Single-cell emission (K2: deterministic lateral spreading)
-                    // ====================================================================
-                    // For boundary crossing, use simple emission. Lateral spreading
-                    // is applied when particles remain in the cell (see else block).
-                    // ====================================================================
-
-                    float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
-                    int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
-
-                    float z_offset_neighbor;
-                    if (exit_face == FACE_Z_MINUS) {
-                        z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
-                    } else if (exit_face == FACE_Z_PLUS) {
-                        z_offset_neighbor = dz * 0.5f - dz * 0.125f;
-                    } else {
-                        z_offset_neighbor = z_new;
-                    }
-                    int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
-                    z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
-
-                    int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
-                    DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
-                    float dropped_boundary_weight = device_emit_component_to_bucket_4d(
-                        bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
-                        theta_edges, E_edges, N_theta, N_E,
-                        N_theta_local, N_E_local
-                    );
-                    if (dropped_boundary_weight > 0.0f) {
-                        atomicAdd(&g_k2_bucket_drop_count, 1ULL);
-                        atomicAdd(&g_k2_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
-                        atomicAdd(&g_k2_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
-                    }
-
-                    // Deposit energy in current cell before particle leaves
+                    // Deposit step-local channels in current cell before transfer.
                     cell_edep += edep;
                     cell_w_nuclear += w_rem;
                     cell_E_nuclear += E_rem;
 
-                    // Only count as boundary loss if particle is leaving simulation domain.
-                    if (device_get_neighbor(cell, exit_face, Nx, Nz) < 0) {
+                    int neighbor_cell = device_get_neighbor(cell, exit_face, Nx, Nz);
+                    if (neighbor_cell < 0) {
+                        // Particle leaves the simulation domain.
                         cell_boundary_weight += w_new;
                         cell_boundary_energy += E_new * w_new;
+                    } else if (exit_face == FACE_Z_PLUS) {
+                        // Forward transport is the dominant path in proton runs:
+                        // use robust multi-cell Gaussian emission for this branch.
+                        int target_z = cell / Nx + 1;
+                        float lateral_boundary_weight = 0.0f;
+                        float dropped_boundary_weight = device_emit_lateral_spread(
+                            OutflowBuckets,
+                            cell,
+                            target_z,
+                            theta_new,
+                            E_new,
+                            w_new,
+                            x_new,
+                            sigma_x,
+                            dx,
+                            Nx,
+                            Nz,
+                            theta_edges,
+                            E_edges,
+                            N_theta,
+                            N_E,
+                            N_theta_local,
+                            N_E_local,
+                            10,
+                            &lateral_boundary_weight
+                        );
+                        if (lateral_boundary_weight > 0.0f) {
+                            cell_boundary_weight += lateral_boundary_weight;
+                            cell_boundary_energy += E_new * lateral_boundary_weight;
+                        }
+                        if (dropped_boundary_weight > 0.0f) {
+                            atomicAdd(&g_k2_bucket_drop_count, 1ULL);
+                            atomicAdd(&g_k2_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
+                            atomicAdd(&g_k2_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
+                        }
+                    } else {
+                        float x_offset_neighbor = device_get_neighbor_x_offset(x_new, exit_face, dx);
+                        int x_sub_neighbor = get_x_sub_bin(x_offset_neighbor, dx);
+
+                        float z_offset_neighbor;
+                        if (exit_face == FACE_Z_MINUS) {
+                            z_offset_neighbor = -dz * 0.5f + dz * 0.125f;
+                        } else {
+                            z_offset_neighbor = z_new;
+                        }
+                        int z_sub_neighbor = get_z_sub_bin(z_offset_neighbor, dz);
+                        z_sub_neighbor = device_transform_z_sub_for_neighbor(z_sub_neighbor, exit_face);
+
+                        int bucket_idx = device_bucket_index(cell, exit_face, Nx, Nz);
+                        DeviceOutflowBucket& bucket = OutflowBuckets[bucket_idx];
+                        float dropped_boundary_weight = device_emit_component_to_bucket_4d(
+                            bucket, theta_new, E_new, w_new, x_sub_neighbor, z_sub_neighbor,
+                            theta_edges, E_edges, N_theta, N_E,
+                            N_theta_local, N_E_local
+                        );
+                        if (dropped_boundary_weight > 0.0f) {
+                            atomicAdd(&g_k2_bucket_drop_count, 1ULL);
+                            atomicAdd(&g_k2_bucket_drop_weight, static_cast<double>(dropped_boundary_weight));
+                            atomicAdd(&g_k2_bucket_drop_energy, static_cast<double>(E_new * dropped_boundary_weight));
+                        }
                     }
                 }
             } else {

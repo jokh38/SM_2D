@@ -18,6 +18,21 @@ TEST(K1Test, LowEnergyTriggersFineTransport) {
     EXPECT_TRUE(ActiveMask[0]);  // Low energy triggers fine transport
 }
 
+TEST(K1Test, ThresholdEnergyTriggersFineTransport) {
+    // Regression: components exactly at the fine-on boundary must hand off to K3.
+    PsiC psi(4, 4, 32);
+
+    // b_E equals b_E_fine_on exactly.
+    uint32_t bid = encode_block(10, 10);
+    int slot = psi.find_or_allocate_slot(0, bid);
+    psi.set_weight(0, slot, encode_local_idx(1, 0), 1.0f);
+
+    std::vector<uint8_t> ActiveMask(16, 0);
+    run_K1_ActiveMask(psi, ActiveMask.data(), 4, 4, 10, 1e-10f);
+
+    EXPECT_TRUE(ActiveMask[0]);
+}
+
 TEST(K1Test, HighEnergyDoesNotTrigger) {
     // P4 FIX: High energy should NOT trigger fine transport
     PsiC psi(4, 4, 32);
