@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iomanip>
 #include <cmath>
+#include <algorithm>
 
 namespace sm_2d {
 
@@ -95,6 +96,65 @@ static void dump_initial_cells_to_csv(
 
 // ============================================================================
 
+static bool compute_psic_represented_energy(
+    const DevicePsiC& psi,
+    const float* d_E_edges,
+    int N_E,
+    int N_theta_local,
+    int N_E_local,
+    double& represented_energy_out
+) {
+    size_t total_slots = static_cast<size_t>(psi.N_cells) * psi.Kb;
+    size_t total_values = total_slots * LOCAL_BINS;
+    std::vector<uint32_t> h_block_ids(total_slots, DEVICE_EMPTY_SLOT);
+    std::vector<float> h_values(total_values, 0.0f);
+    std::vector<float> h_E_edges(static_cast<size_t>(N_E + 1), 0.0f);
+
+    if (!device_psic_copy_to_host(psi, h_block_ids.data(), h_values.data())) {
+        return false;
+    }
+
+    cudaError_t edge_err = cudaMemcpy(
+        h_E_edges.data(),
+        d_E_edges,
+        static_cast<size_t>(N_E + 1) * sizeof(float),
+        cudaMemcpyDeviceToHost
+    );
+    if (edge_err != cudaSuccess) {
+        return false;
+    }
+
+    represented_energy_out = 0.0;
+    for (int cell = 0; cell < psi.N_cells; ++cell) {
+        for (int slot = 0; slot < psi.Kb; ++slot) {
+            uint32_t bid = h_block_ids[static_cast<size_t>(cell) * psi.Kb + slot];
+            if (bid == DEVICE_EMPTY_SLOT) {
+                continue;
+            }
+
+            int b_E = static_cast<int>((bid >> 12) & 0xFFF);
+            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
+                size_t idx = (static_cast<size_t>(cell) * psi.Kb + slot) * LOCAL_BINS + lidx;
+                float w = h_values[idx];
+                if (w <= 0.0f) {
+                    continue;
+                }
+
+                int E_local = (lidx / N_theta_local) % N_E_local;
+                int E_bin = b_E * N_E_local + E_local;
+                E_bin = std::max(0, std::min(E_bin, N_E - 1));
+                float E_lower = h_E_edges[E_bin];
+                float E_upper = h_E_edges[E_bin + 1];
+                float E_center = E_lower + 0.5f * (E_upper - E_lower);
+                represented_energy_out += static_cast<double>(w) * static_cast<double>(E_center);
+            }
+        }
+    }
+    return true;
+}
+
+// ============================================================================
+
 // Implementation of DeviceLUTWrapper (PIMPL pattern for CUDA types)
 class DeviceLUTWrapperImpl {
 public:
@@ -170,8 +230,10 @@ bool run_k1k6_pipeline_transport(
     config.E_coarse_max = transport.E_coarse_max;
     config.step_coarse = transport.step_coarse;
     config.n_steps_per_cell = transport.n_steps_per_cell;
+    config.fine_batch_max_cells = transport.fine_batch_max_cells;
     config.max_iterations = transport.max_iterations;
     config.log_level = transport.log_level;
+    config.fail_fast_on_audit = transport.fail_fast_on_audit || transport.validation_mode;
 
     // Phase-space dimensions
     config.N_theta = N_theta;
@@ -347,12 +409,33 @@ bool run_k1k6_pipeline_transport(
         cudaFree(d_slot_dropped_energy);
     }
 
+    double represented_injected_energy = 0.0;
+    if (!compute_psic_represented_energy(
+            psi_in,
+            state.d_E_edges,
+            N_E,
+            N_theta_local,
+            N_E_local,
+            represented_injected_energy)) {
+        std::cerr << "Failed to compute represented injected energy from PsiC" << std::endl;
+        state.cleanup();
+        device_psic_cleanup(psi_in);
+        device_psic_cleanup(psi_out);
+        return false;
+    }
+
+    double source_representation_loss_energy = h_injected_energy - represented_injected_energy;
+    if (std::abs(source_representation_loss_energy) < 1e-12) {
+        source_representation_loss_energy = 0.0;
+    }
+
     state.source_injected_weight = h_injected_weight;
     state.source_out_of_grid_weight = h_out_of_grid_weight;
     state.source_slot_dropped_weight = h_slot_dropped_weight;
     state.source_injected_energy = h_injected_energy;
     state.source_out_of_grid_energy = h_out_of_grid_energy;
     state.source_slot_dropped_energy = h_slot_dropped_energy;
+    state.source_representation_loss_energy = source_representation_loss_energy;
 
     if (verbose_logging || debug_dumps_enabled) {
         // Optional heavy verification path for source injection accounting.
@@ -380,6 +463,9 @@ bool run_k1k6_pipeline_transport(
             std::cout << "  Source injection verification:" << std::endl;
             std::cout << "    Total weight: " << total_weight << " (expected: " << W_total << ")" << std::endl;
             std::cout << "    Non-zero cells: " << nonzero_cells << " / " << psi_in.N_cells << std::endl;
+            std::cout << "    Injected energy (sampled): " << h_injected_energy << " MeV" << std::endl;
+            std::cout << "    Injected energy (represented): " << represented_injected_energy << " MeV" << std::endl;
+            std::cout << "    Source representation loss: " << source_representation_loss_energy << " MeV" << std::endl;
         }
     }
 

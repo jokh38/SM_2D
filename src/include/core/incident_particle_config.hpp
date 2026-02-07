@@ -191,6 +191,8 @@ struct TransportConfig {
     int fine_batch_max_cells = 0;     // 0 => auto planning
     int fine_halo_cells = 1;          // Scratch halo thickness (cells)
     float preflight_vram_margin = 0.85f; // Preflight usable VRAM fraction [0,1]
+    bool validation_mode = false;     // Enables validation-only runtime checks
+    bool fail_fast_on_audit = false;  // Stop transport when K5 audit fails
 
     // Iteration + logging
     int max_iterations = 0;           // 0 => use grid.max_steps

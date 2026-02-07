@@ -35,6 +35,8 @@ TEST(TransportConfigTest, LoadTransportSectionFromIni) {
         out << "fine_batch_max_cells = 2048\n";
         out << "fine_halo_cells = 2\n";
         out << "preflight_vram_margin = 0.80\n";
+        out << "validation_mode = true\n";
+        out << "fail_fast_on_audit = true\n";
         out << "max_iterations = 321\n";
         out << "log_level = 2\n";
         out << "energy_groups = 0.1:2.0:0.1,2.0:30.0:0.5\n";
@@ -55,6 +57,8 @@ TEST(TransportConfigTest, LoadTransportSectionFromIni) {
     EXPECT_EQ(cfg.transport.fine_batch_max_cells, 2048);
     EXPECT_EQ(cfg.transport.fine_halo_cells, 2);
     EXPECT_FLOAT_EQ(cfg.transport.preflight_vram_margin, 0.80f);
+    EXPECT_TRUE(cfg.transport.validation_mode);
+    EXPECT_TRUE(cfg.transport.fail_fast_on_audit);
     EXPECT_EQ(cfg.transport.max_iterations, 321);
     EXPECT_EQ(cfg.transport.log_level, 2);
     ASSERT_EQ(cfg.transport.energy_groups.size(), 2u);

@@ -11,6 +11,7 @@
 #include "core/local_bins.hpp"  // For decode_local_idx_4d
 #include <cuda_runtime.h>
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <vector>
@@ -532,7 +533,7 @@ __global__ void compact_coarse_list(
 
         for (int lidx = 0; lidx < LOCAL_BINS_val && !has_weight; ++lidx) {
             float w = values[(cell * Kb + slot) * LOCAL_BINS_val + lidx];
-            if (w > 1e-12f) {
+            if (w > 0.0f) {
                 has_weight = true;
                 break;
             }
@@ -582,6 +583,70 @@ __global__ void compute_total_weight(
     if (tid == 0) {
         total_weight[cell] = sdata[0];
     }
+}
+
+bool compute_psic_total_weight_energy(
+    const DevicePsiC& psi,
+    const float* d_E_edges,
+    int N_E,
+    int N_theta_local,
+    int N_E_local,
+    double& total_weight,
+    double& total_energy
+) {
+    size_t total_slots = static_cast<size_t>(psi.N_cells) * psi.Kb;
+    size_t total_values = total_slots * DEVICE_LOCAL_BINS;
+    std::vector<uint32_t> h_block_ids(total_slots, DEVICE_EMPTY_BLOCK_ID);
+    std::vector<float> h_values(total_values, 0.0f);
+    std::vector<float> h_E_edges(static_cast<size_t>(N_E + 1), 0.0f);
+
+    if (!device_psic_copy_to_host(psi, h_block_ids.data(), h_values.data())) {
+        return false;
+    }
+
+    cudaError_t edge_copy_err = cudaMemcpy(
+        h_E_edges.data(),
+        d_E_edges,
+        static_cast<size_t>(N_E + 1) * sizeof(float),
+        cudaMemcpyDeviceToHost
+    );
+    if (edge_copy_err != cudaSuccess) {
+        return false;
+    }
+
+    total_weight = 0.0;
+    total_energy = 0.0;
+
+    for (int cell = 0; cell < psi.N_cells; ++cell) {
+        for (int slot = 0; slot < psi.Kb; ++slot) {
+            uint32_t bid = h_block_ids[static_cast<size_t>(cell) * psi.Kb + slot];
+            if (bid == DEVICE_EMPTY_BLOCK_ID) {
+                continue;
+            }
+
+            int b_E = static_cast<int>((bid >> 12) & 0xFFF);
+            for (int lidx = 0; lidx < DEVICE_LOCAL_BINS; ++lidx) {
+                size_t value_idx =
+                    (static_cast<size_t>(cell) * psi.Kb + slot) * DEVICE_LOCAL_BINS + lidx;
+                float w = h_values[value_idx];
+                if (w <= 0.0f) {
+                    continue;
+                }
+
+                int E_local = (lidx / N_theta_local) % N_E_local;
+                int E_bin = b_E * N_E_local + E_local;
+                E_bin = std::max(0, std::min(E_bin, N_E - 1));
+                float E_lower = h_E_edges[E_bin];
+                float E_upper = h_E_edges[E_bin + 1];
+                float E_center = E_lower + 0.5f * (E_upper - E_lower);
+
+                total_weight += static_cast<double>(w);
+                total_energy += static_cast<double>(w) * static_cast<double>(E_center);
+            }
+        }
+    }
+
+    return true;
 }
 
 // ============================================================================
@@ -800,6 +865,7 @@ void reset_pipeline_state(K1K6PipelineState& state, int Nx, int Nz) {
     cudaMemcpy(state.d_n_coarse, &zero, sizeof(int), cudaMemcpyHostToDevice);
     state.transport_dropped_weight = 0.0;
     state.transport_dropped_energy = 0.0;
+    state.transport_audit_residual_energy = 0.0;
 
 }
 
@@ -1144,6 +1210,7 @@ bool run_k1k6_pipeline_transport(
     const int max_iter = config.max_iterations;
 
     int iter = 0;
+    bool k3_batching_notified = false;
 
     // ========================================================================
     // Main Transport Loop
@@ -1220,6 +1287,30 @@ bool run_k1k6_pipeline_transport(
 
         // Check if we're done
         if (state.n_active == 0 && state.n_coarse == 0) {
+            double terminal_residual_weight = 0.0;
+            double terminal_residual_energy = 0.0;
+            if (!compute_psic_total_weight_energy(
+                    *psi_in,
+                    state.d_E_edges,
+                    config.N_E,
+                    config.N_theta_local,
+                    config.N_E_local,
+                    terminal_residual_weight,
+                    terminal_residual_energy)) {
+                std::cerr << "Failed to compute terminal residual phase-space totals" << std::endl;
+                return false;
+            }
+
+            if (terminal_residual_weight > 0.0 || terminal_residual_energy > 0.0) {
+                state.transport_dropped_weight += terminal_residual_weight;
+                state.transport_dropped_energy += terminal_residual_energy;
+                if (verbose_logging) {
+                    std::cout << "  Terminal residual phase space reclassified as transport drop: "
+                              << "weight=" << terminal_residual_weight
+                              << ", energy=" << terminal_residual_energy << " MeV" << std::endl;
+                }
+            }
+
             if (summary_logging) {
                 std::cout << "  Transport complete after " << iter << " iterations" << std::endl;
             }
@@ -1256,10 +1347,43 @@ bool run_k1k6_pipeline_transport(
         // K3: Fine Transport (low energy cells)
         // --------------------------------------------------------------------
         if (state.n_active > 0) {
-            if (!run_k3_fine_transport(*psi_in, *psi_out, state.d_ActiveList, state.n_active,
-                                       dlut, config, state)) {
-                std::cerr << "K3 failed at iteration " << iter << std::endl;
+            const int requested_batch = config.fine_batch_max_cells;
+            const int effective_batch = (requested_batch > 0)
+                ? std::min(requested_batch, state.n_active)
+                : state.n_active;
+            if (effective_batch <= 0) {
+                std::cerr << "Invalid K3 batch size at iteration " << iter
+                          << ": requested=" << requested_batch
+                          << ", active=" << state.n_active << std::endl;
                 return false;
+            }
+
+            if (summary_logging &&
+                !k3_batching_notified &&
+                requested_batch > 0 &&
+                state.n_active > effective_batch) {
+                const int n_batches = (state.n_active + effective_batch - 1) / effective_batch;
+                std::cout << "  K3 batching enabled: " << n_batches
+                          << " batches (cap=" << effective_batch << " cells/batch)" << std::endl;
+                k3_batching_notified = true;
+            }
+
+            for (int batch_offset = 0; batch_offset < state.n_active; batch_offset += effective_batch) {
+                const int batch_cells = std::min(effective_batch, state.n_active - batch_offset);
+                const uint32_t* batch_active_list = state.d_ActiveList + batch_offset;
+                if (!run_k3_fine_transport(
+                        *psi_in,
+                        *psi_out,
+                        batch_active_list,
+                        batch_cells,
+                        dlut,
+                        config,
+                        state)) {
+                    std::cerr << "K3 failed at iteration " << iter
+                              << ", batch_offset=" << batch_offset
+                              << ", batch_cells=" << batch_cells << std::endl;
+                    return false;
+                }
             }
         }
 
@@ -1281,17 +1405,23 @@ bool run_k1k6_pipeline_transport(
         // Gather per-iteration drop channels from transport kernels and fold into K5.
         unsigned long long k2_slot_drop_count = 0;
         unsigned long long k2_bucket_drop_count = 0;
+        unsigned long long k2_pruned_weight_count = 0;
         double k2_slot_drop_weight = 0.0;
         double k2_slot_drop_energy = 0.0;
         double k2_bucket_drop_weight = 0.0;
         double k2_bucket_drop_energy = 0.0;
+        double k2_pruned_weight_sum = 0.0;
+        double k2_pruned_energy_sum = 0.0;
         k2_get_debug_counters(
             k2_slot_drop_count,
             k2_slot_drop_weight,
             k2_slot_drop_energy,
             k2_bucket_drop_count,
             k2_bucket_drop_weight,
-            k2_bucket_drop_energy
+            k2_bucket_drop_energy,
+            k2_pruned_weight_count,
+            k2_pruned_weight_sum,
+            k2_pruned_energy_sum
         );
 
         unsigned long long k3_slot_drop_count = 0;
@@ -1324,22 +1454,27 @@ bool run_k1k6_pipeline_transport(
             k4_slot_drop_energy
         );
 
-        const double transport_drop_weight_iter =
+        const double slot_bucket_drop_weight_iter =
             k2_slot_drop_weight +
             k2_bucket_drop_weight +
             k3_slot_drop_weight +
             k3_bucket_drop_weight +
             k4_slot_drop_weight;
-        const double transport_drop_energy_iter =
+        const double slot_bucket_drop_energy_iter =
             k2_slot_drop_energy +
             k2_bucket_drop_energy +
             k3_slot_drop_energy +
             k3_bucket_drop_energy +
             k4_slot_drop_energy;
+        const double pruned_drop_weight_iter = k2_pruned_weight_sum + k3_pruned_weight_sum;
+        const double pruned_drop_energy_iter = k2_pruned_energy_sum + k3_pruned_energy_sum;
+        const double transport_drop_weight_iter = slot_bucket_drop_weight_iter + pruned_drop_weight_iter;
+        const double transport_drop_energy_iter = slot_bucket_drop_energy_iter + pruned_drop_energy_iter;
         state.transport_dropped_weight += transport_drop_weight_iter;
         state.transport_dropped_energy += transport_drop_energy_iter;
 
-        if (verbose_logging && (transport_drop_weight_iter > 0.0 || k3_pruned_weight_count > 0)) {
+        if (verbose_logging && (transport_drop_weight_iter > 0.0 ||
+                                k2_pruned_weight_count > 0 || k3_pruned_weight_count > 0)) {
             std::cout << "  Transport drops: weight=" << transport_drop_weight_iter
                       << ", energy=" << transport_drop_energy_iter << " MeV"
                       << " [K2 slot=" << k2_slot_drop_count
@@ -1347,11 +1482,12 @@ bool run_k1k6_pipeline_transport(
                       << ", K3 slot=" << k3_slot_drop_count
                       << ", K3 bucket=" << k3_bucket_drop_count
                       << ", K4 slot=" << k4_slot_drop_count << "]" << std::endl;
-            if (k3_pruned_weight_count > 0) {
-                std::cout << "  K3 pruned tiny weights (not in K5 drop channel): count="
-                          << k3_pruned_weight_count
-                          << ", weight=" << k3_pruned_weight_sum
-                          << ", energy=" << k3_pruned_energy_sum << " MeV" << std::endl;
+            if (k2_pruned_weight_count > 0 || k3_pruned_weight_count > 0) {
+                std::cout << "  Transport pruned tiny weights: "
+                          << "K2 count=" << k2_pruned_weight_count
+                          << ", K3 count=" << k3_pruned_weight_count
+                          << ", weight=" << pruned_drop_weight_iter
+                          << ", energy=" << pruned_drop_energy_iter << " MeV" << std::endl;
             }
         }
 
@@ -1404,12 +1540,37 @@ bool run_k1k6_pipeline_transport(
             return false;
         }
 
+        AuditReport report = get_audit_report(state, config.Nx, config.Nz);
+        {
+            double energy_rhs =
+                report.E_out_total +
+                report.E_dep_total +
+                report.E_cutoff_total +
+                report.E_nuclear_total +
+                report.E_boundary_total +
+                report.E_transport_drop_total +
+                report.E_source_out_of_grid_total +
+                report.E_source_slot_drop_total;
+            double energy_residual = report.E_in_total - energy_rhs;
+            if (std::isfinite(energy_residual)) {
+                state.transport_audit_residual_energy += energy_residual;
+            }
+        }
+
         if (verbose_logging) {
-            AuditReport report = get_audit_report(state, config.Nx, config.Nz);
             std::cout << "  Weight audit: error=" << report.W_error
                       << " pass=" << (report.W_pass ? "yes" : "no")
                       << ", Energy audit: error=" << report.E_error
                       << " pass=" << (report.E_pass ? "yes" : "no") << std::endl;
+        }
+
+        if (config.fail_fast_on_audit && (!report.W_pass || !report.E_pass)) {
+            std::cerr << "K5 audit fail-fast at iteration " << iter
+                      << " (W_error=" << report.W_error
+                      << ", E_error=" << report.E_error
+                      << ", W_pass=" << report.W_pass
+                      << ", E_pass=" << report.E_pass << ")" << std::endl;
+            return false;
         }
 
         // Update previous cumulative tallies for next iteration's delta-based K5.
@@ -1494,22 +1655,36 @@ bool run_k1k6_pipeline_transport(
     const double source_injected_energy = state.source_injected_energy;
     const double source_out_of_grid_energy = state.source_out_of_grid_energy;
     const double source_slot_dropped_energy = state.source_slot_dropped_energy;
+    const double source_representation_loss_energy = state.source_representation_loss_energy;
     const double transport_drop_weight = state.transport_dropped_weight;
     const double transport_drop_energy = state.transport_dropped_energy;
+    const double transport_audit_residual_energy = state.transport_audit_residual_energy;
     const double source_total_energy = source_injected_energy + source_out_of_grid_energy + source_slot_dropped_energy;
-    double total_accounted_transport = total_edep + total_cutoff_energy + total_boundary_loss_energy + total_nuclear_energy + transport_drop_energy;
-    double total_accounted_system = total_accounted_transport + source_out_of_grid_energy + source_slot_dropped_energy;
+    double total_accounted_transport =
+        total_edep +
+        total_cutoff_energy +
+        total_boundary_loss_energy +
+        total_nuclear_energy +
+        transport_drop_energy +
+        transport_audit_residual_energy;
+    double total_accounted_system =
+        total_accounted_transport +
+        source_out_of_grid_energy +
+        source_slot_dropped_energy +
+        source_representation_loss_energy;
 
     std::cout << "\n=== Energy Conservation Report ===" << std::endl;
     std::cout << "  Source Energy (in-grid): " << source_injected_energy << " MeV" << std::endl;
     std::cout << "  Source Energy (outside grid): " << source_out_of_grid_energy << " MeV" << std::endl;
     std::cout << "  Source Energy (slot dropped): " << source_slot_dropped_energy << " MeV" << std::endl;
+    std::cout << "  Source Energy (representation loss): " << source_representation_loss_energy << " MeV" << std::endl;
     std::cout << "  Source Energy (total): " << source_total_energy << " MeV" << std::endl;
     std::cout << "  Energy Deposited: " << total_edep << " MeV" << std::endl;
     std::cout << "  Cutoff Energy Deposited: " << total_cutoff_energy << " MeV" << std::endl;
     std::cout << "  Nuclear Energy Deposited: " << total_nuclear_energy << " MeV" << std::endl;
     std::cout << "  Boundary Loss Energy: " << total_boundary_loss_energy << " MeV" << std::endl;
     std::cout << "  Transport Drop Energy: " << transport_drop_energy << " MeV" << std::endl;
+    std::cout << "  Transport Audit Residual Energy: " << transport_audit_residual_energy << " MeV" << std::endl;
     std::cout << "  Cutoff Weight: " << total_cutoff_weight << " (particles below E < 0.1 MeV)" << std::endl;
     std::cout << "  Transport Drop Weight: " << transport_drop_weight << std::endl;
     std::cout << "  Total Accounted Energy (transport only): " << total_accounted_transport << " MeV" << std::endl;

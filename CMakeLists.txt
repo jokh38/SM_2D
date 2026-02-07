@@ -65,6 +65,8 @@ set(IMPL_CUDA_SOURCES
     src/perf/memory_profiler.cpp
     src/perf/kernel_profiler.cpp
     src/perf/occupancy_analyzer.cpp
+    src/perf/fine_batch_planner.cpp
+    src/perf/memory_preflight.cpp
 )
 
 # Build implementation library (GPU-only)

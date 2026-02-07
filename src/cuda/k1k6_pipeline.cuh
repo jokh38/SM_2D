@@ -58,8 +58,10 @@ struct K1K6PipelineConfig {
     int N_theta_local, N_E_local;  // Local bins per block
 
     // Loop control + logging
+    int fine_batch_max_cells = 0; // 0 => process all active fine cells at once
     int max_iterations;        // Maximum transport iterations
     int log_level;             // 0: quiet, 1: summary, 2: verbose
+    bool fail_fast_on_audit = false;   // Stop immediately when K5 W/E pass flags fail
 };
 
 // ============================================================================
@@ -167,12 +169,14 @@ struct K1K6PipelineState {
     // Energy deposition tallies
     double* d_EdepC;           // Energy deposition [Nx*Nz]
     float* d_AbsorbedWeight_cutoff;
+    double* d_AbsorbedEnergy_cutoff;
     float* d_AbsorbedWeight_nuclear;
     double* d_AbsorbedEnergy_nuclear;
     float* d_BoundaryLoss_weight;
     double* d_BoundaryLoss_energy;
     // Previous cumulative tallies for iteration-delta audit
     float* d_prev_AbsorbedWeight_cutoff;
+    double* d_prev_AbsorbedEnergy_cutoff;
     float* d_prev_AbsorbedWeight_nuclear;
     float* d_prev_BoundaryLoss_weight;
     double* d_prev_EdepC;
@@ -197,6 +201,12 @@ struct K1K6PipelineState {
     double source_injected_energy;
     double source_out_of_grid_energy;
     double source_slot_dropped_energy;
+    double source_representation_loss_energy;
+    // Transport-side drop accounting (accumulated across iterations).
+    double transport_dropped_weight;
+    double transport_dropped_energy;
+    // Per-iteration K5 signed energy residual accumulated across transport.
+    double transport_audit_residual_energy;
 
     // Device memory ownership
     bool owns_device_memory;
@@ -207,10 +217,11 @@ struct K1K6PipelineState {
         , n_active(0), n_coarse(0)
         , d_n_active(nullptr), d_n_coarse(nullptr)
         , d_EdepC(nullptr)
-        , d_AbsorbedWeight_cutoff(nullptr), d_AbsorbedWeight_nuclear(nullptr)
+        , d_AbsorbedWeight_cutoff(nullptr), d_AbsorbedEnergy_cutoff(nullptr), d_AbsorbedWeight_nuclear(nullptr)
         , d_AbsorbedEnergy_nuclear(nullptr)
         , d_BoundaryLoss_weight(nullptr), d_BoundaryLoss_energy(nullptr)
         , d_prev_AbsorbedWeight_cutoff(nullptr)
+        , d_prev_AbsorbedEnergy_cutoff(nullptr)
         , d_prev_AbsorbedWeight_nuclear(nullptr)
         , d_prev_BoundaryLoss_weight(nullptr)
         , d_prev_EdepC(nullptr)
@@ -224,6 +235,9 @@ struct K1K6PipelineState {
         , source_slot_dropped_weight(0.0f)
         , source_injected_energy(0.0), source_out_of_grid_energy(0.0)
         , source_slot_dropped_energy(0.0)
+        , source_representation_loss_energy(0.0)
+        , transport_dropped_weight(0.0), transport_dropped_energy(0.0)
+        , transport_audit_residual_energy(0.0)
         , owns_device_memory(false)
     {}
 
@@ -315,7 +329,10 @@ bool run_k3_fine_transport(
 bool run_k4_bucket_transfer(
     DevicePsiC& psi_out,
     const DeviceOutflowBucket* d_OutflowBuckets,
-    int Nx, int Nz
+    int Nx, int Nz,
+    const float* d_E_edges,
+    int N_E,
+    int N_E_local
 );
 
 // Run K5 only: Weight + energy conservation audit
@@ -323,9 +340,11 @@ bool run_k5_conservation_audit(
     const DevicePsiC& psi_in,
     const DevicePsiC& psi_out,
     const double* d_EdepC,
+    const double* d_AbsorbedEnergy_cutoff,
     const double* d_AbsorbedEnergy_nuclear,
     const double* d_BoundaryLoss_energy,
     const double* d_prev_EdepC,
+    const double* d_prev_AbsorbedEnergy_cutoff,
     const double* d_prev_AbsorbedEnergy_nuclear,
     const double* d_prev_BoundaryLoss_energy,
     const float* d_AbsorbedWeight_cutoff,
@@ -338,6 +357,8 @@ bool run_k5_conservation_audit(
     float source_slot_dropped_weight,
     double source_out_of_grid_energy,
     double source_slot_dropped_energy,
+    float transport_dropped_weight,
+    double transport_dropped_energy,
     int include_source_terms,
     const float* d_E_edges,
     int N_E,

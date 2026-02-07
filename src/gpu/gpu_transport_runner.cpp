@@ -1,6 +1,7 @@
 #include "gpu/gpu_transport_runner.hpp"
 #include "cuda/gpu_transport_wrapper.hpp"
 #include "core/local_bins.hpp"  // For N_theta_local, N_E_local
+#include "perf/memory_preflight.hpp"
 #include <cuda_runtime.h>
 
 #include "lut/r_lut.hpp"
@@ -72,6 +73,9 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
         runtime_transport.E_fine_off = std::max(runtime_transport.E_fine_off, runtime_transport.E_fine_on);
     }
     runtime_transport.E_trigger = runtime_transport.E_fine_on;
+    if (runtime_transport.validation_mode) {
+        runtime_transport.fail_fast_on_audit = true;
+    }
 
     // Create phase-space grids for K1-K6 pipeline from runtime transport config.
     const int N_theta = runtime_transport.N_theta;
@@ -79,7 +83,11 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
     const int N_E_local = runtime_transport.N_E_local;
 
     // Angular grid: [-pi/2, pi/2] for full angular coverage
-    AngularGrid theta_grid(-M_PI/2.0f, M_PI/2.0f, N_theta);
+    // With a small N_theta (default 36), a ±90 deg grid is too coarse for
+    // therapeutic proton beams and introduces large quantization artifacts.
+    // Use a practical transport envelope to preserve angular resolution.
+    constexpr float kThetaTransportLimitRad = 0.35f;  // ±20 degrees
+    AngularGrid theta_grid(-kThetaTransportLimitRad, kThetaTransportLimitRad, N_theta);
 
     // Energy grid: piecewise-uniform from transport configuration.
     std::vector<std::tuple<float, float, float>> energy_groups;
@@ -98,6 +106,38 @@ SimulationResult GPUTransportRunner::run(const IncidentParticleConfig& config) {
                       << " MeV]: " << group.dE_MeV << " MeV/bin" << std::endl;
         }
         std::cout << "===================" << std::endl;
+    }
+
+    // Preflight VRAM check before heavy CUDA allocations in wrapper path.
+    MemoryPreflightInput preflight_input;
+    preflight_input.Nx = config.grid.Nx;
+    preflight_input.Nz = config.grid.Nz;
+    preflight_input.N_theta = N_theta;
+    preflight_input.N_E = N_E;
+    preflight_input.fine_batch_requested_cells = runtime_transport.fine_batch_max_cells;
+    preflight_input.preflight_vram_margin = runtime_transport.preflight_vram_margin;
+
+    const MemoryPreflightResult preflight = run_memory_preflight(preflight_input);
+    if (runtime_transport.log_level >= 1) {
+        std::cout << "GPU memory preflight: required "
+                  << format_binary_bytes(preflight.estimate.total_required_bytes)
+                  << ", usable " << format_binary_bytes(preflight.usable_vram_bytes)
+                  << " (free " << format_binary_bytes(preflight.free_vram_bytes)
+                  << ", margin " << runtime_transport.preflight_vram_margin << ")" << std::endl;
+        std::cout << "  components: psi=" << format_binary_bytes(preflight.estimate.psi_buffers_bytes)
+                  << ", buckets=" << format_binary_bytes(preflight.estimate.outflow_buckets_bytes)
+                  << ", pipeline=" << format_binary_bytes(preflight.estimate.pipeline_state_bytes)
+                  << ", lut=" << format_binary_bytes(preflight.estimate.lut_bytes)
+                  << ", overhead=" << format_binary_bytes(preflight.estimate.runtime_overhead_bytes)
+                  << std::endl;
+    }
+    if (!preflight.ok) {
+        throw std::runtime_error("GPU memory preflight failed: " + preflight.message);
+    }
+    runtime_transport.fine_batch_max_cells = preflight.fine_batch_plan.planned_cells;
+    if (runtime_transport.log_level >= 1 && preflight.fine_batch_plan.clamped) {
+        std::cout << "  fine_batch_max_cells clamped to "
+                  << runtime_transport.fine_batch_max_cells << " by preflight" << std::endl;
     }
 
     // Generate NIST range LUT using the piecewise-uniform energy grid (Option D2)

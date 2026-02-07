@@ -2,6 +2,7 @@
 set(TEST_COMMON_FILES
     unit/test_build_system.cpp
     unit/test_memory_budget.cpp
+    unit/test_memory_preflight.cpp
     unit/test_logging.cpp
     unit/test_memory_pool.cpp
     unit/test_grids.cpp
