@@ -386,6 +386,8 @@ inline IncidentParticleConfig load_incident_particle_config(const std::string& f
     config.transport.preflight_vram_margin = transport_sec.get_float("preflight_vram_margin", config.transport.preflight_vram_margin);
     config.transport.validation_mode = transport_sec.get_bool("validation_mode", config.transport.validation_mode);
     config.transport.fail_fast_on_audit = transport_sec.get_bool("fail_fast_on_audit", config.transport.fail_fast_on_audit);
+    config.transport.debug_dumps = transport_sec.get_bool("debug_dumps", config.transport.debug_dumps);
+    config.transport.debug_dumps = transport_sec.get_bool("enable_debug_dumps", config.transport.debug_dumps);
     config.transport.max_iterations = transport_sec.get_int("max_iterations", config.transport.max_iterations);
     config.transport.log_level = transport_sec.get_int("log_level", config.transport.log_level);
     if (transport_sec.has("energy_groups")) {
@@ -491,6 +493,7 @@ inline bool save_incident_particle_config(
     file << "preflight_vram_margin = " << config.transport.preflight_vram_margin << "\n";
     file << "validation_mode = " << (config.transport.validation_mode ? "true" : "false") << "\n";
     file << "fail_fast_on_audit = " << (config.transport.fail_fast_on_audit ? "true" : "false") << "\n";
+    file << "debug_dumps = " << (config.transport.debug_dumps ? "true" : "false") << "\n";
     file << "max_iterations = " << config.transport.max_iterations << "\n";
     file << "log_level = " << config.transport.log_level << "\n";
     file << "energy_groups = " << serialize_transport_energy_groups(config.transport.energy_groups) << "\n\n";
@@ -543,6 +546,7 @@ inline void print_config_summary(std::ostream& os, const IncidentParticleConfig&
        << ", max_iterations=" << runtime_steps
        << ", validation_mode=" << (config.transport.validation_mode ? "on" : "off")
        << ", fail_fast_on_audit=" << (config.transport.fail_fast_on_audit ? "on" : "off")
+       << ", debug_dumps=" << (config.transport.debug_dumps ? "on" : "off")
        << "\n";
     os << "Output Dir: " << config.output.output_dir << "\n";
     os << "======================================\n";

@@ -76,3 +76,16 @@ target_include_directories(sm2d_tests PRIVATE ${CMAKE_CUDA_TOOLKIT_ROOT_DIR}/inc
 
 include(GoogleTest)
 gtest_discover_tests(sm2d_tests)
+
+# Python-based validation tests
+if(SM2D_ENABLE_VALIDATION_TESTS)
+    # Angular resolution regression check
+    add_test(NAME angular_resolution_regression
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/val_test/check_theta_resolution_regression.py --run
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+    set_tests_properties(angular_resolution_regression PROPERTIES
+        TIMEOUT 600
+        LABELS "validation;angular"
+    )
+endif()

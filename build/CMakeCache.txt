@@ -472,6 +472,12 @@ GTest_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/GTest
 //Path to a program.
 NVCC_EXECUTABLE:FILEPATH=/usr/local/cuda-12.4/bin/nvcc
 
+//Enable verbose debug CSV dumps and kernel debug logs
+SM2D_ENABLE_DEBUG_DUMPS:BOOL=ON
+
+//Enable validation test suite (longer runtime)
+SM2D_ENABLE_VALIDATION_TESTS:BOOL=ON
+
 //Value Computed by CMake
 SM_2D_BINARY_DIR:STATIC=/workspaces/SM_2D/build
 

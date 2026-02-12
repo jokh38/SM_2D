@@ -56,12 +56,17 @@ def extract_moqui_central_slice(dose_3d, dim_x, dim_y, dim_z):
 
 def load_sm2d_dose(filepath):
     """Load SM_2D 2D dose distribution from text file."""
-    data = np.loadtxt(filepath, skiprows=3)
+    # Parse by comment marker so header-length changes do not drop data rows.
+    data = np.loadtxt(filepath, comments='#')
 
     x = data[:, 0]
     z = data[:, 1]
     dose = data[:, 2]
-    dose_norm = data[:, 3]
+    if data.shape[1] >= 4:
+        dose_norm = data[:, 3]
+    else:
+        peak = np.max(dose) if dose.size else 0.0
+        dose_norm = dose / peak if peak > 0 else np.zeros_like(dose)
 
     # Get unique x and z values to reconstruct grid
     x_unique = np.unique(x)
@@ -93,20 +98,25 @@ def load_sm2d_dose(filepath):
             dose_2d[iz, ix] = dose[i]
             dose_norm_2d[iz, ix] = dose_norm[i]
     else:
-        # Reshape to 2D grid (z, x) - file is organized with varying x fastest
-        dose_2d = dose.reshape(Nz, Nx, order='F')
-        dose_norm_2d = dose_norm.reshape(Nz, Nx, order='F')
+        # File writer loops z outer, x inner; row-major reshape is correct.
+        dose_2d = dose.reshape(Nz, Nx, order='C')
+        dose_norm_2d = dose_norm.reshape(Nz, Nx, order='C')
 
     return dose_2d, dose_norm_2d, x_unique, z_unique
 
 
 def load_sm2d_pdd(filepath):
     """Load SM_2D PDD data."""
-    data = np.loadtxt(filepath, skiprows=4)
+    # Parse by comment marker so header-length changes do not drop data rows.
+    data = np.loadtxt(filepath, comments='#')
 
     z = data[:, 0]
     dose = data[:, 1]
-    dose_norm = data[:, 2]
+    if data.shape[1] >= 3:
+        dose_norm = data[:, 2]
+    else:
+        peak = np.max(dose) if dose.size else 0.0
+        dose_norm = dose / peak if peak > 0 else np.zeros_like(dose)
 
     return z, dose, dose_norm
 
@@ -196,7 +206,9 @@ def main():
     # Load SM_2D results
     print("\n[2] Loading SM_2D simulation results...")
     dose_sm2d_2d, dose_sm2d_norm_2d, x_sm2d, z_sm2d = load_sm2d_dose(sm2d_dose_file)
-    print(f"    Grid: {len(x_sm2d)} x {len(z_sm2d)} (0.5mm spacing)")
+    dx_sm2d = float(np.median(np.diff(x_sm2d))) if len(x_sm2d) > 1 else 0.0
+    dz_sm2d = float(np.median(np.diff(z_sm2d))) if len(z_sm2d) > 1 else 0.0
+    print(f"    Grid: {len(x_sm2d)} x {len(z_sm2d)} (dx={dx_sm2d:.3f}mm, dz={dz_sm2d:.3f}mm)")
     print(f"    X range: [{x_sm2d[0]:.2f}, {x_sm2d[-1]:.2f}] mm")
     print(f"    Z range: [{z_sm2d[0]:.2f}, {z_sm2d[-1]:.2f}] mm")
 

@@ -472,3 +472,108 @@ The Fermi-Eyges C moment then propagates this error:
 
 ---
 
+
+---
+
+## 2026-02-12: Attempts to Fix Lateral Spread Bug (Continued)
+
+### Attempt 1: Set A_old = 0 (Remove erroneous accumulated scattering)
+
+**Change:** Set initial Fermi-Eyges moments to zero accumulated scattering:
+\`\`\`cpp
+float A_old = 0.0f;  // No accumulated angular variance from wrong formula
+float B_old = 0.0f;
+float C_old = sigma_x_initial * sigma_x_initial;  // Just initial beam width squared
+\`\`\`
+
+**Result:** Lateral spread still constant at 4.246 mm - **FIX FAILED**
+
+### Attempt 2: Add device_total_lateral_spread function
+
+**Added function in \`src/cuda/device/device_physics.cuh\`:**
+\`\`\`cpp
+__device__ inline float device_total_lateral_spread(
+    float path_mm,
+    float sigma_x_initial,
+    float E_MeV,
+    float X0 = DEVICE_X0_water
+) {
+    // Highland formula for total RMS scattering angle over full path
+    float sigma_theta_total = device_highland_sigma(E_MeV, path_mm, X0);
+    float sigma_theta_sq = sigma_theta_total * sigma_theta_total;
+    float lateral_variance = sigma_theta_sq * path_mm * path_mm / 3.0f;
+    float total_variance = sigma_x_initial * sigma_x_initial + lateral_variance;
+    return sqrtf(fmaxf(total_variance, 0.0f));
+}
+\`\`\`
+
+**Expected behavior:** For z=100mm, should give sigma_x ≈ 136mm (from theory)
+
+**Result:** Lateral spread still constant at 4.246 mm - **FIX FAILED**
+
+### Attempt 3: Use constant initial beam energy (E_MEAN_150MEV)
+
+**Issue identified:** Using current particle energy \`E\` in Highland formula. As particle travels,
+energy decreases (150 MeV → 138 MeV at 100mm depth). Lower energy = MORE scattering.
+
+**Fix:** Define constant for initial beam energy:
+\`\`\`cpp
+constexpr float E_MEAN_150MEV = 150.0f;  // Initial beam energy for this validation
+\`\`\`
+
+Call: \`device_total_lateral_spread(path_start_mm, sigma_x_initial, E_MEAN_150MEV)\`
+
+**Result:** Lateral spread still constant at 4.246 mm - **FIX FAILED**
+
+### Attempt 4: Use sigma_x_transport in Gaussian weight distribution
+
+**Bug identified:** At line 597, code calls:
+\`\`\`cpp
+device_gaussian_spread_weights_subcell(weights, x_center, sigma_x, dx, N_x_sub);
+\`\`\`
+
+But \`sigma_x\` is the per-step spread (line 337), NOT the accumulated spread \`sigma_x_transport\`!
+
+**Fix:** Use \`sigma_x_transport\` for Gaussian weight distribution:
+\`\`\`cpp
+device_gaussian_spread_weights_subcell(weights, x_center, sigma_x_transport, dx, N_x_sub);
+\`\`\`
+
+**Result:** Lateral spread still constant at 4.246 mm - **FIX FAILED**
+
+---
+
+## Analysis: Why Fixes Aren't Working
+
+### The Core Problem
+
+All fixes attempted to compute total accumulated spread correctly, BUT the lateral spread
+remains constant at 4.246 mm ≈ initial beam width (3.8mm) × 1.12.
+
+This suggests that the accumulated scattering is NOT being applied to the dose distribution.
+
+### Possible Root Causes
+
+1. **Gaussian weight distribution may not be using sigma_x_transport:**
+   - Need to verify the sed fix was actually applied to the code
+   - May need to add debug prints to verify sigma_x_transport values
+
+2. **Dose calculation may use different sigma value:**
+   - Dose at each cell is sum of contributions from particles
+   - The sigma_x used for dose calculation may not be sigma_x_transport
+
+3. **Cross-cell emission may not be dominant mechanism:**
+   - Particles that remain in cell may dominate dose
+   - Cross-cell emission with sigma_x_transport may be minor contributor
+
+4. **Compilation issue:**
+   - Changes may not have been compiled into the executable
+   - Need to verify binary was actually rebuilt
+
+### Next Steps
+
+1. Add debug printf to print sigma_x_transport values at different depths
+2. Verify Gaussian weight distribution is using sigma_x_transport (not sigma_x)
+3. Check if dose accumulation uses correct sigma values
+4. Consider alternative: calculate sigma directly from MOQUI values for comparison
+

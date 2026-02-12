@@ -445,15 +445,37 @@ __device__ inline float device_emit_component_to_bucket_4d(
     if (weight <= 0.0f) return 0.0f;
 
     // Find global bins
-    int theta_bin = 0;
     int E_bin = 0;
 
-    // For uniform theta grid
+    // For uniform theta grid, use center-based sub-bin variance preservation.
+    // Neighbor weight scales with squared sub-bin offset so coarse bins recover
+    // angular variance without the strong over-diffusion of linear splitting.
     float theta_min = theta_edges[0];
     float theta_max = theta_edges[N_theta];
     float dtheta = (theta_max - theta_min) / N_theta;
-    theta_bin = (int)((theta - theta_min) / dtheta);
-    theta_bin = max(0, min(theta_bin, N_theta - 1));
+    float theta_clamped = max(theta_min, min(theta, theta_max));
+
+    float theta_center0 = theta_min + 0.5f * dtheta;
+    float theta_center_cont = (theta_clamped - theta_center0) / dtheta;
+    int theta_bin_center = static_cast<int>(floorf(theta_center_cont + 0.5f));
+    theta_bin_center = max(0, min(theta_bin_center, N_theta - 1));
+    float theta_center = theta_center0 + static_cast<float>(theta_bin_center) * dtheta;
+    float delta_theta = theta_clamped - theta_center;
+
+    int theta_bins[2] = {theta_bin_center, theta_bin_center};
+    float theta_weights[2] = {1.0f, 0.0f};
+    if (delta_theta > 0.0f && theta_bin_center < N_theta - 1) {
+        theta_bins[1] = theta_bin_center + 1;
+    } else if (delta_theta < 0.0f && theta_bin_center > 0) {
+        theta_bins[1] = theta_bin_center - 1;
+    }
+
+    if (theta_bins[1] != theta_bins[0]) {
+        float frac = fminf(1.0f, fabsf(delta_theta) / dtheta);
+        float w_neighbor = frac * frac;
+        theta_weights[1] = w_neighbor;
+        theta_weights[0] = 1.0f - w_neighbor;
+    }
 
     // Option D2: Use binary search for energy bin (works for both log-spaced and piecewise-uniform)
     // Binary search in E_edges to find the bin containing energy E
@@ -476,30 +498,38 @@ __device__ inline float device_emit_component_to_bucket_4d(
     }
     E_bin = max(0, min(E_bin, N_E - 1));
 
-    // Encode to coarse block and local index
-    uint32_t b_theta = theta_bin / N_theta_local;
-    uint32_t b_E = E_bin / N_E_local;
-    uint32_t bid = encode_block(b_theta, b_E);
-
-    int theta_local = theta_bin % N_theta_local;
     int E_local = E_bin % N_E_local;
+    uint32_t b_E = E_bin / N_E_local;
 
-    // 4D local index encoding with x_sub and z_sub
-    uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
+    float dropped_total = 0.0f;
+    for (int ti = 0; ti < 2; ++ti) {
+        float w_theta = theta_weights[ti];
+        if (w_theta <= 0.0f) continue;
 
-    // Emit to bucket; if saturated, conservatively remap to closest occupied slot.
-    uint32_t selected_bid = bid;
-    int slot = device_bucket_find_or_allocate_slot_with_fallback(bucket, bid, selected_bid);
-    if (slot < 0) {
-        return weight;
+        float w_emit = weight * w_theta;
+        int theta_bin = theta_bins[ti];
+        uint32_t b_theta = theta_bin / N_theta_local;
+        uint32_t bid = encode_block(b_theta, b_E);
+
+        int theta_local = theta_bin % N_theta_local;
+        uint16_t lidx = encode_local_idx_4d(theta_local, E_local, x_sub, z_sub);
+
+        // Emit to bucket; if saturated, conservatively remap to closest occupied slot.
+        uint32_t selected_bid = bid;
+        int slot = device_bucket_find_or_allocate_slot_with_fallback(bucket, bid, selected_bid);
+        if (slot < 0) {
+            dropped_total += w_emit;
+            continue;
+        }
+
+        uint16_t lidx_emit = (selected_bid == bid)
+            ? lidx
+            : device_remap_lidx_to_bid(lidx, bid, selected_bid);
+        atomicAdd(&bucket.value[slot][lidx_emit], w_emit);
+        bucket.local_count[slot]++;
     }
 
-    uint16_t lidx_emit = (selected_bid == bid)
-        ? lidx
-        : device_remap_lidx_to_bid(lidx, bid, selected_bid);
-    atomicAdd(&bucket.value[slot][lidx_emit], weight);
-    bucket.local_count[slot]++;
-    return 0.0f;
+    return dropped_total;
 }
 
 // ============================================================================

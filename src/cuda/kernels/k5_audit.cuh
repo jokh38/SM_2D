@@ -14,6 +14,7 @@ struct AuditReport {
     float W_boundary_total;
     float W_source_out_of_grid_total;
     float W_source_slot_drop_total;
+    float W_transport_drop_total;
     double E_in_total;
     double E_out_total;
     double E_dep_total;
@@ -22,6 +23,7 @@ struct AuditReport {
     double E_boundary_total;
     double E_source_out_of_grid_total;
     double E_source_slot_drop_total;
+    double E_transport_drop_total;
     int processed_cells;
 };
 
@@ -33,9 +35,11 @@ __global__ void K5_ConservationAudit(
     const double* __restrict__ EdepC,
     const double* __restrict__ AbsorbedEnergy_nuclear,
     const double* __restrict__ BoundaryLoss_energy,
+    const double* __restrict__ AbsorbedEnergy_cutoff,
     const double* __restrict__ PrevEdepC,
     const double* __restrict__ PrevAbsorbedEnergy_nuclear,
     const double* __restrict__ PrevBoundaryLoss_energy,
+    const double* __restrict__ PrevAbsorbedEnergy_cutoff,
     const float* __restrict__ AbsorbedWeight_cutoff,
     const float* __restrict__ AbsorbedWeight_nuclear,
     const float* __restrict__ BoundaryLoss_weight,
@@ -46,6 +50,8 @@ __global__ void K5_ConservationAudit(
     float source_slot_dropped_weight,
     double source_out_of_grid_energy,
     double source_slot_dropped_energy,
+    float transport_dropped_weight,
+    double transport_dropped_energy,
     int include_source_terms,
     const float* __restrict__ E_edges,
     int N_E,

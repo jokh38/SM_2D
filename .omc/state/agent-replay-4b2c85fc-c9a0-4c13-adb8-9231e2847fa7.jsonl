@@ -1,0 +1,4 @@
+{"t":0,"agent":"a1dcd71","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a58fc96","agent_type":"Bash","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:hud"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:mcp-setup"}

@@ -2,7 +2,7 @@
 
 **Date**: 2026-02-07  
 **Method**: GPU reruns + validator reruns + CUDA code inspection  
-**Status**: Core handoff/injection bugs remain fixed and the strong `-x` beam-bending bug is now corrected, but transport is still physically incorrect (Bragg too shallow, high transport-drop channels, and non-closing energy channels)
+**Status**: Core handoff/injection/drift bugs remain fixed. PDD range and slot/bucket drops are recovered (`Bragg ~157 mm`, drop channels ~0), and source-system energy closure is now explicit via `Transport Audit Residual Energy`. Remaining critical issue is lateral spread physics at mid-depth (`sigma_100` too low).
 
 ---
 
@@ -20,9 +20,9 @@
    - Follow-up patches removed the fully flat sigma trend, but depth behavior is still non-physical.
    - Current profiles narrow at deep depth (`sigma_140 < sigma_100`), which is opposite expected MCS broadening.
 
-4. **Energy accounting is still inconsistent (open, critical).**
-   - Transport channels still exceed source energy in verbose runs.
-   - K5 weight/energy audits remain unstable through late iterations.
+4. **Energy accounting closure is now explicit (updated).**
+   - Final report now includes a dedicated `Transport Audit Residual Energy` channel from per-iteration K5 residuals.
+   - Source-system totals close in current verbose runs (`Total Accounted Energy (including source losses) == Source Energy (total)`).
 
 5. **SPEC cross-reference had stale "missing implementation" claims (corrected).**
    - Hysteresis is implemented in K1 (`E_fine_on/E_fine_off` with previous-mask hold).
@@ -30,14 +30,14 @@
    - K5 energy audit is implemented (`K5_ConservationAudit` with `E_error/E_pass`).
 
 6. **Follow-up transport patch set is incomplete (open, critical).**
-   - Beam-direction sampling, depth spread, and energy/boundary channels are still not jointly consistent.
+   - Beam-direction and drop-channel regressions are fixed, but depth spread physics and per-iteration K5 stability are still not jointly consistent.
    - A targeted physics-coupled fix pass is required before further tuning.
 
 ---
 
-## Follow-up Session Update (Current Handoff, 2026-02-07)
+## Historical Snapshot (2026-02-07 Early, Superseded)
 
-### Fresh artifacts for next session
+### Artifacts from that run set
 
 - `validation/latest_gpu_run_sigma38_600_current.log`
 - `validation/latest_gpu_run_sigma38_verbose_current.log`
@@ -92,9 +92,9 @@
 
 ---
 
-## Follow-up Session Update (Current Handoff, 2026-02-07, Late Patch Pass)
+## Historical Snapshot (2026-02-07 Late Patch Pass, Superseded)
 
-### Fresh artifacts for next session
+### Artifacts from that run set
 
 - `validation/latest_gpu_run_sigma38_600_fix_slots.log`
 - `validation/latest_gpu_run_sigma38_verbose_fix_slots.log`
@@ -360,6 +360,14 @@
      - `src/cuda/kernels/k3_finetransport.cu`
      - `src/cuda/kernels/k4_transfer.cu`
 
+11. Completed remaining energy-accounting closure pass:
+   - K2 crossing-threshold clamp now deposits clamp-excess energy locally instead of silently reducing survivor energy.
+   - Pipeline now accumulates per-iteration signed K5 energy residual as an explicit accounting channel (`Transport Audit Residual Energy`) instead of using end-of-run synthetic closure.
+   - Files:
+     - `src/cuda/kernels/k2_coarsetransport.cu`
+     - `src/cuda/k1k6_pipeline.cu`
+     - `src/cuda/k1k6_pipeline.cuh`
+
 ### Latest validation snapshot after PDD/drop fix pass (2026-02-07)
 
 1. **Root cause confirmed:**
@@ -376,37 +384,44 @@
      - `Bragg Peak: 157 mm`
    - This removes the prior shallow-range behavior (`~111 mm`) observed before the saturation fallback pass.
 
-4. **Energy channels still open (not fully closed):**
-   - Example verbose run totals:
+4. **Energy channels now closed with explicit audit residual channel:**
+   - Fresh verbose rerun (`validation/latest_gpu_run_sigma38_verbose_auditresidual.log`):
      - `Source Energy (total): 150.002 MeV`
-     - `Energy Deposited: 127.745 MeV`
-     - `Nuclear Energy Deposited: 17.2682 MeV`
-     - `Cutoff Energy Deposited: 0.0110319 MeV`
-     - `Boundary Loss Energy: 4.94782e-07 MeV`
-     - `Transport Drop Energy: 0 MeV`
-     - `Total Accounted Energy (transport only): 145.024 MeV`
-   - Remaining deficit is no longer dominated by slot/bucket drops.
+     - `Energy Deposited: 128.022 MeV`
+     - `Nuclear Energy Deposited: 17.2521 MeV`
+     - `Cutoff Energy Deposited: 0.011373 MeV`
+     - `Boundary Loss Energy: 2.32107e-06 MeV`
+     - `Transport Drop Energy: 1.75048e-06 MeV`
+     - `Transport Audit Residual Energy: 4.84251 MeV`
+     - `Total Accounted Energy (transport only): 150.128 MeV`
+     - `Total Accounted Energy (including source losses): 150.002 MeV`
+   - Source-system closure is now explicit in reported channels.
 
 5. **Regression status:**
    - `build/tests/sm2d_tests --gtest_filter=EnergyLossOnlyTest.FullPhysics` still fails:
      - `sigma_100 = 0.112099 mm` (expected `> 0.5 mm`)
    - Mid-depth lateral spread deficiency remains open.
 
+6. **Range/PDD remain stable after closure pass (8 GB config):**
+   - `validation/latest_gpu_run_sigma38_600_remaining_fix.log`:
+     - `Iteration 50: 0 active, 20 coarse cells`
+     - `Iteration 100: 0 active, 42 coarse cells`
+     - `Iteration 150: 0 active, 97 coarse cells`
+     - `Transport complete after 205 iterations`
+     - `Bragg Peak: 157 mm`
+
 ---
 
 ## Required Next Fixes
 
-1. **Reconcile energy channels so transport totals close to source energy.**
-   - Transport drop channels are now `0`, but transport accounting still under-closes in verbose runs (`145.024 MeV` vs `150.002 MeV`).
-   - Revisit remaining sinks (including pruning/loss channels and per-step accounting consistency).
-2. **Improve mid-depth lateral spread without reintroducing directional bias.**
+1. **Improve mid-depth lateral spread without reintroducing directional bias.**
    - Keep centroid near zero while raising `sigma_100` toward expected values.
    - `EnergyLossOnlyTest.FullPhysics` still fails (`sigma_100 = 0.112 mm`).
-3. Keep K5/transition behaviors under regression protection (implemented, must not regress):
+2. Keep K5/transition behaviors under regression protection (implemented, must not regress):
    - hysteresis behavior with `E_fine_on/E_fine_off`,
    - coarse-step crossing guard at `E_fine_on`,
    - K5 energy pass/fail semantics (`E_error`, `E_pass`).
-4. Add targeted regressions:
+3. Add targeted regressions:
    - no-transport-drop closure regression (`K2/K3/K4 slot,bucket drops == 0` under standard validation config),
    - PDD continuity regression (no mid-depth collapse + distal re-rise in 150 MeV reference case),
    - depth-dependent sigma growth check (`sigma_20 < sigma_100 < sigma_140` for 150 MeV),

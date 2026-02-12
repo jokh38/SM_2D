@@ -1,0 +1,2 @@
+cell,ix,iz,x_mm,z_mm,total_weight,num_slots,mean_E_MeV,mean_theta_rad,min_E_MeV,max_E_MeV,min_theta_rad,max_theta_rad
+120,40,1,20.250000,0.750000,0.999437,1,149.875000,0.009722,149.875000,149.875000,0.009722,0.009722

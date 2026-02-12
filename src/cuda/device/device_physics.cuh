@@ -444,6 +444,49 @@ __device__ inline float device_accumulated_sigma_theta(float moment_A) {
 }
 
 // ============================================================================
+// TOTAL ACCUMULATED LATERAL SPREAD (from source to current depth)
+// ============================================================================
+// Computes total lateral spread sigma_x for a particle that has traveled from
+// the beam source (z=0) to depth z at energy E.
+//
+// Uses Fermi-Eyges theory for total accumulated scattering:
+//   σ_x²(z) = σ_x,initial² + (σ_θ,total² × z²) / 3
+//
+// where σ_θ,total is the total RMS scattering angle accumulated over path z,
+// computed using Highland formula for the full path length at current energy.
+//
+// This gives the correct O(z^(3/2)) scaling for lateral spread:
+//   σ_θ ∝ √z  →  σ_x² ∝ z × z² / 3 = z³/3  →  σ_x ∝ z^(3/2)
+//
+// Parameters:
+//   path_mm: total path length from source to current depth [mm]
+//   sigma_x_initial: initial beam width (at source) [mm]
+//   E_MeV: current particle energy [MeV]
+//   X0: radiation length [mm]
+// Returns: total lateral spread sigma_x [mm]
+// ============================================================================
+__device__ inline float device_total_lateral_spread(
+    float path_mm,
+    float sigma_x_initial,
+    float E_MeV,
+    float X0 = DEVICE_X0_water
+) {
+    // Highland formula for total RMS scattering angle over full path
+    // σ_θ_total = Highland_sigma(E, path_mm)
+    float sigma_theta_total = device_highland_sigma(E_MeV, path_mm, X0);
+
+    // Fermi-Eyges: lateral variance from accumulated angular variance
+    // For uniform scattering over path z, σ_x² = σ_θ² × z² / 3
+    float sigma_theta_sq = sigma_theta_total * sigma_theta_total;
+    float lateral_variance = sigma_theta_sq * path_mm * path_mm / 3.0f;
+
+    // Add initial beam width (in quadrature)
+    float total_variance = sigma_x_initial * sigma_x_initial + lateral_variance;
+
+    return sqrtf(fmaxf(total_variance, 0.0f));
+}
+
+// ============================================================================
 // Hybrid Moment Tracking (Phase B - PLAN_MCS2)
 // ============================================================================
 // Combines analytic Fermi-Eyges theory with accumulated moments for

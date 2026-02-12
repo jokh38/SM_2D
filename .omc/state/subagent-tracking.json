@@ -1,0 +1,15 @@
+{
+  "agents": [
+    {
+      "agent_id": "abb2619",
+      "agent_type": "Bash",
+      "started_at": "2026-02-12T11:32:10.696Z",
+      "parent_mode": "none",
+      "status": "running"
+    }
+  ],
+  "total_spawned": 1,
+  "total_completed": 0,
+  "total_failed": 0,
+  "last_updated": "2026-02-12T11:32:10.797Z"
+}

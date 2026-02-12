@@ -48,9 +48,12 @@ __device__ double g_k2_pruned_energy_sum = 0.0;
 
 namespace {
 constexpr float K2_WEIGHT_PRUNE_THRESHOLD = 1e-12f;
-// Fraction of pre-step C carried into per-step spreading to compensate for
-// unresolved lateral variance in discretized sub-cell transport.
-constexpr float UNRESOLVED_C_FRACTION = 0.04f;
+// Depth-scaled carry-over of unresolved accumulated variance.
+// This compensates quantization loss more strongly at mid/deep depth
+// without applying the full accumulated C at every step.
+constexpr float UNRESOLVED_C_BASE_FRACTION = 0.04f;
+constexpr float UNRESOLVED_C_DEPTH_SLOPE = 0.003f;   // per mm
+constexpr float UNRESOLVED_C_MAX_FRACTION = 0.35f;
 constexpr unsigned THETA_SEED_A = 2654435761u;
 constexpr unsigned THETA_SEED_B = 2246822519u;
 constexpr unsigned THETA_SEED_C = 3266489917u;
@@ -278,8 +281,16 @@ __global__ void K2_CoarseTransport(
 
             float sigma_theta_step = sqrtf(fmaxf(A_new - A_old, 0.0f));
             float delta_C = fmaxf(C_new - C_old, 0.0f);
-            float C_effective = delta_C + UNRESOLVED_C_FRACTION * C_old;
+            float unresolved_fraction = fminf(
+                UNRESOLVED_C_MAX_FRACTION,
+                UNRESOLVED_C_BASE_FRACTION + UNRESOLVED_C_DEPTH_SLOPE * path_start_mm
+            );
+            float C_effective = delta_C + unresolved_fraction * C_old;
             float sigma_x = fmaxf(device_accumulated_sigma_x(C_effective), 0.01f);
+            // Use per-step spread for cross-cell bucket emission to avoid
+            // repeatedly applying accumulated variance on every boundary hop.
+            float sigma_x_transport =
+                fmaxf(device_lateral_spread_sigma(sigma_theta_step, step_mm), 0.01f);
 
             // ========================================================================
             // Iteration 2: Moment-Based Spreading Enhancement
@@ -385,7 +396,7 @@ __global__ void K2_CoarseTransport(
                             E_new,
                             w_new,
                             x_new,
-                            sigma_x,
+                            sigma_x_transport,
                             dx,
                             Nx,
                             Nz,

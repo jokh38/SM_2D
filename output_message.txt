@@ -1,7 +1,7 @@
 ========================================
 SM_2D: Proton Therapy Simulation
 ========================================
-Loading configuration from: test_c.ini
+Loading configuration from: validation/gpu_compare_sigma38.ini
 === Incident Particle Configuration ===
 Particle Type: proton
 Beam Profile: gaussian
@@ -11,963 +11,116 @@ Angle: 0 rad (sigma = 0.001 rad)
 Weight: 1
 Samples: 1000
 
-Grid: 11 x 200 (dx=2mm, dz=2mm)
-Output Dir: results/test_c
+Grid: 100 x 320 (dx=1mm, dz=1mm)
+Transport: theta_bins=36, E_fine_on=10 MeV, E_fine_off=11 MeV, step_coarse=5 mm, max_iterations=200, validation_mode=off, fail_fast_on_audit=off, debug_dumps=on
+Output Dir: /workspaces/SM_2D/results
 ======================================
 
 --- Running Simulation ---
 Using GPU transport (Vavilov energy straggling)
-=== Option D2 Energy Grid ===
-  N_E = 1029 bins
-  [0.1-2 MeV]: 0.1 MeV/bin (19 bins)
-  [2-20 MeV]: 0.2 MeV/bin (90 bins)
-  [20-100 MeV]: 0.25 MeV/bin (320 bins)
-  [100-250 MeV]: 0.25 MeV/bin (600 bins)
-=============================
-=== LUT Verification ===
-  R(0.1 MeV) = 0.001607 mm (expected ~0.0016)
-  R(150 MeV) = 157.7 mm (expected ~158)
-  R(250 MeV) = 379.077 mm (max range in LUT)
-  S(150 MeV) = 5.443 MeV*cm^2/g
-  Energy loss test: E=150 -> E_new=148.918, dE=1.0824 MeV (step=2mm)
-=======================
+GPU memory preflight: required 5.96 GiB, usable 6.36 GiB (free 7.48 GiB, margin 0.85)
+  components: psi=1.96 GiB, buckets=3.93 GiB, pipeline=3.48 MiB, lut=24.12 KiB, overhead=64.00 MiB
 Running K1-K6 GPU pipeline transport...
   GPU: NVIDIA GeForce RTX 2080
   Energy: 150 MeV
   Phase-space: 36 x 1029 bins
+  max_iterations: 200
 Running K1-K6 GPU pipeline wrapper...
-  Grid: 11 x 200 cells
+  Grid: 100 x 320 cells
   Source: (0, 0) mm, 150 MeV
-  Using GAUSSIAN beam: sigma_x=20 mm, sigma_theta=0.001 rad, n_samples=1000
+  Using GAUSSIAN beam: sigma_x=3.8 mm, sigma_theta=0.001 rad, n_samples=1000
 DevicePsiC allocation:
-  Grid: 11x200 = 2200 cells
-  Kb: 8, LOCAL_BINS: 256
-  block_id: 70400 bytes (0.0671387 MB)
-  value: 18022400 bytes (17.1875 MB)
-  total per PsiC: 17.2546 MB
+  Grid: 100x320 = 32000 cells
+  Kb: 32, LOCAL_BINS: 256
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 1048576000 bytes (1000 MB)
+  total per PsiC: 1003.91 MB
 DevicePsiC allocation successful
 DevicePsiC allocation:
-  Grid: 11x200 = 2200 cells
-  Kb: 8, LOCAL_BINS: 256
-  block_id: 70400 bytes (0.0671387 MB)
-  value: 18022400 bytes (17.1875 MB)
-  total per PsiC: 17.2546 MB
+  Grid: 100x320 = 32000 cells
+  Kb: 32, LOCAL_BINS: 256
+  block_id: 4096000 bytes (3.90625 MB)
+  value: 1048576000 bytes (1000 MB)
+  total per PsiC: 1003.91 MB
 DevicePsiC allocation successful
   Source: (0, 0) mm
   Energy: 150 MeV, Angle: 0 rad
-  Source injection verification:
-    Total weight: 0.088 (expected: 1)
-    Non-zero cells: 11 / 2200
-  DEBUG: Wrote 11 initial non-zero cells to debug_cells_iter_00_initial.csv
-=== E_trigger Configuration ===
-E_trigger = 1000 MeV
-E_bin for E_trigger = 1028
+  DEBUG: Wrote 682 raw phase-space rows to results/debug_ps_raw_iter_00_initial.csv
+=== Fine Threshold Configuration ===
+E_fine_on = 10 MeV
+E_fine_off = 11 MeV
+E_bin for E_fine_on = 59
+E_bin for E_fine_off = 64
 N_E_local = 2
-b_E_trigger = 514
+b_E_fine_on = 29
+b_E_fine_off = 32
 === 150 MeV Particle ===
 E_bin_150 = 629
 b_E_150 = 314
-Condition: b_E_150 < b_E_trigger → 314 < 514 = TRUE (K3 active)
+Condition: b_E_150 < b_E_fine_on → 314 < 29 = FALSE (K2 coarse)
 ==============================
-  Iteration 1: 11 active, 0 coarse cells
-  Iteration 1: 11 active, 0 coarse cells
-  K4: Transferred 93 particles (weight bins: 115)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_01_after_K4.csv (z range: 1 - 1 mm)
-  Weight audit: error=4.32989 pass=no
-  Iteration 2: 11 active, 0 coarse cells
-  K4: Transferred 80 particles (weight bins: 260)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_02_after_K4.csv (z range: 3 - 3 mm)
-  Weight audit: error=3.48066e+18 pass=no
-  Iteration 3: 11 active, 0 coarse cells
-  K4: Transferred 133 particles (weight bins: 203)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_03_after_K4.csv (z range: 3 - 3 mm)
-  Weight audit: error=8.17113e+17 pass=no
-  Iteration 4: 11 active, 0 coarse cells
-  K4: Transferred 83 particles (weight bins: 483)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_04_after_K4.csv (z range: 5 - 5 mm)
-  Weight audit: error=1.38002e+19 pass=no
-  Iteration 5: 11 active, 0 coarse cells
-  K4: Transferred 141 particles (weight bins: 238)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_05_after_K4.csv (z range: 5 - 5 mm)
-  Weight audit: error=3.36918e+18 pass=no
-  Iteration 6: 11 active, 0 coarse cells
-  K4: Transferred 87 particles (weight bins: 560)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_06_after_K4.csv (z range: 7 - 7 mm)
-  Weight audit: error=5.26078e+19 pass=no
-  Iteration 7: 11 active, 0 coarse cells
-  K4: Transferred 137 particles (weight bins: 255)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_07_after_K4.csv (z range: 7 - 7 mm)
-  Weight audit: error=1.33584e+19 pass=no
-  Iteration 8: 11 active, 0 coarse cells
-  K4: Transferred 88 particles (weight bins: 595)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_08_after_K4.csv (z range: 9 - 9 mm)
-  Weight audit: error=2.16392e+20 pass=no
-  Iteration 9: 11 active, 0 coarse cells
-  K4: Transferred 140 particles (weight bins: 257)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_09_after_K4.csv (z range: 9 - 9 mm)
-  Weight audit: error=5.09128e+19 pass=no
-  Iteration 10: 11 active, 0 coarse cells
-  K4: Transferred 88 particles (weight bins: 615)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_10_after_K4.csv (z range: 11 - 11 mm)
-  Weight audit: error=9.22815e+20 pass=no
-  K4: Transferred 148 particles (weight bins: 280)
-  Weight audit: error=2.09623e+20 pass=no
-  K4: Transferred 88 particles (weight bins: 637)
-  Weight audit: error=3.82687e+21 pass=no
-  K4: Transferred 143 particles (weight bins: 284)
-  Weight audit: error=8.92666e+20 pass=no
-  K4: Transferred 88 particles (weight bins: 651)
-  Weight audit: error=1.63215e+22 pass=no
-  K4: Transferred 147 particles (weight bins: 285)
-  Weight audit: error=3.70835e+21 pass=no
-  K4: Transferred 88 particles (weight bins: 645)
-  Weight audit: error=6.90374e+22 pass=no
-  K4: Transferred 144 particles (weight bins: 276)
-  Weight audit: error=1.57993e+22 pass=no
-  K4: Transferred 88 particles (weight bins: 642)
-  Weight audit: error=2.83696e+23 pass=no
-  K4: Transferred 146 particles (weight bins: 274)
-  Weight audit: error=6.68405e+22 pass=no
-  K4: Transferred 88 particles (weight bins: 635)
-  Weight audit: error=1.15196e+24 pass=no
-  K4: Transferred 144 particles (weight bins: 272)
-  Weight audit: error=2.64493e+23 pass=no
-  K4: Transferred 88 particles (weight bins: 638)
-  Weight audit: error=4.55049e+24 pass=no
-  K4: Transferred 144 particles (weight bins: 275)
-  Weight audit: error=1.1156e+24 pass=no
-  K4: Transferred 88 particles (weight bins: 645)
-  Weight audit: error=1.81706e+25 pass=no
-  K4: Transferred 148 particles (weight bins: 281)
-  Weight audit: error=4.34289e+24 pass=no
-  K4: Transferred 88 particles (weight bins: 645)
-  Weight audit: error=7.22283e+25 pass=no
-  K4: Transferred 152 particles (weight bins: 292)
-  Weight audit: error=1.75599e+25 pass=no
-  K4: Transferred 88 particles (weight bins: 650)
-  Weight audit: error=2.87601e+26 pass=no
-  K4: Transferred 144 particles (weight bins: 287)
-  Weight audit: error=6.99691e+25 pass=no
-  K4: Transferred 88 particles (weight bins: 641)
-  Weight audit: error=1.0499e+27 pass=no
-  K4: Transferred 144 particles (weight bins: 303)
-  Weight audit: error=2.7734e+26 pass=no
-  K4: Transferred 88 particles (weight bins: 613)
-  Weight audit: error=3.47734e+27 pass=no
-  K4: Transferred 148 particles (weight bins: 304)
-  Weight audit: error=9.80985e+26 pass=no
-  K4: Transferred 88 particles (weight bins: 578)
-  Weight audit: error=9.63018e+27 pass=no
-  K4: Transferred 148 particles (weight bins: 284)
-  Weight audit: error=3.1504e+27 pass=no
-  K4: Transferred 88 particles (weight bins: 578)
-  Weight audit: error=2.70463e+28 pass=no
-  K4: Transferred 146 particles (weight bins: 280)
-  Weight audit: error=6.43859e+27 pass=no
-  K4: Transferred 88 particles (weight bins: 604)
-  Weight audit: error=8.31304e+28 pass=no
-  K4: Transferred 146 particles (weight bins: 285)
-  Weight audit: error=1.48843e+28 pass=no
-  K4: Transferred 88 particles (weight bins: 637)
-  Weight audit: error=2.75059e+29 pass=no
-  K4: Transferred 146 particles (weight bins: 283)
-  Weight audit: error=5.45586e+28 pass=no
-  K4: Transferred 88 particles (weight bins: 636)
-  Weight audit: error=8.76718e+29 pass=no
-  K4: Transferred 146 particles (weight bins: 281)
-  Weight audit: error=1.78541e+29 pass=no
-  K4: Transferred 88 particles (weight bins: 649)
-  Weight audit: error=2.63745e+30 pass=no
-  K4: Transferred 144 particles (weight bins: 278)
-  Weight audit: error=5.46503e+29 pass=no
-  K4: Transferred 88 particles (weight bins: 657)
-  Weight audit: error=6.92167e+30 pass=no
-  K4: Transferred 148 particles (weight bins: 282)
-  Weight audit: error=1.49703e+30 pass=no
-  K4: Transferred 11 particles (weight bins: 164)
-  Weight audit: error=2.03342e+31 pass=no
-  K4: Transferred 10 particles (weight bins: 20)
-  Weight audit: error=3.12046e+30 pass=no
-  Iteration 50: 11 active, 0 coarse cells
-  K4: Transferred 11 particles (weight bins: 162)
-  DEBUG: Wrote 11 non-zero cells to results/debug_cells_iter_50_after_K4.csv (z range: 51 - 51 mm)
-  Weight audit: error=5.56522e+31 pass=no
-  Iteration 51: 11 active, 0 coarse cells
-  K4: Transferred 8 particles (weight bins: 16)
-  Weight audit: error=9.16398e+30 pass=no
-  K4: Transferred 11 particles (weight bins: 149)
-  Weight audit: error=1.46041e+32 pass=no
-  K4: Transferred 9 particles (weight bins: 18)
-  Weight audit: error=2.29986e+31 pass=no
-  K4: Transferred 11 particles (weight bins: 133)
-  Weight audit: error=4.17935e+32 pass=no
-  K4: Transferred 9 particles (weight bins: 18)
-  Weight audit: error=6.57562e+31 pass=no
-  K4: Transferred 11 particles (weight bins: 124)
-  Weight audit: error=1.14152e+33 pass=no
-  K4: Transferred 9 particles (weight bins: 13)
-  Weight audit: error=1.70781e+32 pass=no
-  K4: Transferred 11 particles (weight bins: 112)
-  Weight audit: error=1.69142e+33 pass=no
-  K4: Transferred 10 particles (weight bins: 20)
-  Weight audit: error=3.77068e+32 pass=no
-  K4: Transferred 11 particles (weight bins: 124)
-  Weight audit: error=5.14479e+33 pass=no
-  Weight audit: error=9.23729e+32 pass=no
-  K4: Transferred 11 particles (weight bins: 126)
-  Weight audit: error=1.34391e+34 pass=no
-  K4: Transferred 8 particles (weight bins: 16)
-  Weight audit: error=2.54814e+33 pass=no
-  K4: Transferred 11 particles (weight bins: 117)
-  Weight audit: error=3.90359e+34 pass=no
-  K4: Transferred 9 particles (weight bins: 17)
-  Weight audit: error=6.41273e+33 pass=no
-  K4: Transferred 11 particles (weight bins: 146)
-  Weight audit: error=6.53836e+34 pass=no
-  Weight audit: error=1.40361e+34 pass=no
-  K4: Transferred 11 particles (weight bins: 140)
-  Weight audit: error=6.0726e+34 pass=no
-  K4: Transferred 9 particles (weight bins: 18)
-  Weight audit: error=2.81228e+34 pass=no
-  K4: Transferred 11 particles (weight bins: 143)
-  Weight audit: error=1.09573e+35 pass=no
-  Weight audit: error=3.09576e+34 pass=no
-  K4: Transferred 11 particles (weight bins: 146)
-  Weight audit: error=3.4248e+35 pass=no
-  K4: Transferred 3 particles (weight bins: 19)
-  Weight audit: error=4.95089e+34 pass=no
-  K4: Transferred 11 particles (weight bins: 136)
-  Weight audit: error=1.01577e+36 pass=no
-  K4: Transferred 11 particles (weight bins: 104)
-  Weight audit: error=5.31479e+34 pass=no
-  K4: Transferred 21 particles (weight bins: 223)
-  Weight audit: error=2.83037e+36 pass=no
-  K4: Transferred 19 particles (weight bins: 232)
-  Weight audit: error=5.31479e+34 pass=no
-  K4: Transferred 22 particles (weight bins: 296)
-  Weight audit: error=6.89352e+36 pass=no
-  K4: Transferred 30 particles (weight bins: 333)
-  Weight audit: error=1.71316e+35 pass=no
-  K4: Transferred 29 particles (weight bins: 269)
-  Weight audit: error=4.76939e+35 pass=no
-  K4: Transferred 33 particles (weight bins: 358)
-  Weight audit: error=1.71316e+35 pass=no
-  K4: Transferred 22 particles (weight bins: 196)
-  Weight audit: error=5.04068e+35 pass=no
-  K4: Transferred 21 particles (weight bins: 290)
-  Weight audit: error=5.04068e+35 pass=no
-  K4: Transferred 33 particles (weight bins: 421)
-  Weight audit: error=4.34963e+36 pass=no
-  K4: Transferred 33 particles (weight bins: 487)
-  Weight audit: error=5.04068e+35 pass=no
-  K4: Transferred 21 particles (weight bins: 252)
-  Weight audit: error=2.16201e+36 pass=no
-  K4: Transferred 18 particles (weight bins: 273)
-  Weight audit: error=2.16201e+36 pass=no
-  K4: Transferred 29 particles (weight bins: 409)
-  Weight audit: error=4.16477e+37 pass=no
-  K4: Transferred 29 particles (weight bins: 452)
-  Weight audit: error=2.16201e+36 pass=no
-  K4: Transferred 22 particles (weight bins: 357)
-  Weight audit: error=3.54723e+37 pass=no
-  K4: Transferred 22 particles (weight bins: 324)
-  Weight audit: error=3.54723e+37 pass=no
-  K4: Transferred 33 particles (weight bins: 511)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 499)
-  Weight audit: error=3.54723e+37 pass=no
-  K4: Transferred 22 particles (weight bins: 318)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 336)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 474)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 504)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 350)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 346)
-  Weight audit: error=inf pass=no
-  Iteration 100: 33 active, 0 coarse cells
-  K4: Transferred 33 particles (weight bins: 488)
-  DEBUG: Wrote 44 non-zero cells to results/debug_cells_iter_100_after_K4.csv (z range: 85 - 91 mm)
-  Weight audit: error=inf pass=no
-  Iteration 101: 44 active, 0 coarse cells
-  K4: Transferred 33 particles (weight bins: 502)
-  Weight audit: error=inf pass=no
-  K4: Transferred 28 particles (weight bins: 348)
-  Weight audit: error=inf pass=no
-  K4: Transferred 28 particles (weight bins: 349)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 534)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 500)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 350)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 352)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 496)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 520)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 320)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 320)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 528)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 496)
-  Weight audit: error=inf pass=no
-  K4: Transferred 27 particles (weight bins: 368)
-  Weight audit: error=inf pass=no
-  K4: Transferred 27 particles (weight bins: 361)
-  Weight audit: error=inf pass=no
-  K4: Transferred 38 particles (weight bins: 522)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 528)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 346)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 346)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 503)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 505)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 352)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 352)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 514)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 514)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 368)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 354)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 524)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 517)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 341)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 342)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 510)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 508)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 338)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 345)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 493)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 490)
-  Weight audit: error=inf pass=no
-  K4: Transferred 20 particles (weight bins: 311)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 318)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 444)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 423)
-  Weight audit: error=inf pass=no
-  K4: Transferred 20 particles (weight bins: 255)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 282)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 427)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 417)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 285)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 282)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 433)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 430)
-  Weight audit: error=inf pass=no
-  Iteration 150: 33 active, 0 coarse cells
-  K4: Transferred 24 particles (weight bins: 302)
-  DEBUG: Wrote 33 non-zero cells to results/debug_cells_iter_150_after_K4.csv (z range: 111 - 115 mm)
-  Weight audit: error=inf pass=no
-  Iteration 151: 33 active, 0 coarse cells
-  K4: Transferred 24 particles (weight bins: 303)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 411)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 429)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 273)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 269)
-  Weight audit: error=inf pass=no
-  K4: Transferred 31 particles (weight bins: 359)
-  Weight audit: error=inf pass=no
-  K4: Transferred 31 particles (weight bins: 369)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 266)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 285)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 423)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 429)
-  Weight audit: error=inf pass=no
-  K4: Transferred 23 particles (weight bins: 272)
-  Weight audit: error=inf pass=no
-  K4: Transferred 23 particles (weight bins: 249)
-  Weight audit: error=inf pass=no
-  K4: Transferred 34 particles (weight bins: 405)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 396)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 254)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 232)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 388)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 364)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 248)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 255)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 393)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 405)
-  Weight audit: error=inf pass=no
-  K4: Transferred 23 particles (weight bins: 253)
-  Weight audit: error=inf pass=no
-  K4: Transferred 23 particles (weight bins: 247)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 375)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 402)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 251)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 259)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 389)
-  Weight audit: error=inf pass=no
-  K4: Transferred 33 particles (weight bins: 370)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 268)
-  Weight audit: error=inf pass=no
-  K4: Transferred 20 particles (weight bins: 241)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 367)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 360)
-  Weight audit: error=inf pass=no
-  K4: Transferred 20 particles (weight bins: 230)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 246)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 407)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 389)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 271)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 278)
-  Weight audit: error=inf pass=no
-  K4: Transferred 32 particles (weight bins: 388)
-  Weight audit: error=inf pass=no
-  K4: Transferred 29 particles (weight bins: 366)
-  Weight audit: error=inf pass=no
-  K4: Transferred 19 particles (weight bins: 281)
-  Weight audit: error=inf pass=no
-  K4: Transferred 20 particles (weight bins: 256)
-  Weight audit: error=inf pass=no
-  K4: Transferred 31 particles (weight bins: 376)
-  Weight audit: error=inf pass=no
-  K4: Transferred 28 particles (weight bins: 311)
-  Weight audit: error=inf pass=no
-  K4: Transferred 21 particles (weight bins: 228)
-  Weight audit: error=inf pass=no
-  K4: Transferred 19 particles (weight bins: 226)
-  Weight audit: error=inf pass=no
-  Iteration 200: 33 active, 0 coarse cells
-  K4: Transferred 29 particles (weight bins: 308)
-  DEBUG: Wrote 44 non-zero cells to results/debug_cells_iter_200_after_K4.csv (z range: 135 - 141 mm)
-  Weight audit: error=inf pass=no
-  Iteration 201: 44 active, 0 coarse cells
-  K4: Transferred 30 particles (weight bins: 254)
-  Weight audit: error=inf pass=no
-  K4: Transferred 17 particles (weight bins: 120)
-  Weight audit: error=inf pass=no
-  K4: Transferred 11 particles (weight bins: 58)
-  Weight audit: error=inf pass=no
-  K4: Transferred 6 particles (weight bins: 130)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 8 particles (weight bins: 88)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 199)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 250: 55 active, 0 coarse cells
-  DEBUG: Wrote 55 non-zero cells to results/debug_cells_iter_250_after_K4.csv (z range: 135 - 143 mm)
-  Weight audit: error=inf pass=no
-  Iteration 251: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 300: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Iteration 301: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 350: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Iteration 351: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 194)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 400: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Iteration 401: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 450: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Iteration 451: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 500: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Iteration 501: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Iteration 550: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Iteration 551: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  Weight audit: error=inf pass=no
-  K4: Transferred 22 particles (weight bins: 193)
-  Weight audit: error=inf pass=no
-  Iteration 600: 55 active, 0 coarse cells
-  Weight audit: error=inf pass=no
-K1-K6 pipeline: completed 600 iterations
+  Iteration 1: 0 active, 14 coarse cells
+  K4: Transferred 134 particles (weight bins: 536)
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_01_after_K4.csv (z range: 1.5 - 1.5 mm)
+  DEBUG: Wrote 536 raw phase-space rows to results/debug_ps_raw_iter_01_after_K4.csv
+  K4: Transferred 196 particles (weight bins: 735)
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_02_after_K4.csv (z range: 2.5 - 2.5 mm)
+  DEBUG: Wrote 734 raw phase-space rows to results/debug_ps_raw_iter_02_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_03_after_K4.csv (z range: 3.5 - 3.5 mm)
+  DEBUG: Wrote 917 raw phase-space rows to results/debug_ps_raw_iter_03_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_04_after_K4.csv (z range: 4.5 - 4.5 mm)
+  DEBUG: Wrote 1107 raw phase-space rows to results/debug_ps_raw_iter_04_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_05_after_K4.csv (z range: 5.5 - 5.5 mm)
+  DEBUG: Wrote 1269 raw phase-space rows to results/debug_ps_raw_iter_05_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_06_after_K4.csv (z range: 6.5 - 6.5 mm)
+  DEBUG: Wrote 1408 raw phase-space rows to results/debug_ps_raw_iter_06_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_07_after_K4.csv (z range: 7.5 - 7.5 mm)
+  DEBUG: Wrote 1544 raw phase-space rows to results/debug_ps_raw_iter_07_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_08_after_K4.csv (z range: 8.5 - 8.5 mm)
+  DEBUG: Wrote 1647 raw phase-space rows to results/debug_ps_raw_iter_08_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_09_after_K4.csv (z range: 9.5 - 9.5 mm)
+  DEBUG: Wrote 1739 raw phase-space rows to results/debug_ps_raw_iter_09_after_K4.csv
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_10_after_K4.csv (z range: 10.5 - 10.5 mm)
+  DEBUG: Wrote 1839 raw phase-space rows to results/debug_ps_raw_iter_10_after_K4.csv
+  Iteration 50: 0 active, 14 coarse cells
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_50_after_K4.csv (z range: 50.5 - 50.5 mm)
+  DEBUG: Wrote 2314 raw phase-space rows to results/debug_ps_raw_iter_50_after_K4.csv
+  Iteration 100: 0 active, 14 coarse cells
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_100_after_K4.csv (z range: 100.5 - 100.5 mm)
+  DEBUG: Wrote 1840 raw phase-space rows to results/debug_ps_raw_iter_100_after_K4.csv
+  Iteration 150: 0 active, 14 coarse cells
+  DEBUG: Wrote 14 non-zero cells to results/debug_cells_iter_150_after_K4.csv (z range: 150.5 - 150.5 mm)
+  DEBUG: Wrote 1586 raw phase-space rows to results/debug_ps_raw_iter_150_after_K4.csv
+  Iteration 200: 166 active, 47 coarse cells
+  DEBUG: Wrote 85 non-zero cells to results/debug_cells_iter_200_after_K4.csv (z range: 160.5 - 166.5 mm)
+  DEBUG: Wrote 854 raw phase-space rows to results/debug_ps_raw_iter_200_after_K4.csv
+K1-K6 pipeline: completed 200 iterations
 
 === Energy Conservation Report ===
-  Energy Deposited: nan MeV
-  Nuclear Energy Deposited: nan MeV
+  Source Energy (in-grid): 150.002 MeV
+  Source Energy (outside grid): 0 MeV
+  Source Energy (slot dropped): 0 MeV
+  Source Energy (representation loss): -0.126641 MeV
+  Source Energy (total): 150.002 MeV
+  Energy Deposited: 134.398 MeV
+  Cutoff Energy Deposited: 0.00655494 MeV
+  Nuclear Energy Deposited: 17.4481 MeV
   Boundary Loss Energy: 0 MeV
-  Cutoff Weight: inf (particles below E < 0.1 MeV)
-  Total Accounted Energy: nan MeV
+  Transport Drop Energy: 0.782424 MeV
+  Transport Audit Residual Energy: -2.50661 MeV
+  Cutoff Weight: 0.726649 (particles below E < 0.1 MeV)
+  Transport Drop Weight: 0.0955988
+  Total Accounted Energy (transport only): 150.128 MeV
+  Total Accounted Energy (including source losses): 150.002 MeV
 =====================================
   Energy deposition extracted
 K1-K6 pipeline wrapper complete.
 GPU transport complete.
 Simulation complete.
-  Bragg Peak: 128 mm depth, 1.01546e+40 Gy
+  Bragg Peak: 161 mm depth, 3.60438 Gy
 
 --- Saving Results ---
-  2D dose saved to: results/test_c/dose_2d.txt
-  PDD saved to: results/test_c/pdd.txt
+  2D dose saved to: /workspaces/SM_2D/results/dose_2d.txt
+  PDD saved to: /workspaces/SM_2D/results/pdd.txt
 
 === Simulation Complete ===

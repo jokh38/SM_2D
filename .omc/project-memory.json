@@ -1,0 +1,372 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1770879298015,
+  "projectRoot": "/workspaces/SM_2D",
+  "techStack": {
+    "languages": [
+      {
+        "name": "C/C++",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "CMakeLists.txt"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "scripts",
+      "src",
+      "tests"
+    ],
+    "gitBranches": {
+      "defaultBranch": "master",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "Testing": {
+      "path": "Testing",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1770879298006,
+      "keyFiles": []
+    },
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 8,
+      "lastAccessed": 1770879298007,
+      "keyFiles": [
+        "CMakeCache.txt",
+        "CTestTestfile.cmake",
+        "Makefile",
+        "cmake_install.cmake",
+        "energy_loss_dose.csv"
+      ]
+    },
+    "dbg": {
+      "path": "dbg",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1770879298007,
+      "keyFiles": [
+        "H5_stopping_power_investigation.md",
+        "H5_summary.txt",
+        "H6_MCS_investigation_report.md",
+        "bug_discovery_report.md",
+        "debug_history.md"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 7,
+      "lastAccessed": 1770879298011,
+      "keyFiles": [
+        "SPEC.md",
+        "code-review.md",
+        "issues.md",
+        "remaining.md",
+        "root_cause_analysis.md"
+      ]
+    },
+    "results": {
+      "path": "results",
+      "purpose": null,
+      "fileCount": 7,
+      "lastAccessed": 1770879298011,
+      "keyFiles": [
+        "combined_plot.png",
+        "debug_cells_iter_01_after_K4.csv",
+        "debug_channels_totals_iter01.csv",
+        "debug_ps_raw_iter_00_initial.csv",
+        "debug_ps_raw_iter_01_after_K4.csv"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1770879298012,
+      "keyFiles": [
+        "verify_phase4.sh"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1770879298012,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 1,
+      "lastAccessed": 1770879298012,
+      "keyFiles": [
+        "CMakeLists.txt"
+      ]
+    },
+    "validation": {
+      "path": "validation",
+      "purpose": null,
+      "fileCount": 55,
+      "lastAccessed": 1770879298013,
+      "keyFiles": [
+        "150MeV.raw",
+        "DELIVERY.md",
+        "README.md",
+        "analyze_angular_divergence.py",
+        "analyze_beam_size.py"
+      ]
+    },
+    "docs/SPEC": {
+      "path": "docs/SPEC",
+      "purpose": "Test specifications",
+      "fileCount": 6,
+      "lastAccessed": 1770879298014,
+      "keyFiles": [
+        "01_assessment_2026-02-06.md",
+        "02_spec_restructure_proposal.md",
+        "03_code_improvement_roadmap.md"
+      ]
+    },
+    "src/data": {
+      "path": "src/data",
+      "purpose": "Data files",
+      "fileCount": 0,
+      "lastAccessed": 1770879298015,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/cuda/kernels/k3_finetransport.cu",
+      "accessCount": 29,
+      "lastAccessed": 1770884639421,
+      "type": "file"
+    },
+    {
+      "path": "src/cuda/device/device_physics.cuh",
+      "accessCount": 14,
+      "lastAccessed": 1770884623498,
+      "type": "file"
+    },
+    {
+      "path": "docs/val_test/session_handoff_2026-02-12-after.md",
+      "accessCount": 11,
+      "lastAccessed": 1770881193840,
+      "type": "file"
+    },
+    {
+      "path": "dbg/debug_history.md",
+      "accessCount": 11,
+      "lastAccessed": 1770884948407,
+      "type": "file"
+    },
+    {
+      "path": "docs/val_test/analyze_one_step.py",
+      "accessCount": 7,
+      "lastAccessed": 1770880107709,
+      "type": "file"
+    },
+    {
+      "path": "docs/val_test/angular_discretization_mitigation_2026-02-12.md",
+      "accessCount": 5,
+      "lastAccessed": 1770879911952,
+      "type": "file"
+    },
+    {
+      "path": "docs/val_test/session_handoff_2026-02-12.md",
+      "accessCount": 5,
+      "lastAccessed": 1770880069889,
+      "type": "file"
+    },
+    {
+      "path": "src/cuda/k1k6_pipeline.cu",
+      "accessCount": 5,
+      "lastAccessed": 1770883739019,
+      "type": "file"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "accessCount": 4,
+      "lastAccessed": 1770879870464,
+      "type": "file"
+    },
+    {
+      "path": "validation/compare_sm2d_moqui.py",
+      "accessCount": 4,
+      "lastAccessed": 1770883349921,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 4,
+      "lastAccessed": 1770883691825,
+      "type": "directory"
+    },
+    {
+      "path": "docs/val_test/check_theta_resolution_regression.py",
+      "accessCount": 3,
+      "lastAccessed": 1770880107704,
+      "type": "file"
+    },
+    {
+      "path": "validation/gpu_compare.ini",
+      "accessCount": 3,
+      "lastAccessed": 1770881234810,
+      "type": "file"
+    },
+    {
+      "path": "src/cuda",
+      "accessCount": 3,
+      "lastAccessed": 1770881447806,
+      "type": "directory"
+    },
+    {
+      "path": "src/cuda/kernels",
+      "accessCount": 3,
+      "lastAccessed": 1770883714985,
+      "type": "directory"
+    },
+    {
+      "path": "src/include/physics/highland.hpp",
+      "accessCount": 3,
+      "lastAccessed": 1770884214960,
+      "type": "directory"
+    },
+    {
+      "path": "validation/README.md",
+      "accessCount": 2,
+      "lastAccessed": 1770881198831,
+      "type": "file"
+    },
+    {
+      "path": "validation/gpu_compare_sigma38.ini",
+      "accessCount": 2,
+      "lastAccessed": 1770881234774,
+      "type": "file"
+    },
+    {
+      "path": "docs/SPEC.md",
+      "accessCount": 2,
+      "lastAccessed": 1770881246368,
+      "type": "file"
+    },
+    {
+      "path": "results/pdd.txt",
+      "accessCount": 2,
+      "lastAccessed": 1770884940903,
+      "type": "file"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "accessCount": 1,
+      "lastAccessed": 1770879678802,
+      "type": "file"
+    },
+    {
+      "path": "docs/val_test",
+      "accessCount": 1,
+      "lastAccessed": 1770879793695,
+      "type": "directory"
+    },
+    {
+      "path": "results/one_step_summary/report.md",
+      "accessCount": 1,
+      "lastAccessed": 1770879846699,
+      "type": "file"
+    },
+    {
+      "path": "docs/val_test/plan.md",
+      "accessCount": 1,
+      "lastAccessed": 1770880107650,
+      "type": "file"
+    },
+    {
+      "path": "validation/comparison_result.md",
+      "accessCount": 1,
+      "lastAccessed": 1770880118061,
+      "type": "file"
+    },
+    {
+      "path": "results/one_step_summary/metrics.csv",
+      "accessCount": 1,
+      "lastAccessed": 1770880118153,
+      "type": "file"
+    },
+    {
+      "path": "results/dose_2d.txt",
+      "accessCount": 1,
+      "lastAccessed": 1770880409501,
+      "type": "file"
+    },
+    {
+      "path": "src/cuda/device/device_lut.cuh",
+      "accessCount": 1,
+      "lastAccessed": 1770880422265,
+      "type": "file"
+    },
+    {
+      "path": "validation",
+      "accessCount": 1,
+      "lastAccessed": 1770881204511,
+      "type": "directory"
+    },
+    {
+      "path": "docs/issues.md",
+      "accessCount": 1,
+      "lastAccessed": 1770881246327,
+      "type": "file"
+    },
+    {
+      "path": "src/cuda/kernels/k2_coarsetransport.cu",
+      "accessCount": 1,
+      "lastAccessed": 1770881444528,
+      "type": "directory"
+    },
+    {
+      "path": "src/include/core",
+      "accessCount": 1,
+      "lastAccessed": 1770883695794,
+      "type": "directory"
+    },
+    {
+      "path": "src/include/core/incident_particle_config.hpp",
+      "accessCount": 1,
+      "lastAccessed": 1770883698585,
+      "type": "file"
+    },
+    {
+      "path": "src/cuda/kernels/k3_finetransport.cuh",
+      "accessCount": 1,
+      "lastAccessed": 1770883717979,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

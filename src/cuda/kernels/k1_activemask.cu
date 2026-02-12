@@ -32,8 +32,10 @@ __global__ void K1_ActiveMask(
         if (bid == EMPTY_BLOCK_ID) continue;
 
         uint32_t b_E = (bid >> 12) & 0xFFF;
-        if (b_E < static_cast<uint32_t>(b_E_fine_on)) below_fine_on = true;
-        if (b_E < static_cast<uint32_t>(b_E_fine_off)) below_fine_off = true;
+        // Use inclusive block thresholds so particles clamped at the fine
+        // handoff boundary (E_fine_on/E_fine_off) are promoted to K3.
+        if (b_E <= static_cast<uint32_t>(b_E_fine_on)) below_fine_on = true;
+        if (b_E <= static_cast<uint32_t>(b_E_fine_off)) below_fine_off = true;
 
         for (int lidx = 0; lidx < LOCAL_BINS_val; ++lidx) {
             W_cell += values[(cell * Kb + slot) * LOCAL_BINS_val + lidx];
@@ -66,8 +68,9 @@ void run_K1_ActiveMask(
             if (bid == EMPTY_BLOCK_ID) continue;
 
             uint32_t b_E = (bid >> 12) & 0xFFF;
-            if (b_E < static_cast<uint32_t>(b_E_fine_on)) below_fine_on = true;
-            if (b_E < static_cast<uint32_t>(b_E_fine_off)) below_fine_off = true;
+            // Keep CPU path consistent with CUDA path (inclusive thresholds).
+            if (b_E <= static_cast<uint32_t>(b_E_fine_on)) below_fine_on = true;
+            if (b_E <= static_cast<uint32_t>(b_E_fine_off)) below_fine_off = true;
 
             // Use LOCAL_BINS constant instead of hardcoded value
             for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {

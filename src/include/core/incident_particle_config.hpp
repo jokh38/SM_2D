@@ -193,6 +193,7 @@ struct TransportConfig {
     float preflight_vram_margin = 0.85f; // Preflight usable VRAM fraction [0,1]
     bool validation_mode = false;     // Enables validation-only runtime checks
     bool fail_fast_on_audit = false;  // Stop transport when K5 audit fails
+    bool debug_dumps = true;          // Runtime gate for debug CSV dumps (when compiled with SM2D_ENABLE_DEBUG_DUMPS)
 
     // Iteration + logging
     int max_iterations = 0;           // 0 => use grid.max_steps
