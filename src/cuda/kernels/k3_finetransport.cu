@@ -56,9 +56,12 @@ namespace {
     constexpr unsigned THETA_SEED_A = 2654435761u;
     constexpr unsigned THETA_SEED_B = 2246822519u;
     constexpr unsigned THETA_SEED_C = 3266489917u;
-    // Fraction of pre-step C carried into per-step spreading to compensate for
-    // unresolved lateral variance in discretized sub-cell transport.
-    constexpr float UNRESOLVED_C_FRACTION = 0.04f;
+    // Depth-scaled carry-over of unresolved accumulated variance.
+    // This compensates quantization loss more strongly at mid/deep depth
+    // without applying the full accumulated C at every step.
+    constexpr float UNRESOLVED_C_BASE_FRACTION = 0.04f;
+    constexpr float UNRESOLVED_C_DEPTH_SLOPE = 0.003f;   // per mm
+    constexpr float UNRESOLVED_C_MAX_FRACTION = 0.35f;
 }
 
 // Debug counters for output-slot allocation failures (K3).
@@ -71,6 +74,12 @@ __device__ double g_k3_bucket_drop_energy = 0.0;
 __device__ unsigned long long g_k3_pruned_weight_count = 0;
 __device__ double g_k3_pruned_weight_sum = 0.0;
 __device__ double g_k3_pruned_energy_sum = 0.0;
+
+// Initial beam energy for total accumulated scattering (fix for energy-dependent scattering)
+// For 150 MeV protons, scattering should be computed at initial beam energy,
+// not current energy (which decreases due to energy loss).
+// Using lower energy overestimates scattering, causing too-wide beams.
+constexpr float E_MEAN_150MEV = 150.0f;  // Initial beam energy for this validation
 
 // ============================================================================
 // P1 FIX: Full GPU Kernel Implementation
@@ -102,7 +111,10 @@ __global__ void K3_FineTransport(
     bool enable_nuclear,      // Enable nuclear interactions
     // FIX C: Initial beam width for lateral spreading (from input config)
     float sigma_x_initial,
-    // NOTE: Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
+    // Precomputed Fermi-Eyges moments per depth (for z^3 lateral spreading)
+    const float* __restrict__ d_FE_moment_A,  // [Nz] angular variance
+    const float* __restrict__ d_FE_moment_B,  // [Nz] position-angle covariance
+    const float* __restrict__ d_FE_sigma_total,  // [Nz] total lateral sigma
     // Outputs
     double* __restrict__ EdepC,
     float* __restrict__ AbsorbedWeight_cutoff,
@@ -292,39 +304,55 @@ __global__ void K3_FineTransport(
             // This is deterministic and reproducible, not Monte Carlo.
             // ========================================================================
 
-            // Fermi-Eyges step evolution:
-            // reconstruct a depth-dependent moment state at the component position,
-            // evolve one step using scattering power, and use accumulated C for spread.
+            // ====================================================================
+            // FERMI-EYGES MOMENTS: Precomputed A(z), B(z) for z^3 lateral spread
+            // ====================================================================
+            // Previous approach (BROKEN): Applied total accumulated sigma as a
+            // convolution kernel at every step. Since sigma_total ~= sigma_initial,
+            // this acted as a constant box filter giving depth-independent spread.
+            //
+            // New approach (CORRECT): Use precomputed moments A(iz), B(iz) that
+            // encode the accumulated scattering history including energy degradation.
+            // delta_C per step = 2*B*ds + A*ds^2 + T*ds^3/3
+            // The B and A terms encode the "lever arm" effect: scattering acquired
+            // early in the path causes larger lateral displacement because the
+            // particle has more remaining path to drift. This gives z^3 scaling.
+            // ====================================================================
             int iz = cell / Nx;
-            float path_start_mm =
-                fmaxf(0.0f, static_cast<float>(iz) * dz + (z_cell + 0.5f * dz));
             float step_mm = fmaxf(actual_range_step, 0.0f);
 
-            float sigma_theta_start = 0.0f;
-            if (path_start_mm > 0.0f) {
-                sigma_theta_start = device_highland_sigma(E, path_start_mm);
-            }
+            // Read precomputed moments at current depth
+            float A_precomp = (d_FE_moment_A != nullptr && iz >= 0 && iz < Nz) ? d_FE_moment_A[iz] : 0.0f;
+            float B_precomp = (d_FE_moment_B != nullptr && iz >= 0 && iz < Nz) ? d_FE_moment_B[iz] : 0.0f;
 
-            float A_old = sigma_theta_start * sigma_theta_start;
-            float B_old = 0.5f * A_old * path_start_mm;
-            float C_old = sigma_x_initial * sigma_x_initial +
-                          (A_old * path_start_mm * path_start_mm) / 3.0f;
-
+            // Current step scattering power
             float E_mid = fmaxf(E - 0.5f * dE, dlut.E_min);
             float T_step = device_scattering_power_T(E_mid, step_mm);
 
-            float A_new = A_old;
-            float B_new = B_old;
-            float C_new = C_old;
-            device_fermi_eyges_step(A_new, B_new, C_new, T_step, step_mm);
-            (void)B_new;
+            // Per-step angular spread (for theta sampling)
+            float sigma_theta_step = sqrtf(fmaxf(T_step * step_mm, 0.0f));
 
-            float sigma_theta_step = sqrtf(fmaxf(A_new - A_old, 0.0f));
-            float delta_C = fmaxf(C_new - C_old, 0.0f);
-            float C_effective = delta_C + UNRESOLVED_C_FRACTION * C_old;
-            float sigma_x = fmaxf(device_accumulated_sigma_x(C_effective), 0.01f);
+            // INCREMENTAL spatial variance for this step (Fermi-Eyges with lever arm)
+            // delta_C = 2*B*ds + A*ds^2 + T*ds^3/3
+            // - 2*B*ds: existing angular-position covariance propagates into position variance
+            // - A*ds^2: existing angular variance causes additional displacement
+            // - T*ds^3/3: new scattering in this step
+            float delta_C = 2.0f * B_precomp * step_mm
+                          + A_precomp * step_mm * step_mm
+                          + T_step * step_mm * step_mm * step_mm / 3.0f;
+            delta_C = fmaxf(delta_C, 0.0f);
 
-            unsigned path_seed = static_cast<unsigned>(fminf(path_start_mm * 1000.0f, 4294967295.0f));
+            // sigma_x for per-step lateral emission (incremental spread only)
+            float sigma_x = fmaxf(sqrtf(delta_C), 0.01f);
+
+            // POST-PROCESSING APPROACH: Disable in-transport lateral spreading.
+            // MCS lateral spread will be applied as a single post-processing
+            // convolution on EdepC after transport completes. This avoids the
+            // double-counting problem where applying total sigma at every step
+            // re-shapes the beam to constant width.
+            float sigma_x_transport = 0.001f;  // Near-zero: kernel -> delta function
+
+            unsigned path_seed = static_cast<unsigned>(fminf(static_cast<float>(iz) * dz * 1000.0f, 4294967295.0f));
             unsigned theta_seed =
                 (static_cast<unsigned>(cell + 1) * THETA_SEED_A) ^
                 (static_cast<unsigned>(slot + 1) * THETA_SEED_B) ^
@@ -394,7 +422,7 @@ __global__ void K3_FineTransport(
                                 E_new,
                                 w_new,
                                 x_new,
-                                sigma_x,
+                                sigma_x_transport,
                                 dx,
                                 Nx,
                                 Nz,
@@ -561,7 +589,7 @@ __global__ void K3_FineTransport(
                         float weights[N_x_sub];
                         float x_center = x_new;  // Center of Gaussian within cell
 
-                        device_gaussian_spread_weights_subcell(weights, x_center, sigma_x, dx, N_x_sub);
+                        device_gaussian_spread_weights_subcell(weights, x_center, sigma_x_transport, dx, N_x_sub);
 
                         // Get cell coordinates
                         int ix = cell % Nx;

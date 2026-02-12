@@ -414,6 +414,9 @@ protected:
                 enable_straggling,
                 enable_nuclear,
                 sigma_x_initial,
+                nullptr,  // d_FE_moment_A (no precomputed moments in test)
+                nullptr,  // d_FE_moment_B
+                nullptr,  // d_FE_sigma_total
                 d_EdepC,
                 d_AbsorbedWeight_cutoff,
                 d_AbsorbedEnergy_cutoff,

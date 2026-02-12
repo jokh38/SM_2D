@@ -7,6 +7,9 @@
 #include "kernels/k6_swap.cuh"
 #include "device/device_lut.cuh"
 #include "device/device_bucket.cuh"
+#include "physics/highland.hpp"
+#include "physics/step_control.hpp"
+#include "lut/r_lut.hpp"
 #include "device/device_psic.cuh"
 #include "core/local_bins.hpp"  // For decode_local_idx_4d
 #include <cuda_runtime.h>
@@ -187,6 +190,104 @@ void dump_nonzero_cells_to_csv(
         std::cout << z_min << " - " << z_max << " mm)";
     }
     std::cout << std::endl;
+}
+
+void dump_phase_space_raw_to_csv(
+    const DevicePsiC& psi,
+    int Nx, int Nz, float dx, float dz,
+    int iteration,
+    const char* stage_name,
+    const float* theta_edges,
+    const float* E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
+) {
+    const int N_cells = Nx * Nz;
+    const size_t total_slots = static_cast<size_t>(N_cells) * static_cast<size_t>(psi.Kb);
+    const size_t total_values = total_slots * static_cast<size_t>(LOCAL_BINS);
+
+    std::vector<float> h_all_values(total_values, 0.0f);
+    std::vector<uint32_t> h_all_block_ids(total_slots, DEVICE_EMPTY_SLOT);
+    cudaMemcpy(h_all_values.data(), psi.value, total_values * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_all_block_ids.data(), psi.block_id, total_slots * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+
+    char filename[256];
+    snprintf(filename, sizeof(filename), "results/debug_ps_raw_iter_%02d_%s.csv", iteration, stage_name);
+    std::ofstream ofs(filename);
+    if (!ofs.is_open()) {
+        std::cerr << "Failed to open " << filename << " for writing" << std::endl;
+        return;
+    }
+
+    ofs << "iter,cell,ix,iz,slot,bid,lidx,weight,"
+        << "b_theta,b_E,theta_local,E_local,x_sub,z_sub,"
+        << "theta_bin,E_bin,theta_rep,E_rep,x_offset_mm,z_offset_mm\n";
+    ofs << std::fixed << std::setprecision(8);
+
+    size_t nonzero_rows = 0;
+    for (int cell = 0; cell < N_cells; ++cell) {
+        const int ix = cell % Nx;
+        const int iz = cell / Nx;
+
+        for (int slot = 0; slot < psi.Kb; ++slot) {
+            const uint32_t bid = h_all_block_ids[static_cast<size_t>(cell) * psi.Kb + slot];
+            if (bid == DEVICE_EMPTY_SLOT) {
+                continue;
+            }
+
+            const int b_theta = static_cast<int>(bid & 0xFFF);
+            const int b_E = static_cast<int>((bid >> 12) & 0xFFF);
+
+            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
+                const size_t idx = (static_cast<size_t>(cell) * psi.Kb + slot) * LOCAL_BINS + lidx;
+                const float w = h_all_values[idx];
+                if (w <= 1e-12f) {
+                    continue;
+                }
+
+                int theta_local, E_local, x_sub, z_sub;
+                decode_local_idx_4d(static_cast<uint16_t>(lidx), theta_local, E_local, x_sub, z_sub);
+
+                int theta_bin = b_theta * N_theta_local + theta_local;
+                int E_bin = b_E * N_E_local + E_local;
+                theta_bin = std::max(0, std::min(theta_bin, N_theta - 1));
+                E_bin = std::max(0, std::min(E_bin, N_E - 1));
+
+                const float theta_rep = theta_edges[theta_bin] +
+                    0.5f * (theta_edges[theta_bin + 1] - theta_edges[theta_bin]);
+                const float E_rep = E_edges[E_bin] +
+                    0.5f * (E_edges[E_bin + 1] - E_edges[E_bin]);
+                const float x_offset = get_x_offset_from_bin(x_sub, dx);
+                const float z_offset = get_z_offset_from_bin(z_sub, dz);
+
+                ofs << iteration << ","
+                    << cell << ","
+                    << ix << ","
+                    << iz << ","
+                    << slot << ","
+                    << bid << ","
+                    << lidx << ","
+                    << w << ","
+                    << b_theta << ","
+                    << b_E << ","
+                    << theta_local << ","
+                    << E_local << ","
+                    << x_sub << ","
+                    << z_sub << ","
+                    << theta_bin << ","
+                    << E_bin << ","
+                    << theta_rep << ","
+                    << E_rep << ","
+                    << x_offset << ","
+                    << z_offset << "\n";
+                ++nonzero_rows;
+            }
+        }
+    }
+
+    ofs.close();
+    std::cout << "  DEBUG: Wrote " << nonzero_rows
+              << " raw phase-space rows to " << filename << std::endl;
 }
 #endif
 
@@ -805,6 +906,14 @@ bool K1K6PipelineState::allocate(int Nx, int Nz) {
     e = cudaMalloc(&d_prev_BoundaryLoss_energy, N_cells * sizeof(double));
     if (e != cudaSuccess) { std::cerr << "Failed d_prev_BoundaryLoss_energy: " << cudaGetErrorString(e) << std::endl; return false; }
 
+    // Allocate Fermi-Eyges moment arrays (per depth row)
+    e = cudaMalloc(&d_FE_moment_A, Nz * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_FE_moment_A: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_FE_moment_B, Nz * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_FE_moment_B: " << cudaGetErrorString(e) << std::endl; return false; }
+    e = cudaMalloc(&d_FE_sigma_total, Nz * sizeof(float));
+    if (e != cudaSuccess) { std::cerr << "Failed d_FE_sigma_total: " << cudaGetErrorString(e) << std::endl; return false; }
+
     // Allocate compact bucket-base map (batch-local buckets are allocated on-demand).
     e = cudaMalloc(&d_CellToBucketBase, N_cells * sizeof(int));
     if (e != cudaSuccess) { std::cerr << "Failed d_CellToBucketBase: " << cudaGetErrorString(e) << std::endl; return false; }
@@ -844,6 +953,9 @@ void K1K6PipelineState::cleanup() {
     if (d_prev_EdepC) cudaFree(d_prev_EdepC);
     if (d_prev_AbsorbedEnergy_nuclear) cudaFree(d_prev_AbsorbedEnergy_nuclear);
     if (d_prev_BoundaryLoss_energy) cudaFree(d_prev_BoundaryLoss_energy);
+    if (d_FE_sigma_total) cudaFree(d_FE_sigma_total);
+    if (d_FE_moment_A) cudaFree(d_FE_moment_A);
+    if (d_FE_moment_B) cudaFree(d_FE_moment_B);
     if (d_BucketScratch) cudaFree(d_BucketScratch);
     if (d_CellToBucketBase) cudaFree(d_CellToBucketBase);
     if (d_theta_edges) cudaFree(d_theta_edges);
@@ -872,6 +984,9 @@ void K1K6PipelineState::cleanup() {
     d_prev_EdepC = nullptr;
     d_prev_AbsorbedEnergy_nuclear = nullptr;
     d_prev_BoundaryLoss_energy = nullptr;
+    d_FE_sigma_total = nullptr;
+    d_FE_moment_A = nullptr;
+    d_FE_moment_B = nullptr;
     d_BucketScratch = nullptr;
     bucket_scratch_capacity_cells = 0;
     d_CellToBucketBase = nullptr;
@@ -930,6 +1045,170 @@ bool init_pipeline_state(
         std::cerr << "Failed copy d_E_edges: " << cudaGetErrorString(e) << std::endl;
         state.cleanup();
         return false;
+    }
+
+    // ====================================================================
+    // Precompute Fermi-Eyges moments A(z), B(z) using energy degradation
+    // ====================================================================
+    // These moments encode the accumulated scattering history at each depth.
+    // A(z) = integral_0^z T(z') dz'       (angular variance)
+    // B(z) = integral_0^z A(z') dz'        (position-angle covariance)
+    // where T = Highland_sigma^2 / ds is the scattering power.
+    //
+    // The key insight: delta_C per step = 2*B*ds + A*ds^2 + T*ds^3/3
+    // includes the lever-arm effect through B and A, giving z^3 scaling.
+    // ====================================================================
+    if (config.E0_MeV > 0.0f) {
+        const int Nz = config.Nz;
+        const float dz = config.dz;
+        std::vector<float> h_A(Nz, 0.0f);
+        std::vector<float> h_B(Nz, 0.0f);
+
+        // Generate a temporary LUT for the precomputation
+        RLUT precomp_lut = GenerateRLUT(0.1f, 300.0f, 256);
+
+        float E_current = config.E0_MeV;
+        float A_acc = 0.0f;
+        float B_acc = 0.0f;
+
+        for (int iz = 0; iz < Nz; ++iz) {
+            h_A[iz] = A_acc;
+            h_B[iz] = B_acc;
+
+            if (E_current <= 0.5f) break;  // Below meaningful transport energy
+
+            // Energy at mid-step for scattering power
+            float dE = compute_energy_deposition(precomp_lut, E_current, dz);
+            dE = std::min(dE, E_current - 0.1f);
+            float E_mid = E_current - 0.5f * dE;
+            if (E_mid < 0.5f) E_mid = 0.5f;
+
+            // Scattering power T = sigma_theta^2 / ds
+            float sigma_theta = highland_sigma(E_mid, dz);
+            float T = sigma_theta * sigma_theta / dz;
+
+            // Update moments (order matters: B uses old A)
+            float A_old = A_acc;
+            A_acc = A_old + T * dz;
+            B_acc = B_acc + A_old * dz + 0.5f * T * dz * dz;
+
+            // Update energy for next step
+            E_current -= dE;
+            if (E_current < 0.1f) E_current = 0.1f;
+        }
+
+        // Log precomputed values at key depths
+        if (config.log_level >= 1) {
+            std::cout << "  Fermi-Eyges precomputed moments (E0=" << config.E0_MeV << " MeV):" << std::endl;
+            int depths[] = {0, 10, 50, 100, 150};
+            for (int d : depths) {
+                int iz = static_cast<int>(d / dz);
+                if (iz >= 0 && iz < Nz) {
+                    float delta_C = 2.0f * h_B[iz] * dz + h_A[iz] * dz * dz
+                                  + (h_A[iz] > 0 ? h_A[iz] / (iz > 0 ? iz : 1) : 0.0f) * dz * dz * dz / 3.0f;
+                    float sigma_step = sqrtf(std::max(0.0f, delta_C));
+                    float sigma_total = sqrtf(config.sigma_x_initial * config.sigma_x_initial
+                                            + h_A[iz] * (iz * dz) * (iz * dz) / 3.0f);
+                    std::cout << "    z=" << d << "mm: A=" << h_A[iz] << " rad^2, B=" << h_B[iz]
+                              << " rad*mm, sigma_step=" << sigma_step << " mm"
+                              << ", sigma_total_approx=" << sigma_total << " mm" << std::endl;
+                }
+            }
+        }
+
+        // Compute C_total and sigma_total at each depth
+        std::vector<float> h_sigma_total(Nz, config.sigma_x_initial);
+        float C_acc = config.sigma_x_initial * config.sigma_x_initial;
+        {
+            float E_tmp = config.E0_MeV;
+            float A_tmp = 0.0f, B_tmp = 0.0f;
+            for (int iz = 0; iz < Nz; ++iz) {
+                h_sigma_total[iz] = sqrtf(std::max(0.0f, C_acc));
+                if (E_tmp <= 0.5f) {
+                    // Fill remaining with last value
+                    for (int jz = iz+1; jz < Nz; ++jz)
+                        h_sigma_total[jz] = h_sigma_total[iz];
+                    break;
+                }
+                float dE_tmp = compute_energy_deposition(precomp_lut, E_tmp, dz);
+                dE_tmp = std::min(dE_tmp, E_tmp - 0.1f);
+                float E_mid_tmp = std::max(0.5f, E_tmp - 0.5f * dE_tmp);
+                float sigma_th = highland_sigma(E_mid_tmp, dz);
+                float T_tmp = sigma_th * sigma_th / dz;
+                float delta_C_tmp = 2.0f * B_tmp * dz + A_tmp * dz * dz + T_tmp * dz * dz * dz / 3.0f;
+                C_acc += delta_C_tmp;
+                A_tmp += T_tmp * dz;
+                B_tmp += A_tmp * dz - 0.5f * T_tmp * dz * dz; // B_old*ds + A_old*ds (not A_new)
+                // Actually: B_new = B_old + A_old*ds + 0.5*T*ds^2
+                // But A_tmp was already updated, so use (A_tmp - T_tmp*dz) for A_old
+                // Recompute correctly:
+                E_tmp -= dE_tmp;
+                if (E_tmp < 0.1f) E_tmp = 0.1f;
+            }
+        }
+        // Re-compute B properly (separate pass for correctness)
+        {
+            float E_tmp = config.E0_MeV;
+            float A_tmp = 0.0f, B_tmp = 0.0f;
+            C_acc = config.sigma_x_initial * config.sigma_x_initial;
+            for (int iz = 0; iz < Nz; ++iz) {
+                h_sigma_total[iz] = sqrtf(std::max(0.0f, C_acc));
+                if (E_tmp <= 0.5f) {
+                    for (int jz = iz+1; jz < Nz; ++jz)
+                        h_sigma_total[jz] = h_sigma_total[iz];
+                    break;
+                }
+                float dE_tmp = compute_energy_deposition(precomp_lut, E_tmp, dz);
+                dE_tmp = std::min(dE_tmp, E_tmp - 0.1f);
+                float E_mid_tmp = std::max(0.5f, E_tmp - 0.5f * dE_tmp);
+                float sigma_th = highland_sigma(E_mid_tmp, dz);
+                float T_tmp = sigma_th * sigma_th / dz;
+                // Correct ordering: delta_C uses old A, B
+                float delta_C_tmp = 2.0f * B_tmp * dz + A_tmp * dz * dz + T_tmp * dz * dz * dz / 3.0f;
+                C_acc += delta_C_tmp;
+                // Update A and B (order: B uses old A)
+                float A_old = A_tmp;
+                A_tmp = A_old + T_tmp * dz;
+                B_tmp = B_tmp + A_old * dz + 0.5f * T_tmp * dz * dz;
+                E_tmp -= dE_tmp;
+                if (E_tmp < 0.1f) E_tmp = 0.1f;
+            }
+        }
+
+        if (config.log_level >= 1) {
+            std::cout << "  Fermi-Eyges sigma_total at key depths:" << std::endl;
+            int depths[] = {0, 10, 50, 100, 150};
+            for (int d : depths) {
+                int iz = static_cast<int>(d / dz);
+                if (iz >= 0 && iz < Nz)
+                    std::cout << "    z=" << d << "mm: sigma_total=" << h_sigma_total[iz] << " mm" << std::endl;
+            }
+        }
+
+        // Upload to GPU
+        e = cudaMemcpy(state.d_FE_sigma_total, h_sigma_total.data(), Nz * sizeof(float), cudaMemcpyHostToDevice);
+        if (e != cudaSuccess) {
+            std::cerr << "Failed copy d_FE_sigma_total: " << cudaGetErrorString(e) << std::endl;
+            state.cleanup();
+            return false;
+        }
+        e = cudaMemcpy(state.d_FE_moment_A, h_A.data(), Nz * sizeof(float), cudaMemcpyHostToDevice);
+        if (e != cudaSuccess) {
+            std::cerr << "Failed copy d_FE_moment_A: " << cudaGetErrorString(e) << std::endl;
+            state.cleanup();
+            return false;
+        }
+        e = cudaMemcpy(state.d_FE_moment_B, h_B.data(), Nz * sizeof(float), cudaMemcpyHostToDevice);
+        if (e != cudaSuccess) {
+            std::cerr << "Failed copy d_FE_moment_B: " << cudaGetErrorString(e) << std::endl;
+            state.cleanup();
+            return false;
+        }
+    } else {
+        // No beam energy set - zero moments (fallback)
+        cudaMemset(state.d_FE_moment_A, 0, config.Nz * sizeof(float));
+        cudaMemset(state.d_FE_moment_B, 0, config.Nz * sizeof(float));
+        cudaMemset(state.d_FE_sigma_total, 0, config.Nz * sizeof(float));
     }
 
     return true;
@@ -1106,6 +1385,9 @@ bool run_k3_fine_transport(
         true,   // enable_straggling (full physics)
         true,   // enable_nuclear (full physics)
         config.sigma_x_initial,  // FIX C: Pass initial beam width
+        state.d_FE_moment_A,     // Precomputed Fermi-Eyges A(z)
+        state.d_FE_moment_B,     // Precomputed Fermi-Eyges B(z)
+        state.d_FE_sigma_total,  // Precomputed total sigma(z)
         state.d_EdepC,
         state.d_AbsorbedWeight_cutoff,
         state.d_AbsorbedEnergy_cutoff,
@@ -1271,30 +1553,32 @@ bool run_k1k6_pipeline_transport(
     const bool verbose_logging = (config.log_level >= 2);
     const bool debug_dumps_enabled =
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
-        true;
+        config.debug_dumps_enabled;
     #else
         false;
     #endif
 
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
-    // DEBUG: Print fine-threshold block mapping
-    std::cout << "=== Fine Threshold Configuration ===" << std::endl;
-    std::cout << "E_fine_on = " << config.E_fine_on << " MeV" << std::endl;
-    std::cout << "E_fine_off = " << config.E_fine_off << " MeV" << std::endl;
-    std::cout << "E_bin for E_fine_on = " << e_grid.FindBin(config.E_fine_on) << std::endl;
-    std::cout << "E_bin for E_fine_off = " << e_grid.FindBin(config.E_fine_off) << std::endl;
-    std::cout << "N_E_local = " << config.N_E_local << std::endl;
-    std::cout << "b_E_fine_on = " << b_E_fine_on << std::endl;
-    std::cout << "b_E_fine_off = " << b_E_fine_off << std::endl;
+    if (debug_dumps_enabled) {
+        // DEBUG: Print fine-threshold block mapping
+        std::cout << "=== Fine Threshold Configuration ===" << std::endl;
+        std::cout << "E_fine_on = " << config.E_fine_on << " MeV" << std::endl;
+        std::cout << "E_fine_off = " << config.E_fine_off << " MeV" << std::endl;
+        std::cout << "E_bin for E_fine_on = " << e_grid.FindBin(config.E_fine_on) << std::endl;
+        std::cout << "E_bin for E_fine_off = " << e_grid.FindBin(config.E_fine_off) << std::endl;
+        std::cout << "N_E_local = " << config.N_E_local << std::endl;
+        std::cout << "b_E_fine_on = " << b_E_fine_on << std::endl;
+        std::cout << "b_E_fine_off = " << b_E_fine_off << std::endl;
 
-    // Sample b_E for 150 MeV
-    int E_bin_150 = e_grid.FindBin(150.0f);
-    int b_E_150 = E_bin_150 / config.N_E_local;
-    std::cout << "=== 150 MeV Particle ===" << std::endl;
-    std::cout << "E_bin_150 = " << E_bin_150 << std::endl;
-    std::cout << "b_E_150 = " << b_E_150 << std::endl;
-    std::cout << "Condition: b_E_150 < b_E_fine_on → " << b_E_150 << " < " << b_E_fine_on << " = " << (b_E_150 < b_E_fine_on ? "TRUE (K3 active)" : "FALSE (K2 coarse)") << std::endl;
-    std::cout << "==============================" << std::endl;
+        // Sample b_E for 150 MeV
+        int E_bin_150 = e_grid.FindBin(150.0f);
+        int b_E_150 = E_bin_150 / config.N_E_local;
+        std::cout << "=== 150 MeV Particle ===" << std::endl;
+        std::cout << "E_bin_150 = " << E_bin_150 << std::endl;
+        std::cout << "b_E_150 = " << b_E_150 << std::endl;
+        std::cout << "Condition: b_E_150 < b_E_fine_on → " << b_E_150 << " < " << b_E_fine_on << " = " << (b_E_150 < b_E_fine_on ? "TRUE (K3 active)" : "FALSE (K2 coarse)") << std::endl;
+        std::cout << "==============================" << std::endl;
+    }
     #endif
 
     if (config.max_iterations <= 0) {
@@ -1642,12 +1926,18 @@ bool run_k1k6_pipeline_transport(
         // DEBUG: Dump non-zero cells after K4 for selected iterations
         // --------------------------------------------------------------------
         #if defined(SM2D_ENABLE_DEBUG_DUMPS)
-        if (iter <= 10 || iter == 50 || iter == 100 || iter == 150 || iter == 200 || iter == 250) {
+        if (debug_dumps_enabled &&
+            (iter <= 10 || iter == 50 || iter == 100 || iter == 150 || iter == 200 || iter == 250)) {
             dump_nonzero_cells_to_csv(*psi_out, config.Nx, config.Nz, config.dx, config.dz,
                                        iter, "after_K4",
                                        a_grid.edges.data(), e_grid.edges.data(),
                                        config.N_theta, config.N_E,
                                        config.N_theta_local, config.N_E_local);
+            dump_phase_space_raw_to_csv(*psi_out, config.Nx, config.Nz, config.dx, config.dz,
+                                        iter, "after_K4",
+                                        a_grid.edges.data(), e_grid.edges.data(),
+                                        config.N_theta, config.N_E,
+                                        config.N_theta_local, config.N_E_local);
         }
         #endif
 
@@ -1769,10 +2059,14 @@ bool run_k1k6_pipeline_transport(
     }
 
     // Boundary loss energy
+    std::vector<float> h_BoundaryLoss_weight(total_cells);
+    cudaMemcpy(h_BoundaryLoss_weight.data(), state.d_BoundaryLoss_weight, total_cells * sizeof(float), cudaMemcpyDeviceToHost);
     std::vector<double> h_BoundaryLoss_energy(total_cells);
     cudaMemcpy(h_BoundaryLoss_energy.data(), state.d_BoundaryLoss_energy, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
+    double total_boundary_loss_weight = 0.0;
     double total_boundary_loss_energy = 0.0;
     for (int i = 0; i < total_cells; ++i) {
+        total_boundary_loss_weight += h_BoundaryLoss_weight[i];
         total_boundary_loss_energy += h_BoundaryLoss_energy[i];
     }
 
@@ -1791,6 +2085,12 @@ bool run_k1k6_pipeline_transport(
     }
 
     // Nuclear energy (from inelastic nuclear interactions)
+    std::vector<float> h_AbsorbedWeight_nuclear(total_cells);
+    cudaMemcpy(h_AbsorbedWeight_nuclear.data(), state.d_AbsorbedWeight_nuclear, total_cells * sizeof(float), cudaMemcpyDeviceToHost);
+    double total_nuclear_weight = 0.0;
+    for (int i = 0; i < total_cells; ++i) {
+        total_nuclear_weight += h_AbsorbedWeight_nuclear[i];
+    }
     std::vector<double> h_AbsorbedEnergy_nuclear(total_cells);
     cudaMemcpy(h_AbsorbedEnergy_nuclear.data(), state.d_AbsorbedEnergy_nuclear, total_cells * sizeof(double), cudaMemcpyDeviceToHost);
     double total_nuclear_energy = 0.0;
@@ -1799,6 +2099,9 @@ bool run_k1k6_pipeline_transport(
     }
 
     const double source_injected_energy = state.source_injected_energy;
+    const double source_injected_weight = state.source_injected_weight;
+    const double source_out_of_grid_weight = state.source_out_of_grid_weight;
+    const double source_slot_dropped_weight = state.source_slot_dropped_weight;
     const double source_out_of_grid_energy = state.source_out_of_grid_energy;
     const double source_slot_dropped_energy = state.source_slot_dropped_energy;
     const double source_representation_loss_energy = state.source_representation_loss_energy;
@@ -1818,6 +2121,48 @@ bool run_k1k6_pipeline_transport(
         source_out_of_grid_energy +
         source_slot_dropped_energy +
         source_representation_loss_energy;
+
+    #if defined(SM2D_ENABLE_DEBUG_DUMPS)
+    if (debug_dumps_enabled) {
+        std::ofstream totals("results/debug_channels_totals_iter01.csv");
+        if (totals.is_open()) {
+            totals << "iter,channel,value\n";
+            totals << "0,EdepC,0\n";
+            totals << "0,AbsorbedWeight_cutoff,0\n";
+            totals << "0,AbsorbedEnergy_cutoff,0\n";
+            totals << "0,AbsorbedWeight_nuclear,0\n";
+            totals << "0,AbsorbedEnergy_nuclear,0\n";
+            totals << "0,BoundaryLoss_weight,0\n";
+            totals << "0,BoundaryLoss_energy,0\n";
+            totals << "0,transport_dropped_weight,0\n";
+            totals << "0,transport_dropped_energy,0\n";
+            totals << "0,transport_audit_residual_energy,0\n";
+            totals << "1,EdepC," << total_edep << "\n";
+            totals << "1,AbsorbedWeight_cutoff," << total_cutoff_weight << "\n";
+            totals << "1,AbsorbedEnergy_cutoff," << total_cutoff_energy << "\n";
+            totals << "1,AbsorbedWeight_nuclear," << total_nuclear_weight << "\n";
+            totals << "1,AbsorbedEnergy_nuclear," << total_nuclear_energy << "\n";
+            totals << "1,BoundaryLoss_weight," << total_boundary_loss_weight << "\n";
+            totals << "1,BoundaryLoss_energy," << total_boundary_loss_energy << "\n";
+            totals << "1,transport_dropped_weight," << transport_drop_weight << "\n";
+            totals << "1,transport_dropped_energy," << transport_drop_energy << "\n";
+            totals << "1,transport_audit_residual_energy," << transport_audit_residual_energy << "\n";
+            totals << "1,source_injected_weight," << source_injected_weight << "\n";
+            totals << "1,source_out_of_grid_weight," << source_out_of_grid_weight << "\n";
+            totals << "1,source_slot_dropped_weight," << source_slot_dropped_weight << "\n";
+            totals << "1,source_injected_energy," << source_injected_energy << "\n";
+            totals << "1,source_out_of_grid_energy," << source_out_of_grid_energy << "\n";
+            totals << "1,source_slot_dropped_energy," << source_slot_dropped_energy << "\n";
+            totals << "1,source_representation_loss_energy," << source_representation_loss_energy << "\n";
+        }
+    }
+    #else
+    (void)total_boundary_loss_weight;
+    (void)total_nuclear_weight;
+    (void)source_injected_weight;
+    (void)source_out_of_grid_weight;
+    (void)source_slot_dropped_weight;
+    #endif
 
     std::cout << "\n=== Energy Conservation Report ===" << std::endl;
     std::cout << "  Source Energy (in-grid): " << source_injected_energy << " MeV" << std::endl;

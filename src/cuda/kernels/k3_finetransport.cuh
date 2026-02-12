@@ -54,6 +54,10 @@ __global__ void K3_FineTransport(
     bool enable_nuclear,      // Enable nuclear interactions
     // FIX C: Initial beam width for lateral spreading (from input config)
     float sigma_x_initial,
+    // Precomputed Fermi-Eyges moments per depth (for z^3 lateral spreading)
+    const float* __restrict__ d_FE_moment_A,  // [Nz] angular variance
+    const float* __restrict__ d_FE_moment_B,  // [Nz] position-angle covariance
+    const float* __restrict__ d_FE_sigma_total,  // [Nz] total lateral sigma
     // Lateral spreading is ALWAYS enabled (deterministic, not Monte Carlo)
     // Outputs
     double* __restrict__ EdepC,

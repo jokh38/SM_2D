@@ -16,81 +16,107 @@
 namespace sm_2d {
 
 // ============================================================================
-// Optional debug dump: non-zero cell information to CSV (initial state)
+// Optional debug dump: raw phase-space rows to CSV (initial state)
 // ============================================================================
 #if defined(SM2D_ENABLE_DEBUG_DUMPS)
 static void dump_initial_cells_to_csv(
     const DevicePsiC& psi,
-    int Nx, int Nz, float dx, float dz
+    int Nx, int Nz, float dx, float dz,
+    const float* d_theta_edges,
+    const float* d_E_edges,
+    int N_theta, int N_E,
+    int N_theta_local, int N_E_local
 ) {
     int N_cells = Nx * Nz;
-    size_t total_values = N_cells * psi.Kb * LOCAL_BINS;
+    const size_t total_slots = static_cast<size_t>(N_cells) * static_cast<size_t>(psi.Kb);
+    const size_t total_values = total_slots * static_cast<size_t>(LOCAL_BINS);
 
-    // Copy all values from device
-    std::vector<float> h_all_values(total_values);
-    std::vector<uint32_t> h_all_block_ids(N_cells * psi.Kb);
+    std::vector<float> h_all_values(total_values, 0.0f);
+    std::vector<uint32_t> h_all_block_ids(total_slots, DEVICE_EMPTY_SLOT);
+    std::vector<float> h_theta_edges(static_cast<size_t>(N_theta + 1), 0.0f);
+    std::vector<float> h_E_edges(static_cast<size_t>(N_E + 1), 0.0f);
 
     cudaMemcpy(h_all_values.data(), psi.value, total_values * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_all_block_ids.data(), psi.block_id, N_cells * psi.Kb * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_all_block_ids.data(), psi.block_id, total_slots * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_theta_edges.data(), d_theta_edges, static_cast<size_t>(N_theta + 1) * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_E_edges.data(), d_E_edges, static_cast<size_t>(N_E + 1) * sizeof(float), cudaMemcpyDeviceToHost);
 
-    // Collect non-zero cells
-    struct CellInfo {
-        int cell;
-        int ix;
-        int iz;
-        float x_center;
-        float z_center;
-        float total_weight;
-    };
-    std::vector<CellInfo> nonzero_cells;
-
-    for (int cell = 0; cell < N_cells; ++cell) {
-        float cell_weight = 0.0f;
-
-        for (int slot = 0; slot < psi.Kb; ++slot) {
-            uint32_t bid = h_all_block_ids[cell * psi.Kb + slot];
-            if (bid == 0xFFFFFFFF) continue;
-
-            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
-                size_t idx = (cell * psi.Kb + slot) * LOCAL_BINS + lidx;
-                float w = h_all_values[idx];
-                if (w > 1e-12f) {
-                    cell_weight += w;
-                }
-            }
-        }
-
-        if (cell_weight > 1e-12f) {
-            int ix = cell % Nx;
-            int iz = cell / Nx;
-            float x_center = (ix + 0.5f) * dx;
-            float z_center = (iz + 0.5f) * dz;
-
-            nonzero_cells.push_back({cell, ix, iz, x_center, z_center, cell_weight});
-        }
-    }
-
-    // Write CSV
-    std::ofstream ofs("results/debug_cells_iter_00_initial.csv");
+    std::ofstream ofs("results/debug_ps_raw_iter_00_initial.csv");
     if (!ofs.is_open()) {
-        std::cerr << "Failed to open debug_cells_iter_00_initial.csv for writing" << std::endl;
+        std::cerr << "Failed to open results/debug_ps_raw_iter_00_initial.csv for writing" << std::endl;
         return;
     }
 
-    ofs << "cell,ix,iz,x_mm,z_mm,total_weight\n";
+    ofs << "iter,cell,ix,iz,slot,bid,lidx,weight,"
+        << "b_theta,b_E,theta_local,E_local,x_sub,z_sub,"
+        << "theta_bin,E_bin,theta_rep,E_rep,x_offset_mm,z_offset_mm\n";
     ofs << std::fixed << std::setprecision(6);
 
-    for (const auto& info : nonzero_cells) {
-        ofs << info.cell << ","
-            << info.ix << ","
-            << info.iz << ","
-            << info.x_center << ","
-            << info.z_center << ","
-            << info.total_weight << "\n";
+    size_t nonzero_rows = 0;
+    for (int cell = 0; cell < N_cells; ++cell) {
+        int ix = cell % Nx;
+        int iz = cell / Nx;
+
+        for (int slot = 0; slot < psi.Kb; ++slot) {
+            uint32_t bid = h_all_block_ids[static_cast<size_t>(cell) * psi.Kb + slot];
+            if (bid == DEVICE_EMPTY_SLOT) {
+                continue;
+            }
+
+            int b_theta = static_cast<int>(bid & 0xFFF);
+            int b_E = static_cast<int>((bid >> 12) & 0xFFF);
+
+            for (int lidx = 0; lidx < LOCAL_BINS; ++lidx) {
+                size_t idx = (static_cast<size_t>(cell) * psi.Kb + slot) * LOCAL_BINS + lidx;
+                float w = h_all_values[idx];
+                if (w <= 1e-12f) {
+                    continue;
+                }
+
+                int theta_local, E_local, x_sub, z_sub;
+                decode_local_idx_4d(static_cast<uint16_t>(lidx), theta_local, E_local, x_sub, z_sub);
+
+                int theta_bin = b_theta * N_theta_local + theta_local;
+                int E_bin = b_E * N_E_local + E_local;
+                theta_bin = std::max(0, std::min(theta_bin, N_theta - 1));
+                E_bin = std::max(0, std::min(E_bin, N_E - 1));
+
+                float theta_rep = h_theta_edges[theta_bin] +
+                    0.5f * (h_theta_edges[theta_bin + 1] - h_theta_edges[theta_bin]);
+                float E_rep = h_E_edges[E_bin] +
+                    0.5f * (h_E_edges[E_bin + 1] - h_E_edges[E_bin]);
+
+                float x_offset = get_x_offset_from_bin(x_sub, dx);
+                float z_offset = get_z_offset_from_bin(z_sub, dz);
+
+                ofs << 0 << ","                  // iter
+                    << cell << ","
+                    << ix << ","
+                    << iz << ","
+                    << slot << ","
+                    << bid << ","
+                    << lidx << ","
+                    << w << ","
+                    << b_theta << ","
+                    << b_E << ","
+                    << theta_local << ","
+                    << E_local << ","
+                    << x_sub << ","
+                    << z_sub << ","
+                    << theta_bin << ","
+                    << E_bin << ","
+                    << theta_rep << ","
+                    << E_rep << ","
+                    << x_offset << ","
+                    << z_offset << "\n";
+                ++nonzero_rows;
+            }
+        }
     }
 
     ofs.close();
-    std::cout << "  DEBUG: Wrote " << nonzero_cells.size() << " initial non-zero cells to debug_cells_iter_00_initial.csv" << std::endl;
+    std::cout << "  DEBUG: Wrote " << nonzero_rows
+              << " raw phase-space rows to results/debug_ps_raw_iter_00_initial.csv" << std::endl;
 }
 #endif
 
@@ -196,7 +222,7 @@ bool run_k1k6_pipeline_transport(
     const bool verbose_logging = transport.log_level >= 2;
     const bool debug_dumps_enabled =
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
-        true;
+        transport.debug_dumps;
     #else
         false;
     #endif
@@ -234,6 +260,7 @@ bool run_k1k6_pipeline_transport(
     config.max_iterations = transport.max_iterations;
     config.log_level = transport.log_level;
     config.fail_fast_on_audit = transport.fail_fast_on_audit || transport.validation_mode;
+    config.debug_dumps_enabled = debug_dumps_enabled;
 
     // Phase-space dimensions
     config.N_theta = N_theta;
@@ -244,6 +271,9 @@ bool run_k1k6_pipeline_transport(
     // FIX C: Set initial beam width from input parameter
     // This is passed to K2 and K3 kernels for lateral spreading calculation
     config.sigma_x_initial = sigma_x;
+
+    // Set initial beam energy for Fermi-Eyges moment precomputation
+    config.E0_MeV = E0;
 
     // ========================================================================
     // STEP 1: Allocate Device PsiC Buffers
@@ -470,8 +500,17 @@ bool run_k1k6_pipeline_transport(
     }
 
     #if defined(SM2D_ENABLE_DEBUG_DUMPS)
-    // DEBUG: Dump initial cell state
-    dump_initial_cells_to_csv(psi_in, Nx, Nz, dx, dz);
+    if (debug_dumps_enabled) {
+        // DEBUG: Dump initial cell state
+        dump_initial_cells_to_csv(
+            psi_in,
+            Nx, Nz, dx, dz,
+            state.d_theta_edges,
+            state.d_E_edges,
+            N_theta, N_E,
+            N_theta_local, N_E_local
+        );
+    }
     #endif
 
     // ========================================================================
@@ -493,6 +532,88 @@ bool run_k1k6_pipeline_transport(
     // Copy energy deposition from device to host
     std::vector<double> h_EdepC(Nx * Nz);
     cudaMemcpy(h_EdepC.data(), state.d_EdepC, Nx * Nz * sizeof(double), cudaMemcpyDeviceToHost);
+
+    // ========================================================================
+    // STEP 5b: Post-processing MCS lateral spread convolution
+    // ========================================================================
+    // During transport, lateral spreading was intentionally disabled to avoid
+    // the double-counting problem (applying total sigma at every z-step
+    // re-shapes the beam to constant width instead of growing with depth).
+    //
+    // Instead, we apply the MCS lateral spread as a SINGLE post-processing
+    // convolution on each depth row of EdepC:
+    //   sigma_MCS(z) = sqrt(sigma_total(z)^2 - sigma_initial^2)
+    // where sigma_total comes from Fermi-Eyges theory (precomputed).
+    //
+    // Result: sigma_measured(z) = sqrt(sigma_source^2 + sigma_MCS(z)^2)
+    //       = sigma_total(z)  -- correct depth-dependent lateral spread
+    // ========================================================================
+    if (state.d_FE_sigma_total != nullptr) {
+        std::vector<float> h_sigma_total(Nz);
+        cudaMemcpy(h_sigma_total.data(), state.d_FE_sigma_total,
+                   Nz * sizeof(float), cudaMemcpyDeviceToHost);
+
+        float sigma_init = sigma_x;  // Initial beam width [mm]
+        float sigma_init_sq = sigma_init * sigma_init;
+        std::vector<double> row_buf(Nx);
+
+        int rows_convolved = 0;
+        for (int iz = 0; iz < Nz; ++iz) {
+            float sigma_total_z = h_sigma_total[iz];
+            float sigma_mcs_sq = sigma_total_z * sigma_total_z - sigma_init_sq;
+            if (sigma_mcs_sq <= 1e-6f) continue;  // No MCS spread at this depth
+
+            float sigma_mcs = std::sqrt(sigma_mcs_sq);
+            float sigma_cells = sigma_mcs / dx;  // Convert to cell units
+
+            // Build Gaussian kernel (truncated at +-3 sigma)
+            int half_k = static_cast<int>(std::ceil(3.0f * sigma_cells));
+            half_k = std::max(1, std::min(half_k, Nx / 2));
+            int kernel_size = 2 * half_k + 1;
+            std::vector<double> kernel(kernel_size);
+            double kernel_sum = 0.0;
+            for (int k = -half_k; k <= half_k; ++k) {
+                double val = std::exp(-0.5 * (static_cast<double>(k) * k) /
+                                      (static_cast<double>(sigma_cells) * sigma_cells));
+                kernel[k + half_k] = val;
+                kernel_sum += val;
+            }
+            for (auto& v : kernel) v /= kernel_sum;  // Normalize
+
+            // Copy row to buffer
+            for (int ix = 0; ix < Nx; ++ix) {
+                row_buf[ix] = h_EdepC[iz * Nx + ix];
+            }
+
+            // 1D convolution (zero-padding at boundaries)
+            for (int ix = 0; ix < Nx; ++ix) {
+                double conv = 0.0;
+                for (int k = -half_k; k <= half_k; ++k) {
+                    int jx = ix + k;
+                    if (jx >= 0 && jx < Nx) {
+                        conv += row_buf[jx] * kernel[k + half_k];
+                    }
+                }
+                h_EdepC[iz * Nx + ix] = conv;
+            }
+            ++rows_convolved;
+        }
+
+        if (summary_logging) {
+            std::cout << "  Applied MCS lateral spread convolution to "
+                      << rows_convolved << " / " << Nz << " depth rows" << std::endl;
+            // Log a few representative values
+            for (int iz_sample : {0, Nz/4, Nz/2, 3*Nz/4, Nz-1}) {
+                if (iz_sample < Nz) {
+                    float st = h_sigma_total[iz_sample];
+                    float sm_sq = st * st - sigma_init_sq;
+                    float sm = (sm_sq > 0.0f) ? std::sqrt(sm_sq) : 0.0f;
+                    std::cout << "    z=" << iz_sample * dz << "mm: sigma_total="
+                              << st << " sigma_MCS=" << sm << " mm" << std::endl;
+                }
+            }
+        }
+    }
 
     // Convert to 2D output format
     for (int iz = 0; iz < Nz; ++iz) {

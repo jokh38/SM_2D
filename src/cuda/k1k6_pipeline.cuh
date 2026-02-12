@@ -49,6 +49,9 @@ struct K1K6PipelineConfig {
     // FIX C: Initial beam width for lateral spreading
     float sigma_x_initial;     // Initial beam width [mm] (from sim.ini sigma_x_mm)
 
+    // Initial beam energy for Fermi-Eyges precomputation
+    float E0_MeV;              // Initial beam energy [MeV]
+
     // Grid dimensions
     int Nx, Nz;                // Spatial grid
     float dx, dz;              // Cell sizes [mm]
@@ -62,6 +65,7 @@ struct K1K6PipelineConfig {
     int max_iterations;        // Maximum transport iterations
     int log_level;             // 0: quiet, 1: summary, 2: verbose
     bool fail_fast_on_audit = false;   // Stop immediately when K5 W/E pass flags fail
+    bool debug_dumps_enabled = true;   // Runtime gate for heavy debug dumps (compile-time guard still applies)
 };
 
 // ============================================================================
@@ -210,6 +214,13 @@ struct K1K6PipelineState {
     // Per-iteration K5 signed energy residual accumulated across transport.
     double transport_audit_residual_energy;
 
+    // Precomputed Fermi-Eyges moments per depth row (for correct z^3 lateral spreading)
+    // A[iz] = accumulated angular variance at depth iz*dz [rad^2]
+    // B[iz] = accumulated position-angle covariance at depth iz*dz [rad*mm]
+    float* d_FE_moment_A;      // [Nz] - precomputed on CPU
+    float* d_FE_moment_B;      // [Nz] - precomputed on CPU
+    float* d_FE_sigma_total;   // [Nz] - sqrt(C_total) total lateral sigma at each depth
+
     // Device memory ownership
     bool owns_device_memory;
 
@@ -242,6 +253,7 @@ struct K1K6PipelineState {
         , source_representation_loss_energy(0.0)
         , transport_dropped_weight(0.0), transport_dropped_energy(0.0)
         , transport_audit_residual_energy(0.0)
+        , d_FE_moment_A(nullptr), d_FE_moment_B(nullptr), d_FE_sigma_total(nullptr)
         , owns_device_memory(false)
     {}
 
