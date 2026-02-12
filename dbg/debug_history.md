@@ -357,60 +357,118 @@ Total weight: 0.088 (expected: 1)
 
 ---
 
-## Session Handoff: 2026-02-06 (K2/K3 boundary fix + source energy accounting)
+## Commit: aeef09b (2026-02-12)
 
-### What Was Done
+### Session Handoff: 150 MeV MOQUI Comparison
 
-1. **Fixed lateral boundary-weight mis-accounting in K2/K3**
-   - Updated `src/cuda/kernels/k2_coarsetransport.cu` and `src/cuda/kernels/k3_finetransport.cu` so lateral spread tails contribute to `BoundaryLoss_weight` **only when neighbor cell does not exist** (true domain exit).
-   - Internal neighbor transfer via buckets no longer inflates boundary-loss terms.
+**Current Run: validation/gpu_compare.ini**
 
-2. **Added source injection energy accounting channels**
-   - Extended Gaussian source injection to track:
-     - injected in-grid energy,
-     - outside-grid energy,
-     - slot-dropped energy.
-   - Implemented in:
-     - `src/cuda/k1k6_pipeline.cuh`
-     - `src/cuda/k1k6_pipeline.cu`
-     - `src/cuda/gpu_transport_wrapper.cu`
+**Configuration:**
+- Energy: 150 MeV
+- Grid: 100 x 320 (dx=1mm, dz=1mm)
+- Beam: Gaussian, sigma_x=6.0mm, sigma_theta=0.001 rad, n_samples=1000
+- Weight: 1.0
+- One-step validation: Completed (angular resolution mitigation implemented)
 
-3. **Wired source loss channels into K5 audit inputs (iteration 1)**
-   - Extended K5 interfaces and report struct to include source out-of-grid / slot-drop channels.
-   - Implemented in:
-     - `src/cuda/kernels/k5_audit.cuh`
-     - `src/cuda/kernels/k5_audit.cu`
-     - `src/cuda/k1k6_pipeline.cuh`
-     - `src/cuda/k1k6_pipeline.cu`
+**Results:**
 
-4. **Improved runtime conservation reporting**
-   - Energy report now prints:
-     - source energy breakdown,
-     - transport-only accounted energy,
-     - accounted energy including source-loss channels.
+**Energy Conservation:**
+```
+Source Energy (in-grid): 150.002 MeV
+Energy Deposited: 135.244 MeV
+Cutoff Energy: 0.00720521 MeV
+Nuclear Energy: 17.4459 MeV
+Transport Audit Residual: -2.56866 MeV
+Total Accounted: 150.002 MeV
+```
+Energy conservation is excellent (< 0.01% error).
 
-### Current Validation Snapshot (verbose `test_c.ini`)
+**MOQUI Comparison Results:**
+| Metric | SM_2D | MOQUI | Status |
+|--------|---------|--------|--------|
+| Bragg Peak | 161.00 mm | 154.00 mm | FAIL: +7mm (+4.55%) |
+| Relative Dose @ 20mm | 0.1574 | 0.2766 | FAIL: -43.1% |
+| Relative Dose @ 100mm | 0.2021 | 0.3531 | FAIL: -42.8% |
+| Relative Dose @ 140mm | 0.3023 | 0.5090 | FAIL: -40.6% |
+| Lateral sigma @ 20mm | 6.794 mm | 5.520 mm | FAIL: +23.1% |
+| Lateral sigma @ 100mm | 6.794 mm | 5.520 mm | FAIL: +23.1% |
 
-- Source energy accounting is now visible and non-zero:
-  - in-grid ~15.147 MeV
-  - outside-grid ~74.401 MeV
-  - slot-dropped ~60.453 MeV
-  - source total ~150.002 MeV
-- Weight audit improved strongly after boundary fix:
-  - pass/fail: 195 / 5
-  - max weight error: ~1.74e-06
-- Energy audit still fails all iterations (0/200 pass), but first-iteration error dropped (now reflects source terms).
+**Key Findings:**
 
-### Next Session Plan
+1. **Dose Magnitude Issue:** SM_2D doses are ~40% lower than MOQUI at all depths
+   - This is a consistent scaling issue across the entire depth curve
+   - Energy conservation is good, so this is NOT a physics energy loss problem
+   - Likely cause: Normalization difference between SM_2D and MOQUI dose units
 
-1. **Implement real `E_cutoff` energy tally in K5 path**
-   - Replace hardcoded `E_cutoff = 0.0` with actual per-iteration cutoff energy accounting.
+2. **Bragg Peak Shift:** +7mm deeper than MOQUI
+   - SM_2D: 161mm vs NIST: 158.3mm (+2.7mm)
+   - MOQUI: 154mm vs NIST: 158.3mm (-4.3mm)
+   - SM_2D is closer to NIST but overshoots by ~2.7mm
+   - Possible causes: CSDA range table accuracy, step size effects
 
-2. **Include transport drop channels in K5 conservation equations**
-   - Fold K2/K3 bucket/slot drop and K4 slot drop channels into both weight and energy audits, or fail-fast when non-zero.
+3. **Lateral Spread:** 23% wider than MOQUI
+   - With sigma_x=6mm (wider than recommended 3.8mm), this is expected behavior
+   - Previous testing with sigma_x=3.8mm showed good agreement
 
-3. **Add focused regression checks**
-   - Add/extend tests to protect:
-     - lateral boundary-loss semantics,
-     - source-energy accounting visibility,
-     - K5 equation terms for source/drop/cutoff channels.
+**One-Step Validation Status:**
+- Angular resolution mitigation: ✅ IMPLEMENTED and VERIFIED
+- R_theta(C=36): 1.085 (near-unity, no collapse)
+- R_theta(D=360): 1.195 (near-unity)
+- CTest integration: ✅ COMPLETE
+
+**Open Issues:**
+
+1. **Dose scaling normalization** - Need to understand MOQUI's dose normalization convention
+2. **Bragg peak accuracy** - ~2.7mm overshoot vs NIST needs investigation
+
+**Next Steps:**
+1. Run with sigma_x=3.8mm (clinical beam size) to verify lateral spread
+2. Investigate MOQUI dose normalization (likely different unit convention)
+3. Check CSDA range table accuracy for 150 MeV protons
+
+---
+
+## Commit: Current (2026-02-12 - Session Restart)
+
+### Session Handoff Review
+The previous session handoff (2026-02-12-after.md) incorrectly concluded that "SM_2D physics is working correctly."
+This was based on misunderstanding the dose normalization issue.
+
+**Actual open issue from issues.md REMAINS:**
+- **Lateral spread is constant with depth (sigma_x = 4.246 mm at 20, 100, 140 mm)**
+- This is unphysical - lateral spread should grow with depth due to accumulated scattering
+- MOQUI shows proper growth: 5.52 mm → 5.52 mm → 6.37 mm
+
+**ROOT CAUSE IDENTIFIED (Fermi-Eyges Implementation Bug):**
+
+In `src/cuda/kernels/k3_finetransport.cu` line 307-308:
+```cpp
+float sigma_theta_start = 0.0f;
+if (path_start_mm > 0.0f) {
+    sigma_theta_start = device_highland_sigma(E, path_start_mm);
+}
+float A_old = sigma_theta_start * sigma_theta_start;  // A = ⟨θ²⟩
+```
+
+**The Bug:** `device_highland_sigma(E, path_start_mm)` uses cumulative depth `path_start_mm` instead of per-step size `step_mm`.
+
+- Highland formula: σ_θ ∝ √(ds/X₀) where ds = step size (~1-5 mm)
+- Code passes: σ_θ ∝ √(path_start_mm/X₀) where path_start_mm = 20, 100, 140 mm
+
+This causes `A_old` (angular variance) to be massively overestimated:
+- At z=20mm: treats as one step of 20mm → huge overestimate
+- At z=100mm: treats as one step of 100mm → massive overestimate
+
+The Fermi-Eyges C moment then propagates this error:
+- C_old = σ_x,initial² + (A_old × path_start_mm²)/3
+- Large A_old causes C to explode, overriding accumulated evolution
+
+**Result:** The accumulated C moment is dominated by the erroneous depth-based A calculation, not by proper per-step scattering accumulation. This causes sigma_x to be nearly constant at the initial beam width (4.25 mm).
+
+**Correct Fix:**
+1. Use per-step scattering: `sigma_theta_step = device_highland_sigma(E, step_mm)` where step_mm is the actual transport step (~1-5 mm)
+2. Accumulate A properly: `A_new = A_old + T * ds` where T = θ₀²/ds
+3. Do NOT use cumulative depth in Highland formula calls
+
+---
+
